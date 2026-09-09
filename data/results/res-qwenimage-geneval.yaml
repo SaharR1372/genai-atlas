@@ -1,0 +1,13 @@
+id: res-qwenimage-geneval
+type: result
+paper: qwen-image-2025
+benchmark: geneval
+value: 0.87
+setting: Qwen-Image base model
+source: Table 3
+guidance: null
+budget: null
+params: 20B MMDiT + Qwen2.5-VL 7B encoder
+nfe: null
+self_reported_baseline: false
+caveat: null

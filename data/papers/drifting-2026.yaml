@@ -1,0 +1,42 @@
+id: drifting-2026
+type: paper
+title: Generative Modeling via Drifting
+short: Drifting Models
+arxiv: '2602.04770'
+date: 2026-02
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- MIT
+authors:
+- Mingyang Deng
+- He Li
+- Tianhong Li
+- Yilun Du
+- Kaiming He
+tier: landmark
+sections:
+- generation
+axes:
+  objective:
+  - drifting
+lines:
+- line-one-step-objectives
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-09'
+  verified_by: opus
+summary: Learns a generator mapping directly, rather than a score or an instantaneous velocity to be integrated
+  at sampling time. Training evolves the mapping's pushforward distribution along a drifting field until
+  it matches the data distribution, an equilibrium condition. The result is natively one-step at inference
+  — not a distilled multi-step model — and reports 1.54 one-step FID on ImageNet 256 in latent space,
+  1.61 in pixel space.
+explanation: null

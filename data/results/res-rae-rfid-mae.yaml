@@ -1,0 +1,14 @@
+id: res-rae-rfid-mae
+type: result
+paper: rae-2025
+benchmark: imagenet256-rfid
+value: 0.16
+setting: RAE with frozen MAE-B encoder
+source: Table 1
+guidance: null
+budget: null
+params: null
+nfe: null
+self_reported_baseline: false
+caveat: MAE-B gives RAE's best reconstruction but not its best generation — a compact illustration that
+  rFID does not predict gFID.

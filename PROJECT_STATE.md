@@ -1,11 +1,28 @@
 # PROJECT_STATE
 
-Last updated: 2026-09-09 (session 2, Sonnet 5) — Sprint 1 (P1) complete.
+Last updated: 2026-09-09 (session 3, Opus 5) — P2 in progress: restructured around research lines.
 
 ## Current phase
 
-**P1 (Sprint 1) complete → P2 not started.**
-Phases are defined in `docs/blueprint.md` section 10; Sprint 1's exact scope was section 11.
+**P2 in progress.** The atlas was restructured around **research lines** after user review found the
+axis-first structure thin and the coverage incomplete. Pushed to
+https://github.com/SaharR1372/genai-atlas (branch `main`).
+
+### User review (session 3) and what was done about it
+1. *Coverage not current* → added 44 papers spanning 2025-26 top venues, all arXiv-verified.
+2. *Missing research directions* → the user was right. **Drifting Models (2602.04770)** was missed
+   entirely; the atlas had only its downstream RAE distillation application. Also missing: the
+   whole natively-few-step family (MeanFlow, Shortcut, IMM), the normalizing-flow revival
+   (STARFlow), and **VAE/representation hybrids** (DecQ, LV-RAE, FlatDINO, PAE) — the user
+   specifically asked "no one mix RAE and VAE together?" and the answer is at least five papers do.
+3. *No performance comparison* → built `/compare` with 46 sourced results and the confounds recorded
+   as first-class schema fields (guidance method, budget, params, caveat).
+4. *Missing sections* → added `/compare`, `/problems`, `/timeline`. Topic sections (editing,
+   unified, VFM, VLM, medical) still only partially covered — see next tasks.
+5. *Deep dives only for RAE* → every line now has an arc page (precursor → origin → evidence →
+   improvement → scaling → limitation) at `/lines/[id]`.
+6. *Representation tab thin* → replaced as primary navigation by `/lines`.
+7. *Writing style* → rewritten in plain declarative prose throughout.
 
 ## Completed work
 
@@ -146,7 +163,22 @@ Sonnet.
   `LegacyContentConfigError` on Astro 7. Already fixed; noted here so a future session doesn't
   "fix" it back.
 
-## Exact next tasks (start of P2)
+## Exact next tasks (continuing P2)
+
+1. **Line deep-dive MDX.** Every line has a structured arc but `explains` is null for all 15. Write
+   the long-form narrative for at least: representation-latent, latent-hybrid, one-step-objectives,
+   pixel-space. Fable/Opus work per D007.
+2. **Topic sections still thin**: editing has 7 papers and one line but no section page; unified has
+   6 papers and one line; VFM/VLM/medical have nothing. The user explicitly asked for these.
+3. **Full-PDF reads** still not done for any paper (`explanation` null on all 74). Landmark/core
+   first: drifting-2026, rae-2025, meanflow-2025, jit-2025, scale-rae-2026.
+4. **Second transition narrative** (diffusion → flow matching) still unwritten.
+5. **Closed systems** (Nano Banana / Gemini 3 Pro Image, GPT-Image) have no arXiv paper and are not
+   yet in the atlas as watchlist pointer nodes with non-arXiv sources.
+6. **GenEval 2 finding** (up to 17.7% drift from human judgment) should propagate a warning onto
+   every GenEval number in `/compare` — currently only stated in the benchmark's own notes.
+
+## Superseded next tasks (from session 2)
 
 Per `docs/blueprint.md` section 10, P2 is: **RAE section complete** — problem→idea→method→evidence→
 limitation→next chain written out for the RAE spine, 20 verified entries with full explanations

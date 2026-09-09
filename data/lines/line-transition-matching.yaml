@@ -1,0 +1,27 @@
+id: line-transition-matching
+type: line
+name: Transition matching
+one_line: Model generation as discrete-time Markov transitions over a continuous state, unifying flow
+  matching and continuous-token autoregression.
+core_bet: Flow matching and autoregression are not rival paradigms but two settings of one transition-kernel
+  formulation.
+primary_axis: objective
+status: emerging
+since: 2025-06
+sections:
+- generation
+arc:
+- paper: transition-matching-2025
+  role: origin
+  note: Formulates the unification and reports a fully causal variant matching or beating flow-based methods
+    on text-to-image.
+strengths:
+- Offers a single formalism where the field currently has two separate camps
+- From the group that introduced flow matching, so the theoretical framing is credible
+weaknesses:
+- One paper deep; no independent replication yet
+- Unclear whether the unification yields practical gains or mainly conceptual clarity
+competes_with:
+- line-flow-matching
+- line-continuous-tokens
+explains: null

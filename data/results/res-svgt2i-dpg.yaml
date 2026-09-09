@@ -1,0 +1,13 @@
+id: res-svgt2i-dpg
+type: result
+paper: svg-t2i-2025
+benchmark: dpg-bench
+value: 85.78
+setting: SVG-T2I 2.6B
+source: Table 6
+guidance: null
+budget: null
+params: 2.6B
+nfe: null
+self_reported_baseline: false
+caveat: null

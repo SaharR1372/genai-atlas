@@ -1,0 +1,14 @@
+id: res-sd3-geneval
+type: result
+paper: sd3-2024
+benchmark: geneval
+value: 0.74
+setting: SD3 8B (depth 38) at 1024px, with DPO
+source: Table 5
+guidance: null
+budget: null
+params: 8B + 4.7B T5-XXL
+nfe: null
+self_reported_baseline: false
+caveat: SD3's own paper reports neither DPG-Bench nor MJHQ-30K; any such number attributed to SD3 is a
+  third-party re-measurement.

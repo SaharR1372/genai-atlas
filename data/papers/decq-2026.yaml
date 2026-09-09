@@ -1,0 +1,42 @@
+id: decq-2026
+type: paper
+title: 'DecQ: Detail-Condensing Queries for Enhanced Reconstruction and Generation in Representation Autoencoders'
+short: DecQ
+arxiv: '2605.22777'
+date: 2026-05
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- Shanghai Innovation Institute
+- Fudan University
+authors:
+- Tianhang Wang
+- Yitong Chen
+- Wei Song
+tier: strong-followup
+sections:
+- rae
+axes:
+  representation:
+  - hybrid-semantic-detail
+lines:
+- line-latent-hybrid
+problems:
+- semantic-latent-detail-loss
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-09'
+  verified_by: opus
+summary: 'Attacks RAE''s core weakness without giving up its frozen encoder: lightweight detail-condensing
+  queries pull fine-grained information out of *shallower* foundation-model layers and feed it to the
+  decoder alongside the semantic tokens. Reported to lift reconstruction PSNR from 19.13 to 22.76 dB while
+  improving generation, which is the have-it-both-ways result the pure-RAE recipe could not reach.'
+explanation: null

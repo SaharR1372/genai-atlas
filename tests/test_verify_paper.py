@@ -20,8 +20,9 @@ optimized for reconstruction alone.</summary>
 
 
 class _FakeResponse:
-    def __init__(self, text):
+    def __init__(self, text, status_code=200):
         self.text = text
+        self.status_code = status_code
 
     def raise_for_status(self):
         pass
@@ -32,6 +33,7 @@ def test_fetch_arxiv_parses_atom_feed(verify_paper_mod, monkeypatch):
         assert params["id_list"] == "2510.11690"
         return _FakeResponse(SAMPLE_ATOM)
 
+    monkeypatch.setattr(verify_paper_mod, "ARXIV_MIN_INTERVAL", 0)
     monkeypatch.setattr(verify_paper_mod.requests, "get", fake_get)
     result = verify_paper_mod.fetch_arxiv("2510.11690")
 
@@ -51,6 +53,7 @@ def test_fetch_arxiv_raises_on_error_entry(verify_paper_mod, monkeypatch):
     def fake_get(url, params=None, timeout=None):
         return _FakeResponse(error_feed)
 
+    monkeypatch.setattr(verify_paper_mod, "ARXIV_MIN_INTERVAL", 0)
     monkeypatch.setattr(verify_paper_mod.requests, "get", fake_get)
     try:
         verify_paper_mod.fetch_arxiv("0000.00000")
@@ -74,6 +77,7 @@ def test_verify_one_writes_status_fields(verify_paper_mod, tmp_path, monkeypatch
         "summary: placeholder\n"
     )
     monkeypatch.setattr(verify_paper_mod, "PAPERS_DIR", papers_dir)
+    monkeypatch.setattr(verify_paper_mod, "ARXIV_MIN_INTERVAL", 0)
 
     def fake_get(url, params=None, timeout=None):
         return _FakeResponse(SAMPLE_ATOM)

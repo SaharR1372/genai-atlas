@@ -1,0 +1,40 @@
+id: qwen-image-2025
+type: paper
+title: Qwen-Image Technical Report
+short: Qwen-Image
+arxiv: '2508.02324'
+date: 2025-08
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- Alibaba (Qwen)
+authors:
+- Chenfei Wu
+- Jiahao Li
+- Jingren Zhou
+tier: core
+sections:
+- generation
+axes:
+  architecture:
+  - mmdit
+  conditioning:
+  - vlm-text-encoder
+lines:
+- line-vae-latent
+links:
+  code: https://github.com/QwenLM/Qwen-Image
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: released
+  weights: none
+  verified: true
+  verified_on: '2026-09-09'
+  verified_by: opus
+summary: A 20B MM-DiT whose distinguishing contribution is a data pipeline built for complex text rendering,
+  an area every prior open system was visibly weak at. Uses a vision-language model as the text encoder
+  rather than CLIP or T5, and became the base most 2025-26 open editing and RL work builds on.
+explanation: null

@@ -1,0 +1,13 @@
+id: res-lumina2-geneval
+type: result
+paper: lumina2-2025
+benchmark: geneval
+value: 0.73
+setting: Lumina-Image 2.0
+source: Table 4
+guidance: null
+budget: null
+params: 2.6B
+nfe: null
+self_reported_baseline: false
+caveat: null

@@ -1,0 +1,12 @@
+id: vlm-text-encoder
+type: concept
+name: Vision-language model as text encoder
+axis: conditioning
+one_line: Condition on prompt embeddings from a multimodal VLM rather than CLIP or T5, so the conditioning
+  signal already carries visual grounding and instruction understanding.
+sections:
+- generation
+- editing
+introduced_by:
+- qwen-image-2025
+explains: null

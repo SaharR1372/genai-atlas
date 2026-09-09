@@ -1,0 +1,41 @@
+id: reg-2025
+type: paper
+title: 'Representation Entanglement for Generation: Training Diffusion Transformers Is Much Easier Than
+  You Think'
+short: REG
+arxiv: '2507.01467'
+date: 2025-07
+venue:
+  name: NeurIPS
+  status: conference
+orgs:
+- CUHK MMLab
+authors:
+- Ge Wu
+- Shen Zhang
+- Ruijing Shi
+tier: core
+sections:
+- rae
+- generation
+axes:
+  training-signal:
+  - representation-alignment
+lines:
+- line-aligned-vae-latent
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-09'
+  verified_by: opus
+summary: 'Sharpens REPA''s idea: rather than aligning hidden states to a frozen encoder as an auxiliary
+  loss, it entangles a high-level semantic token directly into the denoising target alongside the low-level
+  latents. A NeurIPS 2025 oral, and evidence that what the generator is asked to predict matters as much
+  as what space it predicts in.'
+explanation: null

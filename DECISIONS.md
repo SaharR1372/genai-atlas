@@ -59,3 +59,25 @@ Format: id · date · decision · why · consequences. Revise by adding a new en
   template-tiering rule. *Why:* a single hardcoded page would leave every other paper link (from the
   transition page, the graph, the homepage) pointing at a 404; the dynamic route was barely more code
   and is what the blueprint's tiering rule was already describing.
+- **D015 · 2026-09-09 · Research lines, not design axes, are the primary organizing unit.**
+  Supersedes D001's Layer-B framing for navigation purposes. A `line` is a family of work sharing one
+  core design bet, with a status (dominant/ascendant/contested/emerging/superseded), an ordered `arc`
+  (precursor → origin → evidence → improvement → scaling → hybrid → challenge), explicit strengths and
+  weaknesses, and the open problems it fails to solve. Axes remain as the *question* each line answers
+  and as cross-cutting metadata; they are no longer the top-level map. *Why:* user review found the
+  axis-first structure thin and hard to navigate, and correctly noted that what a reader wants is
+  "which approaches exist, how do they differ, which is winning". Line ids are namespaced `line-*`
+  because ids are globally unique and several lines share a name with an axis option.
+- **D016 · 2026-09-09 · Benchmark confounds are schema fields, not prose.** `result` entities carry
+  `guidance`, `budget`, `params`, `nfe`, `self_reported_baseline` and `caveat` as first-class fields,
+  and comparison tables render them beside every number. *Why:* the single most important finding from
+  the benchmark survey is that guidance method alone moves ImageNet gFID by more than most claimed
+  architectural wins (one paper's own table: 1.65 → 1.49 → 1.14 → 1.06 for the same model under four
+  guidance methods). A comparison page that hides this actively misleads. The atlas therefore refuses
+  to render a bare leaderboard.
+- **D017 · 2026-09-09 · Coverage gaps found by user review, and the process fix.** The atlas had
+  seeded "Distilling Drifting Transformers" (2606.15553) without its own parent paradigm, Drifting
+  Models (2602.04770) — a derivative was catalogued while its source was missed. Root cause: session 1
+  and 2 searched outward from a fixed seed list rather than searching the design space for unknown
+  branches. Fix: when adding any paper, check what it *builds on* and whether that ancestor is in the
+  atlas; the `builds_on` relation is now the audit trail for exactly this failure.

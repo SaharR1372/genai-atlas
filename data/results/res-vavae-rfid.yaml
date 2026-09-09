@@ -1,0 +1,13 @@
+id: res-vavae-rfid
+type: result
+paper: vavae-2025
+benchmark: imagenet256-rfid
+value: 0.28
+setting: VA-VAE f16d32
+source: Table 3; independently confirmed by MAETok Table 4 and REPA-E
+guidance: null
+budget: null
+params: null
+nfe: null
+self_reported_baseline: false
+caveat: 'The strongest cross-paper agreement in this table: three independent papers report the same value.'

@@ -32,3 +32,5 @@ summary: Scales SVG's frozen-DINOv3 recipe from ImageNet to text-to-image, repor
   and 85.78 DPG-Bench with full open-source release — the direct competitor to Scale-RAE, published about
   a month apart on essentially the same question.
 explanation: null
+lines:
+- line-representation-latent

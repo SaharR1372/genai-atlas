@@ -1,0 +1,9 @@
+id: dpg-bench
+type: benchmark
+name: DPG-Bench
+metric: overall score
+higher_is_better: true
+sections:
+- generation
+notes: Dense-prompt text-to-image benchmark using long, detailed prompts, complementary to GenEval's short
+  compositional ones.

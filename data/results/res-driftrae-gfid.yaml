@@ -1,0 +1,14 @@
+id: res-driftrae-gfid
+type: result
+paper: distilling-rae-2026
+benchmark: imagenet256-gfid
+value: 1.48
+setting: DiT^DH-XL backbone in RAE latent, one-step distilled
+source: Table 4
+guidance: extrapolation-based
+budget: 16 epochs distillation
+params: 839M (inherited from RAE)
+nfe: 1
+self_reported_baseline: false
+caveat: Distilled from a 50-step RAE teacher that itself scores 1.13, so this is a one-step result that
+  presupposes the full RAE training run.

@@ -1,0 +1,38 @@
+id: line-continuous-tokens
+type: line
+name: Continuous-token autoregression
+one_line: Autoregress over continuous vectors, scoring each with a small diffusion head instead of a softmax
+  over a codebook.
+core_bet: Autoregression is worth keeping but quantization is not; per-token continuous prediction removes
+  the codebook entirely.
+primary_axis: representation
+status: ascendant
+since: 2024-06
+sections:
+- generation
+- unified
+arc:
+- paper: mar-2024
+  role: origin
+  note: Shows vector quantization is unnecessary for autoregressive image generation by replacing the
+    categorical loss with a small per-token diffusion loss.
+- paper: resurrect-mar-2025
+  role: evidence
+  note: Isolates the tokenizer and bidirectional architecture, not the objective, as what actually limits
+    masked autoregressive models.
+- paper: nextstep1-2025
+  role: scaling
+  note: A 14B autoregressive model with a 157M flow-matching head reaching state of the art among autoregressive
+    text-to-image systems.
+strengths:
+- No quantization loss, so no reconstruction ceiling from the codebook
+- Keeps autoregression's flexible generation order and language-model compatibility
+- Scaling evidence now exists at frontier text-to-image size
+weaknesses:
+- Per-token diffusion head adds sampling cost
+- Still sequential, so slower than parallel denoising at comparable quality
+competes_with:
+- line-discrete-tokens
+- line-flow-matching
+- line-transition-matching
+explains: null

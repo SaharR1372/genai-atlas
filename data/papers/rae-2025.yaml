@@ -49,3 +49,5 @@ summary: 'Replaces the VAE with a Representation Autoencoder: a frozen pretraine
   well. Strong reconstruction *and* generation simultaneously, closing the dilemma VA-VAE/REPA-E only
   partially closed.'
 explanation: null
+lines:
+- line-representation-latent

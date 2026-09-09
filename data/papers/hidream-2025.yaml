@@ -1,0 +1,35 @@
+id: hidream-2025
+type: paper
+title: 'HiDream-I1: A High-Efficient Image Generative Foundation Model with Sparse Diffusion Transformer'
+short: HiDream-I1
+arxiv: '2505.22705'
+date: 2025-05
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- HiDream.ai
+authors:
+- Qi Cai
+- Jingwen Chen
+- Yang Chen
+tier: strong-followup
+sections:
+- generation
+lines:
+- line-vae-latent
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-09'
+  verified_by: opus
+summary: A 17B sparse diffusion transformer released in fast, dev, and full variants — an open-weight
+  system competitive with FLUX-class models, and one of the few using sparsity rather than dense scaling
+  for efficiency.
+explanation: null

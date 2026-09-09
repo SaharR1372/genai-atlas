@@ -1,0 +1,13 @@
+id: res-repae-gfid-ng
+type: result
+paper: repae-2025
+benchmark: imagenet256-gfid
+value: 1.69
+setting: SiT-XL + E2E-VAE, no guidance
+source: Table 9
+guidance: none
+budget: 800 epochs
+params: 675M
+nfe: null
+self_reported_baseline: false
+caveat: null

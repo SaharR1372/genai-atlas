@@ -1,0 +1,60 @@
+---
+import Base from "../layouts/Base.astro";
+import { papersByDate, nodeById } from "../lib/graph";
+
+const papers = papersByDate();
+
+// group by year, then show month order within
+const years = [...new Set(papers.map((p) => (p.date ?? "").slice(0, 4)))].sort();
+
+const ERA: Record<string, string> = {
+  "2021": "Before the shift. Latent diffusion and masked autoencoders arrive separately; nobody yet connects them.",
+  "2022": "Latent diffusion becomes the default, and CLIP-space generation is tried once and set aside.",
+  "2023": "The backbone becomes a transformer, and self-supervised features get good enough to matter.",
+  "2024": "Flow matching wins the objective argument. Autoregression mounts a serious challenge. Alignment losses appear.",
+  "2025": "The latent itself becomes the contested question: align it, replace it, or delete it.",
+  "2026": "Consolidation and new paradigms. Hybrids soften the VAE-versus-representation split while one-step objectives attack from a different direction.",
+};
+---
+<Base title="Timeline" description="How modern generative vision developed, in order.">
+  <h1 style="font-size:1.9rem; margin:0 0 0.6rem;">Timeline</h1>
+  <p class="measure" style="color:var(--text-muted); margin-bottom:2.5rem;">
+    Every paper in the atlas by date, with the line it belongs to. The point of reading it in order
+    is to see how long an idea sits unused before something makes it work: generating in a semantic
+    space was tried in 2022 and abandoned, then became the most active question in the field three
+    years later.
+  </p>
+
+  {years.map((year) => (
+    <section style="margin-bottom:3rem;">
+      <div style="display:flex; align-items:baseline; gap:1rem; margin-bottom:0.75rem; border-bottom:1px solid var(--border); padding-bottom:0.5rem;">
+        <h2 style="font-size:1.6rem; margin:0; font-family:var(--font-mono);">{year}</h2>
+        <p class="measure" style="margin:0; color:var(--text-muted); font-size:0.9rem;">{ERA[year]}</p>
+      </div>
+      <div style="display:flex; flex-direction:column;">
+        {papers.filter((p) => (p.date ?? "").startsWith(year)).map((p) => {
+          const lines = (p.data.lines ?? []).map((lid: string) => nodeById(lid)).filter(Boolean);
+          const sectionKey = p.sections?.[0] ?? "generation";
+          return (
+            <div style="display:grid; grid-template-columns:4.5rem 1fr; gap:1rem; padding:0.6rem 0; border-bottom:1px solid var(--border);">
+              <span style="font-family:var(--font-mono); font-size:0.82rem; color:var(--text-muted);">
+                {(p.date ?? "").slice(5)}
+              </span>
+              <div>
+                <a href={`/papers/${p.id}`} style={`color:var(--section-${sectionKey}); font-weight:500;`}>
+                  {p.data.short ?? p.label}
+                </a>
+                {p.data.tier === "landmark" && (
+                  <span class="badge" style="margin-left:0.5rem; border-color:var(--tier-landmark); color:var(--tier-landmark);">landmark</span>
+                )}
+                <span style="color:var(--text-muted); font-size:0.85rem;">
+                  {lines.length > 0 && <> · {lines.map((l: any) => l.data.name).join(", ")}</>}
+                </span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  ))}
+</Base>

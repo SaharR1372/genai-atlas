@@ -71,3 +71,30 @@ def test_real_repo_data_validates_clean(validate_mod):
     """Regression test: whatever is currently checked in must pass validation."""
     errors, warnings, n_entities, n_relations = validate_mod.run()
     assert errors == [], f"real data/ has validation errors: {errors}"
+
+
+def test_line_arc_membership_must_be_declared_on_both_sides(validate_mod, sample_data_dir):
+    """A line listing a paper in its arc, without that paper declaring the line, is an error."""
+    (sample_data_dir / "lines").mkdir()
+    (sample_data_dir / "lines" / "line-test.yaml").write_text(
+        "id: line-test\n"
+        "type: line\n"
+        "name: Test line\n"
+        "one_line: A test.\n"
+        "core_bet: Testing.\n"
+        "primary_axis: objective\n"
+        "status: emerging\n"
+        "sections: [generation]\n"
+        "arc:\n"
+        "  - paper: sd3-2024\n"
+        "    role: origin\n"
+        "    note: sd3 does not declare this line\n"
+    )
+    errors, _, _, _ = validate_mod.run(data_dir=sample_data_dir)
+    assert any("does not declare lines" in e for e in errors)
+
+
+def test_real_data_every_line_arc_paper_declares_membership(validate_mod):
+    """Regression guard on the real atlas: line arcs and paper.lines must not drift apart."""
+    errors, _, _, _ = validate_mod.run()
+    assert not [e for e in errors if "does not declare lines" in e]

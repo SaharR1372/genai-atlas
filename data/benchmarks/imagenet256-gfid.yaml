@@ -1,0 +1,12 @@
+id: imagenet256-gfid
+type: benchmark
+name: ImageNet 256x256 gFID
+metric: gFID-50K
+higher_is_better: false
+sections:
+- generation
+- rae
+notes: Generation FID against ImageNet validation statistics at 256x256, class-conditional. The field's
+  default yardstick for architecture and latent-design work. Numbers are only meaningful alongside the
+  guidance technique, training budget, and parameter count, all of which vary widely between the papers
+  reporting them.

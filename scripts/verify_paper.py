@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import argparse
 import re
+import time
 import sys
 import xml.etree.ElementTree as ET
 from datetime import date, datetime
@@ -37,8 +38,30 @@ ARXIV_API = "http://export.arxiv.org/api/query"
 ATOM_NS = {"a": "http://www.w3.org/2005/Atom"}
 
 
-def fetch_arxiv(arxiv_id: str) -> dict:
-    resp = requests.get(ARXIV_API, params={"id_list": arxiv_id}, timeout=20)
+# arXiv asks API clients to leave ~3s between requests and rate-limits (HTTP 429) otherwise.
+ARXIV_MIN_INTERVAL = 3.0
+_last_request_at = 0.0
+
+
+def fetch_arxiv(arxiv_id: str, retries: int = 4) -> dict:
+    """Fetch one entry, throttled and with exponential backoff on 429/5xx."""
+    global _last_request_at
+
+    resp = None
+    for attempt in range(retries):
+        wait = ARXIV_MIN_INTERVAL - (time.monotonic() - _last_request_at)
+        if wait > 0:
+            time.sleep(wait)
+        _last_request_at = time.monotonic()
+
+        resp = requests.get(ARXIV_API, params={"id_list": arxiv_id}, timeout=30)
+        if resp.status_code in (429, 500, 502, 503, 504):
+            backoff = ARXIV_MIN_INTERVAL * (2 ** (attempt + 1))
+            print(f"  (arXiv returned {resp.status_code}; retrying in {backoff:.0f}s)")
+            time.sleep(backoff)
+            continue
+        break
+
     resp.raise_for_status()
     root = ET.fromstring(resp.text)
     entry = root.find("a:entry", ATOM_NS)

@@ -41,3 +41,5 @@ summary: Moves diffusion training from pixel space into the latent space of a pr
   cutting compute by orders of magnitude while keeping quality; introduces the VAE + UNet + cross-attention
   recipe every 'latent diffusion' system since has started from.
 explanation: null
+lines:
+- line-vae-latent

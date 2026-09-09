@@ -39,3 +39,5 @@ summary: Argues pixel-space diffusion was never unstable because of pixels — i
   match tokenizer-based DiT/PixArt-alpha at 256-1024px with no VAE, no pretraining, and no auxiliary losses
   at all.
 explanation: null
+lines:
+- line-pixel-space

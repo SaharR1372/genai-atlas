@@ -1,0 +1,47 @@
+id: line-unified-models
+type: line
+name: Unified understanding and generation
+one_line: Build one model that both interprets images and produces them, instead of separate understanding
+  and generation systems.
+core_bet: Understanding and generation should share parameters, and doing so makes both better.
+primary_axis: architecture
+status: ascendant
+since: 2023-12
+sections:
+- unified
+arc:
+- paper: emu2-2024
+  role: precursor
+  note: Autoregressive prediction of visual embeddings alongside text at multimodal LLM scale.
+- paper: janus-pro-2025
+  role: origin
+  note: Decouples the encoder used for understanding from the one used for generation while sharing the
+    language backbone.
+- paper: metaquery-2025
+  role: improvement
+  note: Connects a fully frozen multimodal LLM to a diffusion decoder with learnable queries, so understanding
+    ability cannot be damaged.
+- paper: blip3o-2025
+  role: evidence
+  note: Systematic ablation of CLIP-versus-VAE features and flow-matching-versus-MSE objectives, fully
+    open.
+- paper: showo2-2025
+  role: improvement
+  note: Autoregressive text and diffusion image generation in one set of weights, now on 3D-VAE latents.
+- paper: omnigen2-2025
+  role: improvement
+  note: Two decoding pathways with unshared parameters rather than one forced shared path.
+- paper: hunyuanimage3-2025
+  role: scaling
+  note: An 80B mixture-of-experts unified model with native chain-of-thought before image output.
+strengths:
+- One model to train, serve, and improve
+- Understanding can inform generation, enabling instruction following and reasoning about the requested
+  image
+- The direction every frontier lab is visibly pursuing
+weaknesses:
+- Generation training frequently degrades understanding ability
+- What is actually shared varies enormously between systems, which makes the label 'unified' nearly meaningless
+  without qualification
+- 'Evaluation is immature: few benchmarks test both capabilities together'
+explains: null

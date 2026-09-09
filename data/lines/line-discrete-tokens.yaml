@@ -1,0 +1,39 @@
+id: line-discrete-tokens
+type: line
+name: Discrete-token autoregression
+one_line: Quantize an image into discrete tokens and predict them with a language-model-style autoregressive
+  transformer.
+core_bet: 'Images should be modeled the way text is: as sequences of discrete tokens from a learned codebook.'
+primary_axis: objective
+status: contested
+since: 2024-04
+sections:
+- generation
+arc:
+- paper: var-2024
+  role: origin
+  note: Redefines the order as coarse-to-fine next-scale prediction rather than raster next-token; first
+    autoregressive model to beat diffusion transformers on ImageNet FID while showing GPT-style scaling
+    laws.
+- paper: gigatok-2025
+  role: evidence
+  note: Scales a tokenizer to 3B parameters and finds better reconstruction does not monotonically improve
+    downstream generation.
+- paper: tokenizer-post-training-2025
+  role: improvement
+  note: Post-trains the tokenizer on the generative distribution it will actually have to decode, closing
+    a train/test gap.
+- paper: masked-bit-2026
+  role: improvement
+  note: Predicts at the bit level to sidestep vocabulary-size and codebook-collapse limits.
+strengths:
+- Reuses the entire language-model stack, including scaling laws and serving infrastructure
+- Natural fit for unified understanding-and-generation models
+weaknesses:
+- Quantization discards information and imposes a hard reconstruction ceiling
+- Codebook collapse and vocabulary sizing remain persistent engineering problems
+- Largely displaced by continuous-token variants in recent results
+competes_with:
+- line-continuous-tokens
+- line-vae-latent
+explains: null

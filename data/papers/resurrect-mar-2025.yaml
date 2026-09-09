@@ -1,0 +1,33 @@
+id: resurrect-mar-2025
+type: paper
+title: Resurrect Mask AutoRegressive Modeling for Efficient and Scalable Image Generation
+short: Resurrect MAR
+arxiv: '2507.13032'
+date: 2025-07
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Yi Xin
+- Le Zhuo
+- Qi Qin
+tier: strong-followup
+sections:
+- generation
+lines:
+- line-continuous-tokens
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-09'
+  verified_by: opus
+summary: A systematic study of what actually limits masked autoregressive models, isolating the tokenizer
+  and the bidirectional architecture as the binding constraints rather than the objective itself.
+explanation: null

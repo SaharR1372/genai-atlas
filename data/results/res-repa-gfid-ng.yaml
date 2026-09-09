@@ -1,0 +1,13 @@
+id: res-repa-gfid-ng
+type: result
+paper: repa-2024
+benchmark: imagenet256-gfid
+value: 5.9
+setting: SiT-XL + REPA, no guidance
+source: Table 4
+guidance: none
+budget: 4M iters
+params: 675M
+nfe: null
+self_reported_baseline: false
+caveat: null

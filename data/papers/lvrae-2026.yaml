@@ -1,0 +1,39 @@
+id: lvrae-2026
+type: paper
+title: Improving Reconstruction of Representation Autoencoder
+short: LV-RAE
+arxiv: '2602.08620'
+date: 2026-02
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Siyu Liu
+- Chujie Qin
+- Hubery Yin
+tier: strong-followup
+sections:
+- rae
+axes:
+  representation:
+  - hybrid-semantic-detail
+lines:
+- line-latent-hybrid
+problems:
+- semantic-latent-detail-loss
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-09'
+  verified_by: opus
+summary: Augments RAE's semantic features with the low-level colour and texture information a frozen semantic
+  encoder discards, and separately hardens the decoder against latent perturbation through fine-tuning
+  with noise injection — a fix for the artifact sensitivity that high-dimensional semantic latents introduce.
+explanation: null

@@ -33,3 +33,5 @@ summary: 'Fixes RAE''s rough edges: multilayer representation aggregation for a 
   fixes classifier-free guidance (which the original RAE struggled with). Reaches SOTA ImageNet gFID 1.06
   in 80 epochs, 10x faster convergence than the original RAE.'
 explanation: null
+lines:
+- line-representation-latent

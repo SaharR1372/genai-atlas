@@ -1,0 +1,35 @@
+id: icedit-2025
+type: paper
+title: 'In-Context Edit: Enabling Instructional Image Editing with In-Context Generation in Large Scale
+  Diffusion Transformer'
+short: ICEdit
+arxiv: '2504.20690'
+date: 2025-04
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Zechuan Zhang
+- Ji Xie
+- Yu Lu
+tier: strong-followup
+sections:
+- editing
+lines:
+- line-in-context-editing
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-09'
+  verified_by: opus
+summary: 'Shows in-context conditioning can replace heavy editing fine-tunes: state-of-the-art instruction
+  editing with roughly 0.1% of the training data and 1% of the trainable parameters prior trained editors
+  required.'
+explanation: null

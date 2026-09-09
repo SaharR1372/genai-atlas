@@ -1,0 +1,32 @@
+id: unieval-2025
+type: paper
+title: 'UniEval: Unified Holistic Evaluation for Unified Multimodal Understanding and Generation'
+short: UniEval
+arxiv: '2505.10483'
+date: 2025-05
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Yi Li
+- Haonan Wang
+- Qixiang Zhang
+tier: strong-followup
+sections:
+- unified
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-09'
+  verified_by: opus
+summary: 'The first benchmark that evaluates understanding and generation together, which is the only
+  way to detect the failure mode unified models are most prone to: gaining generation ability while quietly
+  losing understanding.'
+explanation: null

@@ -1,0 +1,13 @@
+id: res-flatdino-gfid
+type: result
+paper: flatdino-2026
+benchmark: imagenet256-gfid
+value: 1.8
+setting: DiT-XL on FlatDINO 32-token 1-D latent
+source: abstract
+guidance: not stated in abstract
+budget: not stated
+params: 675M (DiT-XL)
+nfe: null
+self_reported_baseline: false
+caveat: Headline claim is efficiency (8x fewer FLOPs per forward pass), not raw FID.

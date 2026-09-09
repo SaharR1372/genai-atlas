@@ -1,0 +1,14 @@
+id: res-repa-gfid
+type: result
+paper: repa-2024
+benchmark: imagenet256-gfid
+value: 1.42
+setting: SiT-XL + REPA, SD-VAE latent
+source: Table 3
+guidance: guidance-interval
+budget: 800 epochs (~4M iters)
+params: 675M
+nfe: null
+self_reported_baseline: false
+caveat: Headline uses guidance-interval, not the plain CFG its DiT/SiT baselines use. With plain CFG (w=1.35)
+  the same model reports 1.80.

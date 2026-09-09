@@ -40,3 +40,5 @@ summary: 'Names and measures the reconstruction-generation dilemma directly: a V
   alignment loss (VF Loss) during VAE training itself, then pairs the resulting VA-VAE with an improved
   DiT baseline (LightningDiT) for a 21x convergence speedup and SOTA ImageNet FID.'
 explanation: null
+lines:
+- line-aligned-vae-latent

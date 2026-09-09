@@ -1,0 +1,40 @@
+id: transition-matching-2025
+type: paper
+title: 'Transition Matching: Scalable and Flexible Generative Modeling'
+short: Transition Matching
+arxiv: '2506.23589'
+date: 2025-06
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- Meta AI (FAIR)
+authors:
+- Neta Shaul
+- Uriel Singer
+- Itai Gat
+- Yaron Lipman
+tier: core
+sections:
+- generation
+axes:
+  objective:
+  - transition-matching
+lines:
+- line-transition-matching
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-09'
+  verified_by: opus
+summary: Recasts generation as learning discrete-time Markov transition kernels over a continuous state,
+  which unifies flow matching and continuous-token autoregression in one formulation instead of treating
+  them as rival camps. Its fully-causal variant is reported as the first such model to match or beat flow-based
+  methods on text-to-image.
+explanation: null

@@ -1,0 +1,11 @@
+id: mean-velocity
+type: concept
+name: Average (mean) velocity
+axis: objective
+one_line: Regress the average velocity over a finite interval instead of the instantaneous velocity, which
+  yields a self-contained identity that supports one-step sampling.
+sections:
+- generation
+introduced_by:
+- meanflow-2025
+explains: null

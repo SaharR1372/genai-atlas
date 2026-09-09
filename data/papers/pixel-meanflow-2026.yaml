@@ -1,0 +1,39 @@
+id: pixel-meanflow-2026
+type: paper
+title: One-step Latent-free Image Generation with Pixel Mean Flows
+short: Pixel MeanFlow
+arxiv: '2601.22158'
+date: 2026-01
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- MIT
+authors:
+- Tianhong Li
+- Zhengyang Geng
+- Kaiming He
+tier: strong-followup
+sections:
+- generation
+axes:
+  representation:
+  - pixels
+lines:
+- line-one-step-objectives
+- line-pixel-space
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-09'
+  verified_by: opus
+summary: 'Carries MeanFlow into pixel space, removing the tokenizer entirely while keeping one-step generation.
+  The clearest convergence point of the pixel-space and one-step lines: if it holds, neither a VAE nor
+  a foundation encoder is needed at either training or sampling time.'
+explanation: null

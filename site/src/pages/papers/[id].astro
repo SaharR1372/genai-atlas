@@ -1,7 +1,7 @@
 ---
 import Base from "../../layouts/Base.astro";
 import katex from "katex";
-import { nodesByType, nodeById, edgesFrom, edgesTo } from "../../lib/graph";
+import { nodesByType, nodeById, edgesFrom, edgesTo, linesOfPaper, resultsForPaper } from "../../lib/graph";
 
 export function getStaticPaths() {
   return nodesByType("papers").map((p) => ({ params: { id: p.id } }));
@@ -35,6 +35,8 @@ function axisEntries() {
   }));
 }
 const axes = axisEntries();
+const paperLines = linesOfPaper(paper.id);
+const paperResults = resultsForPaper(paper.id);
 
 // One rendered equation per blueprint's "readable equations" requirement — the shared
 // straight-line interpolation every flow-matching/rectified-flow paper in this atlas trains on.
@@ -60,6 +62,51 @@ const flowEquation = katex.renderToString(
     </h2>
     <p style="margin:0; font-size:1.02rem;">{d.summary}</p>
   </div>
+
+  {paperLines.length > 0 && (
+    <section style="margin-bottom:2rem;">
+      <h2 style="font-size:0.95rem; color:var(--text-muted); margin:0 0 0.6rem; text-transform:uppercase; letter-spacing:0.03em;">
+        Research line{paperLines.length > 1 ? "s" : ""}
+      </h2>
+      <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+        {paperLines.map((l: any) => (
+          <a class="card section-border" style={`--section-color: var(--section-${l.sections?.[0] ?? "generation"}); padding:0.7rem 1rem; display:block;`} href={`/lines/${l.id}`}>
+            <span style="font-weight:500;">{l.data.name}</span>
+            <span class="badge" style="margin-left:0.4rem;">{l.data.status}</span>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+
+  {paperResults.length > 0 && (
+    <section style="margin-bottom:2rem;">
+      <h2 style="font-size:0.95rem; color:var(--text-muted); margin:0 0 0.6rem; text-transform:uppercase; letter-spacing:0.03em;">
+        Reported results
+      </h2>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead><tr><th>Benchmark</th><th>Value</th><th>Guidance</th><th>Budget</th><th>Source</th></tr></thead>
+          <tbody>
+            {paperResults.map((r: any) => (
+              <tr>
+                <td style="font-size:0.88rem;">{nodeById(r.data.benchmark)?.data.name}{r.data.nfe ? ` (NFE=${r.data.nfe})` : ""}</td>
+                <td style="font-family:var(--font-mono); font-weight:600;">{r.data.value}</td>
+                <td style="font-size:0.82rem; color:var(--text-muted);">{r.data.guidance ?? "—"}</td>
+                <td style="font-size:0.82rem; color:var(--text-muted);">{r.data.budget ?? "—"}</td>
+                <td style="font-size:0.82rem; color:var(--text-muted);">{r.data.source}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {paperResults.filter((r: any) => r.data.caveat).map((r: any) => (
+        <p style="font-size:0.85rem; color:var(--text-muted); margin:0.75rem 0 0; border-left:2px solid var(--border-strong); padding-left:0.75rem;">
+          {r.data.caveat}
+        </p>
+      ))}
+    </section>
+  )}
 
   {axes.length > 0 && (
     <section style="margin-bottom:2rem;">

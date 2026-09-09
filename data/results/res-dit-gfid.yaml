@@ -1,0 +1,13 @@
+id: res-dit-gfid
+type: result
+paper: dit-2023
+benchmark: imagenet256-gfid
+value: 2.27
+setting: ImageNet 256x256, SD-VAE f8d4 latent
+source: Table 2
+guidance: cfg=1.5
+budget: 7M steps
+params: 675M
+nfe: null
+self_reported_baseline: false
+caveat: null

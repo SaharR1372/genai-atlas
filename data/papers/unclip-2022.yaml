@@ -37,3 +37,5 @@ summary: Generates a CLIP image embedding from a text prompt (the 'prior'), then
   language-aligned feature space rather than a reconstruction-optimized autoencoder latent — the idea
   RAE and SVG revive three years later.
 explanation: null
+lines:
+- line-representation-latent

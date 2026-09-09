@@ -1,0 +1,13 @@
+id: res-sdvae-rfid
+type: result
+paper: ldm-2022
+benchmark: imagenet256-rfid
+value: 0.62
+setting: SD-VAE f8d4, as re-measured by MAETok
+source: MAETok Table 4
+guidance: null
+budget: null
+params: null
+nfe: null
+self_reported_baseline: true
+caveat: null

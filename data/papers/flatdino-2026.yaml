@@ -1,0 +1,38 @@
+id: flatdino-2026
+type: paper
+title: Laminating Representation Autoencoders for Efficient Diffusion
+short: FlatDINO
+arxiv: '2602.04873'
+date: 2026-02
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- University of Geneva
+authors:
+- Ramón Calvo-González
+- François Fleuret
+tier: strong-followup
+sections:
+- rae
+axes:
+  representation:
+  - hybrid-semantic-detail
+lines:
+- line-latent-hybrid
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-09'
+  verified_by: opus
+summary: 'Literally composes the two rival representations: it takes DINOv2 patch features and compresses
+  them with a VAE into 32 continuous 1-D tokens, an 8x shorter sequence. Reports gFID 1.80 on ImageNet
+  256 at 8x fewer FLOPs per forward pass than diffusing on uncompressed foundation features, arguing the
+  dense patch grid RAE inherits is largely redundant.'
+explanation: null

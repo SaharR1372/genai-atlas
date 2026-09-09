@@ -41,3 +41,5 @@ summary: Shows naive end-to-end VAE+diffusion training collapses the VAE's laten
   loss's path back to the VAE) makes joint end-to-end training work — 17-45x faster than REPA/vanilla
   training, with SOTA ImageNet FID.
 explanation: null
+lines:
+- line-aligned-vae-latent

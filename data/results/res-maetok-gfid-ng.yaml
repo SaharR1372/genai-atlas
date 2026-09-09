@@ -1,0 +1,13 @@
+id: res-maetok-gfid-ng
+type: result
+paper: maetok-2025
+benchmark: imagenet256-gfid
+value: 2.31
+setting: SiT-XL + MAETok, no guidance
+source: Table 2
+guidance: none
+budget: 4M steps
+params: 675M
+nfe: null
+self_reported_baseline: false
+caveat: null

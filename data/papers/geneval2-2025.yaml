@@ -1,0 +1,34 @@
+id: geneval2-2025
+type: paper
+title: 'GenEval 2: Addressing Benchmark Drift in Text-to-Image Evaluation'
+short: GenEval 2
+arxiv: '2512.16853'
+date: 2025-12
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- University of Washington
+- Meta AI (FAIR)
+- UCLA
+authors:
+- Dhruba Ghosh
+- Ludwig Schmidt
+tier: core
+sections:
+- generation
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-09'
+  verified_by: opus
+summary: Shows the field's most-cited compositional benchmark has drifted up to 17.7% away from human
+  judgment as models improved, and proposes a corrected version. Directly relevant to any claim in this
+  atlas that rests on a GenEval number.
+explanation: null

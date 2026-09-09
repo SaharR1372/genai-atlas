@@ -27,6 +27,7 @@ PUBLIC_OUT = ROOT / "site" / "public" / "graph.json"
 
 # node-producing directories under data/ (everything except relations/, monitor/)
 NODE_DIRS = [
+    "lines",
     "concepts", "papers", "systems", "problems",
     "benchmarks", "results", "transitions", "paths", "updates",
 ]
@@ -34,6 +35,7 @@ NODE_DIRS = [
 # fields to lift onto the graph node's top level for easy client-side filtering,
 # per entity type; everything else stays nested under "data".
 NODE_LABEL_FIELD = {
+    "lines": "name",
     "concepts": "name",
     "papers": "title",
     "systems": "name",

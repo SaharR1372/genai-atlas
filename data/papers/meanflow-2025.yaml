@@ -1,0 +1,42 @@
+id: meanflow-2025
+type: paper
+title: Mean Flows for One-step Generative Modeling
+short: MeanFlow
+arxiv: '2505.13447'
+date: 2025-05
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- CMU
+- MIT
+authors:
+- Zhengyang Geng
+- Mingyang Deng
+- Xingjian Bai
+- J. Zico Kolter
+- Kaiming He
+tier: landmark
+sections:
+- generation
+axes:
+  objective:
+  - mean-velocity
+lines:
+- line-one-step-objectives
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-09'
+  verified_by: opus
+summary: Replaces flow matching's instantaneous velocity target with an *average* velocity over a finite
+  interval, giving a self-contained identity that supports one-step sampling trained from scratch with
+  no distillation and no pretrained teacher. Reaches 3.43 FID at 1 NFE on ImageNet 256, and anchors the
+  whole natively-few-step family that follows.
+explanation: null

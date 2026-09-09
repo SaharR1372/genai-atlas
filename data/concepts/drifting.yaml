@@ -1,0 +1,11 @@
+id: drifting
+type: concept
+name: Drifting field
+axis: objective
+one_line: Learn the generator mapping itself and evolve its pushforward distribution during training until
+  it matches the data, rather than learning a score or velocity to integrate at sampling time.
+sections:
+- generation
+introduced_by:
+- drifting-2026
+explains: null

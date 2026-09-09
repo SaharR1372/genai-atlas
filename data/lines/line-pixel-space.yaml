@@ -1,0 +1,37 @@
+id: line-pixel-space
+type: line
+name: Pixel-space generation
+one_line: Drop the tokenizer entirely and generate raw pixels with a plain transformer.
+core_bet: No learned latent is necessary; pixel-space instability was an artifact of the prediction target,
+  not of pixels.
+primary_axis: representation
+status: emerging
+since: 2025-11
+sections:
+- generation
+- rae
+arc:
+- paper: jit-2025
+  role: origin
+  note: Argues epsilon-prediction, not pixels, caused pixel-space instability; x-prediction on large patches
+    makes a plain ViT competitive with tokenizer-based DiTs at 256 to 1024px, with no VAE, no pretraining,
+    no auxiliary losses.
+- paper: pixel-meanflow-2026
+  role: improvement
+  note: Adds one-step generation to the tokenizer-free setting, removing the latent at both training and
+    sampling time.
+strengths:
+- Removes an entire component, and with it the tokenizer's failure modes and its reconstruction ceiling
+- No train/test mismatch between real and generated latents
+- The strongest existing challenge to the premise every latent line shares
+weaknesses:
+- Compute scales badly with resolution compared with latent methods
+- Very few independent results so far, and mostly from one group
+- No demonstrated path yet to text-to-image at frontier scale
+open_questions:
+- latent-vs-pixel-space
+competes_with:
+- line-vae-latent
+- line-representation-latent
+- line-latent-hybrid
+explains: null

@@ -1,0 +1,13 @@
+id: res-repae-gfid
+type: result
+paper: repae-2025
+benchmark: imagenet256-gfid
+value: 1.12
+setting: SiT-XL + end-to-end-tuned VAE (f16d32)
+source: Table 9
+guidance: CFG (scale not stated)
+budget: 800 epochs
+params: 675M
+nfe: null
+self_reported_baseline: false
+caveat: null

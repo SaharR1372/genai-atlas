@@ -38,3 +38,5 @@ summary: 'Introduces a simulation-free objective for continuous normalizing flow
   (optimal transport) path as a simple special case that trains faster and samples in fewer steps than
   diffusion.'
 explanation: null
+lines:
+- line-flow-matching

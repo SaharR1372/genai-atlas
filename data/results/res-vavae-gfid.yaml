@@ -1,0 +1,14 @@
+id: res-vavae-gfid
+type: result
+paper: vavae-2025
+benchmark: imagenet256-gfid
+value: 1.35
+setting: LightningDiT + VA-VAE f16d32 (DINOv2-aligned)
+source: Table 3
+guidance: cfg-interval + timestep shift (scale not stated)
+budget: 800 epochs
+params: 675M
+nfe: null
+self_reported_baseline: false
+caveat: The widely quoted '21x faster than DiT' refers to the 64-epoch checkpoint (gFID 2.11), not to
+  this 800-epoch headline number. The speed claim and the quality claim come from different rows.

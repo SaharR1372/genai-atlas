@@ -1,0 +1,63 @@
+id: line-vae-latent
+type: line
+name: VAE-latent diffusion
+one_line: Compress images with a reconstruction-trained autoencoder, then run diffusion or flow matching
+  in that latent space.
+core_bet: The generative latent should be a compact code learned by an autoencoder trained to reconstruct
+  pixels.
+primary_axis: representation
+status: dominant
+since: 2021-12
+sections:
+- generation
+arc:
+- paper: ldm-2022
+  role: origin
+  note: Establishes that diffusion in a pretrained autoencoder's latent is orders of magnitude cheaper
+    than in pixels, at negligible quality cost.
+- paper: dit-2023
+  role: improvement
+  note: Swaps the UNet for a plain transformer and shows diffusion obeys transformer scaling laws.
+- paper: sit-2024
+  role: evidence
+  note: Isolates objective, coupling, and sampler as independent choices on an unchanged DiT backbone.
+- paper: sd3-2024
+  role: scaling
+  note: Flow matching plus dual-stream MM-DiT at production scale; the recipe most open systems still
+    follow.
+- paper: dcae-2024
+  role: improvement
+  note: Pushes spatial compression to 128x, trading latent size against reconstruction difficulty.
+- paper: qwen-image-2025
+  role: scaling
+  note: Vision-language text encoder and a data pipeline built for text rendering; the open baseline of
+    2025-26.
+- paper: hidream-2025
+  role: improvement
+  note: Sparse rather than dense scaling for the same quality tier.
+- paper: lumina2-2025
+  role: improvement
+  note: Efficiency-focused variant with a Gemma-2 text encoder.
+- paper: seedream4-2025
+  role: scaling
+  note: Generation, editing, and multi-image composition in one industrial system at 4K.
+- paper: qwen-image-2-2026
+  role: scaling
+  note: The 2026 successor generation of the leading open family.
+strengths:
+- 'Enormous ecosystem: weights, LoRAs, tooling, and community fine-tunes all assume it'
+- Well-understood training dynamics and failure modes
+- Cheap inference relative to pixel-space at high resolution
+weaknesses:
+- The latent is semantically impoverished, so the generator spends capacity rediscovering structure a
+  foundation model already has
+- Reconstruction-optimized latents are demonstrably not the easiest latents to generate in (see the reconstruction-generation
+  dilemma)
+open_questions:
+- vae-latent-semantics
+- reconstruction-generation-dilemma
+competes_with:
+- line-representation-latent
+- line-pixel-space
+- line-latent-hybrid
+explains: null

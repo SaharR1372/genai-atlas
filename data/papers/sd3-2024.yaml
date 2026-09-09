@@ -46,3 +46,6 @@ summary: Takes rectified flow to production scale with a new dual-stream 'MM-DiT
   establishes the flow-matching + MM-DiT recipe that FLUX, Qwen-Image, Seedream and most 2025 open T2I
   systems are variations of.
 explanation: null
+lines:
+- line-flow-matching
+- line-vae-latent

@@ -1,0 +1,14 @@
+id: res-drifting-gfid
+type: result
+paper: drifting-2026
+benchmark: imagenet256-gfid
+value: 1.54
+setting: ImageNet 256x256, latent space, one-step
+source: abstract
+guidance: not stated
+budget: not stated
+params: not stated
+nfe: 1
+self_reported_baseline: false
+caveat: One-step (NFE=1). Not comparable to the multi-step rows above; the relevant comparison is against
+  other one-step methods.

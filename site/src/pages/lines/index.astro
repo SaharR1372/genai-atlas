@@ -1,0 +1,71 @@
+---
+import Base from "../../layouts/Base.astro";
+import { allLines, papersInLine } from "../../lib/graph";
+
+const lines = allLines();
+
+const STATUS_NOTE: Record<string, string> = {
+  dominant: "The default choice. Most systems you encounter use this.",
+  ascendant: "Gaining ground quickly, with results that are holding up.",
+  contested: "Live disagreement about whether it is the right bet. Not a verdict of failure.",
+  emerging: "Young, promising, and not yet independently replicated at scale.",
+  superseded: "Largely displaced, kept for the history it explains.",
+};
+
+const byAxis = ["representation", "objective", "training-signal", "inference", "conditioning", "architecture"]
+  .map((axis) => ({ axis, lines: lines.filter((l) => l.data.primary_axis === axis) }))
+  .filter((g) => g.lines.length > 0);
+
+const AXIS_LABEL: Record<string, string> = {
+  representation: "What space to generate in",
+  objective: "What to train the model to predict",
+  "training-signal": "What shapes the model beyond the base objective",
+  inference: "What happens at sampling time",
+  conditioning: "How the condition reaches the generator",
+  architecture: "How understanding and generation are arranged",
+};
+---
+<Base title="Research lines" description="The families of work in modern generative vision, each defined by one core design bet.">
+  <h1 style="font-size:1.9rem; margin:0 0 0.6rem;">Research lines</h1>
+  <p class="measure" style="color:var(--text-muted); margin-bottom:2.5rem;">
+    A line is a family of work sharing one core bet. Lines are grouped below by the design question
+    the bet answers. A paper can belong to more than one line, and lines that answer the same
+    question compete with each other directly.
+  </p>
+
+  {byAxis.map(({ axis, lines: group }) => (
+    <section style="margin-bottom:3rem;">
+      <h2 style="font-size:0.85rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin:0 0 0.25rem;">
+        {axis.replace("-", " ")}
+      </h2>
+      <p style="margin:0 0 1.25rem; font-family:var(--font-heading); font-size:1.2rem;">
+        {AXIS_LABEL[axis]}
+      </p>
+      <div style="display:flex; flex-direction:column; gap:1rem;">
+        {group.map((l) => {
+          const n = papersInLine(l.id).length;
+          const sectionKey = l.sections?.[0] ?? "generation";
+          return (
+            <a
+              class="card section-border"
+              style={`--section-color: var(--section-${sectionKey}); display:block;`}
+              href={`/lines/${l.id}`}
+            >
+              <div style="display:flex; align-items:baseline; gap:0.6rem; flex-wrap:wrap; margin-bottom:0.4rem;">
+                <h3 style="font-size:1.15rem; margin:0;">{l.data.name}</h3>
+                <span class="badge">{l.data.status}</span>
+                <span style="font-size:0.8rem; color:var(--text-muted);">
+                  {n} paper{n === 1 ? "" : "s"}{l.data.since ? ` · since ${l.data.since}` : ""}
+                </span>
+              </div>
+              <p style="margin:0 0 0.5rem;">{l.data.one_line}</p>
+              <p style="margin:0; font-size:0.85rem; color:var(--text-muted);">
+                {STATUS_NOTE[l.data.status]}
+              </p>
+            </a>
+          );
+        })}
+      </div>
+    </section>
+  ))}
+</Base>

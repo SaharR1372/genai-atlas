@@ -1,0 +1,27 @@
+id: line-guidance-sampling
+type: line
+name: Guidance and sampling
+one_line: Change what happens at inference time — guidance formulation, stochasticity, step schedule —
+  without retraining the model.
+core_bet: Substantial quality is available at sampling time, and the guidance machinery inherited from
+  diffusion is mismatched to flow models.
+primary_axis: inference
+status: ascendant
+since: 2025-09
+sections:
+- generation
+arc:
+- paper: glass-flows-2025
+  role: origin
+  note: Simulates a flow inside a flow to get SDE-quality samples at ODE cost, with no retraining.
+- paper: rectified-cfg-2025
+  role: improvement
+  note: Reformulates classifier-free guidance specifically for rectified-flow models, where the diffusion-era
+    version degrades high-guidance samples.
+strengths:
+- No training cost, so improvements apply to already-released models
+- Composes with every other line
+weaknesses:
+- Bounded by what the trained model already represents
+- Guidance interacts with representation choice in ways not yet well characterized
+explains: null

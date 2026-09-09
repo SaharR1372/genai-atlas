@@ -1,84 +1,90 @@
 ---
 import Base from "../layouts/Base.astro";
-import graph, { nodesByType, conceptsByAxis } from "../lib/graph";
+import graph, { nodesByType, allLines, papersInLine, allProblems } from "../lib/graph";
 
-const AXES = [
-  { id: "representation", label: "Representation", section: "rae" },
-  { id: "objective", label: "Objective", section: "generation" },
-  { id: "architecture", label: "Architecture", section: "generation" },
-  { id: "conditioning", label: "Conditioning & control", section: "editing" },
-  { id: "training-signal", label: "Training signal", section: "unified" },
-  { id: "inference", label: "Inference", section: "generation" },
-];
-
+const lines = allLines();
 const paperCount = nodesByType("papers").length;
-const conceptCount = nodesByType("concepts").length;
-const problemCount = nodesByType("problems").length;
+const problemCount = allProblems().length;
 const recentPapers = nodesByType("papers")
   .slice()
   .sort((a, b) => (b.date ?? "").localeCompare(a.date ?? ""))
-  .slice(0, 6);
+  .slice(0, 8);
+
+// the representation question is the atlas's spine, so surface those lines first
+const repLines = lines.filter((l) => l.data.primary_axis === "representation");
+const objLines = lines.filter((l) => l.data.primary_axis === "objective");
 ---
-<Base title="Home" description="A living research atlas of modern generative vision, organized around ideas, not papers.">
-  <section style="max-width:52ch; margin-bottom:3rem;">
-    <p class="badge" style="margin-bottom:0.75rem;">Living atlas · updated continuously</p>
-    <h1 style="font-size:2.1rem; margin:0 0 0.75rem;">Follow the representation.</h1>
-    <p style="color:var(--text-muted); font-size:1.05rem;">
-      Generative vision is converging on a shared space for seeing, generating, and editing images.
-      Objectives and architectures have largely settled around flow-matching transformers — the
-      questions that now move the field are about representation: what latent space a model
-      generates in, and what gets traded away to get there.
+<Base title="Home" description="A living research atlas of modern generative vision, organized around research lines rather than paper lists.">
+  <section class="measure" style="margin-bottom:3rem;">
+    <p class="badge" style="margin-bottom:0.75rem;">Living atlas · {paperCount} papers · {lines.length} research lines</p>
+    <h1 style="font-size:2.2rem; margin:0 0 0.75rem;">Follow the representation.</h1>
+    <p style="font-size:1.08rem;">
+      Modern image generation has largely settled its argument about objectives and architectures.
+      What it has not settled is where generation should happen: in a compression code, in a
+      foundation model's feature space, in discrete tokens, or in raw pixels. That question is the
+      spine of this atlas, and every research line below is a different answer to it.
     </p>
   </section>
 
   <section style="margin-bottom:3rem;">
-    <h2 style="font-size:1.1rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:1rem;">
-      The design space
-    </h2>
-    <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:1rem;">
-      {AXES.map((axis) => {
-        const concepts = conceptsByAxis(axis.id);
-        return (
-          <a
-            class="card section-border"
-            style={`--section-color: var(--section-${axis.section}); display:block;`}
-            href={`/axes/${axis.id}`}
-          >
-            <h3 style="font-size:1.05rem; margin:0 0 0.35rem;">{axis.label}</h3>
-            <p style="color:var(--text-muted); font-size:0.88rem; margin:0;">
-              {concepts.length} option{concepts.length === 1 ? "" : "s"} tracked
-            </p>
-          </a>
-        );
-      })}
+    <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:1rem;">
+      <h2 style="font-size:1.4rem; margin:0;">What space to generate in</h2>
+      <a href="/lines" style="font-size:0.88rem;">All research lines →</a>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:1rem;">
+      {repLines.map((l) => (
+        <a class="card section-border" style={`--section-color: var(--section-${l.sections?.[0] ?? "generation"}); display:block;`} href={`/lines/${l.id}`}>
+          <div style="display:flex; align-items:baseline; gap:0.5rem; margin-bottom:0.35rem;">
+            <h3 style="font-size:1.02rem; margin:0;">{l.data.name}</h3>
+            <span class="badge">{l.data.status}</span>
+          </div>
+          <p style="margin:0; font-size:0.9rem; color:var(--text-muted);">{l.data.one_line}</p>
+        </a>
+      ))}
     </div>
   </section>
 
-  <section style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:1rem; margin-bottom:3rem;">
+  <section style="margin-bottom:3rem;">
+    <h2 style="font-size:1.4rem; margin:0 0 1rem;">What to train the model to predict</h2>
+    <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:1rem;">
+      {objLines.map((l) => (
+        <a class="card section-border" style={`--section-color: var(--section-${l.sections?.[0] ?? "generation"}); display:block;`} href={`/lines/${l.id}`}>
+          <div style="display:flex; align-items:baseline; gap:0.5rem; margin-bottom:0.35rem;">
+            <h3 style="font-size:1.02rem; margin:0;">{l.data.name}</h3>
+            <span class="badge">{l.data.status}</span>
+          </div>
+          <p style="margin:0; font-size:0.9rem; color:var(--text-muted);">{l.data.one_line}</p>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <section style="display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:1rem; margin-bottom:3rem;">
+    <a class="card" href="/compare">
+      <h3 style="font-size:1rem; margin:0 0 0.35rem;">Which one is better?</h3>
+      <p style="color:var(--text-muted); font-size:0.88rem; margin:0;">
+        Head-to-head benchmarks, and an honest account of why the published numbers do not support a
+        clean ranking.
+      </p>
+    </a>
+    <a class="card" href="/problems">
+      <h3 style="font-size:1rem; margin:0 0 0.35rem;">Open problems</h3>
+      <p style="color:var(--text-muted); font-size:0.88rem; margin:0;">
+        {problemCount} unsolved questions, each linked to the papers attacking it and the lines that
+        inherit it.
+      </p>
+    </a>
+    <a class="card" href="/timeline">
+      <h3 style="font-size:1rem; margin:0 0 0.35rem;">Timeline</h3>
+      <p style="color:var(--text-muted); font-size:0.88rem; margin:0;">
+        The field in order, so you can see how long an idea waits before something makes it work.
+      </p>
+    </a>
     <a class="card" href="/graph">
       <h3 style="font-size:1rem; margin:0 0 0.35rem;">Research graph</h3>
       <p style="color:var(--text-muted); font-size:0.88rem; margin:0;">
-        {graph.node_count} nodes, {graph.edge_count} typed relations — see how branches build on,
-        challenge, and compete with each other.
-      </p>
-    </a>
-    <a class="card" href="/transitions/pixels-to-representation-latents">
-      <h3 style="font-size:1rem; margin:0 0 0.35rem;">Transitions</h3>
-      <p style="color:var(--text-muted); font-size:0.88rem; margin:0;">
-        Why the field moved, and what each move cost. Start with pixels → representation latents.
-      </p>
-    </a>
-    <a class="card" href="/papers/rae-2025">
-      <h3 style="font-size:1rem; margin:0 0 0.35rem;">Paper deep dives</h3>
-      <p style="color:var(--text-muted); font-size:0.88rem; margin:0;">
-        {paperCount} papers tracked, {conceptCount} concepts, {problemCount} open problems. Start
-        with Representation Autoencoders.
-      </p>
-    </a>
-    <a class="card" href="/search">
-      <h3 style="font-size:1rem; margin:0 0 0.35rem;">Search</h3>
-      <p style="color:var(--text-muted); font-size:0.88rem; margin:0;">
-        Full-text search across every paper, concept, and problem in the atlas.
+        {graph.node_count} nodes and {graph.edge_count} typed relations: who builds on, challenges,
+        and competes with whom.
       </p>
     </a>
   </section>
@@ -88,14 +94,12 @@ const recentPapers = nodesByType("papers")
       Recently added
     </h2>
     <table>
-      <thead>
-        <tr><th>Date</th><th>Paper</th><th>Tier</th></tr>
-      </thead>
+      <thead><tr><th>Date</th><th>Paper</th><th>Tier</th></tr></thead>
       <tbody>
         {recentPapers.map((p) => (
           <tr>
             <td style="font-family:var(--font-mono); font-size:0.85rem; color:var(--text-muted);">{p.date}</td>
-            <td>{p.label}</td>
+            <td><a href={`/papers/${p.id}`}>{p.data.short ?? p.label}</a></td>
             <td><span class="badge" style={`border-color: var(--tier-${p.tier}); color: var(--tier-${p.tier});`}>{p.tier}</span></td>
           </tr>
         ))}

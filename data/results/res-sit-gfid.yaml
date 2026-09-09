@@ -1,0 +1,13 @@
+id: res-sit-gfid
+type: result
+paper: sit-2024
+benchmark: imagenet256-gfid
+value: 2.06
+setting: ImageNet 256x256, SD-VAE f8d4, SDE sampler
+source: Table 7
+guidance: cfg=1.5
+budget: 7M steps
+params: 675M
+nfe: null
+self_reported_baseline: false
+caveat: null

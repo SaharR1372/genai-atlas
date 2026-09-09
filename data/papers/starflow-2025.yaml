@@ -1,0 +1,41 @@
+id: starflow-2025
+type: paper
+title: 'STARFlow: Scaling Latent Normalizing Flows for High-resolution Image Synthesis'
+short: STARFlow
+arxiv: '2506.06276'
+date: 2025-06
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- Apple
+authors:
+- Jiatao Gu
+- Tianrong Chen
+- David Berthelot
+- Huangjie Zheng
+- Shuangfei Zhai
+tier: core
+sections:
+- generation
+axes:
+  objective:
+  - normalizing-flow
+lines:
+- line-normalizing-flows
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-09'
+  verified_by: opus
+summary: Revives normalizing flows as a serious high-resolution generator using a transformer autoregressive
+  flow with a deep-shallow architecture, trained in a pretrained autoencoder's latent space. Notable for
+  an explicit ablation finding latent-space modeling beats pixel-level for this family, and for giving
+  exact likelihoods that diffusion and flow matching do not.
+explanation: null

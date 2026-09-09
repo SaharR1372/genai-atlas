@@ -1,0 +1,46 @@
+id: line-in-context-editing
+type: line
+name: In-context editing
+one_line: Edit by putting the reference image into the model's own token sequence and letting attention
+  handle it, rather than through adapters or inversion.
+core_bet: 'Editing needs no special mechanism: a reference image is just more context for a sufficiently
+  capable generator.'
+primary_axis: conditioning
+status: dominant
+since: 2025-01
+sections:
+- editing
+arc:
+- paper: acepp-2025
+  role: origin
+  note: Unifies creation and editing under a long-context conditioning unit, implemented cheaply as a
+    LoRA on FLUX.1.
+- paper: step1x-edit-2025
+  role: improvement
+  note: Multimodal LLM parses the instruction, DiT executes it; also the source of GEdit-Bench.
+- paper: icedit-2025
+  role: evidence
+  note: State-of-the-art instruction editing with roughly 0.1% of the data and 1% of the trainable parameters
+    prior editors needed.
+- paper: kontext-2025
+  role: scaling
+  note: Concatenates reference tokens onto the generation sequence in one rectified-flow model, and becomes
+    the open reference point for the approach.
+- paper: seedream4-2025
+  role: scaling
+  note: Industrial-scale generation and editing in a single system.
+- paper: omnigen2-2025
+  role: hybrid
+  note: Editing as one capability of a unified understanding-and-generation model with separate text and
+    image decoding paths.
+strengths:
+- 'Architecturally simple: no inversion, no adapters, no per-task heads'
+- Handles local edits and global reference-driven generation with one mechanism
+- Very data-efficient when built on a strong pretrained generator
+weaknesses:
+- Preserving untouched regions exactly is still imperfect
+- Referring-expression grounding fails when several similar objects are present
+- Depends on a strong base generator, so it inherits that model's biases
+open_questions:
+- semantic-latent-detail-loss
+explains: null

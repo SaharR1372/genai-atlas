@@ -37,3 +37,5 @@ summary: Bridges a frozen, understanding-only multimodal LLM to a diffusion imag
   have to change to gain generation. Trains only on paired image-caption data with a standard diffusion
   loss.
 explanation: null
+lines:
+- line-unified-models

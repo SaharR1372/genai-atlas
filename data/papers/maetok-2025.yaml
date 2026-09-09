@@ -40,3 +40,5 @@ summary: 'Argues the key variable for generation quality is latent *geometry*, n
   modes is both easier to generate in and reconstructs well, hitting SOTA ImageNet FID with only 128 tokens
   and far less compute than prior tokenizers.'
 explanation: null
+lines:
+- line-aligned-vae-latent

@@ -1,0 +1,35 @@
+id: rectified-cfg-2025
+type: paper
+title: Rectified-CFG++ for Flow Based Models
+short: Rectified-CFG++
+arxiv: '2510.07631'
+date: 2025-10
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Shreshth Saini
+- Alan C. Bovik
+tier: emerging
+sections:
+- generation
+axes:
+  inference:
+  - cfg
+lines:
+- line-guidance-sampling
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-09'
+  verified_by: opus
+summary: Reworks classifier-free guidance specifically for rectified-flow models, where the original diffusion-era
+  formulation is mismatched to straight-path transport and degrades samples at high guidance scales.
+explanation: null

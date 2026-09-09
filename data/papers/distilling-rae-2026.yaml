@@ -31,3 +31,6 @@ summary: Identifies that RAE latents are severely anisotropic on a per-token bas
   coupling forces curved, hard-to-distill denoising trajectories. Proposes a 'drifting field' distillation
   method built for this anisotropic geometry, reaching FID 1.48 with only 16 epochs of distillation.
 explanation: null
+lines:
+- line-one-step-objectives
+- line-representation-latent

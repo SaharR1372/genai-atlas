@@ -1,0 +1,14 @@
+id: res-pae-gfid
+type: result
+paper: pae-2026
+benchmark: imagenet256-gfid
+value: 1.03
+setting: Prior-Aligned Autoencoder latent
+source: abstract
+guidance: not stated in abstract
+budget: 13x faster convergence claimed
+params: not stated
+nfe: null
+self_reported_baseline: false
+caveat: Taken from the abstract; the guidance method and budget behind the headline are not stated there.
+  Needs a PDF-level check before being treated as directly comparable.

@@ -1,0 +1,37 @@
+id: omnigen2-2025
+type: paper
+title: 'OmniGen2: Towards Instruction-Aligned Multimodal Generation'
+short: OmniGen2
+arxiv: '2506.18871'
+date: 2025-06
+venue:
+  name: CVPR
+  status: conference
+orgs:
+- BAAI
+authors:
+- Chenyuan Wu
+- Pengfei Zheng
+- Ruiran Yan
+tier: core
+sections:
+- unified
+- editing
+lines:
+- line-in-context-editing
+- line-unified-models
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-09'
+  verified_by: opus
+summary: Uses two decoding pathways with unshared parameters for text and image, rather than forcing one
+  shared path, and covers text-to-image, editing, and in-context generation in one model. A CVPR 2026
+  paper and the leading fully open unified system.
+explanation: null

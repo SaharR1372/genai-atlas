@@ -18,6 +18,30 @@
     "source": {
       "type": "string",
       "description": "Where in the paper this number comes from, e.g. 'Table 3'"
+    },
+    "guidance": {
+      "type": ["string", "null"],
+      "description": "Guidance technique AND scale, e.g. 'cfg=1.5', 'AutoGuidance', 'guidance-interval', 'none'. Kept separate from `setting` because guidance METHOD alone moves ImageNet gFID by more than most claimed architectural wins — the comparison tables must be able to group by it."
+    },
+    "budget": {
+      "type": ["string", "null"],
+      "description": "Training budget, e.g. '800 epochs', '7M steps', '16 epochs distillation'."
+    },
+    "params": {
+      "type": ["string", "null"],
+      "description": "Generator parameter count, e.g. '675M', '~2B'."
+    },
+    "nfe": {
+      "type": ["integer", "null"],
+      "description": "Number of function evaluations at sampling time (1 for one-step methods)."
+    },
+    "self_reported_baseline": {
+      "type": "boolean",
+      "description": "True if this number was measured by a paper OTHER than the one that produced the method (i.e. a third-party re-measurement), which is a known source of large spread."
+    },
+    "caveat": {
+      "type": ["string", "null"],
+      "description": "Why this number may not be comparable to its neighbours. Rendered as a visible warning on comparison tables rather than hidden in prose."
     }
   }
 }

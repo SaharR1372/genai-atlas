@@ -1,0 +1,54 @@
+id: line-one-step-objectives
+type: line
+name: Natively few-step objectives
+one_line: Train for one or few steps from the start, instead of training a many-step model and distilling
+  it afterwards.
+core_bet: Iterative sampling is an artifact of the training objective, and a better objective yields one-step
+  generation directly.
+primary_axis: objective
+status: emerging
+since: 2024-10
+sections:
+- generation
+arc:
+- paper: shortcut-2024
+  role: origin
+  note: Conditions the network on step size so one model works at any budget down to a single step, with
+    no distillation stage.
+- paper: imm-2025
+  role: origin
+  note: Matches distributions between interpolant marginals in one training stage, with convergence guarantees
+    consistency models lack; 1.99 FID in 8 steps.
+- paper: meanflow-2025
+  role: origin
+  note: Targets average rather than instantaneous velocity, giving a self-contained identity for from-scratch
+    one-step training; 3.43 FID at 1 NFE.
+- paper: sana-sprint-2025
+  role: evidence
+  note: 'The distillation-based contrast case: 1-4 steps via continuous-time consistency distillation
+    plus an adversarial term, but requires a teacher.'
+- paper: drifting-2026
+  role: improvement
+  note: Learns the generator mapping directly and evolves its pushforward until it matches the data; natively
+    one-step, 1.54 FID on ImageNet 256.
+- paper: pixel-meanflow-2026
+  role: improvement
+  note: Combines one-step training with no tokenizer at all.
+- paper: distilling-rae-2026
+  role: hybrid
+  note: Applies drifting-style distillation inside RAE latents, where anisotropy makes the naive version
+    unstable.
+strengths:
+- Collapses the inference-cost gap that made diffusion expensive to serve
+- No teacher model, so no inherited teacher errors and one training run instead of two
+- Advancing fast, with several independent formulations converging on similar quality
+weaknesses:
+- Still generally behind the best many-step models at the very top of the quality range
+- Mostly demonstrated on class-conditional ImageNet rather than frontier text-to-image
+- Interacts badly with high-dimensional anisotropic latents, as the RAE case shows
+open_questions:
+- transport-path-straightness
+- latent-prior-shape
+competes_with:
+- line-flow-matching
+explains: null

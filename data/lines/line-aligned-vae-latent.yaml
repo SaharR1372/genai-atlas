@@ -1,0 +1,47 @@
+id: line-aligned-vae-latent
+type: line
+name: Representation-aligned latents
+one_line: Keep the autoencoder, but apply pressure from a vision foundation model so its latent (or the
+  generator's hidden states) become semantically structured.
+core_bet: The VAE is worth keeping; what needs fixing is the absence of semantic structure, and an alignment
+  loss can supply it.
+primary_axis: training-signal
+status: ascendant
+since: 2024-10
+sections:
+- rae
+- generation
+arc:
+- paper: repa-2024
+  role: origin
+  note: Aligning a diffusion transformer's hidden states to frozen DINOv2 features speeds training 17.5x
+    with no change to the latent or architecture.
+- paper: vavae-2025
+  role: improvement
+  note: Moves the alignment pressure into VAE training itself, and names the reconstruction-generation
+    dilemma explicitly.
+- paper: repae-2025
+  role: improvement
+  note: Makes VAE and diffusion transformer trainable end to end through the alignment loss, which naive
+    joint training destroys.
+- paper: maetok-2025
+  role: evidence
+  note: 'Reframes the target as latent geometry: fewer Gaussian-mixture modes and more discriminative
+    features, no variational form required.'
+- paper: reg-2025
+  role: improvement
+  note: Entangles a semantic token into the denoising target rather than aligning hidden states as a side
+    loss.
+strengths:
+- Large speedups with minimal disruption to an existing, well-understood stack
+- 'Directly measurable: convergence-rate gains are large and reproducible'
+- Compatible with the entire VAE-latent ecosystem
+weaknesses:
+- Treats the symptom rather than the cause — the latent is still a reconstruction code
+- Adds a dependency on a frozen encoder anyway, which invites the question RAE asks
+open_questions:
+- vae-latent-semantics
+- reconstruction-generation-dilemma
+competes_with:
+- line-representation-latent
+explains: null

@@ -1,0 +1,35 @@
+id: janus-pro-2025
+type: paper
+title: 'Janus-Pro: Unified Multimodal Understanding and Generation with Data and Model Scaling'
+short: Janus-Pro
+arxiv: '2501.17811'
+date: 2025-01
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- DeepSeek
+authors:
+- Xiaokang Chen
+- Zhiyu Wu
+- Xingchao Liu
+tier: core
+sections:
+- unified
+lines:
+- line-unified-models
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-09'
+  verified_by: opus
+summary: Decouples the visual encoder used for understanding from the one used for generation while keeping
+  a single shared language backbone, then scales data and model size. One of the most reused open unified
+  baselines of the period.
+explanation: null

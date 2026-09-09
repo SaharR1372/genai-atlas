@@ -1,0 +1,15 @@
+id: res-scalerae-geneval
+type: result
+paper: scale-rae-2026
+benchmark: geneval
+value: 0.495
+setting: Best ablation config, deliberately budget-limited (~30K iterations)
+source: Table 3
+guidance: null
+budget: ~30K iterations
+params: 0.5B-9.8B swept
+nfe: null
+self_reported_baseline: false
+caveat: 'Scale-RAE is a controlled scaling study, not a system release. Reading this as a state-of-the-art
+  claim is a category error. The legitimate comparison is its within-paper ablation at matched budget:
+  RAE 49.5 versus a VAE baseline at 39.6.'

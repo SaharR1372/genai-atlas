@@ -36,3 +36,5 @@ summary: Argues understanding and generation genuinely need different granularit
   and resolves the conflict with a dual-codebook design — a CLIP-style semantic encoder and a pixel encoder,
   kept aligned through a shared index mapping — rather than one shared latent trying to serve both.
 explanation: null
+lines:
+- line-latent-hybrid

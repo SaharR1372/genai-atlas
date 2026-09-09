@@ -1,0 +1,269 @@
+---
+import Base from "../layouts/Base.astro";
+import { resultsForBenchmark, nodeById, allBenchmarks } from "../lib/graph";
+
+const paperOf = (r: any) => nodeById(r.data.paper);
+const lineOf = (r: any) => {
+  const p = paperOf(r);
+  const lid = (p?.data.lines ?? [])[0];
+  return lid ? nodeById(lid) : null;
+};
+
+const imagenet = resultsForBenchmark("imagenet256-gfid");
+const guided = imagenet.filter((r) => r.data.guidance && r.data.guidance !== "none" && !r.data.nfe);
+const unguided = imagenet.filter((r) => r.data.guidance === "none");
+const fewStep = imagenet.filter((r) => r.data.nfe);
+const rfid = resultsForBenchmark("imagenet256-rfid");
+const geneval = resultsForBenchmark("geneval");
+const dpg = resultsForBenchmark("dpg-bench");
+
+const bench = (id: string) => nodeById(id);
+---
+<Base title="Which approach is actually better?" description="Head-to-head benchmark comparison across generative-vision research lines, with the confounds made explicit.">
+  <h1 style="font-size:1.9rem; margin:0 0 0.6rem;">Which approach is actually better?</h1>
+  <p class="measure" style="color:var(--text-muted); margin-bottom:2rem;">
+    The honest answer is that the published numbers do not support a clean ranking, and the reason
+    is worth understanding before reading any table below.
+  </p>
+
+  <div class="card section-border" style="--section-color: var(--section-medical); margin-bottom:1.25rem;">
+    <h2 style="font-size:1.05rem; margin:0 0 0.6rem;">What you can conclude</h2>
+    <ul style="margin:0; padding-left:1.2rem;">
+      <li style="margin-bottom:0.5rem;">
+        Pushing semantic structure into the latent reliably speeds up training. Within a single
+        paper, holding the backbone fixed, representation alignment and frozen foundation encoders
+        both cut the steps needed to reach a given quality by large factors. These are the most
+        trustworthy claims in the field because they are measured against the paper's own baseline.
+      </li>
+      <li style="margin-bottom:0.5rem;">
+        At their best-tuned settings, pixel-space, VAE-latent, and representation-latent models all
+        land in roughly the same 1.0 to 2.0 gFID band on ImageNet 256. No family is running away
+        with it.
+      </li>
+      <li>
+        Reconstruction quality does not predict generation quality. The clearest single example is
+        inside one paper: the encoder giving the best reconstruction is not the one giving the best
+        generation.
+      </li>
+    </ul>
+  </div>
+
+  <div class="card section-border" style="--section-color: var(--section-medical); margin-bottom:2.5rem;">
+    <h2 style="font-size:1.05rem; margin:0 0 0.6rem;">What you cannot conclude</h2>
+    <ul style="margin:0; padding-left:1.2rem;">
+      <li style="margin-bottom:0.5rem;">
+        <strong>That any one family beats another.</strong> Guidance method, model size, and training
+        budget vary simultaneously across the papers making these claims, and each alone can move
+        the number by more than the gap being argued about.
+      </li>
+      <li style="margin-bottom:0.5rem;">
+        <strong>That the guidance column is a detail.</strong> One paper reports the identical model
+        at 1.65 with no guidance, 1.49 with classifier-free guidance, 1.14 with autoguidance, and
+        1.06 with representation guidance. That 0.59 swing comes from the sampler alone, and it is
+        larger than most of the architectural gaps in the table below.
+      </li>
+      <li>
+        <strong>That text-to-image scores are precise.</strong> Three papers report the same public
+        checkpoint at 0.66, 0.67, and 0.82 on the same benchmark, purely from differences in prompt
+        rewriting and sampler settings. Treat gaps under roughly 0.05 as noise.
+      </li>
+    </ul>
+  </div>
+
+  <section style="margin-bottom:3rem;">
+    <h2 style="font-size:1.35rem; margin:0 0 0.3rem;">ImageNet 256, with guidance</h2>
+    <p style="color:var(--text-muted); font-size:0.9rem; margin:0 0 1rem;">
+      Lower is better. The guidance column is why this table is not a leaderboard.
+    </p>
+    <div style="overflow-x:auto;">
+      <table>
+        <thead>
+          <tr><th>gFID</th><th>Paper</th><th>Line</th><th>Guidance</th><th>Budget</th><th>Params</th></tr>
+        </thead>
+        <tbody>
+          {guided.map((r) => {
+            const p = paperOf(r); const l = lineOf(r);
+            return (
+              <tr>
+                <td style="font-family:var(--font-mono); font-weight:600;">{r.data.value}</td>
+                <td><a href={`/papers/${p?.id}`}>{p?.data.short ?? p?.label}</a></td>
+                <td style="font-size:0.82rem;">{l ? <a href={`/lines/${l.id}`}>{l.data.name}</a> : "—"}</td>
+                <td style="font-size:0.82rem; color:var(--text-muted);">{r.data.guidance}</td>
+                <td style="font-size:0.82rem; color:var(--text-muted);">{r.data.budget ?? "—"}</td>
+                <td style="font-size:0.82rem; color:var(--text-muted);">{r.data.params ?? "—"}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-top:1rem;">
+      {guided.filter((r) => r.data.caveat).map((r) => (
+        <p style="font-size:0.85rem; color:var(--text-muted); margin:0 0 0.5rem; border-left:2px solid var(--border-strong); padding-left:0.75rem;">
+          <strong>{paperOf(r)?.data.short}:</strong> {r.data.caveat}
+        </p>
+      ))}
+    </div>
+  </section>
+
+  <section style="margin-bottom:3rem;">
+    <h2 style="font-size:1.35rem; margin:0 0 0.3rem;">ImageNet 256, without guidance</h2>
+    <p style="color:var(--text-muted); font-size:0.9rem; margin:0 0 1rem;">
+      The cleaner comparison, because it removes the single largest confound. Fewer papers report it,
+      which is itself telling.
+    </p>
+    <div style="overflow-x:auto;">
+      <table>
+        <thead>
+          <tr><th>gFID</th><th>Paper</th><th>Line</th><th>Budget</th><th>Params</th></tr>
+        </thead>
+        <tbody>
+          {unguided.map((r) => {
+            const p = paperOf(r); const l = lineOf(r);
+            return (
+              <tr>
+                <td style="font-family:var(--font-mono); font-weight:600;">{r.data.value}</td>
+                <td><a href={`/papers/${p?.id}`}>{p?.data.short ?? p?.label}</a></td>
+                <td style="font-size:0.82rem;">{l ? <a href={`/lines/${l.id}`}>{l.data.name}</a> : "—"}</td>
+                <td style="font-size:0.82rem; color:var(--text-muted);">{r.data.budget ?? "—"}</td>
+                <td style="font-size:0.82rem; color:var(--text-muted);">{r.data.params ?? "—"}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+    <p class="measure" style="font-size:0.9rem; margin-top:1rem;">
+      Note what happens here. The gap between a plain VAE-latent transformer and a representation
+      latent is enormous without guidance and much smaller with it. Guidance is doing a large share
+      of the work that headline numbers attribute to the latent.
+    </p>
+  </section>
+
+  <section style="margin-bottom:3rem;">
+    <h2 style="font-size:1.35rem; margin:0 0 0.3rem;">One-step and few-step</h2>
+    <p style="color:var(--text-muted); font-size:0.9rem; margin:0 0 1rem;">
+      A separate contest. These models sample in one or a few passes rather than dozens, so they are
+      not comparable to the tables above.
+    </p>
+    <div style="overflow-x:auto;">
+      <table>
+        <thead>
+          <tr><th>gFID</th><th>NFE</th><th>Paper</th><th>Line</th><th>Note</th></tr>
+        </thead>
+        <tbody>
+          {fewStep.map((r) => {
+            const p = paperOf(r); const l = lineOf(r);
+            return (
+              <tr>
+                <td style="font-family:var(--font-mono); font-weight:600;">{r.data.value}</td>
+                <td style="font-family:var(--font-mono);">{r.data.nfe}</td>
+                <td><a href={`/papers/${p?.id}`}>{p?.data.short ?? p?.label}</a></td>
+                <td style="font-size:0.82rem;">{l ? <a href={`/lines/${l.id}`}>{l.data.name}</a> : "—"}</td>
+                <td style="font-size:0.8rem; color:var(--text-muted);">{r.data.setting}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+    <p class="measure" style="font-size:0.9rem; margin-top:1rem;">
+      The result worth pausing on: one method reports 1.54 in latent space and 1.61 in pixel space
+      with everything else held fixed. A 0.07 gap is weak support for the latent being essential.
+    </p>
+  </section>
+
+  <section style="margin-bottom:3rem;">
+    <h2 style="font-size:1.35rem; margin:0 0 0.3rem;">Reconstruction quality of the latent itself</h2>
+    <p style="color:var(--text-muted); font-size:0.9rem; margin:0 0 1rem;">
+      No generator involved. This is the ceiling the tokenizer imposes, and the point is that it does
+      not predict the generation numbers above.
+    </p>
+    <div style="overflow-x:auto;">
+      <table>
+        <thead><tr><th>rFID</th><th>Tokenizer</th><th>Paper</th></tr></thead>
+        <tbody>
+          {rfid.map((r) => {
+            const p = paperOf(r);
+            return (
+              <tr>
+                <td style="font-family:var(--font-mono); font-weight:600;">{r.data.value}</td>
+                <td style="font-size:0.88rem;">{r.data.setting}</td>
+                <td><a href={`/papers/${p?.id}`}>{p?.data.short ?? p?.label}</a></td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-top:1rem;">
+      {rfid.filter((r) => r.data.caveat).map((r) => (
+        <p style="font-size:0.85rem; color:var(--text-muted); margin:0 0 0.5rem; border-left:2px solid var(--border-strong); padding-left:0.75rem;">
+          <strong>{paperOf(r)?.data.short}:</strong> {r.data.caveat}
+        </p>
+      ))}
+    </div>
+  </section>
+
+  <section style="margin-bottom:2rem;">
+    <h2 style="font-size:1.35rem; margin:0 0 0.3rem;">Text-to-image</h2>
+    <p style="color:var(--text-muted); font-size:0.9rem; margin:0 0 1rem;">
+      Higher is better. Read these as coarse bands, not rankings: the same checkpoint scores
+      differently across papers, and the benchmark itself has measured drift.
+    </p>
+    <div style="overflow-x:auto;">
+      <table>
+        <thead><tr><th>GenEval</th><th>System</th><th>Line</th><th>Params</th></tr></thead>
+        <tbody>
+          {geneval.map((r) => {
+            const p = paperOf(r); const l = lineOf(r);
+            return (
+              <tr>
+                <td style="font-family:var(--font-mono); font-weight:600;">{r.data.value}</td>
+                <td><a href={`/papers/${p?.id}`}>{p?.data.short ?? p?.label}</a> <span style="font-size:0.8rem; color:var(--text-muted);">{r.data.setting}</span></td>
+                <td style="font-size:0.82rem;">{l ? <a href={`/lines/${l.id}`}>{l.data.name}</a> : "—"}</td>
+                <td style="font-size:0.82rem; color:var(--text-muted);">{r.data.params ?? "—"}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-top:1rem;">
+      {geneval.filter((r) => r.data.caveat).map((r) => (
+        <p style="font-size:0.85rem; color:var(--text-muted); margin:0 0 0.5rem; border-left:2px solid var(--border-strong); padding-left:0.75rem;">
+          <strong>{paperOf(r)?.data.short}:</strong> {r.data.caveat}
+        </p>
+      ))}
+    </div>
+
+    <div style="overflow-x:auto; margin-top:1.5rem;">
+      <table>
+        <thead><tr><th>DPG-Bench</th><th>System</th><th>Params</th></tr></thead>
+        <tbody>
+          {dpg.map((r) => {
+            const p = paperOf(r);
+            return (
+              <tr>
+                <td style="font-family:var(--font-mono); font-weight:600;">{r.data.value}</td>
+                <td><a href={`/papers/${p?.id}`}>{p?.data.short ?? p?.label}</a></td>
+                <td style="font-size:0.82rem; color:var(--text-muted);">{r.data.params ?? "—"}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="card">
+    <h2 style="font-size:1rem; margin:0 0 0.5rem;">How to read a claim in this field</h2>
+    <p class="measure" style="margin:0;">
+      When a paper says it beats a baseline, check three columns before believing the headline: the
+      guidance method, the training budget, and the parameter count. If any of the three differs from
+      the baseline, the gap is not attributable to the idea being sold. The within-paper ablation,
+      where those are held fixed, is almost always the more informative number, and it is almost
+      always smaller than the abstract implies.
+    </p>
+  </div>
+</Base>

@@ -36,3 +36,5 @@ summary: A fully open study of unified-model design choices that lands on a diff
   CLIP image features (not VAE latents), trained understanding-first then generation-second so understanding
   ability is preserved; ships model, code, and both pretraining and instruction-tuning data.
 explanation: null
+lines:
+- line-unified-models

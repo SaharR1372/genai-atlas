@@ -2,6 +2,27 @@
 
 ## Unreleased
 
+### 2026-09-09 — Session 3 (Opus 5) — restructured around research lines
+- **Pushed to GitHub**: https://github.com/SaharR1372/genai-atlas (branch `main`).
+- **New primary structure**: added the `line` entity type (D015) and rebuilt navigation around it.
+  15 research lines, each with a core bet, status, ordered arc, strengths, weaknesses, and the open
+  problems it does not solve. `/lines` and `/lines/[id]` replace the axis map as the entry point.
+- **Coverage**: +44 papers (74 total), every one arXiv-verified by `verify_paper.py`. Fills gaps
+  found in user review — Drifting Models (2602.04770), the natively-few-step family (MeanFlow,
+  Shortcut Models, Inductive Moment Matching), the normalizing-flow revival (STARFlow), VAE/
+  representation hybrids (DecQ, LV-RAE, FlatDINO, PAE, VFM-VAE), 2025-26 top-venue work across
+  editing, unified models, RL alignment, and evaluation.
+- **Benchmarks**: 4 benchmarks and 46 sourced results, with guidance method, training budget,
+  parameter count, NFE and per-number caveats as schema fields (D016). New `/compare` page states
+  plainly what the numbers do and do not support.
+- **New pages**: `/compare`, `/problems`, `/timeline`; paper pages now show line membership and
+  reported results.
+- **Tooling**: `verify_paper.py` now throttles to arXiv's ~3s guidance and backs off on HTTP 429;
+  `validate.py` gained line-membership consistency checks (a line's arc and a paper's `lines` must
+  agree). 18 tests passing.
+- **Corrections caught by verification**: OmniGen2 and RefEdit titles were wrong in the first draft
+  and were fixed against the fetched arXiv metadata.
+
 ### 2026-09-09 — Session 1 (Fable 5.1, plan mode)
 - Added project blueprint (`docs/blueprint.md`) covering scope, taxonomy, research families,
   backbone paper map, site design, data schema, repo layout, 3-day update pipeline, model strategy,

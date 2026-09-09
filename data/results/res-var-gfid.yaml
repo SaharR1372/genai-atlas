@@ -1,0 +1,14 @@
+id: res-var-gfid
+type: result
+paper: var-2024
+benchmark: imagenet256-gfid
+value: 1.73
+setting: ImageNet 256x256, VAR-d30-re, multi-scale VQ tokenizer
+source: Table 1 (v2)
+guidance: guidance ratio 2.0 + rejection sampling
+budget: 350 epochs
+params: 2.0B
+nfe: null
+self_reported_baseline: false
+caveat: arXiv v1 reported 1.80 for this configuration and the current version reports 1.73; cite which
+  version you mean. Uses rejection sampling, which the diffusion baselines do not.

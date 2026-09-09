@@ -1,0 +1,13 @@
+id: res-vavae-gfid-ng
+type: result
+paper: vavae-2025
+benchmark: imagenet256-gfid
+value: 2.17
+setting: LightningDiT + VA-VAE, no guidance
+source: Table 3
+guidance: none
+budget: 800 epochs
+params: 675M
+nfe: null
+self_reported_baseline: false
+caveat: null

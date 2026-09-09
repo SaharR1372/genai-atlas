@@ -1,0 +1,179 @@
+---
+import Base from "../../layouts/Base.astro";
+import {
+  allLines, nodeById, papersInLine, resultsForPaper, allBenchmarks,
+} from "../../lib/graph";
+
+export function getStaticPaths() {
+  return allLines().map((l) => ({ params: { id: l.id } }));
+}
+
+const { id } = Astro.params;
+const line = nodeById(id as string)!;
+const d = line.data;
+const sectionKey = line.sections?.[0] ?? "generation";
+
+const ROLE_LABEL: Record<string, string> = {
+  precursor: "Before",
+  origin: "The idea",
+  evidence: "Evidence",
+  improvement: "Improvement",
+  scaling: "At scale",
+  hybrid: "Combination",
+  challenge: "Limitation",
+  open: "Still open",
+};
+const ROLE_ORDER = ["precursor", "origin", "evidence", "improvement", "scaling", "hybrid", "challenge", "open"];
+
+const arc = (d.arc ?? []) as { paper: string; role: string; note: string }[];
+
+// group the arc into the problem -> idea -> evidence -> limitation narrative the atlas promises
+const arcGroups = ROLE_ORDER
+  .map((role) => ({ role, steps: arc.filter((s) => s.role === role) }))
+  .filter((g) => g.steps.length > 0);
+
+const members = papersInLine(line.id);
+const competitors = (d.competes_with ?? []).map((cid: string) => nodeById(cid)).filter(Boolean);
+const problems = (d.open_questions ?? []).map((pid: string) => nodeById(pid)).filter(Boolean);
+
+// headline benchmark numbers for papers in this line
+const lineResults = members
+  .flatMap((p) => resultsForPaper(p.id).map((r) => ({ r, p })))
+  .sort((a, b) => (a.r.data.benchmark ?? "").localeCompare(b.r.data.benchmark ?? ""));
+const benchName = (bid: string) => nodeById(bid)?.data.name ?? bid;
+---
+<Base title={d.name} description={d.one_line}>
+  <p class="badge" style="margin-bottom:0.75rem;">Research line · {d.status}</p>
+  <h1 style={`font-size:2rem; margin:0 0 0.6rem; color:var(--section-${sectionKey});`}>{d.name}</h1>
+  <p class="measure" style="font-size:1.1rem; margin:0 0 1.5rem;">{d.one_line}</p>
+
+  <div class="card section-border" style={`--section-color: var(--section-${sectionKey}); margin-bottom:2.5rem;`}>
+    <h2 style="font-size:0.8rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.04em; margin:0 0 0.4rem;">
+      What defines membership
+    </h2>
+    <p style="margin:0;">{d.core_bet}</p>
+  </div>
+
+  {arcGroups.length > 0 && (
+    <section style="margin-bottom:3rem;">
+      <h2 style="font-size:1.35rem; margin:0 0 0.4rem;">How the line developed</h2>
+      <p style="color:var(--text-muted); font-size:0.9rem; margin:0 0 1.5rem;">
+        Read top to bottom: what came before, the idea itself, the evidence for it, what improved,
+        and where it breaks.
+      </p>
+      {arcGroups.map(({ role, steps }) => (
+        <div style="margin-bottom:1.75rem;">
+          <h3 style="font-size:0.8rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin:0 0 0.6rem;">
+            {ROLE_LABEL[role]}
+          </h3>
+          <div style="display:flex; flex-direction:column; gap:0.85rem;">
+            {steps.map((s) => {
+              const p = nodeById(s.paper);
+              return (
+                <div style="border-left:2px solid var(--border); padding-left:1rem;">
+                  <p style="margin:0 0 0.2rem;">
+                    <a href={`/papers/${s.paper}`} style="font-weight:500;">
+                      {p?.data.short ?? p?.label ?? s.paper}
+                    </a>
+                    <span style="color:var(--text-muted); font-size:0.85rem;"> · {p?.date}</span>
+                    {p?.data.tier && (
+                      <span class="badge" style={`margin-left:0.4rem; border-color:var(--tier-${p.data.tier}); color:var(--tier-${p.data.tier});`}>
+                        {p.data.tier}
+                      </span>
+                    )}
+                  </p>
+                  <p style="margin:0; color:var(--text);">{s.note}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+    </section>
+  )}
+
+  <section style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px,1fr)); gap:1.25rem; margin-bottom:3rem;">
+    {d.strengths && (
+      <div class="card">
+        <h2 style="font-size:1rem; margin:0 0 0.6rem;">What it gets right</h2>
+        <ul style="margin:0; padding-left:1.2rem;">
+          {d.strengths.map((s: string) => <li style="margin-bottom:0.4rem;">{s}</li>)}
+        </ul>
+      </div>
+    )}
+    {d.weaknesses && (
+      <div class="card">
+        <h2 style="font-size:1rem; margin:0 0 0.6rem;">Where it is weak</h2>
+        <ul style="margin:0; padding-left:1.2rem;">
+          {d.weaknesses.map((s: string) => <li style="margin-bottom:0.4rem;">{s}</li>)}
+        </ul>
+      </div>
+    )}
+  </section>
+
+  {lineResults.length > 0 && (
+    <section style="margin-bottom:3rem;">
+      <h2 style="font-size:1.35rem; margin:0 0 0.4rem;">Reported numbers</h2>
+      <p style="color:var(--text-muted); font-size:0.9rem; margin:0 0 1rem;">
+        As published, with the guidance method, budget, and model size that produced them. See
+        <a href="/compare">the comparison page</a> for why these cannot be ranked naively.
+      </p>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr><th>Paper</th><th>Benchmark</th><th>Value</th><th>Guidance</th><th>Budget</th><th>Params</th></tr>
+          </thead>
+          <tbody>
+            {lineResults.map(({ r, p }) => (
+              <tr>
+                <td><a href={`/papers/${p.id}`}>{p.data.short ?? p.label}</a></td>
+                <td style="font-size:0.85rem;">{benchName(r.data.benchmark)}{r.data.nfe ? ` (NFE=${r.data.nfe})` : ""}</td>
+                <td style="font-family:var(--font-mono);">{r.data.value}</td>
+                <td style="font-size:0.82rem; color:var(--text-muted);">{r.data.guidance ?? "—"}</td>
+                <td style="font-size:0.82rem; color:var(--text-muted);">{r.data.budget ?? "—"}</td>
+                <td style="font-size:0.82rem; color:var(--text-muted);">{r.data.params ?? "—"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  )}
+
+  <section style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px,1fr)); gap:1.25rem;">
+    {competitors.length > 0 && (
+      <div>
+        <h2 style="font-size:1rem; margin:0 0 0.6rem;">Competing answers</h2>
+        <ul style="margin:0; padding-left:1.2rem;">
+          {competitors.map((c: any) => (
+            <li style="margin-bottom:0.35rem;">
+              <a href={`/lines/${c.id}`}>{c.data.name}</a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
+    {problems.length > 0 && (
+      <div>
+        <h2 style="font-size:1rem; margin:0 0 0.6rem;">Open problems it has not solved</h2>
+        <ul style="margin:0; padding-left:1.2rem;">
+          {problems.map((p: any) => (
+            <li style="margin-bottom:0.35rem;"><a href={`/problems#${p.id}`}>{p.data.statement}</a></li>
+          ))}
+        </ul>
+      </div>
+    )}
+  </section>
+
+  {members.length > arc.length && (
+    <section style="margin-top:2.5rem;">
+      <h2 style="font-size:1rem; margin:0 0 0.6rem;">Also in this line</h2>
+      <p style="margin:0;">
+        {members
+          .filter((m) => !arc.some((s) => s.paper === m.id))
+          .map((m) => m.data.short ?? m.label)
+          .join(", ")}
+      </p>
+    </section>
+  )}
+</Base>

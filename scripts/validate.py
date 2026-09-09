@@ -36,6 +36,7 @@ CONTENT_DIR = ROOT / "content"
 
 # directory (under data/) -> (schema filename, "single" | "array")
 DIR_SCHEMA_MAP = {
+    "lines": ("line.schema.json", "single"),
     "concepts": ("concept.schema.json", "single"),
     "papers": ("paper.schema.json", "single"),
     "systems": ("system.schema.json", "single"),
@@ -183,6 +184,8 @@ def run(data_dir: Path = DATA_DIR, content_dir: Path = CONTENT_DIR, root: Path =
         if etype == "papers":
             for pid in entity.get("problems", []):
                 check_id_exists(pid, f"{src} paper.problems -> '{pid}'", {"problems"})
+            for lid in entity.get("lines", []):
+                check_id_exists(lid, f"{src} paper.lines -> '{lid}'", {"lines"})
             for axis_key, concept_ids in entity.get("axes", {}).items():
                 for cid in concept_ids:
                     check_id_exists(cid, f"{src} paper.axes.{axis_key} -> '{cid}'", {"concepts"})
@@ -191,6 +194,24 @@ def run(data_dir: Path = DATA_DIR, content_dir: Path = CONTENT_DIR, root: Path =
                             f"{src}: paper.axes.{axis_key} references concept '{cid}' whose own "
                             f"axis is '{registry[cid]['entity'].get('axis')}'"
                         )
+
+        elif etype == "lines":
+            for step in entity.get("arc", []):
+                paper_id = step["paper"]
+                check_id_exists(paper_id, f"{src} line.arc -> '{paper_id}'", {"papers"})
+                # membership must be declared on both sides, or the site's line pages and the
+                # paper pages will disagree about who belongs to what
+                if paper_id in registry:
+                    declared = registry[paper_id]["entity"].get("lines", [])
+                    if entity_id not in declared:
+                        errors.append(
+                            f"{src}: line.arc lists paper '{paper_id}' but that paper does not "
+                            f"declare lines: ['{entity_id}'] (declared: {declared})"
+                        )
+            for pid in entity.get("open_questions", []):
+                check_id_exists(pid, f"{src} line.open_questions -> '{pid}'", {"problems"})
+            for lid in entity.get("competes_with", []):
+                check_id_exists(lid, f"{src} line.competes_with -> '{lid}'", {"lines"})
 
         elif etype == "problems":
             for pid in entity.get("attacked_by", []):

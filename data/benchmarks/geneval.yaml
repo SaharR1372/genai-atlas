@@ -1,0 +1,11 @@
+id: geneval
+type: benchmark
+name: GenEval
+metric: overall score
+higher_is_better: true
+sections:
+- generation
+notes: 'Object-focused compositional text-to-image benchmark (counting, position, colour attribution).
+  Widely reported, and now known to be unreliable: GenEval 2 measured up to 17.7% drift from human judgment
+  as models improved. Independent papers also report materially different scores for the identical FLUX.1-dev
+  checkpoint (0.66, 0.67, 0.82), so differences under roughly 0.05 should not be read as real.'

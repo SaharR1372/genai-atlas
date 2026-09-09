@@ -1,0 +1,89 @@
+---
+import Base from "../layouts/Base.astro";
+import { allProblems, nodeById, allLines } from "../lib/graph";
+
+const problems = allProblems().sort((a, b) => {
+  const order = ["open", "partially-solved", "solved-by"];
+  return order.indexOf(a.data.status) - order.indexOf(b.data.status);
+});
+
+const linesAttacking = (problemId: string) =>
+  allLines().filter((l) => (l.data.open_questions ?? []).includes(problemId));
+
+const STATUS_LABEL: Record<string, string> = {
+  open: "Open",
+  "partially-solved": "Partly addressed",
+  "solved-by": "Resolved",
+};
+---
+<Base title="Open problems" description="What is actually unsolved in generative vision, and who is attacking each problem.">
+  <h1 style="font-size:1.9rem; margin:0 0 0.6rem;">Open problems</h1>
+  <p class="measure" style="color:var(--text-muted); margin-bottom:2.5rem;">
+    The questions the field has not answered, each with the papers attacking it and the research
+    lines that inherit it as a weakness. A problem marked partly addressed has real progress against
+    it but no settled answer.
+  </p>
+
+  {problems.map((p) => {
+    const attackers = (p.data.attacked_by ?? []).map((id: string) => nodeById(id)).filter(Boolean);
+    const lines = linesAttacking(p.id);
+    const sectionKey = p.sections?.[0] ?? "generation";
+    return (
+      <section id={p.id} style="margin-bottom:2.5rem; scroll-margin-top:2rem;">
+        <div class="card section-border" style={`--section-color: var(--section-${sectionKey});`}>
+          <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:0.6rem;">
+            <span class="badge">{STATUS_LABEL[p.data.status] ?? p.data.status}</span>
+          </div>
+          <h2 style="font-size:1.15rem; margin:0 0 0.6rem;">{p.data.statement}</h2>
+          <p style="margin:0 0 1rem;">{p.data.why_it_matters}</p>
+
+          {p.data.candidate_approaches?.length > 0 && (
+            <div style="margin-bottom:1rem;">
+              <h3 style="font-size:0.78rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin:0 0 0.4rem;">
+                Approaches tried
+              </h3>
+              <ul style="margin:0; padding-left:1.2rem;">
+                {p.data.candidate_approaches.map((c: string) => (
+                  <li style="margin-bottom:0.25rem;">{c}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          <div style="display:flex; gap:2rem; flex-wrap:wrap; font-size:0.9rem;">
+            {attackers.length > 0 && (
+              <div>
+                <h3 style="font-size:0.78rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin:0 0 0.35rem;">
+                  Papers attacking it
+                </h3>
+                <p style="margin:0;">
+                  {attackers.map((a: any, i: number) => (
+                    <>
+                      {i > 0 && ", "}
+                      <a href={`/papers/${a.id}`}>{a.data.short ?? a.label}</a>
+                    </>
+                  ))}
+                </p>
+              </div>
+            )}
+            {lines.length > 0 && (
+              <div>
+                <h3 style="font-size:0.78rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin:0 0 0.35rem;">
+                  Lines that carry it as a weakness
+                </h3>
+                <p style="margin:0;">
+                  {lines.map((l: any, i: number) => (
+                    <>
+                      {i > 0 && ", "}
+                      <a href={`/lines/${l.id}`}>{l.data.name}</a>
+                    </>
+                  ))}
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+    );
+  })}
+</Base>

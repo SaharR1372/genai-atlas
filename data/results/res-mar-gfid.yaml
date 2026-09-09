@@ -1,0 +1,13 @@
+id: res-mar-gfid
+type: result
+paper: mar-2024
+benchmark: imagenet256-gfid
+value: 1.55
+setting: MAR-H, KL-16 continuous VAE
+source: Table 3
+guidance: CFG (scale swept, value not stated)
+budget: 800 epochs
+params: 943M
+nfe: null
+self_reported_baseline: false
+caveat: null

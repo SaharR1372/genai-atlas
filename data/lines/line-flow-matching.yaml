@@ -1,0 +1,42 @@
+id: line-flow-matching
+type: line
+name: Flow matching and rectified flow
+one_line: Regress the velocity field of a straight path between noise and data, rather than reversing
+  a stochastic noising process.
+core_bet: The training objective should be a simple regression along a fixed, near-straight probability
+  path.
+primary_axis: objective
+status: dominant
+since: 2022-09
+sections:
+- generation
+arc:
+- paper: flow-matching-2023
+  role: origin
+  note: A simulation-free objective for continuous normalizing flows, with the optimal-transport straight
+    path as a simple special case.
+- paper: rectified-flow-2023
+  role: origin
+  note: Independently derives the same idea, plus reflow to straighten paths further toward one-step sampling.
+- paper: sit-2024
+  role: evidence
+  note: Places diffusion and flow matching in one interpolant family and shows the flow side wins at matched
+    size and FLOPs.
+- paper: sd3-2024
+  role: scaling
+  note: Takes rectified flow to production scale with logit-normal timestep sampling; effectively settles
+    the objective question for open text-to-image.
+strengths:
+- Simpler to state, implement, and reason about than diffusion's schedule machinery
+- Straighter paths make few-step sampling and distillation tractable
+- Now the consensus choice, so tooling and intuition are mature
+weaknesses:
+- Gave up the well-developed SNR-weighting and noise-schedule theory of the DDPM era
+- Path straightness in theory does not guarantee straightness in a given latent space
+open_questions:
+- transport-path-straightness
+competes_with:
+- line-one-step-objectives
+- line-normalizing-flows
+- line-transition-matching
+explains: null

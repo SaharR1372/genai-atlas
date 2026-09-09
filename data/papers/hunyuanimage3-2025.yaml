@@ -1,0 +1,34 @@
+id: hunyuanimage3-2025
+type: paper
+title: HunyuanImage 3.0 Technical Report
+short: HunyuanImage 3.0
+arxiv: '2509.23951'
+date: 2025-09
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- Tencent
+authors:
+- Tencent Hunyuan Team
+tier: core
+sections:
+- generation
+- unified
+lines:
+- line-unified-models
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-09'
+  verified_by: opus
+summary: An 80B mixture-of-experts model that unifies understanding and generation autoregressively, with
+  native chain-of-thought before image output. The largest open-sourced unified image foundation model
+  at time of release.
+explanation: null

@@ -1,0 +1,14 @@
+id: res-svg-gfid
+type: result
+paper: svg-2025
+benchmark: imagenet256-gfid
+value: 1.92
+setting: SVG-XL, frozen DINOv3 + residual detail branch
+source: Table 1
+guidance: CFG (scale unresolved in source)
+budget: 1400 epochs
+params: 675M
+nfe: null
+self_reported_baseline: false
+caveat: Trained far longer than most rows here (1400 epochs). At a comparable 500 epochs it reports 2.10.
+  The source gives conflicting CFG scales (4.0 in a figure caption, 1.5 in an appendix table).

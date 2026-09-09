@@ -40,3 +40,5 @@ summary: 'Shows vector quantization is not required for autoregressive image gen
   per-token vectors and score them with a small conditional diffusion loss instead of a softmax over a
   discrete codebook, removing quantization error entirely while keeping AR''s flexible generation order.'
 explanation: null
+lines:
+- line-continuous-tokens

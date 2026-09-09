@@ -1,0 +1,68 @@
+id: line-representation-latent
+type: line
+name: Representation-space generation
+one_line: Freeze a vision foundation model and generate directly inside its feature space; train only
+  a decoder back to pixels.
+core_bet: The generative latent should be a pretrained semantic representation, not a code learned for
+  reconstruction.
+primary_axis: representation
+status: contested
+since: 2022-04
+sections:
+- rae
+- generation
+arc:
+- paper: unclip-2022
+  role: precursor
+  note: Generates a CLIP image embedding from text, then decodes it — the first system whose primary latent
+    was a semantic space.
+- paper: emu2-2024
+  role: precursor
+  note: Autoregressively predicts CLIP visual embeddings at multimodal LLM scale, with a diffusion decoder.
+- paper: rae-2025
+  role: origin
+  note: Frozen DINO/SigLIP/MAE encoder plus trained ViT decoder; identifies the width-vs-token-dimension
+    requirement, a dimension-dependent noise shift, and noise-augmented decoding as what makes it train.
+- paper: svg-2025
+  role: origin
+  note: Reaches the same conclusion independently within days, using frozen DINOv3 plus a residual detail
+    branch; reports 62x faster training.
+- paper: vfmvae-2025
+  role: evidence
+  note: Finds distilling foundation features into a trained tokenizer weakens them, supporting the keep-it-frozen
+    choice from the tokenizer side.
+- paper: scale-rae-2026
+  role: scaling
+  note: Carries the recipe to open-vocabulary text-to-image with SigLIP-2; VAE baselines overfit by epoch
+    64 where RAE stays stable to 256.
+- paper: svg-t2i-2025
+  role: scaling
+  note: The competing scale-up of the same bet, about a month earlier.
+- paper: raev2-2026
+  role: improvement
+  note: Fixes classifier-free guidance, adds multilayer feature aggregation, and reaches gFID 1.06 in
+    80 epochs.
+- paper: distilling-rae-2026
+  role: challenge
+  note: Shows these latents are severely anisotropic per token, which forces curved trajectories and obstructs
+    distillation.
+strengths:
+- Semantically rich latent by construction, not by auxiliary loss
+- Strong reconstruction and generation simultaneously, which the dilemma said was hard
+- Inherits every future improvement in vision foundation models for free
+- Notably more stable under long fine-tuning than VAE latents
+weaknesses:
+- Semantic features discard high-frequency detail, so the decoder carries the whole fidelity burden
+- High-dimensional and anisotropic, which complicates sampling and distillation
+- No published instruction-editing method operates in this space yet
+open_questions:
+- semantic-latent-detail-loss
+- high-dim-latent-diffusion
+- transport-path-straightness
+- latent-vs-pixel-space
+competes_with:
+- line-vae-latent
+- line-pixel-space
+- line-latent-hybrid
+- line-aligned-vae-latent
+explains: null

@@ -1,0 +1,39 @@
+id: nextstep1-2025
+type: paper
+title: 'NextStep-1: Toward Autoregressive Image Generation with Continuous Tokens at Scale'
+short: NextStep-1
+arxiv: '2508.10711'
+date: 2025-08
+venue:
+  name: ICLR
+  status: conference
+orgs:
+- StepFun
+authors:
+- Chunrui Han
+- Guopeng Li
+- Jingwei Wu
+tier: core
+sections:
+- generation
+- unified
+axes:
+  representation:
+  - continuous-tokens
+lines:
+- line-continuous-tokens
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-09'
+  verified_by: opus
+summary: Scales MAR's continuous-token idea to a 14B autoregressive model with a 157M flow-matching head,
+  reaching state of the art among autoregressive text-to-image systems. An ICLR 2026 oral, and the strongest
+  evidence that continuous-token autoregression is a real competitor to diffusion rather than a curiosity.
+explanation: null

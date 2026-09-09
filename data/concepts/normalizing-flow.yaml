@@ -1,0 +1,11 @@
+id: normalizing-flow
+type: concept
+name: Normalizing flow
+axis: objective
+one_line: An invertible mapping trained by exact maximum likelihood, giving exact densities and an inverse
+  for free at the cost of architectural constraints.
+sections:
+- generation
+introduced_by:
+- starflow-2025
+explains: null

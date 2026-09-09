@@ -39,3 +39,5 @@ summary: Redefines autoregressive image generation as coarse-to-fine next-*scale
   raster-order next-token prediction; for the first time an AR image model beats diffusion transformers
   on ImageNet FID while also showing GPT-style scaling laws. NeurIPS 2024 best paper.
 explanation: null
+lines:
+- line-discrete-tokens

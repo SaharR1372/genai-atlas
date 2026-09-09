@@ -42,3 +42,6 @@ summary: Reframes diffusion and flow matching as two points in one family of sto
   SiT-XL beats DiT-XL at matched size and FLOPs. Becomes the standard testbed the REPA/RAE line builds
   all its ablations on.
 explanation: null
+lines:
+- line-flow-matching
+- line-vae-latent

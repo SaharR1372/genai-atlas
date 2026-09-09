@@ -44,3 +44,5 @@ summary: Adds a simple auxiliary loss that aligns a diffusion transformer's inte
   FID, with no change to the model's own latent space or architecture — the paper RAE explicitly re-reads
   as 'why only align to the representation when you could generate directly inside it?'
 explanation: null
+lines:
+- line-aligned-vae-latent

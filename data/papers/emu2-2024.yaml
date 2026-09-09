@@ -38,3 +38,6 @@ summary: A 37B multimodal model that autoregressively predicts the next CLIP vis
   continuation of unCLIP's semantic-latent idea, and a direct ancestor of MetaQuery/BLIP3-o's frozen-MLLM-plus-diffusion-decoder
   pattern.
 explanation: null
+lines:
+- line-representation-latent
+- line-unified-models

@@ -1,0 +1,33 @@
+id: pico-banana-2025
+type: paper
+title: 'Pico-Banana-400K: A Large-Scale Dataset for Text-Guided Image Editing'
+short: Pico-Banana-400K
+arxiv: '2510.19808'
+date: 2025-10
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- Apple
+authors:
+- Yusu Qian
+- Eli Bocek-Rivele
+- Liangchen Song
+tier: strong-followup
+sections:
+- editing
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-09'
+  verified_by: opus
+summary: 400K edit pairs on real photographs, distilled from a frontier closed editor onto OpenImages.
+  Notable both as Apple entering open editing data and as evidence that closed-model distillation is now
+  a standard way to build open training sets.
+explanation: null

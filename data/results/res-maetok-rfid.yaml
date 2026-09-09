@@ -1,0 +1,13 @@
+id: res-maetok-rfid
+type: result
+paper: maetok-2025
+benchmark: imagenet256-rfid
+value: 0.48
+setting: MAETok, 128 tokens
+source: Table 4
+guidance: null
+budget: null
+params: null
+nfe: null
+self_reported_baseline: false
+caveat: null

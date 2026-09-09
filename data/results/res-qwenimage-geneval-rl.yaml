@@ -1,0 +1,14 @@
+id: res-qwenimage-geneval-rl
+type: result
+paper: qwen-image-2025
+benchmark: geneval
+value: 0.91
+setting: Qwen-Image after RL tuning
+source: Table 4
+guidance: null
+budget: null
+params: 20B
+nfe: null
+self_reported_baseline: false
+caveat: Post-RL. Illustrates that RL alignment moves GenEval by ~0.04, comparable to the gap between several
+  distinct systems in this table.

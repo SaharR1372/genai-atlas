@@ -1,0 +1,14 @@
+id: res-rae-gfid
+type: result
+paper: rae-2025
+benchmark: imagenet256-gfid
+value: 1.13
+setting: DiT^DH-XL, frozen DINOv2-B encoder
+source: Table 8
+guidance: AutoGuidance
+budget: 800 epochs
+params: 839M
+nfe: null
+self_reported_baseline: false
+caveat: AutoGuidance is a stronger guidance method than the plain CFG used by the VAE baselines in most
+  cross-paper comparisons, and contributes a large share of the gap.

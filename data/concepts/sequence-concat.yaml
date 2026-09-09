@@ -1,0 +1,12 @@
+id: sequence-concat
+type: concept
+name: In-context sequence concatenation
+axis: conditioning
+one_line: Concatenate a reference image's tokens directly onto the generation sequence and let ordinary
+  attention mix them, with no adapter, inversion, or task-specific head.
+sections:
+- editing
+- generation
+introduced_by:
+- kontext-2025
+explains: null

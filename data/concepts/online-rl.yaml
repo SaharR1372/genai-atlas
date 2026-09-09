@@ -1,0 +1,12 @@
+id: online-rl
+type: concept
+name: Online RL / policy gradient
+axis: training-signal
+one_line: Fine-tune a generator against a reward model with online policy-gradient methods such as GRPO,
+  rather than only maximizing likelihood on a fixed dataset.
+sections:
+- generation
+- editing
+introduced_by:
+- flow-grpo-2025
+explains: null

@@ -1,0 +1,13 @@
+id: res-scalerae-dpg
+type: result
+paper: scale-rae-2026
+benchmark: dpg-bench
+value: 76.9
+setting: Best ablation config, budget-limited
+source: Table 4
+guidance: null
+budget: ~30K iterations
+params: null
+nfe: null
+self_reported_baseline: false
+caveat: Same budget-limited ablation caveat as the GenEval row.

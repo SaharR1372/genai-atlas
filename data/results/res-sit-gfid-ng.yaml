@@ -1,0 +1,13 @@
+id: res-sit-gfid-ng
+type: result
+paper: sit-2024
+benchmark: imagenet256-gfid
+value: 8.3
+setting: ImageNet 256x256, no guidance
+source: cited via REPA Table 3
+guidance: none
+budget: 7M steps
+params: 675M
+nfe: null
+self_reported_baseline: false
+caveat: null

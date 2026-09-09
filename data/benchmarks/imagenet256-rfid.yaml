@@ -1,0 +1,11 @@
+id: imagenet256-rfid
+type: benchmark
+name: ImageNet 256x256 rFID
+metric: rFID
+higher_is_better: false
+sections:
+- rae
+- generation
+notes: 'Reconstruction FID of the autoencoder/tokenizer alone, with no generative model involved. Measures
+  the ceiling a latent imposes. Deliberately separated from gFID because the central finding of this whole
+  research area is that the two do not track each other: better reconstruction does not imply better generation.'

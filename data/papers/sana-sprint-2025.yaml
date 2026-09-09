@@ -1,0 +1,39 @@
+id: sana-sprint-2025
+type: paper
+title: 'SANA-Sprint: One-Step Diffusion with Continuous-Time Consistency Distillation'
+short: SANA-Sprint
+arxiv: '2503.09641'
+date: 2025-03
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- NVIDIA
+- MIT
+authors:
+- Junsong Chen
+- Shuchen Xue
+- Yuyang Zhao
+- Han Cai
+- Song Han
+tier: strong-followup
+sections:
+- generation
+lines:
+- line-one-step-objectives
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-09'
+  verified_by: opus
+summary: Combines continuous-time consistency distillation with an adversarial term to reach 1-4 step
+  text-to-image generation, reported faster than FLUX-schnell at comparable quality. Distillation-based,
+  so it depends on a strong multi-step teacher — the contrast case against MeanFlow and Drifting, which
+  train few-step behavior from scratch.
+explanation: null

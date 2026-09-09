@@ -1,0 +1,13 @@
+id: res-dit-gfid-ng
+type: result
+paper: dit-2023
+benchmark: imagenet256-gfid
+value: 9.62
+setting: ImageNet 256x256, no guidance
+source: Table 2
+guidance: none
+budget: 7M steps
+params: 675M
+nfe: null
+self_reported_baseline: false
+caveat: null

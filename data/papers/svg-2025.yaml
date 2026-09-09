@@ -32,3 +32,5 @@ summary: 'Independently arrives at the same core move as RAE within days: drop t
   fine-grained pixel detail semantic features drop. Reports 62x faster training and 35x faster inference
   than VAE-based diffusion at comparable quality.'
 explanation: null
+lines:
+- line-representation-latent

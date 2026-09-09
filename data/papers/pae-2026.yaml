@@ -1,0 +1,40 @@
+id: pae-2026
+type: paper
+title: What Matters for Diffusion-Friendly Latent Manifold? Prior-Aligned Autoencoders for Latent Diffusion
+short: PAE
+arxiv: '2605.07915'
+date: 2026-05
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- Shanghai Jiao Tong University
+- Alibaba Group
+authors:
+- Zhengrong Yue
+- Taihang Hu
+- Mengting Chen
+tier: core
+sections:
+- rae
+- generation
+lines:
+- line-latent-hybrid
+problems:
+- reconstruction-generation-dilemma
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-09'
+  verified_by: opus
+summary: 'Asks the design question directly rather than picking a side: instead of inheriting a frozen
+  foundation encoder (RAE) or training for reconstruction alone (VAE), it explicitly shapes a tokenizer''s
+  latent manifold using priors distilled from foundation models — spatial structure, local continuity,
+  global semantics. Reports RAE-comparable quality at 13x faster convergence and gFID 1.03.'
+explanation: null

@@ -48,3 +48,5 @@ summary: 'Tests whether the RAE recipe survives the jump from ImageNet to open-v
   models stay stable through 256 fine-tuning epochs where VAE-based models catastrophically overfit by
   epoch 64.'
 explanation: null
+lines:
+- line-representation-latent

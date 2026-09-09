@@ -1,0 +1,13 @@
+id: res-svg-rfid
+type: result
+paper: svg-2025
+benchmark: imagenet256-rfid
+value: 0.65
+setting: Frozen DINOv3 + residual detail branch
+source: Table 1
+guidance: null
+budget: null
+params: null
+nfe: null
+self_reported_baseline: false
+caveat: null

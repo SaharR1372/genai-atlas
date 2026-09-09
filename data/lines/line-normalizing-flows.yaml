@@ -1,0 +1,29 @@
+id: line-normalizing-flows
+type: line
+name: Normalizing-flow revival
+one_line: Return to exact-likelihood invertible models, scaled up with transformers and trained in a latent
+  space.
+core_bet: Exact likelihoods and invertibility are worth having, and the old scaling barriers were architectural
+  rather than fundamental.
+primary_axis: objective
+status: emerging
+since: 2025-06
+sections:
+- generation
+arc:
+- paper: starflow-2025
+  role: origin
+  note: A transformer autoregressive flow with a deep-shallow design, trained in a pretrained autoencoder's
+    latent space; the first flow-based model to compete at high resolution, with an explicit ablation
+    preferring latent over pixel modeling.
+strengths:
+- Exact likelihoods, which diffusion and flow matching cannot provide
+- Invertible by construction, which matters for editing and inverse problems
+- Backed by a major industrial lab rather than a single academic result
+weaknesses:
+- Far less validated than diffusion at frontier scale
+- Architecturally constrained by invertibility
+- Thin follow-up literature so far
+competes_with:
+- line-flow-matching
+explains: null

@@ -1,0 +1,13 @@
+id: res-imm-gfid
+type: result
+paper: imm-2025
+benchmark: imagenet256-gfid
+value: 1.99
+setting: ImageNet 256x256, 8 steps
+source: abstract
+guidance: not stated
+budget: not stated
+params: not stated
+nfe: 8
+self_reported_baseline: false
+caveat: null

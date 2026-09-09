@@ -35,3 +35,5 @@ summary: 'Independently derives the same straight-path ODE idea as flow matching
   near-one-step sampling. The ''rectified'' in ''rectified flow transformer'' (SD3, FLUX) traces back
   here.'
 explanation: null
+lines:
+- line-flow-matching

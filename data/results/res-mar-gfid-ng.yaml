@@ -1,0 +1,13 @@
+id: res-mar-gfid-ng
+type: result
+paper: mar-2024
+benchmark: imagenet256-gfid
+value: 2.35
+setting: MAR-H, no guidance
+source: Table 3
+guidance: none
+budget: 800 epochs
+params: 943M
+nfe: null
+self_reported_baseline: false
+caveat: null

@@ -37,3 +37,5 @@ summary: Replaces the UNet backbone of latent diffusion with a plain Vision Tran
   patches, showing that transformer scaling laws (more FLOPs, lower FID) hold for diffusion just as they
   do for language modeling. The direct ancestor of every DiT/MMDiT system in this atlas.
 explanation: null
+lines:
+- line-vae-latent

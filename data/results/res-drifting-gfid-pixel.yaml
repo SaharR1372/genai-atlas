@@ -1,0 +1,14 @@
+id: res-drifting-gfid-pixel
+type: result
+paper: drifting-2026
+benchmark: imagenet256-gfid
+value: 1.61
+setting: ImageNet 256x256, pixel space, one-step
+source: abstract
+guidance: not stated
+budget: not stated
+params: not stated
+nfe: 1
+self_reported_baseline: false
+caveat: One-step, pixel space. Notable because it is within 0.07 FID of the same method's latent-space
+  result, which is evidence against the latent being essential.

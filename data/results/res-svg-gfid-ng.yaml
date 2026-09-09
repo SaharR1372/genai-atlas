@@ -1,0 +1,13 @@
+id: res-svg-gfid-ng
+type: result
+paper: svg-2025
+benchmark: imagenet256-gfid
+value: 3.36
+setting: SVG-XL, no guidance
+source: Table 1
+guidance: none
+budget: 1400 epochs
+params: 675M
+nfe: null
+self_reported_baseline: false
+caveat: null

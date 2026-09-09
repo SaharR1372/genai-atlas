@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://genai-atlas/schema/line.schema.json",
+  "title": "Research line (a family of work sharing one core design bet)",
+  "description": "The atlas's primary organizing unit. A line is not an axis option and not a capability domain: it is a coherent research program defined by a shared bet, with its own arc, evidence, and open questions.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "type", "name", "one_line", "core_bet", "primary_axis", "status", "sections"],
+  "properties": {
+    "id": { "$ref": "common.schema.json#/$defs/id" },
+    "type": { "const": "line" },
+    "name": { "type": "string", "minLength": 1 },
+    "one_line": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The core bet in a single plain sentence."
+    },
+    "core_bet": {
+      "type": "string",
+      "minLength": 1,
+      "description": "What design choice defines membership in this line — the claim a paper has to make to belong here."
+    },
+    "primary_axis": {
+      "$ref": "common.schema.json#/$defs/axisKey",
+      "description": "Which design axis this line's defining bet is placed on."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["emerging", "ascendant", "dominant", "contested", "superseded"],
+      "description": "Where the line stands as of the last review. 'contested' means live disagreement about whether it works, not that it failed."
+    },
+    "since": { "$ref": "common.schema.json#/$defs/isoDate" },
+    "sections": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "common.schema.json#/$defs/section" }
+    },
+    "arc": {
+      "type": "array",
+      "description": "The line's narrative spine: problem -> idea -> method -> evidence -> limitation -> next. Every paper listed here must also declare this line in its own `lines` field.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["paper", "role", "note"],
+        "properties": {
+          "paper": { "$ref": "common.schema.json#/$defs/id" },
+          "role": {
+            "type": "string",
+            "enum": ["precursor", "origin", "evidence", "improvement", "scaling", "hybrid", "challenge", "open"]
+          },
+          "note": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "strengths": { "type": "array", "items": { "type": "string" } },
+    "weaknesses": { "type": "array", "items": { "type": "string" } },
+    "open_questions": {
+      "type": "array",
+      "items": { "$ref": "common.schema.json#/$defs/id" },
+      "description": "Problem ids this line has not resolved."
+    },
+    "competes_with": {
+      "type": "array",
+      "items": { "$ref": "common.schema.json#/$defs/id" },
+      "description": "Other line ids that answer the same question differently."
+    },
+    "explains": {
+      "type": ["string", "null"],
+      "description": "Path to the MDX deep dive for this line."
+    }
+  }
+}

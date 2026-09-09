@@ -1,0 +1,13 @@
+id: res-maetok-gfid
+type: result
+paper: maetok-2025
+benchmark: imagenet256-gfid
+value: 1.67
+setting: SiT-XL + MAETok, 128 tokens
+source: Table 2
+guidance: cfg=2.0, 250 steps
+budget: 4M steps
+params: 675M generator + 176M tokenizer
+nfe: null
+self_reported_baseline: false
+caveat: null

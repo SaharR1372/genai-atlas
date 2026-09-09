@@ -1,0 +1,11 @@
+id: transition-matching
+type: concept
+name: Transition matching
+axis: objective
+one_line: Model generation as a sequence of discrete-time Markov transition kernels over a continuous
+  state, which subsumes both flow matching and continuous-token autoregression as special cases.
+sections:
+- generation
+introduced_by:
+- transition-matching-2025
+explains: null

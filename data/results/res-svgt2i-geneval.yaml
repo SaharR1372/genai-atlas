@@ -1,0 +1,15 @@
+id: res-svgt2i-geneval
+type: result
+paper: svg-t2i-2025
+benchmark: geneval
+value: 0.75
+setting: SVG-T2I 2.6B DiT, frozen DINOv3 latent
+source: Table 5
+guidance: null
+budget: null
+params: 2.6B
+nfe: null
+self_reported_baseline: false
+caveat: Reported with an LLM prompt rewriter, which is not comparable to scores measured on raw prompts.
+  The same paper reports 0.82 for FLUX.1-dev under the same rewriter, where other papers report 0.66-0.67
+  for that identical checkpoint.

@@ -1,0 +1,14 @@
+id: res-dcae-rfid
+type: result
+paper: dcae-2024
+benchmark: imagenet256-rfid
+value: 0.69
+setting: DC-AE f32c32
+source: Table 2
+guidance: null
+budget: null
+params: null
+nfe: null
+self_reported_baseline: false
+caveat: DC-AE reports no ImageNet 256x256 gFID at all; its generation results are 512x512 only, and its
+  headline 'beats SD-VAE' result there uses 4x the training iterations.

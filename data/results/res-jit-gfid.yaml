@@ -1,0 +1,15 @@
+id: res-jit-gfid
+type: result
+paper: jit-2025
+benchmark: imagenet256-gfid
+value: 1.82
+setting: JiT-G/16, raw pixels, no tokenizer
+source: Table 6
+guidance: CFG-interval
+budget: 600 epochs
+params: ~2B
+nfe: null
+self_reported_baseline: false
+caveat: Uses roughly 2B parameters against the 675-839M of the latent-space rows, and a guidance-interval
+  technique. No unguided number is reported, so this cannot be compared against the unguided column. Any
+  claim that pixel-space now beats latent-space is confounded by scale and guidance simultaneously.

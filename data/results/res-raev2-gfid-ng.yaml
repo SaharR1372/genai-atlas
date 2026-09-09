@@ -1,0 +1,13 @@
+id: res-raev2-gfid-ng
+type: result
+paper: raev2-2026
+benchmark: imagenet256-gfid
+value: 1.65
+setting: RAEv2, K=7, no guidance
+source: Table 4
+guidance: none
+budget: 80 epochs
+params: 839M
+nfe: null
+self_reported_baseline: false
+caveat: null

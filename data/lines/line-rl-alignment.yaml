@@ -1,0 +1,33 @@
+id: line-rl-alignment
+type: line
+name: Reinforcement learning and preference alignment
+one_line: Fine-tune generators against reward models or human preference with policy-gradient methods,
+  rather than only maximizing likelihood.
+core_bet: Likelihood on web data is the wrong final objective; what to optimize is a reward reflecting
+  prompt adherence and human preference.
+primary_axis: training-signal
+status: ascendant
+since: 2025-05
+sections:
+- generation
+- editing
+arc:
+- paper: flow-grpo-2025
+  role: origin
+  note: Makes online RL work for flow models by converting the ODE to an SDE; lifts SD3.5-Medium's GenEval
+    from 63% to 95%.
+- paper: diffusionnft-2025
+  role: improvement
+  note: Optimizes the forward process directly, so it works with any black-box sampler and needs only
+    clean images.
+- paper: neon-2025
+  role: improvement
+  note: Extrapolates away from self-training degradation, turning model collapse into a usable signal.
+strengths:
+- Very large gains on prompt-adherence benchmarks for modest compute
+- Orthogonal to the representation and objective questions, so it composes with any line
+weaknesses:
+- Optimizes whatever the reward model measures, including its biases
+- Reward hacking and diversity collapse are recurring failure modes
+- Benchmark gains may overstate real quality gains, especially given GenEval's measured drift
+explains: null

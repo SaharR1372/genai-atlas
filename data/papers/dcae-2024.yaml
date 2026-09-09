@@ -38,3 +38,5 @@ summary: Pushes autoencoder spatial compression up to 128x (vs. the standard 8x)
   inference than SD-VAE-f8 at matched or better FID. The dimension/compression trade-off RAE's high-dimensional
   latents sit at the opposite end of.
 explanation: null
+lines:
+- line-vae-latent

@@ -50,6 +50,11 @@
       },
       "propertyNames": { "$ref": "common.schema.json#/$defs/axisKey" }
     },
+    "lines": {
+      "type": "array",
+      "items": { "$ref": "common.schema.json#/$defs/id" },
+      "description": "Research line ids this paper belongs to. A paper may sit in more than one."
+    },
     "problems": {
       "type": "array",
       "items": { "$ref": "common.schema.json#/$defs/id" }

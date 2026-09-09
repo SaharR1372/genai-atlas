@@ -1,0 +1,13 @@
+id: res-qwenimage-dpg
+type: result
+paper: qwen-image-2025
+benchmark: dpg-bench
+value: 88.32
+setting: Qwen-Image
+source: Table 3
+guidance: null
+budget: null
+params: 20B
+nfe: null
+self_reported_baseline: false
+caveat: null

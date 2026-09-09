@@ -1,0 +1,13 @@
+id: res-meanflow-gfid
+type: result
+paper: meanflow-2025
+benchmark: imagenet256-gfid
+value: 3.43
+setting: ImageNet 256x256, one-step, trained from scratch
+source: abstract
+guidance: not stated
+budget: not stated
+params: not stated
+nfe: 1
+self_reported_baseline: false
+caveat: One-step and trained from scratch with no teacher, unlike distillation methods.

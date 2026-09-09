@@ -1,0 +1,15 @@
+id: res-raev2-gfid
+type: result
+paper: raev2-2026
+benchmark: imagenet256-gfid
+value: 1.06
+setting: RAEv2, K=7 multilayer aggregation
+source: Table 4
+guidance: REPA-Guidance
+budget: 80 epochs
+params: 839M
+nfe: null
+self_reported_baseline: false
+caveat: The paper's own Table 4 shows the identical model at 1.65 (no guidance), 1.49 (CFG), 1.14 (AutoGuidance)
+  and 1.06 (REPA-Guidance). Guidance method alone moves this number by more than 0.5 FID, which is larger
+  than most claimed architectural wins in this table.

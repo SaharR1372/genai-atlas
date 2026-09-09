@@ -1,0 +1,55 @@
+id: line-latent-hybrid
+type: line
+name: Semantic-plus-detail hybrids
+one_line: Take a foundation-model representation and give it back the low-level detail it discards, with
+  a residual branch, detail queries, or a VAE compressing it.
+core_bet: Neither pure reconstruction codes nor pure semantic features are the right latent; the answer
+  is an explicit combination of both.
+primary_axis: representation
+status: emerging
+since: 2024-12
+sections:
+- rae
+- generation
+arc:
+- paper: tokenflow-2024
+  role: precursor
+  note: Dual codebooks — one semantic, one pixel-level — kept aligned by a shared mapping, motivated by
+    understanding and generation needing different granularity.
+- paper: lvrae-2026
+  role: origin
+  note: Augments RAE's semantic features with the missing colour and texture information, and hardens
+    the decoder against latent perturbation.
+- paper: flatdino-2026
+  role: origin
+  note: 'Compresses DINOv2 features with a VAE into 32 1-D tokens: literally composing the two rival representations,
+    at 8x fewer FLOPs.'
+- paper: pae-2026
+  role: improvement
+  note: Shapes a tokenizer's manifold using priors distilled from foundation models rather than inheriting
+    a frozen encoder; gFID 1.03 at 13x faster convergence.
+- paper: decq-2026
+  role: improvement
+  note: Pulls fine detail from shallower foundation-model layers into the decoder, lifting reconstruction
+    PSNR 19.13 to 22.76 dB without unfreezing the encoder.
+- paper: latent-diffusability-2026
+  role: evidence
+  note: Trains tokenizers across the whole reconstruction-to-representation spectrum and measures which
+    latent properties actually predict generation quality.
+strengths:
+- Directly targets the one weakness the representation-latent line cannot argue away
+- 'Empirically strong: several members report both better reconstruction and better generation than pure
+  RAE'
+- Cheaper sequences than diffusing on dense foundation-feature grids
+weaknesses:
+- Youngest line here, with the least independent replication
+- More moving parts, so ablations are harder to attribute
+- No agreement yet on which hybridization mechanism is the right one
+open_questions:
+- semantic-latent-detail-loss
+- reconstruction-generation-dilemma
+- latent-prior-shape
+competes_with:
+- line-representation-latent
+- line-vae-latent
+explains: null
