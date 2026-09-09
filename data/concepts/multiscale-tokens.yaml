@@ -1,0 +1,11 @@
+id: multiscale-tokens
+type: concept
+name: Multi-scale (next-scale) tokens
+axis: representation
+one_line: A coarse-to-fine pyramid of discrete tokens generated scale by scale, rather than a single flat
+  token grid.
+sections:
+- generation
+introduced_by:
+- var-2024
+explains: null

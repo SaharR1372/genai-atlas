@@ -1,0 +1,12 @@
+id: representation-alignment
+type: concept
+name: Representation alignment (REPA-style)
+axis: training-signal
+one_line: An auxiliary loss during generator training that pulls its intermediate hidden states toward
+  a frozen vision foundation encoder's features, without changing the generator's own latent space.
+sections:
+- rae
+- generation
+introduced_by:
+- repa-2024
+explains: null

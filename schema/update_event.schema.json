@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://genai-atlas/schema/update_event.schema.json",
+  "title": "Update event (pipeline monitoring log)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "type", "date", "kind", "target", "source_url"],
+  "properties": {
+    "id": { "$ref": "common.schema.json#/$defs/id" },
+    "type": { "const": "update_event" },
+    "date": { "$ref": "common.schema.json#/$defs/isoDate" },
+    "kind": {
+      "type": "string",
+      "enum": ["new_paper", "code_release", "weights", "acceptance", "revision", "followup", "reproduction"]
+    },
+    "target": { "$ref": "common.schema.json#/$defs/id" },
+    "source_url": { "type": "string" },
+    "run_id": { "type": ["string", "null"] },
+    "notes": { "type": "string" }
+  }
+}

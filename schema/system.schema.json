@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://genai-atlas/schema/system.schema.json",
+  "title": "System (model family)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "type", "name", "org", "releases", "sections"],
+  "properties": {
+    "id": { "$ref": "common.schema.json#/$defs/id" },
+    "type": { "const": "system" },
+    "name": { "type": "string", "minLength": 1 },
+    "org": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "open": { "type": "boolean" },
+    "releases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["version", "date"],
+        "properties": {
+          "version": { "type": "string" },
+          "date": { "$ref": "common.schema.json#/$defs/isoDate" },
+          "arxiv": { "type": ["string", "null"] },
+          "paper": { "$ref": "common.schema.json#/$defs/id" },
+          "open": { "type": "boolean" },
+          "notes": { "type": "string" }
+        }
+      }
+    },
+    "axes": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": { "$ref": "common.schema.json#/$defs/id" }
+      },
+      "propertyNames": { "$ref": "common.schema.json#/$defs/axisKey" }
+    },
+    "sections": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "common.schema.json#/$defs/section" }
+    },
+    "summary": { "type": "string" }
+  }
+}

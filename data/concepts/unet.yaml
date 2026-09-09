@@ -1,0 +1,10 @@
+id: unet
+type: concept
+name: UNet backbone
+axis: architecture
+one_line: A convolutional encoder-decoder with skip connections; the dominant diffusion backbone before
+  diffusion transformers.
+sections:
+- generation
+introduced_by: []
+explains: null

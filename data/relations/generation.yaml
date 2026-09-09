@@ -1,0 +1,137 @@
+- from: dit-2023
+  to: ldm-2022
+  type: builds_on
+  evidence: DiT operates in LDM's VAE latent space, replacing only the denoising backbone (UNet -> ViT).
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: dit-2023
+  to: unet
+  type: replaces
+  evidence: DiT swaps the convolutional UNet backbone for a plain Vision Transformer at every model size,
+    and shows the transformer scales better.
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: sit-2024
+  to: dit-2023
+  type: builds_on
+  evidence: SiT reuses the DiT backbone exactly, changing only the objective/interpolant framing.
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: sit-2024
+  to: flow-matching
+  type: combines
+  evidence: SiT's interpolant framework includes flow matching's straight-path coupling as one specific
+    choice within its design space.
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: sit-2024
+  to: diffusion-objective
+  type: combines
+  evidence: SiT's interpolant framework includes standard diffusion's stochastic coupling as one specific
+    choice within its design space.
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: sd3-2024
+  to: dit-2023
+  type: uses_architecture_from
+  evidence: SD3's MM-DiT is a dual-stream extension of the plain DiT block.
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: sd3-2024
+  to: flow-matching-2023
+  type: uses_objective_from
+  evidence: SD3 trains with a rectified-flow / flow-matching objective and a logit-normal timestep sampler.
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: sd3-2024
+  to: rectified-flow-2023
+  type: uses_objective_from
+  evidence: SD3 explicitly builds on the rectified-flow reflow formulation for straight paths.
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: sd3-2024
+  to: ldm-2022
+  type: improves
+  evidence: SD3 is a direct production-scale successor in the 'latent diffusion' lineage LDM started,
+    with a new architecture and objective.
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: var-2024
+  to: sd3-2024
+  type: competes_with
+  evidence: VAR proposes next-scale autoregression as an alternative generative paradigm to flow-matching
+    diffusion transformers, matching or beating their ImageNet FID.
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: mar-2024
+  to: var-2024
+  type: challenges
+  evidence: MAR shows continuous per-token diffusion loss removes the vector-quantization step VAR still
+    depends on for its discrete multi-scale tokens.
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: mar-2024
+  to: diffusion-objective
+  type: uses_objective_from
+  evidence: MAR scores each continuous token with a small conditional diffusion loss.
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: jit-2025
+  to: vae-latent
+  type: challenges
+  evidence: JiT trains competitive diffusion transformers directly on raw pixel patches, challenging the
+    assumption that a VAE latent space is necessary at all.
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: jit-2025
+  to: rae-2025
+  type: challenges
+  evidence: JiT's pixel-space return directly challenges the representation-space generation line's premise
+    that a learned (semantic or otherwise) latent is needed.
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: jit-2025
+  to: latent-vs-pixel-space
+  type: addresses
+  evidence: JiT is the paper this atlas uses to frame the open question of whether any tokenizer is necessary.
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: flow-matching-2023
+  to: diffusion-objective
+  type: challenges
+  evidence: Flow matching reframes generation as directly regressing a velocity field along a fixed coupling,
+    sidestepping the noise-schedule/SNR machinery diffusion models rely on.
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: rectified-flow-2023
+  to: diffusion-objective
+  type: challenges
+  evidence: Rectified flow independently proposes the same straight-path alternative to stochastic diffusion,
+    plus an iterative 'reflow' straightening procedure.
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: dcae-2024
+  to: vae-latent
+  type: improves
+  evidence: DC-AE substantially raises the compression ratio a VAE-style latent can sustain (up to 128x)
+    while keeping reconstruction quality, extending what this representation option can do.
+  confidence: high
+  added_by: sonnet
+  status: verified

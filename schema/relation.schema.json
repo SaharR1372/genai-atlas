@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://genai-atlas/schema/relation.schema.json",
+  "title": "Relation (a single typed edge; files under data/relations/ hold arrays of these)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["from", "to", "type", "evidence", "confidence", "added_by", "status"],
+  "properties": {
+    "from": { "$ref": "common.schema.json#/$defs/id" },
+    "to": { "$ref": "common.schema.json#/$defs/id" },
+    "type": { "$ref": "common.schema.json#/$defs/relationType" },
+    "evidence": { "type": "string", "minLength": 1 },
+    "confidence": { "$ref": "common.schema.json#/$defs/confidence" },
+    "added_by": { "$ref": "common.schema.json#/$defs/addedBy" },
+    "status": {
+      "type": "string",
+      "enum": ["candidate", "verified"]
+    }
+  }
+}

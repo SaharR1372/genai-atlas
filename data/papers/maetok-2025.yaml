@@ -1,0 +1,42 @@
+id: maetok-2025
+type: paper
+title: Masked Autoencoders Are Effective Tokenizers for Diffusion Models
+short: MAETok
+arxiv: '2502.03444'
+date: 2025-02
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- Carnegie Mellon University
+- University of Hong Kong
+- Peking University
+- AMD
+authors:
+- Hao Chen
+- Yujin Han
+- Fangyi Chen
+tier: core
+sections:
+- rae
+axes:
+  representation:
+  - semantic-latent
+problems:
+- semantic-latent-detail-loss
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-09'
+  verified_by: sonnet
+summary: 'Argues the key variable for generation quality is latent *geometry*, not whether the autoencoder
+  is variational: a masked-modeling-trained, purely discriminative latent with fewer Gaussian-mixture
+  modes is both easier to generate in and reconstructs well, hitting SOTA ImageNet FID with only 128 tokens
+  and far less compute than prior tokenizers.'
+explanation: null

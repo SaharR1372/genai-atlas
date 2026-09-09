@@ -1,0 +1,34 @@
+id: svg-t2i-2025
+type: paper
+title: 'SVG-T2I: Scaling Up Text-to-Image Latent Diffusion Model Without Variational Autoencoder'
+short: SVG-T2I
+arxiv: '2512.11749'
+date: 2025-12
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Minglei Shi
+tier: strong-followup
+sections:
+- rae
+- generation
+axes:
+  representation:
+  - semantic-latent
+links:
+  code: https://github.com/KlingAIResearch/SVG-T2I
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: released
+  weights: none
+  verified: true
+  verified_on: '2026-09-09'
+  verified_by: sonnet
+summary: Scales SVG's frozen-DINOv3 recipe from ImageNet to text-to-image, reporting a 0.75 GenEval score
+  and 85.78 DPG-Bench with full open-source release — the direct competitor to Scale-RAE, published about
+  a month apart on essentially the same question.
+explanation: null

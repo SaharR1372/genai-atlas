@@ -1,0 +1,18 @@
+[project]
+name = "genai-atlas"
+version = "0.1.0"
+description = "Living research atlas of modern generative vision — data tooling and update pipeline"
+requires-python = ">=3.9"
+dependencies = [
+    "PyYAML>=6.0",
+    "jsonschema>=4.20,<5",  # RefResolver (used in scripts/validate.py) is deprecated in 4.18+; revisit before jsonschema 5
+    "requests>=2.31",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

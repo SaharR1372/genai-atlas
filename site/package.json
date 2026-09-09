@@ -1,0 +1,24 @@
+{
+  "name": "genai-atlas-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "predev": "python3 ../scripts/build_graph.py",
+    "dev": "astro dev",
+    "prebuild": "python3 ../scripts/build_graph.py",
+    "build": "astro build",
+    "postbuild": "pagefind --site dist",
+    "preview": "astro preview",
+    "astro": "astro",
+    "graph:build": "python3 ../scripts/build_graph.py"
+  },
+  "dependencies": {
+    "astro": "^7.3.2",
+    "@astrojs/mdx": "^8.0.1",
+    "katex": "^0.16.11",
+    "d3": "^7.9.0"
+  },
+  "devDependencies": {
+    "pagefind": "^1.5.2"
+  }
+}

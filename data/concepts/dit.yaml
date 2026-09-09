@@ -1,0 +1,12 @@
+id: dit
+type: concept
+name: Diffusion Transformer (DiT)
+axis: architecture
+one_line: A plain Vision-Transformer backbone for diffusion/flow models, operating on a grid of latent
+  patch tokens with adaptive layer norm for timestep/class conditioning.
+sections:
+- generation
+- rae
+introduced_by:
+- dit-2023
+explains: null

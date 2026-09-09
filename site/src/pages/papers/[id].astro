@@ -1,0 +1,156 @@
+---
+import Base from "../../layouts/Base.astro";
+import katex from "katex";
+import { nodesByType, nodeById, edgesFrom, edgesTo } from "../../lib/graph";
+
+export function getStaticPaths() {
+  return nodesByType("papers").map((p) => ({ params: { id: p.id } }));
+}
+
+const { id } = Astro.params;
+const paper = nodeById(id as string)!;
+const d = paper.data;
+
+const outgoing = edgesFrom(paper.id);
+const incoming = edgesTo(paper.id);
+const buildsOn = outgoing.filter((e) => ["builds_on", "uses_objective_from", "uses_architecture_from", "uses_representation_from"].includes(e.type));
+const builtOnBy = incoming.filter((e) => ["builds_on", "improves", "uses_objective_from", "uses_architecture_from", "uses_representation_from"].includes(e.type));
+const inTension = [...outgoing, ...incoming].filter((e) => ["challenges", "competes_with", "replaces"].includes(e.type));
+const addresses = outgoing.filter((e) => e.type === "addresses");
+const problems = (d.problems ?? []).map((pid: string) => nodeById(pid)).filter(Boolean);
+
+const sectionKey = paper.sections[0] ?? "generation";
+const isFullTemplate = ["landmark", "core"].includes(d.tier);
+
+const axisLabels: Record<string, string> = {
+  representation: "Representation", objective: "Objective", architecture: "Architecture",
+  conditioning: "Conditioning & control", "training-signal": "Training signal", inference: "Inference",
+};
+
+function axisEntries() {
+  if (!d.axes) return [];
+  return Object.entries(d.axes as Record<string, string[]>).map(([axis, ids]) => ({
+    axis, label: axisLabels[axis] ?? axis,
+    concepts: (ids as string[]).map((cid) => nodeById(cid)).filter(Boolean),
+  }));
+}
+const axes = axisEntries();
+
+// One rendered equation per blueprint's "readable equations" requirement — the shared
+// straight-line interpolation every flow-matching/rectified-flow paper in this atlas trains on.
+const flowEquation = katex.renderToString(
+  "x_t = (1-t)\\,x_0 + t\\,x_1, \\qquad v_\\theta(x_t, t) \\approx x_1 - x_0",
+  { throwOnError: false, displayMode: true }
+);
+---
+<Base title={d.title} description={d.summary}>
+  <p class="badge" style={`margin-bottom:0.75rem; border-color: var(--tier-${d.tier}); color: var(--tier-${d.tier});`}>
+    {d.tier}
+  </p>
+  <h1 style={`font-size:1.75rem; margin:0 0 0.5rem; color:var(--section-${sectionKey});`}>{d.title}</h1>
+  <p style="color:var(--text-muted); margin:0 0 1.5rem;">
+    {d.authors?.join(", ")} {d.orgs?.length ? `· ${d.orgs.join(", ")}` : ""} · {d.date}
+    {d.arxiv && <> · <a href={`https://arxiv.org/abs/${d.arxiv}`}>arXiv:{d.arxiv}</a></>}
+    {d.links?.code && <> · <a href={d.links.code}>code</a></>}
+  </p>
+
+  <div class="card" style="margin-bottom:2rem;">
+    <h2 style="font-size:0.95rem; color:var(--text-muted); margin:0 0 0.5rem; text-transform:uppercase; letter-spacing:0.03em;">
+      Why it matters
+    </h2>
+    <p style="margin:0; font-size:1.02rem;">{d.summary}</p>
+  </div>
+
+  {axes.length > 0 && (
+    <section style="margin-bottom:2rem;">
+      <h2 style="font-size:0.95rem; color:var(--text-muted); margin:0 0 0.75rem; text-transform:uppercase; letter-spacing:0.03em;">
+        Design-axis choices
+      </h2>
+      <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:0.75rem;">
+        {axes.map(({ axis, label, concepts }) => (
+          <div class="card section-border" style={`--section-color: var(--section-${sectionKey}); padding:0.9rem 1.1rem;`}>
+            <p style="margin:0 0 0.3rem; font-size:0.8rem; color:var(--text-muted);">{label}</p>
+            {concepts.map((c: any) => (
+              <p style="margin:0;"><a href={`/axes/${axis}`}>{c.data.name}</a></p>
+            ))}
+          </div>
+        ))}
+      </div>
+    </section>
+  )}
+
+  {problems.length > 0 && (
+    <section style="margin-bottom:2rem;">
+      <h2 style="font-size:0.95rem; color:var(--text-muted); margin:0 0 0.75rem; text-transform:uppercase; letter-spacing:0.03em;">
+        Problem
+      </h2>
+      <ul style="margin:0; padding-left:1.2rem;">
+        {problems.map((p: any) => <li>{p.data.statement}</li>)}
+      </ul>
+    </section>
+  )}
+
+  {isFullTemplate && (
+    <section class="card" style="margin-bottom:2rem;">
+      <h2 style="font-size:0.95rem; color:var(--text-muted); margin:0 0 0.75rem; text-transform:uppercase; letter-spacing:0.03em;">
+        Method note — the shared flow-matching interpolation
+      </h2>
+      <p style="margin:0 0 0.75rem; font-size:0.92rem; color:var(--text-muted);">
+        Every flow-matching / rectified-flow paper in this atlas trains toward a straight-line path
+        between a noise sample x&#8320; and a data sample x&#8321;:
+      </p>
+      <Fragment set:html={flowEquation} />
+    </section>
+  )}
+
+  <section style="margin-bottom:2rem;">
+    <h2 style="font-size:0.95rem; color:var(--text-muted); margin:0 0 0.75rem; text-transform:uppercase; letter-spacing:0.03em;">
+      Builds on
+    </h2>
+    {buildsOn.length === 0 ? <p style="color:var(--text-muted); margin:0;">Nothing recorded yet.</p> : (
+      <ul style="margin:0; padding-left:1.2rem;">
+        {buildsOn.map((e) => {
+          const target = nodeById(e.to);
+          return <li><span class="badge">{e.type}</span> <a href={target?.nodeType === "papers" ? `/papers/${e.to}` : `/axes/representation`}>{target?.label ?? e.to}</a> — {e.evidence}</li>;
+        })}
+      </ul>
+    )}
+  </section>
+
+  <section style="margin-bottom:2rem;">
+    <h2 style="font-size:0.95rem; color:var(--text-muted); margin:0 0 0.75rem; text-transform:uppercase; letter-spacing:0.03em;">
+      Built on by
+    </h2>
+    {builtOnBy.length === 0 ? <p style="color:var(--text-muted); margin:0;">Nothing recorded yet.</p> : (
+      <ul style="margin:0; padding-left:1.2rem;">
+        {builtOnBy.map((e) => {
+          const source = nodeById(e.from);
+          return <li><a href={`/papers/${e.from}`}>{source?.label ?? e.from}</a> <span class="badge">{e.type}</span> this — {e.evidence}</li>;
+        })}
+      </ul>
+    )}
+  </section>
+
+  {inTension.length > 0 && (
+    <section style="margin-bottom:2rem;">
+      <h2 style="font-size:0.95rem; color:var(--text-muted); margin:0 0 0.75rem; text-transform:uppercase; letter-spacing:0.03em;">
+        Challenges / competes with
+      </h2>
+      <ul style="margin:0; padding-left:1.2rem;">
+        {inTension.map((e) => {
+          const other = e.from === paper.id ? nodeById(e.to) : nodeById(e.from);
+          return <li><span class="badge">{e.type}</span> <a href={other?.nodeType === "papers" ? `/papers/${other.id}` : "#"}>{other?.label}</a> — {e.evidence}</li>;
+        })}
+      </ul>
+    </section>
+  )}
+
+  {!isFullTemplate && (
+    <p style="color:var(--text-muted); font-size:0.85rem;">
+      This is a {d.tier} entry — a short-form summary. Full paper-page explanations (before/problem/
+      core idea/representation/architecture/objective/conditioning/training/inference/results/
+      ablations/limitations) are written for landmark and core papers first; see PROJECT_STATE.md
+      for the schedule.
+    </p>
+  )}
+</Base>

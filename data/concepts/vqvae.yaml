@@ -1,0 +1,10 @@
+id: vqvae
+type: concept
+name: VQ-VAE / VQGAN
+axis: background
+one_line: An autoencoder with a discrete codebook bottleneck, later paired with GAN or transformer-based
+  priors. Predecessor to modern discrete-token generation.
+sections:
+- generation
+introduced_by: []
+explains: null

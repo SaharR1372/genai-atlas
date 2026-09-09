@@ -1,0 +1,17 @@
+id: semantic-latent-detail-loss
+type: problem
+statement: Semantic / foundation-model latents discard much of the high-frequency pixel detail (exact
+  color, texture, fine structure) that faithful reconstruction — and, later, edit-region preservation
+  — depends on.
+why_it_matters: 'This is the crux of whether semantic latents can ever support image editing: an editor
+  must leave untouched pixels untouched, which requires detail the latent may not carry.'
+sections:
+- rae
+- editing
+attacked_by:
+- maetok-2025
+status: open
+solved_by: []
+candidate_approaches:
+- residual/detail branch alongside the semantic latent (SVG)
+- detail-recovering decoder queries (later follow-up work, not yet in this atlas)

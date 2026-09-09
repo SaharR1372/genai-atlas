@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://genai-atlas/schema/concept.schema.json",
+  "title": "Concept",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "type", "name", "axis", "one_line"],
+  "properties": {
+    "id": { "$ref": "common.schema.json#/$defs/id" },
+    "type": { "const": "concept" },
+    "name": { "type": "string", "minLength": 1 },
+    "axis": {
+      "oneOf": [
+        { "$ref": "common.schema.json#/$defs/axisKey" },
+        { "const": "background" }
+      ],
+      "description": "One of the six design axes, or 'background' for pre-2023 ancestor concepts"
+    },
+    "one_line": { "type": "string", "minLength": 1 },
+    "sections": {
+      "type": "array",
+      "items": { "$ref": "common.schema.json#/$defs/section" }
+    },
+    "introduced_by": {
+      "type": "array",
+      "items": { "$ref": "common.schema.json#/$defs/id" },
+      "description": "Paper ids that introduced or popularized this concept/option"
+    },
+    "explains": {
+      "type": ["string", "null"],
+      "description": "Path to MDX file with the full explanation"
+    }
+  }
+}

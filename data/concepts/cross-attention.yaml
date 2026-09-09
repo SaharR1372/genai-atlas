@@ -1,0 +1,11 @@
+id: cross-attention
+type: concept
+name: Cross-attention conditioning
+axis: conditioning
+one_line: Condition a generator on text/image context via dedicated cross-attention layers between the
+  generation stream and a separately encoded context sequence.
+sections:
+- generation
+- editing
+introduced_by: []
+explains: null

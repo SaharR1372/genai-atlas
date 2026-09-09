@@ -1,0 +1,31 @@
+id: dit-to-rae-in-12-steps
+type: path
+title: DiT to RAE in 12 steps
+audience: Readers who know standard latent diffusion and want to understand how the field arrived at representation-space
+  generation.
+steps:
+- id: ldm-2022
+  why: Where the 'latent' in latent diffusion comes from.
+- id: dit-2023
+  why: Replaces the UNet backbone with a plain transformer.
+- id: flow-matching-2023
+  why: The objective that later replaces epsilon-prediction diffusion.
+- id: rectified-flow-2023
+  why: Independently arrives at the same straight-path idea.
+- id: sit-2024
+  why: Unifies diffusion and flow matching in one interpolant framework, and is the exact testbed RAE
+    later reuses.
+- id: sd3-2024
+  why: Flow matching + DiT at production scale, still in a VAE latent.
+- id: dinov2-2023
+  why: The frozen self-supervised backbone every representation-latent method borrows.
+- id: repa-2024
+  why: First shows aligning a DiT's hidden states to DINOv2 features accelerates training dramatically.
+- id: vavae-2025
+  why: Pushes alignment into the VAE itself, exposing the reconstruction-generation dilemma.
+- id: repae-2025
+  why: Makes the VAE and DiT trainable end-to-end through the alignment loss.
+- id: maetok-2025
+  why: 'Reframes the goal as latent geometry: fewer Gaussian-mixture modes, easier generation.'
+- id: rae-2025
+  why: 'Drops the VAE entirely: diffuse directly in a frozen encoder''s high-dimensional semantic space.'

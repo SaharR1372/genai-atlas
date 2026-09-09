@@ -1,0 +1,11 @@
+id: diffusion-loss-ar
+type: concept
+name: Diffusion-loss autoregression
+axis: objective
+one_line: Autoregress over a sequence of continuous tokens, using a small per-token diffusion model as
+  the loss instead of a categorical cross-entropy over a codebook.
+sections:
+- generation
+introduced_by:
+- mar-2024
+explains: null

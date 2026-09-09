@@ -1,0 +1,44 @@
+id: sit-2024
+type: paper
+title: 'SiT: Exploring Flow and Diffusion-based Generative Models with Scalable Interpolant Transformers'
+short: SiT
+arxiv: '2401.08740'
+date: 2024-01
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- NYU
+- MIT
+authors:
+- Nanye Ma
+- Mark Goldstein
+- Michael S. Albergo
+- Nicholas M. Boffi
+- Eric Vanden-Eijnden
+- Saining Xie
+tier: core
+sections:
+- generation
+- rae
+axes:
+  objective:
+  - interpolant-framework
+  architecture:
+  - dit
+links:
+  code: https://github.com/willisma/SiT
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: released
+  weights: none
+  verified: true
+  verified_on: '2026-09-09'
+  verified_by: sonnet
+summary: Reframes diffusion and flow matching as two points in one family of stochastic interpolants,
+  isolating objective, coupling, and sampler as independent design choices on the exact DiT backbone;
+  SiT-XL beats DiT-XL at matched size and FLOPs. Becomes the standard testbed the REPA/RAE line builds
+  all its ablations on.
+explanation: null

@@ -1,0 +1,39 @@
+id: dit-2023
+type: paper
+title: Scalable Diffusion Models with Transformers
+short: DiT
+arxiv: '2212.09748'
+date: 2022-12
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- UC Berkeley
+- NYU
+authors:
+- William Peebles
+- Saining Xie
+tier: landmark
+sections:
+- generation
+- rae
+axes:
+  architecture:
+  - dit
+  representation:
+  - vae-latent
+links:
+  code: https://github.com/facebookresearch/DiT
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: released
+  weights: none
+  verified: true
+  verified_on: '2026-09-09'
+  verified_by: sonnet
+summary: Replaces the UNet backbone of latent diffusion with a plain Vision Transformer operating on latent
+  patches, showing that transformer scaling laws (more FLOPs, lower FID) hold for diffusion just as they
+  do for language modeling. The direct ancestor of every DiT/MMDiT system in this atlas.
+explanation: null

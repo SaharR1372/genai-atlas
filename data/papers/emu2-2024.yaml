@@ -1,0 +1,40 @@
+id: emu2-2024
+type: paper
+title: Generative Multimodal Models are In-Context Learners
+short: Emu2
+arxiv: '2312.13286'
+date: 2023-12
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- BAAI
+- Tsinghua University
+- Peking University
+authors:
+- Quan Sun
+- Yufeng Cui
+- Xiaosong Zhang
+tier: core
+sections:
+- rae
+- unified
+axes:
+  representation:
+  - semantic-latent
+links:
+  code: https://github.com/baaivision/Emu
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: released
+  weights: none
+  verified: true
+  verified_on: '2026-09-09'
+  verified_by: sonnet
+summary: A 37B multimodal model that autoregressively predicts the next CLIP visual embedding alongside
+  text tokens, then decodes embeddings back to pixels with a diffusion decoder — an autoregressive, MLLM-scale
+  continuation of unCLIP's semantic-latent idea, and a direct ancestor of MetaQuery/BLIP3-o's frozen-MLLM-plus-diffusion-decoder
+  pattern.
+explanation: null

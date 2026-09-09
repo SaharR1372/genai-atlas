@@ -1,0 +1,17 @@
+id: latent-prior-shape
+type: problem
+statement: Should the noise source distribution for diffusion/flow training be a simple isotropic Gaussian,
+  or something structured (a mixture, a learned distribution) that better matches the target latent's
+  actual geometry?
+why_it_matters: A mismatched source distribution is one hypothesized cause of curved, hard-to-distill
+  transport paths in high-dimensional semantic latents.
+sections:
+- rae
+- generation
+attacked_by: []
+status: open
+solved_by: []
+candidate_approaches:
+- Gaussian-mixture source distributions
+- data-adaptive learned source distributions
+- structured couplings for the stochastic interpolant

@@ -1,0 +1,11 @@
+id: dit-dh
+type: concept
+name: DiT with diffusion head (DiT^DH)
+axis: architecture
+one_line: A DiT variant whose final block is replaced by a small per-token diffusion head, used to decode
+  high-dimensional semantic latents where a single linear projection is insufficient.
+sections:
+- rae
+introduced_by:
+- rae-2025
+explains: null

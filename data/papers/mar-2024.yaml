@@ -1,0 +1,42 @@
+id: mar-2024
+type: paper
+title: Autoregressive Image Generation without Vector Quantization
+short: MAR
+arxiv: '2406.11838'
+date: 2024-06
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- MIT
+- Google DeepMind
+- Tsinghua University
+authors:
+- Tianhong Li
+- Yonglong Tian
+- He Li
+- Mingyang Deng
+- Kaiming He
+tier: landmark
+sections:
+- generation
+axes:
+  representation:
+  - continuous-tokens
+  objective:
+  - diffusion-loss-ar
+links:
+  code: https://github.com/LTH14/mar
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: released
+  weights: none
+  verified: true
+  verified_on: '2026-09-09'
+  verified_by: sonnet
+summary: 'Shows vector quantization is not required for autoregressive image generation: predict continuous
+  per-token vectors and score them with a small conditional diffusion loss instead of a softmax over a
+  discrete codebook, removing quantization error entirely while keeping AR''s flexible generation order.'
+explanation: null

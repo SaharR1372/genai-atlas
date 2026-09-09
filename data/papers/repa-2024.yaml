@@ -1,0 +1,46 @@
+id: repa-2024
+type: paper
+title: 'Representation Alignment for Generation: Training Diffusion Transformers Is Easier Than You Think'
+short: REPA
+arxiv: '2410.06940'
+date: 2024-10
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- KAIST
+- NYU
+- Google
+authors:
+- Sihyun Yu
+- Sangkyung Kwak
+- Huiwon Jang
+- Jongheon Jeong
+- Jonathan Huang
+- Jinwoo Shin
+- Saining Xie
+tier: landmark
+sections:
+- rae
+- generation
+axes:
+  training-signal:
+  - representation-alignment
+problems:
+- vae-latent-semantics
+links:
+  code: https://github.com/sihyun-yu/REPA
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: released
+  weights: none
+  verified: true
+  verified_on: '2026-09-09'
+  verified_by: sonnet
+summary: Adds a simple auxiliary loss that aligns a diffusion transformer's intermediate hidden states
+  to a frozen DINOv2's features during training. Speeds up SiT-XL training by 17.5x and sets a new ImageNet
+  FID, with no change to the model's own latent space or architecture — the paper RAE explicitly re-reads
+  as 'why only align to the representation when you could generate directly inside it?'
+explanation: null

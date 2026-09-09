@@ -1,0 +1,41 @@
+id: jit-2025
+type: paper
+title: 'Back to Basics: Let Denoising Generative Models Denoise'
+short: JiT
+arxiv: '2511.13720'
+date: 2025-11
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- MIT
+authors:
+- Tianhong Li
+- Kaiming He
+tier: strong-followup
+sections:
+- generation
+- rae
+axes:
+  representation:
+  - pixels
+  objective:
+  - diffusion-objective
+problems:
+- latent-vs-pixel-space
+links:
+  code: https://github.com/LTH14/JiT
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: released
+  weights: none
+  verified: true
+  verified_on: '2026-09-09'
+  verified_by: sonnet
+summary: Argues pixel-space diffusion was never unstable because of pixels — it was unstable because of
+  epsilon-prediction. Switching to x-prediction on large patches lets a plain ViT ('Just image Transformers')
+  match tokenizer-based DiT/PixArt-alpha at 256-1024px with no VAE, no pretraining, and no auxiliary losses
+  at all.
+explanation: null

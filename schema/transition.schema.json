@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://genai-atlas/schema/transition.schema.json",
+  "title": "Transition (why the field moved)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "type", "title", "from_option", "to_option", "driver", "key_papers", "narrative"],
+  "properties": {
+    "id": { "$ref": "common.schema.json#/$defs/id" },
+    "type": { "const": "transition" },
+    "title": { "type": "string", "minLength": 1 },
+    "from_option": { "$ref": "common.schema.json#/$defs/id" },
+    "to_option": { "$ref": "common.schema.json#/$defs/id" },
+    "era": { "type": "string" },
+    "driver": {
+      "$ref": "common.schema.json#/$defs/axisKey",
+      "description": "Which axis became the binding constraint that forced this transition"
+    },
+    "cost": {
+      "type": "string",
+      "description": "What was lost or traded away by making this move"
+    },
+    "key_papers": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "common.schema.json#/$defs/id" }
+    },
+    "narrative": {
+      "type": ["string", "null"],
+      "description": "Path to MDX file with the full narrative + mini-graph"
+    }
+  }
+}

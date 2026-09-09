@@ -1,0 +1,35 @@
+id: siglip2-2025
+type: paper
+title: 'SigLIP 2: Multilingual Vision-Language Encoders with Improved Semantic Understanding, Localization,
+  and Dense Features'
+short: SigLIP 2
+arxiv: '2502.14786'
+date: 2025-02
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- Google DeepMind
+authors:
+- Michael Tschannen
+- Alexey Gritsenko
+- Xiao Wang
+tier: core
+sections:
+- vfm
+- rae
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-09'
+  verified_by: sonnet
+summary: Extends SigLIP's sigmoid contrastive language-image objective with captioning, self-distillation
+  and masked-prediction losses in one recipe, improving dense/localization features specifically; the
+  frozen encoder Scale-RAE uses for text-to-image.
+explanation: null

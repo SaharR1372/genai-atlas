@@ -1,0 +1,11 @@
+id: continuous-tokens
+type: concept
+name: Continuous tokens
+axis: representation
+one_line: Per-position continuous vectors generated autoregressively, each sampled by a small diffusion
+  loss instead of a softmax over a discrete codebook.
+sections:
+- generation
+introduced_by:
+- mar-2024
+explains: null

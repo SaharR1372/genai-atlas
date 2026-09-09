@@ -1,0 +1,189 @@
+/* Design tokens for the Generative Vision Atlas. See docs/blueprint.md section 5. */
+
+:root {
+  /* ---- neutral base (light) ---- */
+  --bg: #fafaf8;
+  --bg-raised: #ffffff;
+  --text: #17181c;
+  --text-muted: #55585f;
+  --border: #e3e2df;
+  --border-strong: #c9c8c3;
+  --link: #2a4d8f;
+  --link-hover: #17346b;
+  --code-bg: #f1f0ec;
+  --shadow: 0 1px 2px rgba(20, 20, 15, 0.06), 0 4px 16px rgba(20, 20, 15, 0.04);
+
+  /* ---- section identity hues (applied to headings/badges/borders only) ---- */
+  --section-generation: #3d5a99;   /* slate blue */
+  --section-rae: #7a5cb8;          /* violet */
+  --section-editing: #2f8f83;      /* teal */
+  --section-unified: #b8842f;      /* amber */
+  --section-vfm: #3f8f52;          /* green */
+  --section-vlm: #5b6270;          /* steel gray */
+  --section-medical: #b8546f;      /* rose */
+
+  /* ---- tier badges ---- */
+  --tier-landmark: #17181c;
+  --tier-core: #3d5a99;
+  --tier-strong-followup: #3f8f52;
+  --tier-emerging: #b8842f;
+  --tier-watchlist: #8a8d94;
+
+  /* ---- typography ---- */
+  --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-heading: "Newsreader", Georgia, "Times New Roman", serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Consolas, monospace;
+  --measure: 70ch;
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121214;
+    --bg-raised: #1a1a1d;
+    --text: #eceef0;
+    --text-muted: #a4a7ae;
+    --border: #2c2d31;
+    --border-strong: #3d3e43;
+    --link: #8fb0e8;
+    --link-hover: #b6cdf3;
+    --code-bg: #202024;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.25);
+
+    --section-generation: #8fb0e8;
+    --section-rae: #c1a8ec;
+    --section-editing: #7fd0c4;
+    --section-unified: #e3b563;
+    --section-vfm: #7fce93;
+    --section-vlm: #a7acb8;
+    --section-medical: #e78ca3;
+
+    --tier-landmark: #eceef0;
+    --tier-core: #8fb0e8;
+    --tier-strong-followup: #7fce93;
+    --tier-emerging: #e3b563;
+    --tier-watchlist: #8a8d94;
+
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #121214;
+  --bg-raised: #1a1a1d;
+  --text: #eceef0;
+  --text-muted: #a4a7ae;
+  --border: #2c2d31;
+  --border-strong: #3d3e43;
+  --link: #8fb0e8;
+  --link-hover: #b6cdf3;
+  --code-bg: #202024;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.25);
+
+  --section-generation: #8fb0e8;
+  --section-rae: #c1a8ec;
+  --section-editing: #7fd0c4;
+  --section-unified: #e3b563;
+  --section-vfm: #7fce93;
+  --section-vlm: #a7acb8;
+  --section-medical: #e78ca3;
+
+  --tier-landmark: #eceef0;
+  --tier-core: #8fb0e8;
+  --tier-strong-followup: #7fce93;
+  --tier-emerging: #e3b563;
+  --tier-watchlist: #8a8d94;
+
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+html {
+  background: var(--bg);
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--text);
+}
+
+a { color: var(--link); text-decoration: none; }
+a:hover { color: var(--link-hover); text-decoration: underline; }
+
+code, pre { font-family: var(--font-mono); }
+
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+code {
+  background: var(--code-bg);
+  border-radius: 4px;
+  padding: 0.15em 0.4em;
+  font-size: 0.9em;
+}
+
+.measure { max-width: var(--measure); }
+
+.container {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.card {
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  padding: 1.25rem 1.5rem;
+}
+
+.badge {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  padding: 0.15em 0.55em;
+  border-radius: 999px;
+  border: 1px solid var(--border-strong);
+  color: var(--text-muted);
+}
+
+.section-border {
+  border-left: 3px solid var(--section-color, var(--border-strong));
+  padding-left: 1rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  overflow-x: auto;
+  display: block;
+}
+
+th, td {
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+
+th { color: var(--text-muted); font-weight: 600; font-size: 0.85rem; }
+
+.katex-display { overflow-x: auto; overflow-y: hidden; }

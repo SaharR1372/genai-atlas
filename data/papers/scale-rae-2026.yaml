@@ -1,0 +1,50 @@
+id: scale-rae-2026
+type: paper
+title: Scaling Text-to-Image Diffusion Transformers with Representation Autoencoders
+short: Scale-RAE
+arxiv: '2601.16208'
+date: 2026-01
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- NYU
+- Meta AI (FAIR)
+authors:
+- Shengbang Tong
+- Boyang Zheng
+- Ziteng Wang
+- Bingda Tang
+- Nanye Ma
+- Ellis Brown
+- Jihan Yang
+- Rob Fergus
+- Yann LeCun
+- Saining Xie
+tier: core
+sections:
+- rae
+- generation
+axes:
+  representation:
+  - semantic-latent
+  - frozen-encoder
+  objective:
+  - flow-matching
+links:
+  code: https://github.com/ZitengWangNYU/Scale-RAE
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: released
+  weights: none
+  verified: true
+  verified_on: '2026-09-09'
+  verified_by: sonnet
+summary: 'Tests whether the RAE recipe survives the jump from ImageNet to open-vocabulary text-to-image:
+  scales a SigLIP-2-frozen RAE decoder on web, synthetic, and text-rendering data. Scale improves general
+  fidelity but targeted data composition is still required for specific domains like rendered text; RAE-based
+  models stay stable through 256 fine-tuning epochs where VAE-based models catastrophically overfit by
+  epoch 64.'
+explanation: null

@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://genai-atlas/schema/problem.schema.json",
+  "title": "Open problem",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "type", "statement", "why_it_matters", "status"],
+  "properties": {
+    "id": { "$ref": "common.schema.json#/$defs/id" },
+    "type": { "const": "problem" },
+    "statement": { "type": "string", "minLength": 1 },
+    "why_it_matters": { "type": "string", "minLength": 1 },
+    "sections": {
+      "type": "array",
+      "items": { "$ref": "common.schema.json#/$defs/section" }
+    },
+    "attacked_by": {
+      "type": "array",
+      "items": { "$ref": "common.schema.json#/$defs/id" }
+    },
+    "status": {
+      "type": "string",
+      "enum": ["open", "partially-solved", "solved-by"]
+    },
+    "solved_by": {
+      "type": "array",
+      "items": { "$ref": "common.schema.json#/$defs/id" }
+    },
+    "candidate_approaches": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  }
+}

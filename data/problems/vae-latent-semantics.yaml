@@ -1,0 +1,18 @@
+id: vae-latent-semantics
+type: problem
+statement: Standard VAE latents (e.g. SD-VAE) are optimized purely for pixel reconstruction, so they carry
+  little semantic structure — giving a diffusion model a low-information target to learn.
+why_it_matters: If the target latent is semantically impoverished, the generator has to rediscover semantics
+  from scratch during training, which is exactly the compute REPA/RAE-style methods claw back.
+sections:
+- rae
+- generation
+attacked_by:
+- repa-2024
+- rae-2025
+status: partially-solved
+solved_by: []
+candidate_approaches:
+- auxiliary alignment loss (REPA)
+- align the VAE itself (VA-VAE, REPA-E)
+- drop the VAE, generate directly in a frozen foundation encoder's space (RAE, SVG)

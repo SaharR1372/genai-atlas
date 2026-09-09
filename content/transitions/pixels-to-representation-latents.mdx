@@ -1,0 +1,53 @@
+---
+id: pixels-to-representation-latents
+title: From pixels to representation latents
+---
+
+## Where generation actually happens
+
+Every image generator has to decide *what space it generates in*. For a long stretch of the
+2022–2024 period that question had a settled answer: pixels are too expensive to model directly at
+high resolution, so compress them first with an autoencoder, then run diffusion in that compressed
+latent. [Latent Diffusion Models](/papers/ldm-2022) made this the default recipe, and the
+[Diffusion Transformer](/papers/dit-2023) kept the recipe while replacing the UNet backbone with a
+transformer — the VAE latent itself went largely unquestioned.
+
+## The problem the settled answer was hiding
+
+A VAE trained purely to reconstruct pixels has no reason to learn anything *semantic*. Two images
+that differ by a few compression artifacts sit far apart in pixel space but should be almost
+identical to a model that understands image content — and a reconstruction-only VAE has no pressure
+to represent them that way. [REPA](/papers/repa-2024) showed the cost of this concretely: adding an
+auxiliary loss that pulls a diffusion transformer's hidden states toward a frozen
+[DINOv2](/papers/dinov2-2023)'s features sped up training by over 17x, with no change to the model's
+own VAE latent. If aligning *to* a semantically rich space helps this much, the natural next question
+is why not generate directly *inside* one.
+
+## Two ways of taking that question seriously
+
+[VA-VAE](/papers/vavae-2025) and [REPA-E](/papers/repae-2025) took the conservative route: keep the
+VAE, but train it — or train it jointly with the diffusion model — under the same
+representation-alignment pressure. This measurably narrows the
+[reconstruction-generation dilemma](/problems/reconstruction-generation-dilemma): a latent tuned only
+for pixel fidelity is often a *harder* target for a generative model to learn, and alignment during
+VAE training helps both sides at once.
+
+[RAE](/papers/rae-2025) and [SVG](/papers/svg-2025) took the radical route, arriving at it within
+days of each other: stop training the encoder at all. Freeze a pretrained vision foundation
+model — DINO, SigLIP, MAE for RAE; DINOv3 for SVG — as the latent space itself, and train only a
+lightweight decoder to map it back to pixels. The result is a latent that is high-dimensional (RAE's
+central finding: decoder width has to meet or exceed the token dimension, which VAE-scale decoders
+never needed) and semantically structured by construction, not by an add-on loss.
+
+## What this costs, and what is still open
+
+Nothing here is free. A frozen encoder can't be fine-tuned to fix a bad reconstruction, so the whole
+burden of pixel fidelity moves onto the decoder — RAE needs a dimension-dependent noise-schedule
+shift and noise-augmented decoding just to train stably, and a dedicated diffusion-head decoder
+([DiT^DH](/concepts/dit-dh)) to decode well at all. Semantic latents also drop exactly the
+high-frequency detail that [image editing](/problems/semantic-latent-detail-loss) depends on to leave
+untouched pixels untouched — an open problem this atlas is watching closely. And the premise itself
+is under direct challenge: [JiT](/papers/jit-2025) argues that once epsilon-prediction is replaced
+with x-prediction, plain pixel-space diffusion is competitive with tokenizer-based DiTs after
+all — reopening the [pixels-vs-latent question](/problems/latent-vs-pixel-space) this whole transition
+was supposed to have settled.

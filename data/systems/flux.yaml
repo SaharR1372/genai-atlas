@@ -1,0 +1,42 @@
+id: flux
+type: system
+name: FLUX
+org:
+  - Black Forest Labs
+open: true
+releases:
+  - version: FLUX.1
+    date: '2024-08'
+    arxiv: null
+    open: true
+    notes: >-
+      No official technical report was published for the base FLUX.1 family (schnell/dev/pro) —
+      only open weights and a model card. "Demystifying Flux Architecture" (arXiv 2507.09595) is a
+      later third-party reverse-engineering write-up, not an official paper, so it is not cited as
+      this release's source.
+  - version: FLUX.1 Kontext
+    date: '2025-06'
+    arxiv: '2506.15742'
+    open: true
+    notes: >-
+      In-context image generation and editing via sequence-concatenation conditioning in latent
+      space. Has a real technical report (unlike base FLUX.1) but is not yet seeded as its own
+      `paper` entity — belongs with the editing section (P3), not Sprint 1's generation/RAE scope.
+  - version: FLUX.2
+    date: '2025-11'
+    arxiv: null
+    open: true
+    notes: >-
+      Multi-reference editing, Mistral text encoder. Referenced in blueprint.md as a landmark
+      editing system; not yet verified or seeded in detail — P3 work.
+axes:
+  architecture:
+    - mmdit
+sections:
+  - generation
+  - editing
+summary: >-
+  Black Forest Labs' open-weight flow-matching text-to-image family, founded by several of the
+  original Stable Diffusion / SD3 authors. FLUX.1 is one of the open reference systems the
+  flow-matching + MM-DiT recipe (see sd3-2024) is measured against; FLUX.1 Kontext and FLUX.2 extend
+  the family into in-context editing.

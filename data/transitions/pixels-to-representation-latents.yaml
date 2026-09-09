@@ -1,0 +1,21 @@
+id: pixels-to-representation-latents
+type: transition
+title: From pixels to representation latents
+from_option: pixels
+to_option: semantic-latent
+era: 2022-2025
+driver: representation
+cost: 'Reconstruction fidelity is no longer guaranteed by a bottlenecked autoencoder trained end-to-end
+  for pixel accuracy — it has to be recovered by a separately trained decoder, and ''what the latent means''
+  shifts from an interpretable compression code to whatever a frozen foundation model happened to learn.
+  The field passed through a VAE-latent stage (LDM) on the way: reconstruction-only latents were themselves
+  a first move away from raw pixels, before representation-alignment work (REPA, VA-VAE) exposed that
+  reconstruction-only latents were the wrong target, and RAE/SVG made the semantic latent itself the generative
+  space.'
+key_papers:
+- ldm-2022
+- dinov2-2023
+- repa-2024
+- vavae-2025
+- rae-2025
+narrative: content/transitions/pixels-to-representation-latents.mdx

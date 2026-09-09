@@ -1,0 +1,281 @@
+- from: repa-2024
+  to: dinov2-2023
+  type: uses_representation_from
+  evidence: REPA's alignment loss targets a frozen DINOv2's patch features as the alignment signal.
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: repa-2024
+  to: vae-latent-semantics
+  type: addresses
+  evidence: REPA is the paper that demonstrates VAE-latent diffusion trains faster once aligned to a semantically
+    rich target.
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: repa-2024
+  to: sit-2024
+  type: improves
+  evidence: REPA is trained as an add-on loss on top of SiT, cutting the steps needed to match a 7M-step
+    SiT-XL down to under 400K.
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: vavae-2025
+  to: repa-2024
+  type: builds_on
+  evidence: VA-VAE's VF Loss extends REPA's alignment idea from the diffusion transformer into VAE training
+    itself.
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: vavae-2025
+  to: reconstruction-generation-dilemma
+  type: addresses
+  evidence: VA-VAE is the paper that names and measures the reconstruction-generation dilemma directly.
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: vavae-2025
+  to: ldm-2022
+  type: improves
+  evidence: VA-VAE is a drop-in successor to SD-VAE-style tokenizers, aligned to a vision foundation model
+    instead of trained for reconstruction alone.
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: repae-2025
+  to: repa-2024
+  type: builds_on
+  evidence: REPA-E trains the VAE and diffusion transformer jointly through the same representation-alignment
+    loss REPA introduced as an add-on.
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: repae-2025
+  to: vavae-2025
+  type: improves
+  evidence: REPA-E goes end-to-end where VA-VAE trains the aligned VAE and the DiT as separate stages.
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: repae-2025
+  to: reconstruction-generation-dilemma
+  type: addresses
+  evidence: REPA-E's end-to-end training is proposed specifically to close the reconstruction-generation
+    gap further than staged training can.
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: maetok-2025
+  to: vae-latent
+  type: challenges
+  evidence: MAETok shows the variational form of the autoencoder is not necessary; a purely discriminative,
+    masked-modeling-trained latent with fewer Gaussian-mixture modes generates better.
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: maetok-2025
+  to: semantic-latent-detail-loss
+  type: addresses
+  evidence: MAETok's latent-geometry framing (fewer GMM modes, more discriminative features) is offered
+    as the mechanism behind better reconstruction and generation together.
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: dcae-2024
+  to: maetok-2025
+  type: competes_with
+  evidence: 'DC-AE and MAETok attack the same latent-design problem from different angles: architecture
+    and compression ratio (DC-AE) versus training objective and latent geometry (MAETok).'
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: metaquery-2025
+  to: unclip-2022
+  type: builds_on
+  evidence: MetaQuery continues unCLIP's idea of generating in a CLIP-like semantic feature space, now
+    mediated by a frozen multimodal LLM instead of a frozen CLIP text encoder.
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: blip3o-2025
+  to: metaquery-2025
+  type: competes_with
+  evidence: BLIP3-o and MetaQuery both connect a frozen/near-frozen MLLM to a diffusion decoder over CLIP-like
+    features, published within weeks of each other.
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: blip3o-2025
+  to: emu2-2024
+  type: builds_on
+  evidence: BLIP3-o's diffusion-over-CLIP-features approach continues the semantic-latent generation lineage
+    Emu2 established with autoregressive CLIP-feature regression.
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: emu2-2024
+  to: unclip-2022
+  type: builds_on
+  evidence: Emu2 extends unCLIP's CLIP-embedding generation into an autoregressive multimodal LLM that
+    predicts the next visual embedding alongside text.
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: rae-2025
+  to: repa-2024
+  type: builds_on
+  evidence: 'Sec. 1: REPA showed alignment helps; RAE asks why not generate in that space.'
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: rae-2025
+  to: vavae-2025
+  type: builds_on
+  evidence: Both attack the reconstruction-generation dilemma by aligning the encoder to a foundation
+    model; RAE goes further and freezes the encoder entirely instead of just aligning it.
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: rae-2025
+  to: vae-latent
+  type: challenges
+  evidence: RAE replaces the VAE outright with a frozen pretrained encoder plus a lightweight trained
+    decoder.
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: rae-2025
+  to: dinov2-2023
+  type: uses_representation_from
+  evidence: DINOv2 is one of the three frozen encoder families RAE evaluates as the generative latent.
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: rae-2025
+  to: dit-2023
+  type: uses_architecture_from
+  evidence: RAE's diffusion transformer is a DiT variant (with an added diffusion-head decoder stage).
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: rae-2025
+  to: vae-latent-semantics
+  type: addresses
+  evidence: RAE's frozen encoder is semantically rich by construction, sidestepping the low-semantic-target
+    problem entirely rather than aligning to fix it.
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: rae-2025
+  to: reconstruction-generation-dilemma
+  type: addresses
+  evidence: Because the encoder is frozen and never optimized for reconstruction, RAE reports strong reconstruction
+    and generation simultaneously.
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: rae-2025
+  to: high-dim-latent-diffusion
+  type: addresses
+  evidence: RAE identifies and fixes the specific failure modes (noise schedule, decoder capacity) of
+    running diffusion in a much higher-dimensional latent than VAEs use.
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: svg-2025
+  to: rae-2025
+  type: competes_with
+  evidence: SVG and RAE independently propose the same core move (frozen foundation encoder as the generative
+    latent) within days of each other, differing mainly in encoder choice and detail recovery mechanism.
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: svg-2025
+  to: dinov3-2025
+  type: uses_representation_from
+  evidence: SVG generates directly inside a frozen DINOv3 feature space.
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: svg-t2i-2025
+  to: svg-2025
+  type: builds_on
+  evidence: SVG-T2I scales SVG's ImageNet recipe to open-vocabulary text-to-image generation.
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: svg-t2i-2025
+  to: scale-rae-2026
+  type: competes_with
+  evidence: SVG-T2I and Scale-RAE are the direct competing answers to 'does the frozen-encoder recipe
+    scale to text-to-image', published about a month apart.
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: scale-rae-2026
+  to: rae-2025
+  type: builds_on
+  evidence: Scale-RAE takes RAE's ImageNet-scale recipe and scales the decoder to open-vocabulary text-to-image
+    data.
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: scale-rae-2026
+  to: siglip2-2025
+  type: uses_representation_from
+  evidence: Scale-RAE's frozen encoder is SigLIP-2, chosen for its language-aligned features at text-to-image
+    scale.
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: raev2-2026
+  to: rae-2025
+  type: improves
+  evidence: RAEv2 fixes RAE's classifier-free-guidance instability and roughly 10x's convergence speed
+    via multilayer representation aggregation and a re-parameterized DiT output.
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: raev2-2026
+  to: repa-2024
+  type: combines
+  evidence: RAEv2 explicitly combines RAE's frozen-encoder latent with a REPA-style alignment loss as
+    complementary mechanisms.
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: distilling-rae-2026
+  to: rae-2025
+  type: builds_on
+  evidence: Distilling Drifting Transformers targets RAE's specific latent space for a distillation method
+    built around its geometry.
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: distilling-rae-2026
+  to: transport-path-straightness
+  type: addresses
+  evidence: The paper's central finding is that RAE latents are severely anisotropic per-token, forcing
+    curved denoising trajectories that obstruct standard distillation.
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: distilling-rae-2026
+  to: high-dim-latent-diffusion
+  type: addresses
+  evidence: The anisotropy diagnosis is specific to RAE's high-dimensional latent space and would not
+    arise the same way in a low-dimensional VAE latent.
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: tokenflow-2024
+  to: rae-2025
+  type: competes_with
+  evidence: 'TokenFlow''s dual-codebook (semantic + pixel) design and RAE''s single frozen-encoder-plus-trained-decoder
+    design are alternative answers to the same underlying question: how much of reconstruction detail
+    must live alongside semantic content in one representation.'
+  confidence: high
+  added_by: sonnet
+  status: verified

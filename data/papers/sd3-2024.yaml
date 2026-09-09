@@ -1,0 +1,48 @@
+id: sd3-2024
+type: paper
+title: Scaling Rectified Flow Transformers for High-Resolution Image Synthesis
+short: SD3 / MMDiT
+arxiv: '2403.03206'
+date: 2024-03
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- Stability AI
+authors:
+- Patrick Esser
+- Sumith Kulal
+- Andreas Blattmann
+- Rahim Entezari
+- Jonas Muller
+- Harry Saini
+tier: landmark
+sections:
+- generation
+axes:
+  objective:
+  - flow-matching
+  architecture:
+  - mmdit
+  conditioning:
+  - joint-attention
+  inference:
+  - cfg
+  representation:
+  - vae-latent
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-09'
+  verified_by: sonnet
+summary: Takes rectified flow to production scale with a new dual-stream 'MM-DiT' architecture (separate
+  weights for text/image tokens, joined by shared attention) plus a logit-normal timestep-sampling schedule;
+  establishes the flow-matching + MM-DiT recipe that FLUX, Qwen-Image, Seedream and most 2025 open T2I
+  systems are variations of.
+explanation: null

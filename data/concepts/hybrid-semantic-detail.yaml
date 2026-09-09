@@ -1,0 +1,12 @@
+id: hybrid-semantic-detail
+type: concept
+name: Hybrid semantic + detail codebook
+axis: representation
+one_line: 'Two coupled codebooks/branches: one capturing semantic content, one capturing pixel-level detail,
+  kept aligned so both understanding and generation/reconstruction stay strong.'
+sections:
+- rae
+- unified
+introduced_by:
+- tokenflow-2024
+explains: null

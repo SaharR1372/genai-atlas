@@ -1,0 +1,42 @@
+id: vavae-2025
+type: paper
+title: 'Reconstruction vs. Generation: Taming Optimization Dilemma in Latent Diffusion Models'
+short: VA-VAE / LightningDiT
+arxiv: '2501.01423'
+date: 2025-01
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- Huazhong University of Science and Technology
+authors:
+- Jingfeng Yao
+- Bin Yang
+- Xinggang Wang
+tier: core
+sections:
+- rae
+- generation
+axes:
+  representation:
+  - vae-latent
+  training-signal:
+  - representation-alignment
+problems:
+- reconstruction-generation-dilemma
+links:
+  code: https://github.com/hustvl/LightningDiT
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: released
+  weights: none
+  verified: true
+  verified_on: '2026-09-09'
+  verified_by: sonnet
+summary: 'Names and measures the reconstruction-generation dilemma directly: a VAE tuned purely for reconstruction
+  fidelity becomes a *harder* space for a diffusion model to learn in. Fixes it by adding a vision-foundation-model
+  alignment loss (VF Loss) during VAE training itself, then pairs the resulting VA-VAE with an improved
+  DiT baseline (LightningDiT) for a 21x convergence speedup and SOTA ImageNet FID.'
+explanation: null

@@ -1,0 +1,19 @@
+id: reconstruction-generation-dilemma
+type: problem
+statement: A single latent space optimized for pixel-reconstruction fidelity is often a poor space for
+  a generative prior to learn in, and pushing on one side tends to hurt the other.
+why_it_matters: This dilemma is the reason a decade of 'just make the autoencoder reconstruct better'
+  work did not translate into better generation, and it motivates the entire representation-space generation
+  line.
+sections:
+- rae
+attacked_by:
+- vavae-2025
+- repae-2025
+- rae-2025
+status: partially-solved
+solved_by: []
+candidate_approaches:
+- align VAE training to a frozen foundation model (VA-VAE)
+- train VAE and diffusion model jointly through that alignment loss (REPA-E)
+- stop training the encoder for reconstruction at all (RAE)

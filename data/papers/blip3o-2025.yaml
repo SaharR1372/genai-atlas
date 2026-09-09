@@ -1,0 +1,38 @@
+id: blip3o-2025
+type: paper
+title: 'BLIP3-o: A Family of Fully Open Unified Multimodal Models-Architecture, Training and Dataset'
+short: BLIP3-o
+arxiv: '2505.09568'
+date: 2025-05
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- Salesforce Research
+- University of Maryland
+authors:
+- Jiuhai Chen
+- Zhiyang Xu
+- Xichen Pan
+tier: core
+sections:
+- rae
+- unified
+axes:
+  representation:
+  - semantic-latent
+links:
+  code: https://github.com/JiuhaiChen/BLIP3o
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: released
+  weights: none
+  verified: true
+  verified_on: '2026-09-09'
+  verified_by: sonnet
+summary: A fully open study of unified-model design choices that lands on a diffusion transformer generating
+  CLIP image features (not VAE latents), trained understanding-first then generation-second so understanding
+  ability is preserved; ships model, code, and both pretraining and instruction-tuning data.
+explanation: null

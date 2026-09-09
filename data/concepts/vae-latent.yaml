@@ -1,0 +1,12 @@
+id: vae-latent
+type: concept
+name: VAE latent
+axis: representation
+one_line: A compact continuous latent from a KL-regularized autoencoder (e.g. SD-VAE, 4-16 channels),
+  trained purely for pixel reconstruction.
+sections:
+- generation
+- rae
+introduced_by:
+- ldm-2022
+explains: null

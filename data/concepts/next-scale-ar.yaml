@@ -1,0 +1,11 @@
+id: next-scale-ar
+type: concept
+name: Next-scale autoregression
+axis: objective
+one_line: Predict an image as a sequence of token maps at increasing resolution, each conditioned on all
+  coarser scales, instead of raster-order next-token prediction.
+sections:
+- generation
+introduced_by:
+- var-2024
+explains: null

@@ -1,0 +1,10 @@
+id: diffusion-objective
+type: concept
+name: Diffusion (epsilon/v/x0-prediction)
+axis: objective
+one_line: Learn to reverse a fixed noising process by predicting the noise, velocity, or clean signal
+  at each step (DDPM-style).
+sections:
+- generation
+introduced_by: []
+explains: null

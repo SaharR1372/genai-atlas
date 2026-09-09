@@ -1,0 +1,43 @@
+id: repae-2025
+type: paper
+title: 'REPA-E: Unlocking VAE for End-to-End Tuning with Latent Diffusion Transformers'
+short: REPA-E
+arxiv: '2504.10483'
+date: 2025-04
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- Australian National University
+- NYU
+authors:
+- Xingjian Leng
+- Jaskirat Singh
+- Yunzhong Hou
+tier: core
+sections:
+- rae
+- generation
+axes:
+  representation:
+  - vae-latent
+  training-signal:
+  - representation-alignment
+problems:
+- reconstruction-generation-dilemma
+links:
+  code: https://github.com/End2End-Diffusion/REPA-E
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: released
+  weights: none
+  verified: true
+  verified_on: '2026-09-09'
+  verified_by: sonnet
+summary: Shows naive end-to-end VAE+diffusion training collapses the VAE's latent space, but training
+  through the REPA alignment loss instead (with a batch-norm bridge and a stop-gradient on the diffusion
+  loss's path back to the VAE) makes joint end-to-end training work — 17-45x faster than REPA/vanilla
+  training, with SOTA ImageNet FID.
+explanation: null

@@ -1,0 +1,12 @@
+id: semantic-latent
+type: concept
+name: Semantic / foundation latent
+axis: representation
+one_line: A latent taken from (or aligned to) a pretrained vision foundation encoder's feature space,
+  so it is high-dimensional and semantically structured rather than reconstruction-only.
+sections:
+- rae
+introduced_by:
+- unclip-2022
+- rae-2025
+explains: null

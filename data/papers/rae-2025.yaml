@@ -1,0 +1,51 @@
+id: rae-2025
+type: paper
+title: Diffusion Transformers with Representation Autoencoders
+short: RAE
+arxiv: '2510.11690'
+date: 2025-10
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- NYU
+authors:
+- Boyang Zheng
+- Nanye Ma
+- Shengbang Tong
+- Saining Xie
+tier: landmark
+sections:
+- rae
+- generation
+axes:
+  representation:
+  - semantic-latent
+  - frozen-encoder
+  objective:
+  - flow-matching
+  architecture:
+  - dit
+  - dit-dh
+problems:
+- vae-latent-semantics
+- reconstruction-generation-dilemma
+- high-dim-latent-diffusion
+links:
+  code: https://github.com/bytetriper/RAE
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: released
+  weights: none
+  verified: true
+  verified_on: '2026-09-09'
+  verified_by: sonnet
+summary: 'Replaces the VAE with a Representation Autoencoder: a frozen pretrained encoder (DINO, SigLIP,
+  or MAE) plus a lightweight trained ViT decoder. The resulting latent is high-dimensional (width must
+  be >= token dimension) and semantically rich rather than reconstruction-only; needs a dimension-dependent
+  noise schedule shift and noise-augmented decoding to train stably, and a DiT^DH diffusion head to decode
+  well. Strong reconstruction *and* generation simultaneously, closing the dilemma VA-VAE/REPA-E only
+  partially closed.'
+explanation: null

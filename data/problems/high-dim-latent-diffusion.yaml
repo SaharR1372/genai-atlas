@@ -1,0 +1,17 @@
+id: high-dim-latent-diffusion
+type: problem
+statement: Diffusion transformers were built around low-dimensional latents (4-16 channels); RAE-style
+  frozen encoders produce latents with hundreds to thousands of channels. Does standard diffusion training
+  still work well at that dimensionality, and what has to change?
+why_it_matters: If high-dimensional semantic latents need fundamentally different noise schedules, samplers,
+  or architectures, every technique tuned on low-dimensional VAE latents needs re-validating.
+sections:
+- rae
+attacked_by:
+- rae-2025
+- distilling-rae-2026
+status: partially-solved
+solved_by: []
+candidate_approaches:
+- dimension-dependent noise-schedule shift (RAE)
+- anisotropy-aware distillation (Distilling Drifting Transformers)

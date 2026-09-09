@@ -1,0 +1,175 @@
+---
+import Base from "../layouts/Base.astro";
+---
+<Base title="Research graph" description="How major research branches build on, challenge, and compete with each other.">
+  <h1 style="font-size:1.9rem; margin:0 0 0.5rem;">Research graph</h1>
+  <p style="color:var(--text-muted); max-width:60ch; margin-bottom:1rem;">
+    Each node is a paper, concept, or open problem; each edge is a typed relationship (builds on,
+    improves, challenges, competes with, and so on). Drag nodes to rearrange, click one to see its
+    connections, use the filter to isolate a relation type. This is a Sprint 1 prototype — see
+    <code>docs/blueprint.md</code> section 5 for the planned lane-timeline layout.
+  </p>
+
+  <div style="display:flex; gap:0.75rem; margin-bottom:1rem; flex-wrap:wrap; align-items:center;">
+    <label style="font-size:0.85rem; color:var(--text-muted);">
+      Filter by relation type:
+      <select id="type-filter" style="margin-left:0.4rem; font-family:var(--font-mono); font-size:0.8rem; padding:0.25em 0.4em; background:var(--bg-raised); color:var(--text); border:1px solid var(--border-strong); border-radius:4px;">
+        <option value="">all</option>
+      </select>
+    </label>
+    <span id="node-count" style="font-size:0.8rem; color:var(--text-muted);"></span>
+  </div>
+
+  <div class="card" style="padding:0; overflow:hidden;">
+    <svg id="graph-svg" width="100%" height="640" style="display:block; background:var(--bg-raised);"></svg>
+  </div>
+  <div id="node-detail" class="card" style="margin-top:1rem; display:none;"></div>
+
+  <script type="module">
+    import * as d3 from "d3";
+
+    const res = await fetch("/graph.json");
+    const graph = await res.json();
+
+    document.getElementById("node-count").textContent =
+      `${graph.node_count} nodes, ${graph.edge_count} edges`;
+
+    const typeSelect = document.getElementById("type-filter");
+    const relationTypes = [...new Set(graph.edges.map((e) => e.type))].sort();
+    for (const t of relationTypes) {
+      const opt = document.createElement("option");
+      opt.value = t;
+      opt.textContent = t;
+      typeSelect.appendChild(opt);
+    }
+
+    const sectionColor = {
+      generation: "#3d5a99", rae: "#7a5cb8", editing: "#2f8f83",
+      unified: "#b8842f", vfm: "#3f8f52", vlm: "#5b6270", medical: "#b8546f",
+    };
+    const typeColor = (t) => sectionColor[t] ?? "#8a8d94";
+    const nodeColor = (n) => typeColor(n.sections?.[0]);
+
+    const svg = d3.select("#graph-svg");
+    const width = svg.node().clientWidth || 900;
+    const height = 640;
+
+    const g = svg.append("g");
+    svg.call(
+      d3.zoom().scaleExtent([0.3, 4]).on("zoom", (event) => g.attr("transform", event.transform))
+    );
+
+    let nodes = graph.nodes.map((n) => ({ ...n }));
+    let links = graph.edges.map((e) => ({ ...e, source: e.from, target: e.to }));
+
+    const linkSel = g.append("g").attr("stroke-opacity", 0.4).selectAll("line");
+    const nodeSel = g.append("g").selectAll("circle");
+    const labelSel = g.append("g").selectAll("text");
+
+    const simulation = d3
+      .forceSimulation(nodes)
+      .force("link", d3.forceLink(links).id((d) => d.id).distance(70).strength(0.35))
+      .force("charge", d3.forceManyBody().strength(-140))
+      .force("center", d3.forceCenter(width / 2, height / 2))
+      .force("collide", d3.forceCollide(16));
+
+    function render() {
+      const link = linkSel.data(links, (d) => `${d.from}->${d.to}`);
+      link.exit().remove();
+      const linkEnter = link
+        .enter()
+        .append("line")
+        .attr("stroke", "#9a9a9a")
+        .attr("stroke-width", 1);
+      const linkMerged = linkEnter.merge(link);
+
+      const node = nodeSel.data(nodes, (d) => d.id);
+      node.exit().remove();
+      const nodeEnter = node
+        .enter()
+        .append("circle")
+        .attr("r", (d) => (d.nodeType === "papers" ? 7 : 5))
+        .attr("fill", nodeColor)
+        .attr("stroke", "#fff")
+        .attr("stroke-width", 1)
+        .style("cursor", "pointer")
+        .call(
+          d3
+            .drag()
+            .on("start", (event, d) => {
+              if (!event.active) simulation.alphaTarget(0.3).restart();
+              d.fx = d.x;
+              d.fy = d.y;
+            })
+            .on("drag", (event, d) => {
+              d.fx = event.x;
+              d.fy = event.y;
+            })
+            .on("end", (event, d) => {
+              if (!event.active) simulation.alphaTarget(0);
+              d.fx = null;
+              d.fy = null;
+            })
+        )
+        .on("click", (event, d) => showDetail(d));
+      const nodeMerged = nodeEnter.merge(node);
+
+      const label = labelSel.data(nodes, (d) => d.id);
+      label.exit().remove();
+      const labelEnter = label
+        .enter()
+        .append("text")
+        .attr("font-size", 9)
+        .attr("fill", "var(--text-muted)")
+        .attr("dx", 9)
+        .attr("dy", 3)
+        .text((d) => d.label);
+      const labelMerged = labelEnter.merge(label);
+
+      simulation.on("tick", () => {
+        linkMerged
+          .attr("x1", (d) => d.source.x)
+          .attr("y1", (d) => d.source.y)
+          .attr("x2", (d) => d.target.x)
+          .attr("y2", (d) => d.target.y);
+        nodeMerged.attr("cx", (d) => d.x).attr("cy", (d) => d.y);
+        labelMerged.attr("x", (d) => d.x).attr("y", (d) => d.y);
+      });
+    }
+
+    function showDetail(d) {
+      const panel = document.getElementById("node-detail");
+      panel.style.display = "block";
+      const related = graph.edges.filter((e) => e.from === d.id || e.to === d.id);
+      panel.innerHTML = `
+        <h3 style="margin:0 0 0.3rem;">${d.label}</h3>
+        <p style="margin:0 0 0.6rem; color:var(--text-muted); font-size:0.85rem;">${d.nodeType} · ${d.tier ?? ""}</p>
+        <ul style="margin:0; padding-left:1.2rem; font-size:0.88rem;">
+          ${related
+            .map((e) => {
+              const otherId = e.from === d.id ? e.to : e.from;
+              const dir = e.from === d.id ? `${e.type} →` : `← ${e.type}`;
+              return `<li>${dir} <a href="/papers/${otherId}">${otherId}</a></li>`;
+            })
+            .join("")}
+        </ul>
+      `;
+    }
+
+    typeSelect.addEventListener("change", () => {
+      const val = typeSelect.value;
+      const filteredEdges = val ? graph.edges.filter((e) => e.type === val) : graph.edges;
+      const keepIds = new Set(filteredEdges.flatMap((e) => [e.from, e.to]));
+      nodes = graph.nodes
+        .filter((n) => !val || keepIds.has(n.id))
+        .map((n) => ({ ...n }));
+      links = filteredEdges.map((e) => ({ ...e, source: e.from, target: e.to }));
+      simulation.nodes(nodes);
+      simulation.force("link").links(links);
+      simulation.alpha(0.6).restart();
+      render();
+    });
+
+    render();
+  </script>
+</Base>

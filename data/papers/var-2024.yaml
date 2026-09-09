@@ -1,0 +1,41 @@
+id: var-2024
+type: paper
+title: 'Visual Autoregressive Modeling: Scalable Image Generation via Next-Scale Prediction'
+short: VAR
+arxiv: '2404.02905'
+date: 2024-04
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- ByteDance
+- Peking University
+authors:
+- Keyu Tian
+- Yi Jiang
+- Zehuan Yuan
+- Bingyue Peng
+- Liwei Wang
+tier: landmark
+sections:
+- generation
+axes:
+  representation:
+  - multiscale-tokens
+  objective:
+  - next-scale-ar
+links:
+  code: https://github.com/FoundationVision/VAR
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: released
+  weights: none
+  verified: true
+  verified_on: '2026-09-09'
+  verified_by: sonnet
+summary: Redefines autoregressive image generation as coarse-to-fine next-*scale* prediction instead of
+  raster-order next-token prediction; for the first time an AR image model beats diffusion transformers
+  on ImageNet FID while also showing GPT-style scaling laws. NeurIPS 2024 best paper.
+explanation: null

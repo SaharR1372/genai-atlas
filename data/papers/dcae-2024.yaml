@@ -1,0 +1,40 @@
+id: dcae-2024
+type: paper
+title: Deep Compression Autoencoder for Efficient High-Resolution Diffusion Models
+short: DC-AE
+arxiv: '2410.10733'
+date: 2024-10
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- MIT
+- NVIDIA
+- Tsinghua University
+authors:
+- Junyu Chen
+- Han Cai
+- Junsong Chen
+tier: strong-followup
+sections:
+- generation
+- rae
+axes:
+  representation:
+  - deep-compression-latent
+links:
+  code: https://github.com/mit-han-lab/efficientvit
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: released
+  weights: none
+  verified: true
+  verified_on: '2026-09-09'
+  verified_by: sonnet
+summary: Pushes autoencoder spatial compression up to 128x (vs. the standard 8x) without losing reconstruction
+  quality, via residual autoencoding and a staged high-resolution adaptation schedule — up to 19x faster
+  inference than SD-VAE-f8 at matched or better FID. The dimension/compression trade-off RAE's high-dimensional
+  latents sit at the opposite end of.
+explanation: null

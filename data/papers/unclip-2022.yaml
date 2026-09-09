@@ -1,0 +1,39 @@
+id: unclip-2022
+type: paper
+title: Hierarchical Text-Conditional Image Generation with CLIP Latents
+short: unCLIP / DALL-E 2
+arxiv: '2204.06125'
+date: 2022-04
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- OpenAI
+authors:
+- Aditya Ramesh
+- Prafulla Dhariwal
+- Alex Nichol
+- Casey Chu
+- Mark Chen
+tier: landmark
+sections:
+- rae
+axes:
+  representation:
+  - semantic-latent
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-09'
+  verified_by: sonnet
+summary: Generates a CLIP image embedding from a text prompt (the 'prior'), then decodes that embedding
+  to pixels with a diffusion decoder. The first time a generative system's primary latent was a semantic,
+  language-aligned feature space rather than a reconstruction-optimized autoencoder latent — the idea
+  RAE and SVG revive three years later.
+explanation: null

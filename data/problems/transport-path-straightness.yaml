@@ -1,0 +1,18 @@
+id: transport-path-straightness
+type: problem
+statement: Rectified-flow-style objectives aim for straight, easy-to-distill transport paths, but anisotropic
+  high-dimensional latents (like RAE's) can force curved, unstable trajectories even under a straight-path
+  objective.
+why_it_matters: Curved paths make few-step distillation and fast sampling much harder — directly relevant
+  to whether representation-space models can ever be as fast at inference as VAE-based ones.
+sections:
+- rae
+- generation
+attacked_by:
+- distilling-rae-2026
+- rectified-flow-2023
+status: open
+solved_by: []
+candidate_approaches:
+- drifting-field distillation for anisotropic latents
+- cosine-similarity-based coupling for cleaner velocity fields

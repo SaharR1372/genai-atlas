@@ -1,0 +1,37 @@
+id: mae-2021
+type: paper
+title: Masked Autoencoders Are Scalable Vision Learners
+short: MAE
+arxiv: '2111.06377'
+date: 2021-11
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- Meta AI
+authors:
+- Kaiming He
+- Xinlei Chen
+- Saining Xie
+- Yanghao Li
+- Piotr Dollár
+- Ross Girshick
+tier: landmark
+sections:
+- vfm
+- rae
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-09'
+  verified_by: sonnet
+summary: Masks most of an image's patches and trains a ViT to reconstruct the missing pixels; one of the
+  three encoder families (with DINO, CLIP/SigLIP) RAE ablates as candidate frozen representations, and
+  the weakest of the three by RAE's own results.
+explanation: null

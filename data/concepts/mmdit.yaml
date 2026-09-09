@@ -1,0 +1,11 @@
+id: mmdit
+type: concept
+name: MM-DiT (dual-stream joint attention)
+axis: architecture
+one_line: Separate weights for text and image token streams, joined only through shared self-attention
+  layers, so each modality keeps its own representation while still attending jointly.
+sections:
+- generation
+introduced_by:
+- sd3-2024
+explains: null

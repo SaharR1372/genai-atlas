@@ -1,0 +1,11 @@
+id: joint-attention
+type: concept
+name: Joint (shared) attention conditioning
+axis: conditioning
+one_line: Concatenate condition and generation tokens into one sequence and let ordinary self-attention
+  mix them, instead of routing conditioning through separate cross-attention layers.
+sections:
+- generation
+introduced_by:
+- sd3-2024
+explains: null

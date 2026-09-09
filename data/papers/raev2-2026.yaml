@@ -1,0 +1,35 @@
+id: raev2-2026
+type: paper
+title: Improved Baselines with Representation Autoencoders
+short: RAEv2
+arxiv: '2605.18324'
+date: 2026-05
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Jaskirat Singh
+tier: strong-followup
+sections:
+- rae
+axes:
+  representation:
+  - semantic-latent
+  - frozen-encoder
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-09'
+  verified_by: sonnet
+summary: 'Fixes RAE''s rough edges: multilayer representation aggregation for a richer frozen feature,
+  explicit combination of RAE with a REPA-style alignment loss, and a re-parameterized DiT output that
+  fixes classifier-free guidance (which the original RAE struggled with). Reaches SOTA ImageNet gFID 1.06
+  in 80 epochs, 10x faster convergence than the original RAE.'
+explanation: null

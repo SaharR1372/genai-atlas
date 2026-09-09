@@ -1,0 +1,9 @@
+id: pixels
+type: concept
+name: Pixels
+axis: representation
+one_line: Generate directly on raw image pixels; no learned tokenizer or latent space at all.
+sections:
+- generation
+introduced_by: []
+explains: null

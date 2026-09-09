@@ -1,0 +1,10 @@
+id: cfg
+type: concept
+name: Classifier-free guidance
+axis: inference
+one_line: Trade diversity for fidelity at sampling time by extrapolating between conditional and unconditional
+  model predictions.
+sections:
+- generation
+introduced_by: []
+explains: null

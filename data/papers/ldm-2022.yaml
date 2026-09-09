@@ -1,0 +1,43 @@
+id: ldm-2022
+type: paper
+title: High-Resolution Image Synthesis with Latent Diffusion Models
+short: LDM / Stable Diffusion
+arxiv: '2112.10752'
+date: 2021-12
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- LMU Munich
+- Runway
+- Heidelberg University
+authors:
+- Robin Rombach
+- Andreas Blattmann
+- Dominik Lorenz
+- Patrick Esser
+- Björn Ommer
+tier: landmark
+sections:
+- generation
+- rae
+axes:
+  representation:
+  - vae-latent
+  architecture:
+  - unet
+links:
+  code: https://github.com/CompVis/latent-diffusion
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: released
+  weights: none
+  verified: true
+  verified_on: '2026-09-09'
+  verified_by: sonnet
+summary: Moves diffusion training from pixel space into the latent space of a pretrained autoencoder,
+  cutting compute by orders of magnitude while keeping quality; introduces the VAE + UNet + cross-attention
+  recipe every 'latent diffusion' system since has started from.
+explanation: null

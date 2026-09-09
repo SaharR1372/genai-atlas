@@ -1,0 +1,36 @@
+id: dinov2-2023
+type: paper
+title: 'DINOv2: Learning Robust Visual Features without Supervision'
+short: DINOv2
+arxiv: '2304.07193'
+date: 2023-04
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- Meta AI
+authors:
+- Maxime Oquab
+- Timothée Darcet
+- Théo Moutakanni
+- Huy Vo
+- Marc Szafraniec
+tier: landmark
+sections:
+- vfm
+- rae
+links:
+  code: https://github.com/facebookresearch/dinov2
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: released
+  weights: none
+  verified: true
+  verified_on: '2026-09-09'
+  verified_by: sonnet
+summary: Scales self-distillation-based self-supervised ViT training to produce general-purpose visual
+  features that transfer without finetuning; becomes the default frozen encoder that REPA, VA-VAE, and
+  RAE all align to or generate directly inside.
+explanation: null

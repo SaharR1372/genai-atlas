@@ -1,0 +1,53 @@
+---
+import Base from "../../layouts/Base.astro";
+import { conceptsByAxis, papersForConcept } from "../../lib/graph";
+
+export function getStaticPaths() {
+  const axes = [
+    { axis: "representation", label: "Representation", section: "rae",
+      blurb: "What space does the model actually generate in?" },
+    { axis: "objective", label: "Objective", section: "generation",
+      blurb: "What is the model trained to predict — noise, velocity, or the next token?" },
+    { axis: "architecture", label: "Architecture", section: "generation",
+      blurb: "What backbone turns the objective into a trainable network?" },
+    { axis: "conditioning", label: "Conditioning & control", section: "editing",
+      blurb: "How does text, a reference image, or a structural signal reach the generator?" },
+    { axis: "training-signal", label: "Training signal", section: "unified",
+      blurb: "What besides the base objective shapes what the model learns — data, auxiliary losses, reward models?" },
+    { axis: "inference", label: "Inference", section: "generation",
+      blurb: "What happens at sampling time to trade compute for quality?" },
+  ];
+  return axes.map((a) => ({ params: { axis: a.axis }, props: a }));
+}
+
+const { axis, label, section, blurb } = Astro.props;
+const concepts = conceptsByAxis(axis);
+---
+<Base title={label} description={blurb}>
+  <p class="badge" style="margin-bottom:0.75rem;">Design axis</p>
+  <h1 style={`font-size:1.9rem; margin:0 0 0.5rem; color:var(--section-${section});`}>{label}</h1>
+  <p style="color:var(--text-muted); max-width:60ch; margin-bottom:2rem;">{blurb}</p>
+
+  {concepts.length === 0 ? (
+    <p style="color:var(--text-muted);">No options tracked yet for this axis.</p>
+  ) : (
+    <div style="display:flex; flex-direction:column; gap:1rem;">
+      {concepts.map((c) => {
+        const papers = papersForConcept(c.id).filter((p) =>
+          Object.values(p.axes ?? {}).some((ids) => ids.includes(c.id))
+        );
+        return (
+          <div class="card section-border" style={`--section-color: var(--section-${section});`}>
+            <h2 style="font-size:1.15rem; margin:0 0 0.4rem;">{c.data.name}</h2>
+            <p style="margin:0 0 0.6rem; color:var(--text);">{c.data.one_line}</p>
+            {papers.length > 0 && (
+              <p style="margin:0; font-size:0.85rem; color:var(--text-muted);">
+                Used by: {papers.map((p) => p.label).join(", ")}
+              </p>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  )}
+</Base>

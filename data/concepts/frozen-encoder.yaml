@@ -1,0 +1,11 @@
+id: frozen-encoder
+type: concept
+name: Frozen encoder + trained decoder
+axis: representation
+one_line: Keep a pretrained vision encoder entirely frozen as the latent space; train only a lightweight
+  decoder to map that space back to pixels.
+sections:
+- rae
+introduced_by:
+- rae-2025
+explains: null

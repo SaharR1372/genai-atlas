@@ -1,0 +1,16 @@
+id: latent-vs-pixel-space
+type: problem
+statement: Is a learned latent space necessary for diffusion transformers at all, or can a correctly reparameterized
+  pixel-space model (JiT) match latent-space performance with no tokenizer?
+why_it_matters: If pixels alone are enough once the objective is fixed, it reframes the entire representation-space
+  research line as optimizing something that may not be structurally necessary — the sharpest open challenge
+  to the RAE line's premise.
+sections:
+- rae
+- generation
+attacked_by:
+- jit-2025
+status: open
+solved_by: []
+candidate_approaches:
+- x-prediction instead of epsilon-prediction on large pixel patches (JiT)

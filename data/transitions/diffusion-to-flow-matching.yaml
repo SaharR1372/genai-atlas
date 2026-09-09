@@ -1,0 +1,17 @@
+id: diffusion-to-flow-matching
+type: transition
+title: From epsilon-prediction diffusion to flow matching
+from_option: diffusion-objective
+to_option: flow-matching
+era: 2022-2024
+driver: inference
+cost: Straight-line transport paths make few-step distillation and fast sampling much easier to reason
+  about, but the field gives up the well-understood noise-schedule and SNR-weighting theory that a decade
+  of DDPM-era diffusion work had built up — flow matching's simplicity at the objective level pushed some
+  of that complexity into how source and target couplings are chosen instead.
+key_papers:
+- flow-matching-2023
+- rectified-flow-2023
+- sd3-2024
+- sit-2024
+narrative: null

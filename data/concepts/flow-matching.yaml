@@ -1,0 +1,13 @@
+id: flow-matching
+type: concept
+name: Flow matching / rectified flow
+axis: objective
+one_line: Directly regress the velocity field of a (near-)straight path between a noise sample and a data
+  sample, rather than reversing a stochastic noising process.
+sections:
+- generation
+- rae
+introduced_by:
+- flow-matching-2023
+- rectified-flow-2023
+explains: null

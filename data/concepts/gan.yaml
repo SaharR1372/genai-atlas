@@ -1,0 +1,10 @@
+id: gan
+type: concept
+name: Generative Adversarial Network
+axis: background
+one_line: A generator trained against a discriminator in a minimax game. Dominant image-generation paradigm
+  before diffusion; mentioned only as historical context.
+sections:
+- generation
+introduced_by: []
+explains: null

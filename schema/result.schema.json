@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://genai-atlas/schema/result.schema.json",
+  "title": "Result (a paper's reported number on a benchmark)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "type", "paper", "benchmark", "value", "setting"],
+  "properties": {
+    "id": { "$ref": "common.schema.json#/$defs/id" },
+    "type": { "const": "result" },
+    "paper": { "$ref": "common.schema.json#/$defs/id" },
+    "benchmark": { "$ref": "common.schema.json#/$defs/id" },
+    "value": { "type": "number" },
+    "setting": {
+      "type": "string",
+      "description": "e.g. 'ImageNet 256x256, cfg=1.5, 50 steps'"
+    },
+    "source": {
+      "type": "string",
+      "description": "Where in the paper this number comes from, e.g. 'Table 3'"
+    }
+  }
+}

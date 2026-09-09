@@ -1,0 +1,76 @@
+---
+import "../styles/tokens.css";
+import "katex/dist/katex.min.css";
+
+interface Props {
+  title: string;
+  description?: string;
+}
+const { title, description = "A research atlas of modern generative vision, 2023-2026." } = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title} · Generative Vision Atlas</title>
+    <meta name="description" content={description} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:wght@500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <script is:inline>
+      // Applied before paint to avoid a light/dark flash. Falls back to system preference.
+      (function () {
+        try {
+          var saved = localStorage.getItem("theme");
+          if (saved === "light" || saved === "dark") {
+            document.documentElement.setAttribute("data-theme", saved);
+          }
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <header class="container" style="display:flex; align-items:center; justify-content:space-between; padding-top:1.25rem; padding-bottom:1.25rem; border-bottom:1px solid var(--border);">
+      <a href="/" style="font-family:var(--font-heading); font-weight:600; font-size:1.15rem; color:var(--text);">
+        Generative Vision Atlas
+      </a>
+      <nav style="display:flex; gap:1.25rem; align-items:center; font-size:0.92rem;">
+        <a href="/axes/representation">Axes</a>
+        <a href="/graph">Graph</a>
+        <a href="/search">Search</a>
+        <button id="theme-toggle" aria-label="Toggle dark mode" style="background:none; border:1px solid var(--border-strong); border-radius:6px; padding:0.3em 0.6em; color:var(--text); cursor:pointer; font-family:var(--font-mono); font-size:0.8rem;">
+          ◐
+        </button>
+      </nav>
+    </header>
+    <main class="container" style="padding-top:2rem; padding-bottom:4rem;">
+      <slot />
+    </main>
+    <footer class="container" style="padding-top:2rem; padding-bottom:2rem; border-top:1px solid var(--border); color:var(--text-muted); font-size:0.85rem;">
+      Living research atlas · data compiled from <code>data/</code>, see
+      <a href="https://github.com">the repository</a> for sources and update history.
+    </footer>
+    <script is:inline>
+      (function () {
+        var btn = document.getElementById("theme-toggle");
+        if (!btn) return;
+        btn.addEventListener("click", function () {
+          var root = document.documentElement;
+          var current = root.getAttribute("data-theme");
+          var isDark = current
+            ? current === "dark"
+            : window.matchMedia("(prefers-color-scheme: dark)").matches;
+          var next = isDark ? "light" : "dark";
+          root.setAttribute("data-theme", next);
+          try {
+            localStorage.setItem("theme", next);
+          } catch (e) {}
+        });
+      })();
+    </script>
+  </body>
+</html>

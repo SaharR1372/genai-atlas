@@ -1,0 +1,19 @@
+---
+import Base from "../layouts/Base.astro";
+---
+<Base title="Search" description="Full-text search across the Generative Vision Atlas.">
+  <h1 style="font-size:1.9rem; margin:0 0 1rem;">Search</h1>
+  <div id="search"></div>
+  <link href="/pagefind/pagefind-ui.css" rel="stylesheet" />
+  <script src="/pagefind/pagefind-ui.js" is:inline></script>
+  <script is:inline>
+    window.addEventListener("DOMContentLoaded", () => {
+      if (window.PagefindUI) {
+        new PagefindUI({ element: "#search", showSubResults: true });
+      } else {
+        document.getElementById("search").innerHTML =
+          '<p style="color:var(--text-muted);">Search index not built yet — run <code>npm run build</code> (which runs Pagefind as a postbuild step) before previewing.</p>';
+      }
+    });
+  </script>
+</Base>

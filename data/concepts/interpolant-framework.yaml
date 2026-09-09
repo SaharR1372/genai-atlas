@@ -1,0 +1,12 @@
+id: interpolant-framework
+type: concept
+name: Stochastic interpolant framework
+axis: objective
+one_line: A generalized formulation that treats diffusion and flow matching as two points in a continuous
+  family of interpolants between noise and data, exposing objective/coupling/sampler as independent design
+  choices.
+sections:
+- generation
+introduced_by:
+- sit-2024
+explains: null

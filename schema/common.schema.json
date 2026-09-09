@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://genai-atlas/schema/common.schema.json",
+  "title": "Common definitions",
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "description": "kebab-case identifier, unique across all entity types"
+    },
+    "axisKey": {
+      "type": "string",
+      "enum": ["representation", "objective", "architecture", "conditioning", "training-signal", "inference"]
+    },
+    "section": {
+      "type": "string",
+      "enum": ["generation", "rae", "editing", "unified", "vfm", "vlm", "medical"]
+    },
+    "tier": {
+      "type": "string",
+      "enum": ["landmark", "core", "strong-followup", "emerging", "watchlist"]
+    },
+    "relationType": {
+      "type": "string",
+      "enum": [
+        "builds_on", "improves", "challenges", "replaces", "combines",
+        "competes_with", "uses_representation_from", "uses_objective_from",
+        "uses_architecture_from", "evaluates_on", "addresses", "enables"
+      ]
+    },
+    "confidence": {
+      "type": "string",
+      "enum": ["high", "medium", "low"]
+    },
+    "addedBy": {
+      "type": "string",
+      "enum": ["human", "fable", "sonnet", "haiku", "pipeline"]
+    },
+    "releaseStatus": {
+      "type": "string",
+      "enum": ["none", "announced", "released"]
+    },
+    "isoDate": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}(-\\d{2})?$",
+      "description": "YYYY-MM or YYYY-MM-DD"
+    }
+  }
+}

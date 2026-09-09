@@ -1,0 +1,12 @@
+id: deep-compression-latent
+type: concept
+name: Deep-compression latent
+axis: representation
+one_line: A latent pushed to much higher spatial compression ratios (up to 128x) than standard VAEs, via
+  residual autoencoding and staged high-resolution adaptation.
+sections:
+- generation
+- rae
+introduced_by:
+- dcae-2024
+explains: null
