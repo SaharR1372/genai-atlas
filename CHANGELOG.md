@@ -2,6 +2,25 @@
 
 ## Unreleased
 
+### 2026-09-10 — Session 7 (Opus 5) — notebooks, capability matrix, VFM/VLM sections
+- **Runnable notebooks with real outputs** (queue Q4). `latents.ipynb` measures what each generation
+  of autoencoder discards and contrasts a DINOv2 feature map against an SD latent; `editing.ipynb`
+  runs three editing mechanisms on one image with difference maps showing how strong each
+  preservation guarantee actually is. Both executed on an A100 80GB with outputs committed. Built
+  from plain-Python specs so the sources stay reviewable in a diff.
+- **`/models` capability matrix** (Q3): 40 systems by what they can do, what latent they are built
+  on, and how available they are. Answers "does this model generate, edit, or both, and on what".
+- **VFM and VLM sections filled** (Q5): 19 verified papers, 6 new lines, and the connection to
+  generation made explicit — which encoders are alignment targets, which are generative latents,
+  which VLMs serve as text encoders and instruction parsers.
+- **New open problem** `which-encoder-for-generation`: REPA and RAE independently rank DINOv2 first
+  as a generative substrate but disagree about the cause, and a 27-encoder study argues the
+  predictor is patch-level spatial structure rather than linear-probe accuracy.
+- **A claim removed**: SVG's widely repeated 62x training speedup could not be found in the paper
+  body on a full-text read, so it is no longer attributed to the paper.
+- **28 papers now carry full written explanations**, 27 from full text.
+- 293 entities, 252 pages, 28 tests, validation clean.
+
 ### 2026-09-10 — Session 7 (Sonnet 5) — WORK_QUEUE Q1/Q2, 23 more full explanations
 - **23 more `explained` blocks written**, all in the representation/latent-design area, from
   fetched arXiv full text: repa-2024, vavae-2025, repae-2025, maetok-2025, svg-2025, svg-t2i-2025,

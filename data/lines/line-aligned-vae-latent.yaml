@@ -40,8 +40,9 @@ weaknesses:
 - Treats the symptom rather than the cause — the latent is still a reconstruction code
 - Adds a dependency on a frozen encoder anyway, which invites the question RAE asks
 open_questions:
-- vae-latent-semantics
 - reconstruction-generation-dilemma
+- vae-latent-semantics
+- which-encoder-for-generation
 competes_with:
 - line-representation-latent
 explains: null

@@ -35,20 +35,23 @@ subagents, then verify claims against the fetched text before writing.
 ---
 
 ## Q3 — Make editing discoverable, and answer "can this model do both?"
-**Status: TODO**
+**Status: DONE** (session 7)
 
 A reader's real question is: *does this model generate, edit, or both, and what space does it work
 in?* That is currently spread across lines and sections, and HiDream-O1-Image is hard to find at all.
 
-- [ ] A capability matrix: model × (generates / edits / understands) × latent space × open weights
-- [ ] Make it reachable from the top nav, not buried under a section
-- [ ] Ensure every named system (HiDream-O1, BAGEL, Emu3.5, Qwen-Image-Edit, Kontext, Seedream,
-      Nano Banana, GPT-Image) appears in it and is findable by search
+- [x] `/models` capability matrix: 40 systems × (generate / edit / multi-ref / understand /
+      tokenize) × basis × availability, filterable. 10 of 40 do both generation and editing.
+- [x] `capabilities` and `openness` added to the paper schema and populated
+- [x] In the top nav as "Models"
+- [x] HiDream-O1-Image called out on the page as the one system with no autoencoder at all
+- Note: closed systems without a paper (Nano Banana, GPT-Image) are still absent from the atlas
+  entirely — they belong under Q6, not here.
 
 ---
 
 ## Q4 — Runnable notebooks with real outputs
-**Status: TODO**
+**Status: IN PROGRESS** (2 of ~5 built, session 7)
 
 For well-known methods and anything claiming to be great, a notebook that runs inference with 1-2
 samples, so a reader sees how each method behaves without cloning six repos. Not new research — just
@@ -65,13 +68,27 @@ diffusers 0.36.0, CUDA available).
 `sd2-community--stable-diffusion-2-1-unclip-small`, `h94--IP-Adapter`, `facebook--dinov2-base`,
 `facebook--vit-mae-base`, `google--siglip2-so400m-patch14-224`, CLIP variants.
 
-- [ ] Notebook harness: shared setup cell, deterministic seeds, output images committed
-- [ ] Generation notebooks (SD1.5 / SDXL / SD3 as the VAE-latent baseline; RAE / Scale-RAE as the
-      representation-latent case — the direct comparison the atlas argues about)
-- [ ] Editing notebooks (IP-Adapter reference conditioning; an inversion method; a training-free
-      attention method)
-- [ ] Site section rendering the notebooks with their outputs, linking to source repos
-- [ ] Run instructions on the site, one click from the GitHub page
+- [x] Harness: `notebooks/build.py` builds and executes from plain-Python specs in
+      `notebooks/specs/*.py`, so sources stay reviewable in a diff. `notebooks/publish.sh` renders
+      to static HTML for the site.
+- [x] `latents.ipynb` — round-trips one image through SD1.5 / SDXL / SD3 autoencoders, measures
+      PSNR and where the error lives, then contrasts a DINOv2 feature map against an SD latent.
+      Executed on A100, 4 embedded figures, 0 errors.
+- [x] `editing.ipynb` — SDEdit vs latent masked blending vs IP-Adapter on one image, with
+      difference maps showing the strength of each preservation guarantee. Executed, 4 figures.
+- [x] `/notebooks` site section with framing, credits and run instructions
+- [ ] RAE / Scale-RAE inference notebook — **the one the atlas most needs**. Weights are cached
+      (`nyu-visionx--Scale-RAE-Qwen1.5B_DiT2.4B`, `nyu-visionx--siglip2_decoder`) but the pipeline
+      is custom, not diffusers, so it needs the Scale-RAE repo code cloned first:
+      https://github.com/ZitengWangNYU/Scale-RAE
+- [ ] An inversion notebook (RF-Inversion or similar) and a training-free attention method
+
+**Gotchas hit, do not rediscover:**
+- SDXL base has only `unet` cached; use `madebyollin/sdxl-vae-fp16-fix` for the SDXL VAE.
+- `runwayml/stable-diffusion-inpainting` is not cached; the masked-blend was implemented inline
+  instead, which is more instructive anyway.
+- NumPy 2 removed `ndarray.ptp()`; use `np.ptp(arr, axis=...)`.
+- Notebooks pass `local_files_only=True` so a run never silently downloads.
 
 **Design constraint:** each cell credits the upstream repo it borrows from. This assembles, it does
 not reimplement.
@@ -79,16 +96,22 @@ not reimplement.
 ---
 
 ## Q5 — Vision foundation models and VLM sections
-**Status: TODO**
+**Status: DONE** (session 7)
 
 Both render empty. The user considers these foundational to any vision task and wants them tracked.
 
-- [ ] VFM section: DINOv2/v3, SigLIP2, MAE, I-JEPA, Perception Encoder, AIMv2, Web-SSL, registers,
-      SAM, Depth Anything — with lines grouping them by what supervision they use
-- [ ] VLM section: encoder+projector (LLaVA), cross-attention (Flamingo), early fusion (Chameleon,
-      Fuyu), native resolution (Qwen-VL family), and why each matters to generation
-- [ ] Explicit link from these to where they are consumed: as alignment targets (REPA), as
-      generative latents (RAE), as text encoders (Qwen-Image), as instruction parsers (Step1X-Edit)
+- [x] 19 papers added, all arXiv-verified. VFM section now has 16 papers, VLM 12.
+- [x] 6 new lines: self-distillation, contrastive language-image, agglomerative distillation,
+      encoder+projector, cross-attention VLM, native-resolution VLM.
+- [x] The connection is made explicit throughout: DINOv2 as REPA's alignment target, DINOv2/SigLIP2/
+      MAE as RAE's candidate latents, DINOv3 for SVG, SigLIP-2 So400M for Scale-RAE, Qwen2.5-VL as
+      both Qwen-Image's text encoder and Step1X-Edit's instruction parser.
+- [x] New open problem `which-encoder-for-generation`: REPA and RAE independently rank DINOv2 first,
+      but disagree on why. A 27-encoder study (2512.10794) argues patch-level spatial structure
+      predicts the gain, not global linear-probe accuracy. Nobody has tested whether Web-SSL's
+      language-free scaling advantage transfers to generation at all.
+- Note: Fuyu-8B and Llama 3.2 Vision have **no arXiv paper** (model cards only), so they are
+  described in line prose rather than given paper entries.
 
 ---
 

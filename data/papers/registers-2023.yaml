@@ -1,0 +1,42 @@
+id: registers-2023
+type: paper
+title: Vision Transformers Need Registers
+short: ViT Registers
+arxiv: '2309.16588'
+date: 2023-09
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- Meta AI
+authors: []
+tier: core
+sections:
+- vfm
+lines:
+- line-self-distillation
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: Identifies high-norm artifact tokens that appear in trained vision transformers and pollute their
+  dense feature maps, and fixes them with a few extra register tokens that give the model somewhere to
+  put global information. Now standard in DINOv2, DINOv3 and SigLIP 2, so anything generating in those
+  feature spaces depends on it.
+explanation: null
+abstract: Transformers have recently emerged as a powerful tool for learning visual representations. In
+  this paper, we identify and characterize artifacts in feature maps of both supervised and self-supervised
+  ViT networks. The artifacts correspond to high-norm tokens appearing during inference primarily in low-informative
+  background areas of images, that are repurposed for internal computations. We propose a simple yet effective
+  solution based on providing additional tokens to the input sequence of the Vision Transformer to fill
+  that role. We show that this solution fixes that problem entirely for both supervised and self-supervised
+  models, sets a new state of the art for self-supervised visual models on dense visual prediction tasks,
+  enables object discovery methods with larger models, and most importantly leads to smoother feature
+  maps and attention maps for downstream visual processing.

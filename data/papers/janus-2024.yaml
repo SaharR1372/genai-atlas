@@ -1,0 +1,44 @@
+id: janus-2024
+type: paper
+title: 'Janus: Decoupling Visual Encoding for Unified Multimodal Understanding and Generation'
+short: Janus
+arxiv: '2410.13848'
+date: 2024-10
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- DeepSeek
+authors: []
+tier: core
+sections:
+- unified
+- vlm
+lines:
+- line-unified-models
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: Diagnoses the conflict in single-encoder unified models, where understanding wants semantic abstraction
+  and generation wants reconstructable detail, and resolves it with two separate visual encoders feeding
+  one shared language backbone.
+explanation: null
+abstract: In this paper, we introduce Janus, an autoregressive framework that unifies multimodal understanding
+  and generation. Prior research often relies on a single visual encoder for both tasks, such as Chameleon.
+  However, due to the differing levels of information granularity required by multimodal understanding
+  and generation, this approach can lead to suboptimal performance, particularly in multimodal understanding.
+  To address this issue, we decouple visual encoding into separate pathways, while still leveraging a
+  single, unified transformer architecture for processing. The decoupling not only alleviates the conflict
+  between the visual encoder's roles in understanding and generation, but also enhances the framework's
+  flexibility. For instance, both the multimodal understanding and generation components can independently
+  select their most suitable encoding methods. Experiments show that Janus surpasses previous unified
+  model and matches or exceeds the performance of task-specific models. The simplicity, high flexibility,
+  and effectiveness of Janus make it a strong candidate for next-generation unified multimodal models.

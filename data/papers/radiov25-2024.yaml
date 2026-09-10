@@ -1,0 +1,42 @@
+id: radiov25-2024
+type: paper
+title: 'RADIOv2.5: Improved Baselines for Agglomerative Vision Foundation Models'
+short: RADIOv2.5
+arxiv: '2412.07679'
+date: 2024-12
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- NVIDIA
+authors: []
+tier: strong-followup
+sections:
+- vfm
+lines:
+- line-agglomerative
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: Refines the multi-teacher distillation recipe, addressing resolution and mode-switching problems
+  that the first agglomerative models suffered.
+explanation: null
+abstract: 'Agglomerative models have recently emerged as a powerful approach to training vision foundation
+  models, leveraging multi-teacher distillation from existing models such as CLIP, DINO, and SAM. This
+  strategy enables the efficient creation of robust models, combining the strengths of individual teachers
+  while significantly reducing computational and resource demands. In this paper, we thoroughly analyze
+  state-of-the-art agglomerative models, identifying critical challenges including resolution mode shifts,
+  teacher imbalance, idiosyncratic teacher artifacts, and an excessive number of output tokens. To address
+  these issues, we propose several novel solutions: multi-resolution training, mosaic augmentation, and
+  improved balancing of teacher loss functions. Specifically, in the context of Vision Language Models,
+  we introduce a token compression technique to maintain high-resolution information within a fixed token
+  count. We release our top-performing variants at multiple scales (-B, -L, -H, and -g), along with inference
+  code and pretrained weights'

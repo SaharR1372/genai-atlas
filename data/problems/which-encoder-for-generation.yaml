@@ -1,0 +1,28 @@
+id: which-encoder-for-generation
+type: problem
+statement: Two independent groups agree DINOv2 is the best encoder to build a generative model on, and
+  disagree about why. Nobody knows which property actually causes the gain.
+why_it_matters: Every representation-space generator has to pick a frozen encoder, and the choice is currently
+  made by copying whoever published last. Without knowing which property matters, there is no principled
+  way to pick the next encoder, and no way to know whether a better one would even be recognized.
+sections:
+- rae
+- vfm
+- generation
+attacked_by:
+- repa-2024
+- rae-2025
+- repa-spatial-2025
+- webssl-2025
+status: open
+solved_by: []
+candidate_approaches:
+- 'Rank by alignment-target ablation: REPA''s own table puts DINOv2-B first and MAE-L last, with SigLIP
+  and CLIP in between'
+- 'Rank by generation quality in the latent itself: RAE finds DINOv2 gives the strongest generation even
+  though MAE gives the best reconstruction, so reconstruction is the wrong proxy'
+- Explain it as semantic quality, which linear-probe accuracy would measure
+- 'Explain it as patch-level spatial structure instead: a 27-encoder study finds spatial structure predicts
+  the generation gain where global linear-probe accuracy does not'
+- Test whether the language-free scaling advantage Web-SSL reports for understanding transfers to generation
+  at all — as of this writing nobody has run that experiment

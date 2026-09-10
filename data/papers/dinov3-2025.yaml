@@ -47,3 +47,5 @@ abstract: Self-supervised learning holds the promise of eliminating the need for
   significantly surpassing previous self- and weakly-supervised foundation models. We also share the DINOv3
   suite of vision models, designed to advance the state of the art on a wide spectrum of tasks and data
   by providing scalable solutions for diverse resource constraints and deployment scenarios.
+lines:
+- line-self-distillation

@@ -53,11 +53,11 @@ explained:
     speedup over encoders that process the full masked sequence.
   evidence: A vanilla ViT-Huge finetuned at 448x448 after MAE pretraining on ImageNet-1k alone reaches
     87.8% top-1 accuracy, the best result among methods using only IN1K data; ViT-L reaches 85.9% and
-    ViT-B 83.6%. MAE-pretrained ViT-L beats a ViT-L trained from scratch by 2.4 points, 84.9% against 82.5%,
-    and transfers strongly, with COCO object detection gains of 4.0 AP, 53.3 against 49.3, and ADE20k segmentation
-    gains 3.7 mIoU, 53.6 against 49.9, over supervised pretraining. Ablations show 75% masking is near
-    optimal for both finetuning and linear probing, and accuracy keeps improving through 1600 epochs without
-    saturating.
+    ViT-B 83.6%. MAE-pretrained ViT-L beats a ViT-L trained from scratch by 2.4 points, 84.9% against
+    82.5%, and transfers strongly, with COCO object detection gains of 4.0 AP, 53.3 against 49.3, and
+    ADE20k segmentation gains 3.7 mIoU, 53.6 against 49.9, over supervised pretraining. Ablations show
+    75% masking is near optimal for both finetuning and linear probing, and accuracy keeps improving through
+    1600 epochs without saturating.
   limitations: Linear-probe accuracy, 75.8% for ViT-L, trails contrastive methods such as MoCo v3 at 77.6%,
     which the authors attribute to the pixel-reconstruction objective producing features that are less
     linearly separable, though finetuning closes and reverses this gap. The authors concede reconstructions
@@ -81,3 +81,5 @@ abstract: 'This paper shows that masked autoencoders (MAE) are scalable self-sup
   allows for learning high-capacity models that generalize well: e.g., a vanilla ViT-Huge model achieves
   the best accuracy (87.8%) among methods that use only ImageNet-1K data. Transfer performance in downstream
   tasks outperforms supervised pre-training and shows promising scaling behavior.'
+lines:
+- line-self-distillation

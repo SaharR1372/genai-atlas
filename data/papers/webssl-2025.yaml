@@ -46,3 +46,5 @@ abstract: 'Visual Self-Supervised Learning (SSL) currently underperforms Contras
   on a wide range of VQA and classic vision benchmarks. These findings demonstrate that pure visual SSL
   can match language-supervised visual pretraining at scale, opening new opportunities for vision-centric
   representation learning.'
+lines:
+- line-self-distillation

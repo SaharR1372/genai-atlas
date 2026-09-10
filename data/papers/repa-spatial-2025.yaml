@@ -1,0 +1,48 @@
+id: repa-spatial-2025
+type: paper
+title: 'What matters for Representation Alignment: Global Information or Spatial Structure?'
+short: REPA spatial-structure study
+arxiv: '2512.10794'
+date: 2025-12
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors: []
+tier: core
+sections:
+- rae
+- vfm
+lines:
+- line-aligned-vae-latent
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: Runs representation alignment against 27 different encoders and finds that what predicts a generation
+  gain is patch-level spatial structure, not the global linear-probe accuracy the field had been using
+  as a proxy. The most direct answer available to the question of which encoder to align to, and why.
+explanation: null
+abstract: 'Representation alignment (REPA) guides generative training by distilling representations from
+  a strong, pretrained vision encoder to intermediate diffusion features. We investigate a fundamental
+  question: what aspect of the target representation matters for generation, its \textit{global} \revision{semantic}
+  information (e.g., measured by ImageNet-1K accuracy) or its spatial structure (i.e. pairwise cosine
+  similarity between patch tokens)? Prevalent wisdom holds that stronger global semantic performance leads
+  to better generation as a target representation. To study this, we first perform a large-scale empirical
+  analysis across 27 different vision encoders and different model scales. The results are surprising;
+  spatial structure, rather than global performance, drives the generation performance of a target representation.
+  To further study this, we introduce two straightforward modifications, which specifically accentuate
+  the transfer of \emph{spatial} information. We replace the standard MLP projection layer in REPA with
+  a simple convolution layer and introduce a spatial normalization layer for the external representation.
+  Surprisingly, our simple method (implemented in $<$4 lines of code), termed iREPA, consistently improves
+  convergence speed of REPA, across a diverse set of vision encoders, model sizes, and training variants
+  (such as REPA, REPA-E, Meanflow, JiT etc). %, etc. Our work motivates revisiting the fundamental working
+  mechanism of representational alignment and how it can be leveraged for improved training of generative
+  models. The code and project page are available at https://end2end-diffusion.github.io/irepa'

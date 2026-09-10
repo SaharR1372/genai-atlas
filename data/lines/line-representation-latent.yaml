@@ -56,10 +56,11 @@ weaknesses:
 - High-dimensional and anisotropic, which complicates sampling and distillation
 - No published instruction-editing method operates in this space yet
 open_questions:
-- semantic-latent-detail-loss
 - high-dim-latent-diffusion
-- transport-path-straightness
 - latent-vs-pixel-space
+- semantic-latent-detail-loss
+- transport-path-straightness
+- which-encoder-for-generation
 competes_with:
 - line-vae-latent
 - line-pixel-space

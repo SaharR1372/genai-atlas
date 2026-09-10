@@ -1,0 +1,28 @@
+id: line-cross-attention-vlm
+type: line
+name: Cross-attention into a frozen language model
+one_line: Inject visual information through dedicated gated cross-attention layers interleaved into a
+  frozen language model.
+core_bet: Vision should enter through its own pathway rather than competing for the token sequence, so
+  the language model's own capabilities are provably untouched.
+primary_axis: conditioning
+status: contested
+since: 2022-04
+sections:
+- vlm
+arc:
+- paper: flamingo-2022
+  role: origin
+  note: Gated cross-attention layers between the frozen language model's blocks, with a perceiver resampler
+    fixing the visual token budget and gates initialized near zero so training starts as a no-op.
+strengths:
+- Visual tokens do not consume the language model's context window
+- The frozen backbone is mathematically guaranteed intact at initialization
+- Handles interleaved image-text sequences naturally
+weaknesses:
+- Adds parameters and complexity the projector approach avoids
+- Largely displaced by encoder-plus-projector in open work, which is simpler and performs comparably
+- The resampler's fixed token budget is a bottleneck on dense detail
+competes_with:
+- line-encoder-projector
+explains: null

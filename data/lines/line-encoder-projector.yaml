@@ -1,0 +1,34 @@
+id: line-encoder-projector
+type: line
+name: Encoder plus projector
+one_line: Bolt a frozen vision encoder onto a language model with a small trained projection, and treat
+  the projected patches as prompt tokens.
+core_bet: The language model's embedding space is a good enough interface that a linear map into it is
+  sufficient; nothing about the language model needs to change.
+primary_axis: architecture
+status: dominant
+since: 2023-04
+sections:
+- vlm
+arc:
+- paper: llava-2023
+  role: origin
+  note: A single linear projection from frozen CLIP into a language model, trained on generated instruction
+    data.
+- paper: llava-onevision-2024
+  role: scaling
+  note: Extends the same interface to multi-image and video with resolution-adaptive tiling, without architectural
+    change.
+- paper: metaquery-2025
+  role: hybrid
+  note: 'Runs the pattern in reverse for generation: learnable queries read a frozen multimodal model
+    and drive a diffusion decoder.'
+strengths:
+- Cheapest possible bridge between vision and language, and easy to train
+- The frozen language model keeps its abilities intact
+- The same interface can be reversed to condition a generator, which is how frozen-model generation works
+weaknesses:
+- A linear map is a narrow channel for everything an image contains
+- Visual tokens consume context length the language model needs elsewhere
+- Fine spatial grounding is limited by what the frozen encoder chose to keep
+explains: null

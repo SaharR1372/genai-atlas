@@ -1,0 +1,37 @@
+id: line-native-resolution-vlm
+type: line
+name: Native-resolution vision-language models
+one_line: Process images at their own resolution and aspect ratio, with position encodings general enough
+  to handle the variation.
+core_bet: Resizing every image to a fixed square destroys exactly the detail that grounding and text rendering
+  depend on, and the fix belongs in the architecture.
+primary_axis: architecture
+status: ascendant
+since: 2024-09
+sections:
+- vlm
+- generation
+arc:
+- paper: qwen2vl-2024
+  role: origin
+  note: Native dynamic resolution plus a rotary position encoding decomposed across time, height and width.
+- paper: qwen25vl-2025
+  role: improvement
+  note: Adds windowed attention and absolute time encoding; becomes the text encoder inside Qwen-Image
+    and the instruction parser inside Step1X-Edit.
+- paper: internvl3-2025
+  role: improvement
+  note: Pretrains multimodally from the start rather than adapting a finished text model.
+- paper: qwen3vl-2025
+  role: scaling
+  note: Interleaved multimodal rotary embeddings and multi-level vision feature fusion.
+strengths:
+- Preserves the fine detail that text rendering and grounding need
+- 'Directly load-bearing for generation: this family encodes the prompts for much of current open text-to-image
+  and editing work'
+- Handles wildly varying aspect ratios without a preprocessing compromise
+weaknesses:
+- Variable sequence length complicates batching and serving
+- Position-encoding schemes are proliferating faster than they are being compared against each other
+- Most of the evidence is from one lab's model family
+explains: null

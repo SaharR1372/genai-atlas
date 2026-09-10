@@ -64,6 +64,16 @@ review pass. Nothing was committed to git this session — files are staged in t
 
 ## Current phase
 
+**Session 7 (2026-09-10).** Working a standing queue from user review, tracked in `WORK_QUEUE.md`,
+which is now the file to read for what is done and what is next. Completed this session: the
+capability matrix (Q3), the first two runnable notebooks (Q4, partial), and the VFM/VLM sections
+(Q5). Still open: explanations for the remaining papers (Q1/Q2), a RAE inference notebook, and the
+unverified vendor claims (Q6).
+
+**Hardware note for notebook work:** this machine has 3x A100 80GB and a populated 103GB Hugging
+Face cache. Use `/home/exx/anaconda3/envs/dediffusion/bin/python` (torch 2.10, diffusers 0.36).
+SD 1.5 loads in about a second and generates in about a second, so notebook iteration is cheap.
+
 **Session 6 (2026-09-10).** Two fixes from user review.
 
 *Recent papers were mostly categorized, but not entirely.* Of 20 papers added since May 2026, 17

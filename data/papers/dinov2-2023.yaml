@@ -36,10 +36,10 @@ summary: Scales self-distillation-based self-supervised ViT training to produce 
 explanation: null
 explained:
   depth: full-text
-  before: Self-supervised vision methods produced strong features only when trained on small curated
-    datasets such as ImageNet, and quality dropped when the same recipes were scaled to larger uncurated
-    web data. CLIP-style weakly supervised training filled that gap, but its features are shaped by captions,
-    which only approximate what an image actually contains.
+  before: Self-supervised vision methods produced strong features only when trained on small curated datasets
+    such as ImageNet, and quality dropped when the same recipes were scaled to larger uncurated web data.
+    CLIP-style weakly supervised training filled that gap, but its features are shaped by captions, which
+    only approximate what an image actually contains.
   problem: Whether self-supervised learning, with no text supervision at all, can match or beat CLIP-style
     features as a general-purpose visual representation once data curation and model scale are pushed
     far enough.
@@ -61,11 +61,11 @@ explained:
     linear accuracy from 83.3% to 85.8% at matched iteration count. Distilled ViT-L outperforms a ViT-L
     trained from scratch on 10 of 12 benchmarks.
   limitations: The authors concede significant geographic and income bias in a fairness evaluation on
-    Dollar Street, where accuracy is 74.0% for Africa against 89.7% for Europe, and 67.4% for low-income households
-    against 90.5% for high-income ones. They write that they observe "significant biases in our models
-    toward wealthy households from Western countries." Supervised finetuning of the giant model adds only
-    about 2 points over its frozen linear features, and dense segmentation still trails specialist supervised
-    heads by roughly 10 mIoU points.
+    Dollar Street, where accuracy is 74.0% for Africa against 89.7% for Europe, and 67.4% for low-income
+    households against 90.5% for high-income ones. They write that they observe "significant biases in
+    our models toward wealthy households from Western countries." Supervised finetuning of the giant model
+    adds only about 2 points over its frozen linear features, and dense segmentation still trails specialist
+    supervised heads by roughly 10 mIoU points.
   why_it_matters: It establishes that self-supervision without any language signal can produce features
     as strong as CLIP-style contrastive training, given deliberate curation and scale. That is why later
     work, including REPA, VA-VAE and RAE, treats DINOv2 as an interchangeable frozen semantic encoder
@@ -82,3 +82,5 @@ abstract: The recent breakthroughs in natural language processing for model pret
   literature. In terms of models, we train a ViT model (Dosovitskiy et al., 2020) with 1B parameters and
   distill it into a series of smaller models that surpass the best available all-purpose features, OpenCLIP
   (Ilharco et al., 2021) on most of the benchmarks at image and pixel levels.
+lines:
+- line-self-distillation

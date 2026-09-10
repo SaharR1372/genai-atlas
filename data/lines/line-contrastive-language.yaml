@@ -1,0 +1,46 @@
+id: line-contrastive-language
+type: line
+name: Contrastive language-image pretraining
+one_line: Learn visual features by aligning images to their captions across web-scale data.
+core_bet: Language supervision is what makes a representation semantically meaningful and directly promptable,
+  and that is worth more than what it costs in spatial precision.
+primary_axis: representation
+status: dominant
+since: 2021-02
+sections:
+- vfm
+- vlm
+arc:
+- paper: clip-2021
+  role: origin
+  note: Contrastive image-text pretraining at web scale, producing the zero-shot transfer that made vision-language
+    models practical.
+- paper: siglip-2023
+  role: improvement
+  note: Swaps the softmax contrastive loss for a pairwise sigmoid, removing the dependence on very large
+    batches.
+- paper: siglip2-2025
+  role: improvement
+  note: Adds captioning and self-distillation objectives to the contrastive recipe, specifically to fix
+    weak dense and localization features.
+- paper: perception-encoder-2025
+  role: evidence
+  note: Finds the most useful embeddings sit in intermediate layers rather than at the output, which complicates
+    the idea of reading a frozen encoder at a single point.
+- paper: aimv2-2024
+  role: improvement
+  note: 'A third route: autoregressive prediction of patches and text together, rather than contrastive
+    alignment.'
+strengths:
+- Directly promptable and language-aligned, which self-distilled features are not
+- The default front end for every vision-language model
+- SigLIP 2 is the frozen encoder Scale-RAE chose for text-to-image
+weaknesses:
+- Consistently beaten by DINOv2 as an alignment target in head-to-head ablations
+- Contrastive training optimizes a global match, which historically cost dense and localization quality
+- Caption quality bounds what the representation can learn
+competes_with:
+- line-self-distillation
+explains: null
+open_questions:
+- which-encoder-for-generation

@@ -18,6 +18,7 @@ tier: core
 sections:
 - vfm
 - rae
+- vlm
 links:
   code: null
   weights: null
@@ -63,9 +64,9 @@ explained:
     bias probe drops from 35.5% to 7.3% for L/16 at 256px.
   limitations: The authors concede the NaFlex variant does not extrapolate well beyond the sequence lengths
     seen in training, though it interpolates reasonably within them. They also concede that fairness gains
-    are uneven, since disaggregating results by geographic region or by income level on Dollar Street shows,
-    in their words, "very minor benefits, or no benefits" in several breakdowns even where aggregate bias
-    metrics improved.
+    are uneven, since disaggregating results by geographic region or by income level on Dollar Street
+    shows, in their words, "very minor benefits, or no benefits" in several breakdowns even where aggregate
+    bias metrics improved.
   why_it_matters: It shows that the field's separate improvements to CLIP-style pretraining, captioning,
     self-distillation, masking and variable resolution, are compatible and additive in one model rather
     than competing design choices, producing a single encoder strong enough at dense and localization
@@ -83,3 +84,5 @@ abstract: 'We introduce SigLIP 2, a family of new multilingual vision-language e
   better multilingual understanding and improved fairness. To allow users to trade off inference cost
   with performance, we release model checkpoints at four sizes: ViT-B (86M), L (303M), So400m (400M),
   and g (1B).'
+lines:
+- line-contrastive-language

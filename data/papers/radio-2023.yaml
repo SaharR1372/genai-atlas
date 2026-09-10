@@ -1,0 +1,45 @@
+id: radio-2023
+type: paper
+title: 'AM-RADIO: Agglomerative Vision Foundation Model -- Reduce All Domains Into One'
+short: AM-RADIO
+arxiv: '2312.06709'
+date: 2023-12
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- NVIDIA
+authors: []
+tier: core
+sections:
+- vfm
+lines:
+- line-agglomerative
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: Distils several specialist foundation models, CLIP for semantics, DINOv2 for dense structure,
+  SAM for segmentation, into one student backbone, on the argument that no single pretraining objective
+  is best at everything.
+explanation: null
+abstract: 'A handful of visual foundation models (VFMs) have recently emerged as the backbones for numerous
+  downstream tasks. VFMs like CLIP, DINOv2, SAM are trained with distinct objectives, exhibiting unique
+  characteristics for various downstream tasks. We find that despite their conceptual differences, these
+  models can be effectively merged into a unified model through multi-teacher distillation. We name this
+  approach AM-RADIO (Agglomerative Model -- Reduce All Domains Into One). This integrative approach not
+  only surpasses the performance of individual teacher models but also amalgamates their distinctive features,
+  such as zero-shot vision-language comprehension, detailed pixel-level understanding, and open vocabulary
+  segmentation capabilities. In pursuit of the most hardware-efficient backbone, we evaluated numerous
+  architectures in our multi-teacher distillation pipeline using the same training recipe. This led to
+  the development of a novel architecture (E-RADIO) that exceeds the performance of its predecessors and
+  is at least 7x faster than the teacher models. Our comprehensive benchmarking process covers downstream
+  tasks including ImageNet classification, ADE20k semantic segmentation, COCO object detection and LLaVa-1.5
+  framework. Code: https://github.com/NVlabs/RADIO'

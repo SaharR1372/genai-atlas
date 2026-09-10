@@ -1,0 +1,44 @@
+id: transfusion-2024
+type: paper
+title: 'Transfusion: Predict the Next Token and Diffuse Images with One Multi-Modal Model'
+short: Transfusion
+arxiv: '2408.11039'
+date: 2024-08
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- Meta AI
+authors: []
+tier: landmark
+sections:
+- unified
+- vlm
+lines:
+- line-unified-models
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: Runs next-token prediction for text and a diffusion objective for continuous image latents inside
+  one transformer, with one set of weights and two losses. The cleanest demonstration that unifying understanding
+  and generation does not require quantizing images into discrete tokens.
+explanation: null
+abstract: We introduce Transfusion, a recipe for training a multi-modal model over discrete and continuous
+  data. Transfusion combines the language modeling loss function (next token prediction) with diffusion
+  to train a single transformer over mixed-modality sequences. We pretrain multiple Transfusion models
+  up to 7B parameters from scratch on a mixture of text and image data, establishing scaling laws with
+  respect to a variety of uni- and cross-modal benchmarks. Our experiments show that Transfusion scales
+  significantly better than quantizing images and training a language model over discrete image tokens.
+  By introducing modality-specific encoding and decoding layers, we can further improve the performance
+  of Transfusion models, and even compress each image to just 16 patches. We further demonstrate that
+  scaling our Transfusion recipe to 7B parameters and 2T multi-modal tokens produces a model that can
+  generate images and text on a par with similar scale diffusion models and language models, reaping the
+  benefits of both worlds.

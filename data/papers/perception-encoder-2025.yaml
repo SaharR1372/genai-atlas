@@ -1,0 +1,47 @@
+id: perception-encoder-2025
+type: paper
+title: 'Perception Encoder: The best visual embeddings are not at the output of the network'
+short: Perception Encoder
+arxiv: '2504.13181'
+date: 2025-04
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- Meta AI
+authors: []
+tier: core
+sections:
+- vfm
+lines:
+- line-contrastive-language
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: Finds that the most useful embeddings in a contrastively trained vision model sit in intermediate
+  layers rather than at the output, and builds a recipe around extracting them. Relevant to representation-space
+  generation because it questions which layer a frozen encoder should even be read from.
+explanation: null
+abstract: 'We introduce Perception Encoder (PE), a state-of-the-art vision encoder for image and video
+  understanding trained via simple vision-language learning. Traditionally, vision encoders have relied
+  on a variety of pretraining objectives, each tailored to specific downstream tasks such as classification,
+  captioning, or localization. Surprisingly, after scaling our carefully tuned image pretraining recipe
+  and refining with our robust video data engine, we find that contrastive vision-language training alone
+  can produce strong, general embeddings for all of these downstream tasks. There is only one caveat:
+  these embeddings are hidden within the intermediate layers of the network. To draw them out, we introduce
+  two alignment methods: language alignment for multimodal language modeling, and spatial alignment for
+  dense prediction. Together, our PE family of models achieves best-in-class results on a wide variety
+  of tasks, including (1) zero-shot image and video classification and retrieval, simultaneously obtaining
+  86.6 average zero-shot ImageNet robustness and 76.9 zero-shot Kinetics-400 video classification; (2)
+  document, image, and video Q&A, enabling 94.6 DocVQA, 80.9 InfographicVQA, and 82.7 PerceptionTest with
+  an 8B LLM; and (3) spatial tasks such as detection, tracking, and depth estimation, setting a new COCO
+  state-of-the-art of 66.0 box mAP. To foster further research, we release our models, code, and novel
+  dataset of synthetically and human-annotated videos: https://github.com/facebookresearch/perception_models'

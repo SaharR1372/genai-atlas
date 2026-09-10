@@ -1,0 +1,33 @@
+id: line-agglomerative
+type: line
+name: Agglomerative multi-teacher distillation
+one_line: Distil several specialist foundation models into one backbone rather than choosing between their
+  objectives.
+core_bet: No single pretraining objective is best at everything, so the right move is to inherit several
+  at once through distillation.
+primary_axis: representation
+status: ascendant
+since: 2023-12
+sections:
+- vfm
+arc:
+- paper: radio-2023
+  role: origin
+  note: Distils CLIP, DINOv2 and SAM into one student, on the argument that semantics, dense structure
+    and segmentation are separate strengths.
+- paper: radiov25-2024
+  role: improvement
+  note: Fixes resolution and mode-switching failures in the first recipe.
+- paper: cradiov4-2026
+  role: scaling
+  note: Now distils DINOv3, SigLIP 2 and SAM 3 — the same three encoders the generative-latent work independently
+    converged on.
+strengths:
+- Sidesteps the self-distillation versus contrastive argument by taking both
+- One backbone to deploy instead of several specialists
+- Its choice of teachers is a useful read on what the field currently rates
+weaknesses:
+- A student is bounded by its teachers and inherits their blind spots
+- Not yet evaluated as a generative latent, which is the use this atlas cares about most
+- Distillation adds a training stage and a set of hyperparameters of its own
+explains: null

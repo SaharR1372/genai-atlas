@@ -1,0 +1,51 @@
+id: line-self-distillation
+type: line
+name: Self-distillation representations
+one_line: Learn visual features with no labels, no language and no pixel reconstruction, by having a network
+  predict its own slowly-updated teacher.
+core_bet: The best visual representation comes from a teacher-student objective in latent space, which
+  produces spatially structured features that transfer without fine-tuning.
+primary_axis: representation
+status: dominant
+since: 2021-11
+sections:
+- vfm
+- rae
+arc:
+- paper: mae-2021
+  role: precursor
+  note: 'Masked pixel reconstruction: scalable and a strong fine-tuning initializer, but its frozen features
+    turn out weak for both alignment and generation.'
+- paper: ijepa-2023
+  role: improvement
+  note: Predicts masked regions in latent space instead of pixel space, on the argument that pixel detail
+    wastes capacity.
+- paper: registers-2023
+  role: improvement
+  note: Removes the high-norm artifact tokens that pollute dense feature maps, now standard across the
+    family.
+- paper: dinov2-2023
+  role: origin
+  note: 'The model that made this bet decisively: features good enough to use frozen, and the default
+    alignment target ever since.'
+- paper: dinov3-2025
+  role: scaling
+  note: Scales to 7B with Gram anchoring to stop dense features degrading over long training.
+- paper: webssl-2025
+  role: evidence
+  note: Shows language-free self-supervision keeps improving with scale where contrastive language training
+    saturates, at least for understanding.
+strengths:
+- Wins the encoder comparison in both REPA's and RAE's own ablations
+- Needs no paired captions, so it scales with raw image data
+- Produces the spatially structured features that predict generation gains
+weaknesses:
+- No language grounding, so it cannot be prompted directly
+- Whether its advantage for generation is semantic quality or spatial structure is disputed, with two
+  groups offering different explanations
+- The claim that language-free scaling wins has not been tested for generation
+competes_with:
+- line-contrastive-language
+explains: null
+open_questions:
+- which-encoder-for-generation

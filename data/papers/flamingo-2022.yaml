@@ -1,0 +1,48 @@
+id: flamingo-2022
+type: paper
+title: 'Flamingo: a Visual Language Model for Few-Shot Learning'
+short: Flamingo
+arxiv: '2204.14198'
+date: 2022-04
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- Google DeepMind
+authors: []
+tier: landmark
+sections:
+- vlm
+lines:
+- line-cross-attention-vlm
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: Injects visual information into a frozen language model through gated cross-attention layers
+  interleaved between its existing blocks, with a perceiver resampler compressing images to a fixed token
+  budget first. The gates initialize near zero so the language model is never disturbed at the start of
+  training.
+explanation: null
+abstract: 'Building models that can be rapidly adapted to novel tasks using only a handful of annotated
+  examples is an open challenge for multimodal machine learning research. We introduce Flamingo, a family
+  of Visual Language Models (VLM) with this ability. We propose key architectural innovations to: (i)
+  bridge powerful pretrained vision-only and language-only models, (ii) handle sequences of arbitrarily
+  interleaved visual and textual data, and (iii) seamlessly ingest images or videos as inputs. Thanks
+  to their flexibility, Flamingo models can be trained on large-scale multimodal web corpora containing
+  arbitrarily interleaved text and images, which is key to endow them with in-context few-shot learning
+  capabilities. We perform a thorough evaluation of our models, exploring and measuring their ability
+  to rapidly adapt to a variety of image and video tasks. These include open-ended tasks such as visual
+  question-answering, where the model is prompted with a question which it has to answer; captioning tasks,
+  which evaluate the ability to describe a scene or an event; and close-ended tasks such as multiple-choice
+  visual question-answering. For tasks lying anywhere on this spectrum, a single Flamingo model can achieve
+  a new state of the art with few-shot learning, simply by prompting the model with task-specific examples.
+  On numerous benchmarks, Flamingo outperforms models fine-tuned on thousands of times more task-specific
+  data.'
