@@ -1,0 +1,18 @@
+{
+  "model": "Qwen-Image",
+  "load_s": 9.9,
+  "runs": {
+    "text": {
+      "seconds": 14.8,
+      "prompt": "a storefront window with a hand-painted sign reading \"GENERATIVE VISION ATLAS\", morning light, photograph"
+    },
+    "compose": {
+      "seconds": 14.6,
+      "prompt": "three red cubes stacked on top of a blue sphere, to the left of a green cone, studio lighting"
+    },
+    "photo": {
+      "seconds": 14.7,
+      "prompt": "a close-up portrait of an elderly fisherman with a weathered face, soft window light, 85mm lens"
+    }
+  }
+}
