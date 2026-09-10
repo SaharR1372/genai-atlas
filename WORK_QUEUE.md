@@ -181,3 +181,46 @@ All checked against vendor primary sources. Results in `docs/refuted-claims.md`.
 - Compact context around 90% and keep this file current, so work stays traceable across sessions.
 - After each meaningful unit: update this file, `PROJECT_STATE.md`, and `CHANGELOG.md`.
 - No explanatory claim without a fetched source (D004).
+
+---
+
+## Q7 — Run the open models and report how they actually perform
+**Status: IN PROGRESS** (session 9)
+
+User asked to run the newly-verified open models. First correction: of the six items they named,
+**none were blocked by authentication**. Three do not exist (`Qwen/Qwen-Image-3.0`,
+`black-forest-labs/FLUX.3-dev`, `stabilityai/stable-diffusion-4` all return repository-not-found),
+and two are closed vendor APIs that were never on the Hub. A token unlocks only gated models, of
+which Krea 2 is the one on our list.
+
+**Chosen for this pass:** Qwen-Image, LLaDA-Image-Turbo, HiDream-O1-Image-Dev. Krea 2 and the rest
+deferred to a later pass at the user's request.
+
+### Download status
+- [x] `HiDream-ai/HiDream-O1-Image-Dev` 35GB, 139s
+- [x] `inclusionAI/LLaDA-Image-Turbo` 49GB, 366s
+- [ ] `Qwen/Qwen-Image` 58GB, in progress
+
+### Environment findings, do not rediscover
+- **Qwen-Image needs nothing special.** `diffusers` 0.36 in the `dediffusion` env already exposes
+  `QwenImagePipeline` and `QwenImageEditPipeline`.
+- **HiDream-O1 needs `transformers==4.57.1`**, but `dediffusion` has 5.2.0 and downgrading would
+  break the other four notebooks. Building an isolated env at `external/hidream-env` instead. Its
+  architecture is `Qwen3VLForConditionalGeneration`, and its own README warns PyTorch 2.9.x is not
+  recommended. Code: `external/HiDream-O1-Image` (`inference.py`, `--model_type dev` for the
+  distilled weights).
+- **LLaDA-Image-Turbo** ships a diffusers-style `model_index.json` but with custom classes
+  (`LLaDAImageQueryFormerModel`, `LLaDAImageSigVQModel`, `LLaDAImageTextProjectionModel`) that need
+  `external/LLaDA-Image`. Worth noting for the atlas: it has a `vae/` component, which confirms the
+  entry filing it under the VAE-latent line.
+- `python -m venv` fails on this machine (ensurepip returns non-zero); use `conda create -p` instead.
+
+### Confirmed against the model card
+HiDream-O1's own card states it is a "Pixel-level Unified Transformer (UiT) without external VAEs or
+disjoint text encoders, which natively encodes raw pixels, text, and task-specific conditions in a
+single shared token space." That matches what the atlas already claims about it, from an independent
+source.
+
+### Next
+- [ ] Generate from all three on identical prompts and seeds, and record what each is actually good at
+- [ ] A comparison notebook, and results folded into `/models` and `/compare`
