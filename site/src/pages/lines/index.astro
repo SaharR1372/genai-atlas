@@ -1,8 +1,9 @@
 ---
 import Base from "../../layouts/Base.astro";
-import { allLines, papersInLine } from "../../lib/graph";
+import { generalLines, medicalLines, papersInLine } from "../../lib/graph";
 
-const lines = allLines();
+const lines = generalLines();
+const nMedical = medicalLines().length;
 
 const STATUS_NOTE: Record<string, string> = {
   dominant: "The default choice. Most systems you encounter use this.",
@@ -31,6 +32,10 @@ const AXIS_LABEL: Record<string, string> = {
     A line is a family of work sharing one core bet. Lines are grouped below by the design question
     the bet answers. A paper can belong to more than one line, and lines that answer the same
     question compete with each other directly.
+  </p>
+  <p class="card section-border" style="--section-color: var(--section-medical); margin-bottom:2.5rem;">
+    Medical imaging is kept as a separate domain with its own {nMedical} lines, because its
+    constraints and its evidence bar are different. <a href="/medical">Go to medical imaging &rarr;</a>
   </p>
 
   {byAxis.map(({ axis, lines: group }) => (

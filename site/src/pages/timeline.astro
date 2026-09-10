@@ -1,8 +1,8 @@
 ---
 import Base from "../layouts/Base.astro";
-import { papersByDate, nodeById } from "../lib/graph";
+import { papersByDate, nodeById, isMedical } from "../lib/graph";
 
-const papers = papersByDate();
+const papers = papersByDate().filter((p) => !isMedical(p));
 
 // group by year, then show month order within
 const years = [...new Set(papers.map((p) => (p.date ?? "").slice(0, 4)))].sort();
@@ -19,7 +19,8 @@ const ERA: Record<string, string> = {
 <Base title="Timeline" description="How modern generative vision developed, in order.">
   <h1 style="font-size:1.9rem; margin:0 0 0.6rem;">Timeline</h1>
   <p class="measure" style="color:var(--text-muted); margin-bottom:2.5rem;">
-    Every paper in the atlas by date, with the line it belongs to. The point of reading it in order
+    Every paper in the general-domain atlas by date, with the line it belongs to. Medical imaging
+    has its own <a href="/medical">separate timeline of ideas</a>. The point of reading it in order
     is to see how long an idea sits unused before something makes it work: generating in a semantic
     space was tried in 2022 and abandoned, then became the most active question in the field three
     years later.

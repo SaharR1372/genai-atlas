@@ -1,0 +1,143 @@
+---
+import Base from "../layouts/Base.astro";
+import { nodesByType } from "../lib/graph";
+import fs from "node:fs";
+import path from "node:path";
+
+// Read the pipeline's own state and review queue at build time, so this page reports
+// what actually happened rather than a hand-written claim.
+const ROOT = path.resolve(process.cwd(), "..");
+const statePath = path.join(ROOT, "data", "monitor", "state.json");
+const candDir = path.join(ROOT, "data", "monitor", "candidates");
+
+let state: any = null;
+try {
+  state = JSON.parse(fs.readFileSync(statePath, "utf8"));
+} catch {}
+
+let candidates: any[] = [];
+try {
+  candidates = fs
+    .readdirSync(candDir)
+    .filter((f) => f.endsWith(".yaml"))
+    .map((f) => {
+      const raw = fs.readFileSync(path.join(candDir, f), "utf8");
+      const title = raw.match(/^title:\s*(.+)$/m)?.[1]?.replace(/^['"]|['"]$/g, "") ?? f;
+      const arxiv = raw.match(/^arxiv:\s*'?([\d.]+)'?/m)?.[1] ?? null;
+      const score = raw.match(/^\s+score:\s*([\d.]+)/m)?.[1] ?? null;
+      const reasons = [...raw.matchAll(/^\s+-\s+(matches sections|core topic|affiliated|notable author|mentions atlas|code or weights|title suggests|\d+ upvotes)(.*)$/gm)]
+        .map((m) => (m[1] + m[2]).trim());
+      return { file: f, title, arxiv, score: score ? parseFloat(score) : 0, reasons };
+    })
+    .sort((a, b) => b.score - a.score);
+} catch {}
+
+const papers = nodesByType("papers");
+const verified = papers.filter((p) => p.data.status?.verified).length;
+const lastRun = state?.last_run ? new Date(state.last_run) : null;
+const s = state?.last_run_stats ?? null;
+---
+<Base title="Updates" description="How this atlas keeps itself current, and what is currently waiting for review.">
+  <h1 style="font-size:1.9rem; margin:0 0 0.6rem;">Updates</h1>
+  <p class="measure" style="color:var(--text-muted); margin-bottom:2.5rem;">
+    A pipeline sweeps arXiv and Hugging Face daily papers every three days, filters for genuine
+    relevance, scores what survives, and proposes it for review. Nothing enters the atlas
+    automatically, and no explanatory claim is written without a fetched source.
+  </p>
+
+  <section style="margin-bottom:3rem;">
+    <h2 style="font-size:1.3rem; margin:0 0 1rem;">The pipeline</h2>
+    <div style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center; margin-bottom:1.5rem; font-size:0.85rem;">
+      {["discover", "filter for relevance", "score quality", "check for duplicates", "propose", "verify", "merge"].map((step, i, arr) => (
+        <>
+          <span class="badge" style="font-family:var(--font-body);">{step}</span>
+          {i < arr.length - 1 && <span style="color:var(--text-muted);">&rarr;</span>}
+        </>
+      ))}
+    </div>
+
+    {s ? (
+      <div class="card">
+        <p style="margin:0 0 0.85rem; font-size:0.9rem; color:var(--text-muted);">
+          Last run {lastRun ? lastRun.toISOString().slice(0, 10) : "unknown"}, which processed
+          {" "}{s.raw} new preprints:
+        </p>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px,1fr)); gap:1rem;">
+          {[
+            { n: s.raw, l: "discovered" },
+            { n: s.off_topic ?? 0, l: "not image generation" },
+            { n: s.out_of_scope ?? 0, l: "out of scope" },
+            { n: s.duplicates ?? 0, l: "already here" },
+            { n: s.admitted ?? 0, l: "proposed for review" },
+          ].map((x) => (
+            <div>
+              <div style="font-family:var(--font-mono); font-size:1.35rem;">{x.n}</div>
+              <div style="font-size:0.8rem; color:var(--text-muted);">{x.l}</div>
+            </div>
+          ))}
+        </div>
+        <p style="margin:1rem 0 0; font-size:0.85rem; color:var(--text-muted); border-top:1px solid var(--border); padding-top:0.85rem;">
+          The aggressive filtering is deliberate. World-action models, depth estimation and language-model
+          post-training papers share almost all of generative vision's vocabulary, and without a hard
+          topic gate they dominate the queue.
+        </p>
+      </div>
+    ) : (
+      <div class="card"><p style="margin:0;">The pipeline has not recorded a run yet.</p></div>
+    )}
+  </section>
+
+  {candidates.length > 0 && (
+    <section style="margin-bottom:3rem;">
+      <h2 style="font-size:1.3rem; margin:0 0 0.35rem;">Waiting for review ({candidates.length})</h2>
+      <p style="color:var(--text-muted); font-size:0.9rem; margin:0 0 1.25rem;">
+        Proposed by the last sweep, not yet part of the atlas. Each shows why it was surfaced.
+      </p>
+      <div style="display:flex; flex-direction:column; gap:0.85rem;">
+        {candidates.map((c) => (
+          <div style="border-left:2px solid var(--border); padding-left:1rem;">
+            <p style="margin:0 0 0.2rem;">
+              <span style="font-family:var(--font-mono); font-size:0.8rem; color:var(--text-muted);">
+                {c.score.toFixed(1)}
+              </span>{" "}
+              {c.arxiv ? <a href={`https://arxiv.org/abs/${c.arxiv}`}>{c.title}</a> : c.title}
+            </p>
+            {c.reasons.length > 0 && (
+              <p style="margin:0; font-size:0.82rem; color:var(--text-muted);">
+                {c.reasons.slice(0, 3).join(" · ")}
+              </p>
+            )}
+          </div>
+        ))}
+      </div>
+    </section>
+  )}
+
+  <section>
+    <h2 style="font-size:1.3rem; margin:0 0 1rem;">Standards</h2>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px,1fr)); gap:1rem;">
+      <div class="card">
+        <h3 style="font-size:0.95rem; margin:0 0 0.4rem;">Every paper is checked</h3>
+        <p style="margin:0; font-size:0.88rem; color:var(--text-muted);">
+          {verified} of {papers.length} entries have had their arXiv record fetched and their title
+          matched. The remainder is a journal paper with a DOI and no arXiv id. Six wrong titles have
+          been caught this way so far.
+        </p>
+      </div>
+      <div class="card">
+        <h3 style="font-size:0.95rem; margin:0 0 0.4rem;">Automation cannot promote</h3>
+        <p style="margin:0; font-size:0.88rem; color:var(--text-muted);">
+          The pipeline never proposes a paper above the lowest tier, and never writes to the atlas
+          directly. A human or a review session decides.
+        </p>
+      </div>
+      <div class="card">
+        <h3 style="font-size:0.95rem; margin:0 0 0.4rem;">Gaps are stated</h3>
+        <p style="margin:0; font-size:0.88rem; color:var(--text-muted);">
+          Where a line has thin coverage, no independent replication, or an unverified claim, its
+          page says so rather than omitting it.
+        </p>
+      </div>
+    </div>
+  </section>
+</Base>

@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+### 2026-09-10 — Session 5 (Opus 5) — medical split out, landing page rebuilt
+- **Medical imaging separated into its own domain** (D020): a dedicated `/medical` area organized by
+  which space each line generates in and why that space was chosen, plus its own open problems and
+  paper index. Medical entities are filtered out of the general lines, timeline and problems views;
+  the research graph gains a domain switch. `isMedical()` is the single definition of the split.
+- **Landing page rebuilt** (D021) for a visitor arriving cold from a shared link: leads with the
+  representation spectrum as one diagram, then the six design questions with every line under them,
+  then what the atlas does that a paper list does not, the medical domain as a distinct block,
+  reading paths, and recent additions. All figures derive from `atlasStats()` at build time.
+- **New `/updates` page** reporting the pipeline's actual last run, the current review queue with the
+  reason each candidate was surfaced, and the verification standards.
+- Open Graph and Twitter card tags added, since the site is meant to be shared.
+- 222 pages, 264 entities, 28 tests, validation clean.
+
 ### 2026-09-10 — Session 4 (Opus 5) — conditioning, editing, medical, and a live pipeline
 - **Living-update pipeline built** (the "every 3 days" requirement): discovery from arXiv and
   Hugging Face daily papers, rule-based relevance and quality scoring, duplicate detection, a ranked

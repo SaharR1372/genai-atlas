@@ -15,6 +15,16 @@ const { title, description = "A research atlas of modern generative vision, 2023
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title} · Generative Vision Atlas</title>
     <meta name="description" content={description} />
+    <link rel="canonical" href={Astro.url.pathname} />
+
+    <!-- Social preview: this atlas is meant to be shared, so links should render properly. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Generative Vision Atlas" />
+    <meta property="og:title" content={`${title} · Generative Vision Atlas`} />
+    <meta property="og:description" content={description} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={`${title} · Generative Vision Atlas`} />
+    <meta name="twitter:description" content={description} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -41,6 +51,7 @@ const { title, description = "A research atlas of modern generative vision, 2023
       <nav style="display:flex; gap:1.25rem; align-items:center; font-size:0.92rem;">
         <a href="/lines">Lines</a>
         <a href="/sections/editing">Sections</a>
+        <a href="/medical" style="color:var(--section-medical);">Medical</a>
         <a href="/compare">Compare</a>
         <a href="/problems">Problems</a>
         <a href="/timeline">Timeline</a>

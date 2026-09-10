@@ -1,8 +1,8 @@
 ---
 import Base from "../layouts/Base.astro";
-import { allProblems, nodeById, allLines } from "../lib/graph";
+import { allProblems, nodeById, allLines, isMedical } from "../lib/graph";
 
-const problems = allProblems().sort((a, b) => {
+const problems = allProblems().filter((p) => !isMedical(p)).sort((a, b) => {
   const order = ["open", "partially-solved", "solved-by"];
   return order.indexOf(a.data.status) - order.indexOf(b.data.status);
 });
@@ -22,6 +22,10 @@ const STATUS_LABEL: Record<string, string> = {
     The questions the field has not answered, each with the papers attacking it and the research
     lines that inherit it as a weakness. A problem marked partly addressed has real progress against
     it but no settled answer.
+  </p>
+  <p class="card section-border" style="--section-color: var(--section-medical); margin-bottom:2.5rem;">
+    Medical imaging keeps its own open problems, since they turn on clinical evidence rather than
+    benchmark scores. <a href="/medical">See the medical domain &rarr;</a>
   </p>
 
   {problems.map((p) => {

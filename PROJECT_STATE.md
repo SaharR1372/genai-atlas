@@ -23,6 +23,15 @@ review pass. Nothing was committed to git this session — files are staged in t
 
 ## Current phase
 
+**Session 5 (2026-09-10).** Two changes from user review: medical imaging is now a separate domain
+(D020) rather than one section among seven, and the landing page was rebuilt (D021) so someone
+arriving from a shared link understands the atlas without clicking through. New `/medical` and
+`/updates` pages; medical filtered out of general indexes; Open Graph tags added. 222 pages.
+
+**Structural note for future sessions:** `isMedical()` in `site/src/lib/graph.ts` is the only place
+the domain split is defined. If a new view is added, it must decide explicitly which domain it shows,
+or medical content will leak back into the general atlas.
+
 **Session 4 (2026-09-10).** Built the three sections the user asked for, plus the living-update
 pipeline. 264 entities, 124 papers (123 arXiv-verified; Ktena et al. is a Nature Medicine paper with
 a DOI and no arXiv id, correctly skipped), 25 research lines, 221 site pages, 28 tests.

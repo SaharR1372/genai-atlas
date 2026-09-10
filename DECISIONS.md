@@ -105,3 +105,19 @@ Format: id · date · decision · why · consequences. Revise by adding a new en
   and the new `line-adapter-conditioning` arc for judgment calls (tier assignments, the `contested` status
   call, the decision to keep `line-in-context-editing`'s origin as ACE++ rather than reassign it to
   OminiControl) that D007 would normally route to a stronger model.
+- **D020 · 2026-09-10 · Medical imaging is a separate domain, not a section.** It gets its own
+  top-level area at `/medical` with its own lines, problems and paper index, and everything tagged
+  `medical` is filtered out of `/lines`, `/timeline`, `/problems` and the default graph view (the
+  graph offers a domain switch). *Why:* the user asked for it directly, and the separation is
+  substantively right — medical work answers to downstream clinical utility and reader studies rather
+  than distribution distance, faces constraints the general field does not (patient privacy, 3D
+  volumes, regulatory validation), and reaches different conclusions about where generation should
+  happen. Mixing the two made both harder to read. `isMedical()` in `site/src/lib/graph.ts` is the
+  single place the split is defined.
+- **D021 · 2026-09-10 · The landing page is the product's argument, not a table of contents.** It
+  leads with the representation spectrum — five live answers to one question, ordered by how much
+  meaning the latent carries, sized by paper count and coloured by status — because that single
+  diagram communicates the whole organizing idea. Every number on the page is derived from the graph
+  at build time via `atlasStats()`, so the landing page can never drift from the data. *Why:* the
+  user intends to share this publicly, so a visitor arriving cold has to understand what the atlas is
+  and why it is organized this way without clicking through.

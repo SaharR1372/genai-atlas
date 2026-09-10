@@ -62,15 +62,67 @@ export function conceptsByAxis(axis: string): GraphNode[] {
 
 const STATUS_ORDER = ["dominant", "ascendant", "contested", "emerging", "superseded"];
 
-/** Research lines, ordered by how settled they are. */
+/**
+ * Medical imaging is treated as a separate domain, not a section alongside the others.
+ * It has its own evaluation culture (downstream clinical utility, reader studies), its own
+ * constraints (patient privacy, 3D volumes, regulatory validation), and a reader interested
+ * in one is usually not interested in the other. Everything tagged `medical` is routed to
+ * /medical and kept out of the general indexes.
+ */
+export function isMedical(n: GraphNode): boolean {
+  return (n.sections ?? []).includes("medical");
+}
+
+function bySettledness(a: GraphNode, b: GraphNode): number {
+  return (
+    STATUS_ORDER.indexOf(a.data.status) - STATUS_ORDER.indexOf(b.data.status) ||
+    (a.data.since ?? "").localeCompare(b.data.since ?? "")
+  );
+}
+
+/** Every research line, both domains. Prefer generalLines()/medicalLines() for indexes. */
 export function allLines(): GraphNode[] {
+  return graph.nodes.filter((n) => n.nodeType === "lines").sort(bySettledness);
+}
+
+/** Research lines outside the medical domain, ordered by how settled they are. */
+export function generalLines(): GraphNode[] {
+  return allLines().filter((l) => !isMedical(l));
+}
+
+export function medicalLines(): GraphNode[] {
+  return allLines().filter(isMedical);
+}
+
+export function medicalPapers(): GraphNode[] {
   return graph.nodes
-    .filter((n) => n.nodeType === "lines")
-    .sort(
-      (a, b) =>
-        STATUS_ORDER.indexOf(a.data.status) - STATUS_ORDER.indexOf(b.data.status) ||
-        (a.data.since ?? "").localeCompare(b.data.since ?? "")
-    );
+    .filter((n) => n.nodeType === "papers" && isMedical(n))
+    .sort((a, b) => (b.date ?? "").localeCompare(a.date ?? ""));
+}
+
+export function generalPapers(): GraphNode[] {
+  return graph.nodes.filter((n) => n.nodeType === "papers" && !isMedical(n));
+}
+
+/** Counts for the landing page, so the numbers there are never hand-maintained. */
+export function atlasStats() {
+  const papers = graph.nodes.filter((n) => n.nodeType === "papers");
+  const verified = papers.filter((p) => p.data.status?.verified).length;
+  const dates = papers.map((p) => p.date).filter(Boolean).sort();
+  return {
+    papers: papers.length,
+    verified,
+    generalPapers: generalPapers().length,
+    medicalPapers: medicalPapers().length,
+    lines: allLines().length,
+    generalLines: generalLines().length,
+    medicalLines: medicalLines().length,
+    problems: graph.nodes.filter((n) => n.nodeType === "problems").length,
+    concepts: graph.nodes.filter((n) => n.nodeType === "concepts").length,
+    results: graph.nodes.filter((n) => n.nodeType === "results").length,
+    relations: graph.edges.length,
+    newestPaper: dates[dates.length - 1] ?? null,
+  };
 }
 
 export function linesForSection(section: string): GraphNode[] {

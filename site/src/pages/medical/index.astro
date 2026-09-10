@@ -1,0 +1,152 @@
+---
+import Base from "../../layouts/Base.astro";
+import { medicalLines, medicalPapers, allProblems, nodeById, isMedical } from "../../lib/graph";
+
+const lines = medicalLines();
+const papers = medicalPapers();
+const problems = allProblems().filter((p) => (p.sections ?? []).includes("medical"));
+
+// group lines by the space they generate in, which is the axis that actually organizes
+// this domain — the split is by task constraint, not by era
+const bySpace = lines.filter((l) => l.data.primary_axis === "representation");
+const other = lines.filter((l) => l.data.primary_axis !== "representation");
+
+const TIER_ORDER = ["landmark", "core", "strong-followup", "emerging", "watchlist"];
+const byTier = TIER_ORDER.map((t) => ({ tier: t, papers: papers.filter((p) => p.tier === t) }))
+  .filter((g) => g.papers.length > 0);
+---
+<Base
+  title="Medical imaging"
+  description="Generative models for clinical images, kept as a separate domain: different constraints, different evidence bar, different answers about where generation should happen."
+>
+  <div style="border-left:4px solid var(--section-medical); padding-left:1.25rem; margin-bottom:2.5rem;">
+    <p class="badge" style="margin-bottom:0.6rem; border-color:var(--section-medical); color:var(--section-medical);">
+      Separate domain
+    </p>
+    <h1 style="font-size:2.1rem; margin:0 0 0.75rem; color:var(--section-medical);">Medical imaging</h1>
+    <p class="measure" style="font-size:1.08rem; margin:0 0 0.75rem;">
+      Generative models applied to clinical images. This is kept apart from the rest of the atlas on
+      purpose. The constraints are different, the evidence bar is different, and the field has
+      arrived at different answers about where generation should happen.
+    </p>
+    <p class="measure" style="color:var(--text-muted); margin:0;">
+      A better distribution distance means little here. What counts is whether a downstream
+      diagnostic model improves, whether a radiologist can tell the image is synthetic, and whether
+      the model memorized a patient.
+    </p>
+  </div>
+
+  <section class="card section-border" style="--section-color: var(--section-medical); margin-bottom:2.5rem;">
+    <h2 style="font-size:1.1rem; margin:0 0 0.75rem;">The finding that organizes this domain</h2>
+    <p class="measure" style="margin:0 0 0.75rem;">
+      The choice of generation space here splits by <strong>task constraint, not by era</strong>.
+      Reconstruction and inverse problems stay in pixel space because the solver needs an invertible
+      mapping back to the measurement, so a latent would break it. Volumetric work trains its own
+      autoencoder because full-resolution 3D will not fit in memory. Most two-dimensional work
+      borrows Stable Diffusion's natural-image autoencoder, and that choice is almost never argued.
+    </p>
+    <p class="measure" style="margin:0;">
+      That last point is the open question. Nobody has tested whether an autoencoder trained on
+      photographs preserves the fine texture that separates a lesion from an artifact, and the
+      standard evaluation metrics come from the same photograph-trained feature family, so they would
+      not reveal it.
+    </p>
+  </section>
+
+  <section style="margin-bottom:3rem;">
+    <h2 style="font-size:1.4rem; margin:0 0 0.35rem;">Where medical generation happens</h2>
+    <p style="color:var(--text-muted); font-size:0.92rem; margin:0 0 1.25rem;">
+      Four answers, each chosen for a stated reason.
+    </p>
+    <div style="display:flex; flex-direction:column; gap:1rem;">
+      {bySpace.map((l) => (
+        <a class="card section-border" style="--section-color: var(--section-medical); display:block;" href={`/lines/${l.id}`}>
+          <div style="display:flex; align-items:baseline; gap:0.6rem; flex-wrap:wrap; margin-bottom:0.4rem;">
+            <h3 style="font-size:1.12rem; margin:0;">{l.data.name}</h3>
+            <span class="badge">{l.data.status}</span>
+            <span style="font-size:0.8rem; color:var(--text-muted);">since {l.data.since}</span>
+          </div>
+          <p style="margin:0 0 0.5rem;">{l.data.one_line}</p>
+          <p style="margin:0; font-size:0.88rem; color:var(--text-muted);">
+            <strong>Why this space:</strong> {l.data.core_bet}
+          </p>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  {other.length > 0 && (
+    <section style="margin-bottom:3rem;">
+      <h2 style="font-size:1.4rem; margin:0 0 1rem;">Other approaches</h2>
+      <div style="display:flex; flex-direction:column; gap:1rem;">
+        {other.map((l) => (
+          <a class="card section-border" style="--section-color: var(--section-medical); display:block;" href={`/lines/${l.id}`}>
+            <div style="display:flex; align-items:baseline; gap:0.6rem; margin-bottom:0.35rem;">
+              <h3 style="font-size:1.1rem; margin:0;">{l.data.name}</h3>
+              <span class="badge">{l.data.status}</span>
+            </div>
+            <p style="margin:0;">{l.data.one_line}</p>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
+
+  {problems.length > 0 && (
+    <section style="margin-bottom:3rem;">
+      <h2 style="font-size:1.4rem; margin:0 0 1rem;">Open problems</h2>
+      {problems.map((p) => (
+        <div class="card" style="margin-bottom:1rem;">
+          <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:0.5rem;">
+            <span class="badge">{p.data.status === "open" ? "Open" : "Partly addressed"}</span>
+          </div>
+          <h3 style="font-size:1.05rem; margin:0 0 0.5rem;">{p.data.statement}</h3>
+          <p style="margin:0 0 0.75rem;">{p.data.why_it_matters}</p>
+          {p.data.candidate_approaches?.length > 0 && (
+            <>
+              <h4 style="font-size:0.76rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin:0 0 0.35rem;">
+                Approaches tried
+              </h4>
+              <ul style="margin:0; padding-left:1.2rem; font-size:0.93rem;">
+                {p.data.candidate_approaches.map((c: string) => <li style="margin-bottom:0.25rem;">{c}</li>)}
+              </ul>
+            </>
+          )}
+        </div>
+      ))}
+    </section>
+  )}
+
+  <section>
+    <h2 style="font-size:1.4rem; margin:0 0 0.35rem;">Papers ({papers.length})</h2>
+    <p style="color:var(--text-muted); font-size:0.92rem; margin:0 0 1.25rem;">
+      Prioritized by strength of evidence rather than by benchmark score.
+    </p>
+    {byTier.map(({ tier, papers: group }) => (
+      <div style="margin-bottom:1.75rem;">
+        <h3 style="font-size:0.78rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin:0 0 0.6rem;">
+          {tier.replace("-", " ")}
+        </h3>
+        <div style="display:flex; flex-direction:column; gap:0.75rem;">
+          {group.map((p) => (
+            <div style="border-left:2px solid var(--border); padding-left:1rem;">
+              <p style="margin:0 0 0.15rem;">
+                <a href={`/papers/${p.id}`} style="font-weight:500;">{p.data.short ?? p.label}</a>
+                <span style="color:var(--text-muted); font-size:0.85rem;"> · {p.date}</span>
+                {(p.data.lines ?? []).map((lid: string) => {
+                  const l = nodeById(lid);
+                  return l && isMedical(l) ? (
+                    <a href={`/lines/${lid}`} class="badge" style="margin-left:0.4rem;">{l.data.name}</a>
+                  ) : null;
+                })}
+              </p>
+              <p style="margin:0; font-size:0.9rem; color:var(--text-muted);">
+                {(p.data.summary ?? "").slice(0, 240)}{(p.data.summary ?? "").length > 240 ? "…" : ""}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+    ))}
+  </section>
+</Base>

@@ -6,8 +6,8 @@ import Base from "../layouts/Base.astro";
   <p style="color:var(--text-muted); max-width:60ch; margin-bottom:1rem;">
     Each node is a paper, concept, or open problem; each edge is a typed relationship (builds on,
     improves, challenges, competes with, and so on). Drag nodes to rearrange, click one to see its
-    connections, use the filter to isolate a relation type. This is a Sprint 1 prototype — see
-    <code>docs/blueprint.md</code> section 5 for the planned lane-timeline layout.
+    connections, and use the filters to isolate a relation type or switch between the general-vision
+    and medical-imaging domains.
   </p>
 
   <div style="display:flex; gap:0.75rem; margin-bottom:1rem; flex-wrap:wrap; align-items:center;">
@@ -15,6 +15,14 @@ import Base from "../layouts/Base.astro";
       Filter by relation type:
       <select id="type-filter" style="margin-left:0.4rem; font-family:var(--font-mono); font-size:0.8rem; padding:0.25em 0.4em; background:var(--bg-raised); color:var(--text); border:1px solid var(--border-strong); border-radius:4px;">
         <option value="">all</option>
+      </select>
+    </label>
+    <label style="font-size:0.85rem; color:var(--text-muted);">
+      Domain:
+      <select id="domain-filter" style="margin-left:0.4rem; font-family:var(--font-mono); font-size:0.8rem; padding:0.25em 0.4em; background:var(--bg-raised); color:var(--text); border:1px solid var(--border-strong); border-radius:4px;">
+        <option value="general">general vision</option>
+        <option value="medical">medical imaging</option>
+        <option value="all">both</option>
       </select>
     </label>
     <span id="node-count" style="font-size:0.8rem; color:var(--text-muted);"></span>
@@ -156,20 +164,43 @@ import Base from "../layouts/Base.astro";
       `;
     }
 
-    typeSelect.addEventListener("change", () => {
-      const val = typeSelect.value;
-      const filteredEdges = val ? graph.edges.filter((e) => e.type === val) : graph.edges;
-      const keepIds = new Set(filteredEdges.flatMap((e) => [e.from, e.to]));
+    const domainSelect = document.getElementById("domain-filter");
+    const isMedical = (n) => (n.sections || []).includes("medical");
+
+    function applyFilters() {
+      const typeVal = typeSelect.value;
+      const domainVal = domainSelect.value;
+
+      const inDomain = (n) =>
+        domainVal === "all" ? true : domainVal === "medical" ? isMedical(n) : !isMedical(n);
+
+      const nodeById = new Map(graph.nodes.map((n) => [n.id, n]));
+      const domainOk = (id) => {
+        const n = nodeById.get(id);
+        return n ? inDomain(n) : false;
+      };
+
+      let edges = graph.edges.filter((e) => domainOk(e.from) && domainOk(e.to));
+      if (typeVal) edges = edges.filter((e) => e.type === typeVal);
+
+      const keepIds = new Set(edges.flatMap((e) => [e.from, e.to]));
       nodes = graph.nodes
-        .filter((n) => !val || keepIds.has(n.id))
+        .filter((n) => inDomain(n) && (!typeVal || keepIds.has(n.id)))
         .map((n) => ({ ...n }));
-      links = filteredEdges.map((e) => ({ ...e, source: e.from, target: e.to }));
+      links = edges.map((e) => ({ ...e, source: e.from, target: e.to }));
+
+      document.getElementById("node-count").textContent =
+        `${nodes.length} nodes, ${links.length} edges`;
+
       simulation.nodes(nodes);
       simulation.force("link").links(links);
       simulation.alpha(0.6).restart();
       render();
-    });
+    }
 
-    render();
+    typeSelect.addEventListener("change", applyFilters);
+    domainSelect.addEventListener("change", applyFilters);
+
+    applyFilters();
   </script>
 </Base>

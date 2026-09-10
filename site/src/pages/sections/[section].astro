@@ -40,12 +40,6 @@ export function getStaticPaths() {
       lede: "Covered only where it bears on generation: as text encoders, as instruction parsers for editing, and as the understanding half of unified models.",
       question: "How does language understanding reach the generator?",
     },
-    {
-      section: "medical",
-      name: "Medical imaging",
-      lede: "Generative models applied to clinical images, where the evaluation bar is downstream clinical utility rather than a better distribution distance.",
-      question: "Which latent space survives contact with anatomy, and is there evidence the generated images actually help?",
-    },
   ];
   return sections.map((s) => ({ params: { section: s.section }, props: s }));
 }

@@ -1,109 +1,241 @@
 ---
 import Base from "../layouts/Base.astro";
-import graph, { nodesByType, allLines, papersInLine, allProblems } from "../lib/graph";
+import {
+  generalLines, medicalLines, papersInLine, atlasStats, nodesByType, nodeById,
+} from "../lib/graph";
 
-const lines = allLines();
-const paperCount = nodesByType("papers").length;
-const problemCount = allProblems().length;
-const recentPapers = nodesByType("papers")
+const stats = atlasStats();
+const lines = generalLines();
+
+// The representation spectrum is the atlas's spine, so the landing page leads with it.
+// Ordered from no latent at all to a purely semantic one.
+const SPECTRUM = [
+  { id: "line-pixel-space", short: "Pixels", note: "no latent at all" },
+  { id: "line-vae-latent", short: "VAE latent", note: "trained to reconstruct" },
+  { id: "line-aligned-vae-latent", short: "Aligned latent", note: "reconstruction, plus semantic pressure" },
+  { id: "line-latent-hybrid", short: "Hybrid", note: "semantics with detail added back" },
+  { id: "line-representation-latent", short: "Semantic latent", note: "a frozen foundation model" },
+].map((s) => {
+  const l = nodeById(s.id);
+  return { ...s, line: l, count: l ? papersInLine(s.id).length : 0, status: l?.data.status };
+});
+const maxCount = Math.max(...SPECTRUM.map((s) => s.count), 1);
+
+const AXIS_QUESTION: Record<string, string> = {
+  representation: "What space do you generate in?",
+  objective: "What do you train the model to predict?",
+  "training-signal": "What shapes it beyond the objective?",
+  conditioning: "How does the prompt reach the generator?",
+  inference: "What happens at sampling time?",
+  architecture: "How are understanding and generation arranged?",
+};
+const AXIS_ORDER = ["representation", "objective", "training-signal", "conditioning", "inference", "architecture"];
+const grouped = AXIS_ORDER
+  .map((axis) => ({ axis, question: AXIS_QUESTION[axis], lines: lines.filter((l) => l.data.primary_axis === axis) }))
+  .filter((g) => g.lines.length > 0);
+
+const recent = nodesByType("papers")
   .slice()
   .sort((a, b) => (b.date ?? "").localeCompare(a.date ?? ""))
-  .slice(0, 8);
+  .slice(0, 6);
 
-// the representation question is the atlas's spine, so surface those lines first
-const repLines = lines.filter((l) => l.data.primary_axis === "representation");
-const objLines = lines.filter((l) => l.data.primary_axis === "objective");
+const STATUS_COLOR: Record<string, string> = {
+  dominant: "var(--section-generation)",
+  ascendant: "var(--section-vfm)",
+  contested: "var(--section-unified)",
+  emerging: "var(--section-rae)",
+  superseded: "var(--text-muted)",
+};
 ---
-<Base title="Home" description="A living research atlas of modern generative vision, organized around research lines rather than paper lists.">
-  <section class="measure" style="margin-bottom:3rem;">
-    <p class="badge" style="margin-bottom:0.75rem;">Living atlas · {paperCount} papers · {lines.length} research lines</p>
-    <h1 style="font-size:2.2rem; margin:0 0 0.75rem;">Follow the representation.</h1>
-    <p style="font-size:1.08rem;">
-      Modern image generation has largely settled its argument about objectives and architectures.
-      What it has not settled is where generation should happen: in a compression code, in a
-      foundation model's feature space, in discrete tokens, or in raw pixels. That question is the
-      spine of this atlas, and every research line below is a different answer to it.
+<Base
+  title="Home"
+  description="A living research atlas of modern generative vision. Organized around the design bets that split the field, not around a list of papers."
+>
+  <!-- ── hero ─────────────────────────────────────────────────────────── -->
+  <section style="margin-bottom:3.5rem;">
+    <p class="badge" style="margin-bottom:1rem;">Living research atlas · updated every 3 days</p>
+    <h1 style="font-size:2.6rem; line-height:1.15; margin:0 0 1rem; max-width:18ch;">
+      Follow the representation.
+    </h1>
+    <p class="measure" style="font-size:1.15rem; margin:0 0 1rem;">
+      Modern image generation has mostly settled its arguments about objectives and architectures.
+      What it has not settled is <strong>where generation should happen</strong>: in a compression
+      code, inside a foundation model's features, in discrete tokens, or in raw pixels.
     </p>
-  </section>
+    <p class="measure" style="color:var(--text-muted); margin:0 0 1.75rem;">
+      This atlas is organized around that question and the others like it. Every paper here sits
+      inside a research line defined by one explicit bet, so you can see what a group is claiming,
+      what it costs them, and who disagrees.
+    </p>
 
-  <section style="margin-bottom:3rem;">
-    <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:1rem;">
-      <h2 style="font-size:1.4rem; margin:0;">What space to generate in</h2>
-      <a href="/lines" style="font-size:0.88rem;">All research lines →</a>
-    </div>
-    <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:1rem;">
-      {repLines.map((l) => (
-        <a class="card section-border" style={`--section-color: var(--section-${l.sections?.[0] ?? "generation"}); display:block;`} href={`/lines/${l.id}`}>
-          <div style="display:flex; align-items:baseline; gap:0.5rem; margin-bottom:0.35rem;">
-            <h3 style="font-size:1.02rem; margin:0;">{l.data.name}</h3>
-            <span class="badge">{l.data.status}</span>
-          </div>
-          <p style="margin:0; font-size:0.9rem; color:var(--text-muted);">{l.data.one_line}</p>
-        </a>
+    <div style="display:flex; gap:2rem; flex-wrap:wrap; padding:1rem 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border);">
+      {[
+        { n: stats.papers, l: "papers", s: `${stats.verified} verified against arXiv` },
+        { n: stats.lines, l: "research lines", s: `${stats.generalLines} general vision, ${stats.medicalLines} medical` },
+        { n: stats.results, l: "benchmark numbers", s: "with their confounds recorded" },
+        { n: stats.problems, l: "open problems", s: "linked to who is attacking them" },
+      ].map((x) => (
+        <div>
+          <div style="font-family:var(--font-mono); font-size:1.6rem; font-weight:500;">{x.n}</div>
+          <div style="font-size:0.9rem;">{x.l}</div>
+          <div style="font-size:0.78rem; color:var(--text-muted);">{x.s}</div>
+        </div>
       ))}
     </div>
   </section>
 
-  <section style="margin-bottom:3rem;">
-    <h2 style="font-size:1.4rem; margin:0 0 1rem;">What to train the model to predict</h2>
-    <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:1rem;">
-      {objLines.map((l) => (
-        <a class="card section-border" style={`--section-color: var(--section-${l.sections?.[0] ?? "generation"}); display:block;`} href={`/lines/${l.id}`}>
-          <div style="display:flex; align-items:baseline; gap:0.5rem; margin-bottom:0.35rem;">
-            <h3 style="font-size:1.02rem; margin:0;">{l.data.name}</h3>
-            <span class="badge">{l.data.status}</span>
-          </div>
-          <p style="margin:0; font-size:0.9rem; color:var(--text-muted);">{l.data.one_line}</p>
-        </a>
-      ))}
-    </div>
-  </section>
+  <!-- ── the spectrum: the one diagram that explains the whole site ────── -->
+  <section style="margin-bottom:3.5rem;">
+    <h2 style="font-size:1.5rem; margin:0 0 0.4rem;">The argument the field is having</h2>
+    <p class="measure" style="color:var(--text-muted); margin:0 0 1.5rem;">
+      Five live answers to one question, ordered by how much meaning the latent carries. Each is an
+      active research line with its own evidence and its own weaknesses.
+    </p>
 
-  <section style="display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:1rem; margin-bottom:3rem;">
-    <a class="card" href="/compare">
-      <h3 style="font-size:1rem; margin:0 0 0.35rem;">Which one is better?</h3>
-      <p style="color:var(--text-muted); font-size:0.88rem; margin:0;">
-        Head-to-head benchmarks, and an honest account of why the published numbers do not support a
-        clean ranking.
-      </p>
-    </a>
-    <a class="card" href="/problems">
-      <h3 style="font-size:1rem; margin:0 0 0.35rem;">Open problems</h3>
-      <p style="color:var(--text-muted); font-size:0.88rem; margin:0;">
-        {problemCount} unsolved questions, each linked to the papers attacking it and the lines that
-        inherit it.
-      </p>
-    </a>
-    <a class="card" href="/timeline">
-      <h3 style="font-size:1rem; margin:0 0 0.35rem;">Timeline</h3>
-      <p style="color:var(--text-muted); font-size:0.88rem; margin:0;">
-        The field in order, so you can see how long an idea waits before something makes it work.
-      </p>
-    </a>
-    <a class="card" href="/graph">
-      <h3 style="font-size:1rem; margin:0 0 0.35rem;">Research graph</h3>
-      <p style="color:var(--text-muted); font-size:0.88rem; margin:0;">
-        {graph.node_count} nodes and {graph.edge_count} typed relations: who builds on, challenges,
-        and competes with whom.
-      </p>
-    </a>
-  </section>
+    <div class="card" style="padding:2rem 1.5rem 1.5rem;">
+      <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--text-muted); margin-bottom:0.6rem; font-family:var(--font-mono);">
+        <span>no semantics in the latent</span>
+        <span>latent is entirely semantic</span>
+      </div>
+      <div style="height:3px; background:linear-gradient(90deg, var(--section-generation), var(--section-rae)); border-radius:2px; margin-bottom:1.5rem;"></div>
 
-  <section>
-    <h2 style="font-size:1.1rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:1rem;">
-      Recently added
-    </h2>
-    <table>
-      <thead><tr><th>Date</th><th>Paper</th><th>Tier</th></tr></thead>
-      <tbody>
-        {recentPapers.map((p) => (
-          <tr>
-            <td style="font-family:var(--font-mono); font-size:0.85rem; color:var(--text-muted);">{p.date}</td>
-            <td><a href={`/papers/${p.id}`}>{p.data.short ?? p.label}</a></td>
-            <td><span class="badge" style={`border-color: var(--tier-${p.tier}); color: var(--tier-${p.tier});`}>{p.tier}</span></td>
-          </tr>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(150px,1fr)); gap:1rem;">
+        {SPECTRUM.map((s) => (
+          <a href={s.line ? `/lines/${s.id}` : "/lines"} style="display:block; text-decoration:none;">
+            <div style={`height:${Math.max(8, (s.count / maxCount) * 46)}px; background:${STATUS_COLOR[s.status ?? "emerging"]}; opacity:0.85; border-radius:3px; margin-bottom:0.6rem;`}></div>
+            <div style="font-weight:600; font-size:0.95rem; color:var(--text);">{s.short}</div>
+            <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:0.3rem;">{s.note}</div>
+            <div style="font-size:0.75rem; font-family:var(--font-mono); color:var(--text-muted);">
+              {s.count} papers · {s.status}
+            </div>
+          </a>
         ))}
-      </tbody>
-    </table>
+      </div>
+
+      <p style="margin:1.5rem 0 0; font-size:0.88rem; color:var(--text-muted); border-top:1px solid var(--border); padding-top:1rem;">
+        The honest summary: at their best-tuned settings all five land within roughly the same range
+        on ImageNet, and the published numbers cannot rank them, because guidance method, model size
+        and training budget all move at once. <a href="/compare">See why &rarr;</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- ── how the atlas is organized ────────────────────────────────────── -->
+  <section style="margin-bottom:3.5rem;">
+    <h2 style="font-size:1.5rem; margin:0 0 0.4rem;">How this is organized</h2>
+    <p class="measure" style="color:var(--text-muted); margin:0 0 1.5rem;">
+      Six design questions. Every research line answers exactly one of them, and lines answering the
+      same question compete directly.
+    </p>
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px,1fr)); gap:1.25rem;">
+      {grouped.map((g) => (
+        <div class="card" style="display:flex; flex-direction:column;">
+          <h3 style="font-size:1.02rem; margin:0 0 0.9rem; font-family:var(--font-heading);">
+            {g.question}
+          </h3>
+          <div style="display:flex; flex-direction:column; gap:0.5rem;">
+            {g.lines.map((l) => (
+              <a href={`/lines/${l.id}`} style="display:flex; align-items:baseline; gap:0.5rem; justify-content:space-between;">
+                <span style="font-size:0.92rem;">{l.data.name}</span>
+                <span style={`font-size:0.7rem; font-family:var(--font-mono); color:${STATUS_COLOR[l.data.status]}; white-space:nowrap;`}>
+                  {l.data.status}
+                </span>
+              </a>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- ── what makes it different ───────────────────────────────────────── -->
+  <section style="margin-bottom:3.5rem;">
+    <h2 style="font-size:1.5rem; margin:0 0 1.25rem;">What this does that a paper list does not</h2>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px,1fr)); gap:1.25rem;">
+      <a class="card section-border" style="--section-color: var(--section-editing); display:block;" href="/compare">
+        <h3 style="font-size:1.05rem; margin:0 0 0.5rem;">Refuses to publish a leaderboard</h3>
+        <p style="margin:0; font-size:0.92rem; color:var(--text-muted);">
+          One paper reports the same model at 1.65, 1.49, 1.14 and 1.06 under four guidance methods.
+          That swing is bigger than most architectural claims. Every number here carries the
+          guidance, budget and model size that produced it.
+        </p>
+      </a>
+      <a class="card section-border" style="--section-color: var(--section-unified); display:block;" href="/problems">
+        <h3 style="font-size:1.05rem; margin:0 0 0.5rem;">Tracks what is unsolved</h3>
+        <p style="margin:0; font-size:0.92rem; color:var(--text-muted);">
+          {stats.problems} open problems, each linked to the papers attacking it and the research
+          lines that carry it as a known weakness. Where a line is weak, its page says so.
+        </p>
+      </a>
+      <a class="card section-border" style="--section-color: var(--section-vfm); display:block;" href="/updates">
+        <h3 style="font-size:1.05rem; margin:0 0 0.5rem;">Updates itself</h3>
+        <p style="margin:0; font-size:0.92rem; color:var(--text-muted);">
+          A pipeline sweeps arXiv and Hugging Face every three days, filters for genuine relevance,
+          and proposes candidates for review. Nothing is added automatically and nothing is claimed
+          without a fetched source.
+        </p>
+      </a>
+    </div>
+  </section>
+
+  <!-- ── medical: a separate domain ────────────────────────────────────── -->
+  <section style="margin-bottom:3.5rem;">
+    <a
+      class="card"
+      href="/medical"
+      style="display:block; border-left:4px solid var(--section-medical); background:var(--bg-raised);"
+    >
+      <p class="badge" style="margin-bottom:0.6rem; border-color:var(--section-medical); color:var(--section-medical);">
+        Separate domain
+      </p>
+      <h2 style="font-size:1.4rem; margin:0 0 0.6rem; color:var(--section-medical);">Medical imaging</h2>
+      <p class="measure" style="margin:0 0 0.75rem;">
+        Kept apart from the rest of the atlas on purpose. Clinical imaging answers the same design
+        question differently, and it answers to a different evidence bar: not a better distribution
+        distance, but whether a diagnostic model improves and whether a radiologist is fooled.
+      </p>
+      <p style="margin:0; font-size:0.9rem; color:var(--text-muted);">
+        {stats.medicalPapers} papers across {stats.medicalLines} lines, organized by which space they
+        generate in and why that space was chosen &rarr;
+      </p>
+    </a>
+  </section>
+
+  <!-- ── start here ───────────────────────────────────────────────────── -->
+  <section style="margin-bottom:3.5rem;">
+    <h2 style="font-size:1.5rem; margin:0 0 1.25rem;">Start here</h2>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px,1fr)); gap:1rem;">
+      {[
+        { href: "/lines/line-representation-latent", t: "New to the latent debate", d: "The line that asks whether the generative space should be a pretrained representation at all." },
+        { href: "/compare", t: "You want the numbers", d: "Head to head on ImageNet and text-to-image, with what the numbers can and cannot support." },
+        { href: "/timeline", t: "You want the story in order", d: "How the field moved, and how long ideas sat unused before something made them work." },
+        { href: "/graph", t: "You want the shape of it", d: `${stats.relations} typed relations: who builds on, challenges, and competes with whom.` },
+      ].map((x) => (
+        <a class="card" href={x.href} style="display:block;">
+          <h3 style="font-size:0.98rem; margin:0 0 0.4rem;">{x.t}</h3>
+          <p style="margin:0; font-size:0.88rem; color:var(--text-muted);">{x.d}</p>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- ── recently added ───────────────────────────────────────────────── -->
+  <section>
+    <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:1rem;">
+      <h2 style="font-size:1.2rem; margin:0;">Recently added</h2>
+      <span style="font-size:0.82rem; color:var(--text-muted); font-family:var(--font-mono);">
+        newest paper: {stats.newestPaper}
+      </span>
+    </div>
+    <div style="display:flex; flex-direction:column;">
+      {recent.map((p) => (
+        <a href={`/papers/${p.id}`} style="display:grid; grid-template-columns:5rem 1fr auto; gap:1rem; padding:0.6rem 0; border-bottom:1px solid var(--border); align-items:baseline;">
+          <span style="font-family:var(--font-mono); font-size:0.82rem; color:var(--text-muted);">{p.date}</span>
+          <span>{p.data.short ?? p.label}</span>
+          <span class="badge" style={`border-color: var(--tier-${p.tier}); color: var(--tier-${p.tier});`}>{p.tier}</span>
+        </a>
+      ))}
+    </div>
   </section>
 </Base>
