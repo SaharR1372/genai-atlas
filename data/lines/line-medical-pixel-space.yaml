@@ -1,0 +1,32 @@
+id: line-medical-pixel-space
+type: line
+name: 'Medical: pixel space'
+one_line: Generate or reconstruct medical images directly in pixels, with no learned latent.
+core_bet: For inverse problems the solver needs an invertible image-to-measurement mapping, so a latent
+  is not merely unnecessary but structurally disallowed.
+primary_axis: representation
+status: dominant
+since: 2021-08
+sections:
+- medical
+arc:
+- paper: jalal-2021
+  role: origin
+  note: A score-based prior for compressed-sensing MRI that generalizes out of distribution where supervised
+    reconstruction fails.
+- paper: chung-ye-2021
+  role: origin
+  note: Alternates score-model sampling with k-space data consistency; the projection step is why this
+    cannot move to a latent.
+- paper: ktena-2024
+  role: evidence
+  note: Pixel-space cascaded diffusion improves diagnostic accuracy and subgroup fairness across three
+    modalities — the strongest downstream evidence in the whole medical section.
+strengths:
+- Required for inverse problems where measurements must stay consistent
+- No tokenizer means no reconstruction ceiling and no train/test latent mismatch
+- Carries the strongest downstream clinical evidence to date
+weaknesses:
+- Expensive at 3D volume resolutions, which is why volumetric work left it
+- The choice is rarely argued in 2D work — it is usually inherited, not reasoned
+explains: null

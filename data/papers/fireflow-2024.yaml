@@ -1,0 +1,32 @@
+id: fireflow-2024
+type: paper
+title: 'FireFlow: Fast Inversion of Rectified Flow for Image Semantic Editing'
+short: FireFlow
+arxiv: '2412.07517'
+date: 2024-12
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors: []
+tier: strong-followup
+sections:
+- editing
+lines:
+- line-editing-inversion
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: Targets the compute cost of precise inversion, claiming second-order solver accuracy at first-order
+  cost with eight-step inversion and editing, roughly three times faster than comparable solvers. The
+  three flow-inversion papers landed within three months of each other and none treated the problem as
+  settled.
+explanation: null

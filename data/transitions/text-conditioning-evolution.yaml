@@ -1,0 +1,26 @@
+id: text-conditioning-evolution
+type: transition
+title: From UNet cross-attention to native multimodal conditioning
+from_option: cross-attention
+to_option: joint-attention
+era: 2022-2026
+driver: conditioning
+cost: Each move traded a cheaper, more modular mechanism for a more expensive or more entangled one. Joint/MM-DiT
+  attention runs full self-attention over the combined text+image sequence rather than a separate lightweight
+  cross-attention module, so cost grows with (text+image) tokens squared instead of image tokens squared
+  plus a linear cross-attention term. Query-bridge and native-token approaches both pull a second large
+  pretrained model (an MLLM) directly into the conditioning path, so the generator now inherits that model's
+  own failure modes (hallucination, instruction-following gaps) as part of how it is conditioned, not
+  just what it is conditioned on.
+key_papers:
+- ldm-2022
+- dit-2023
+- sd3-2024
+- ip-adapter-2023
+- ominicontrol-2024
+- kontext-2025
+- metaquery-2025
+- qwen-image-2025
+- scale-rae-2026
+- svg-t2i-2025
+narrative: content/transitions/text-conditioning-evolution.mdx

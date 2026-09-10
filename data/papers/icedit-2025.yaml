@@ -16,6 +16,9 @@ authors:
 tier: strong-followup
 sections:
 - editing
+axes:
+  conditioning:
+  - sequence-concat
 lines:
 - line-in-context-editing
 links:

@@ -1,0 +1,27 @@
+---
+id: vlm-text-encoder
+title: Vision-language model as text encoder
+---
+
+## Mechanism
+
+This concept is about the *source* of the conditioning embedding, orthogonal to how it is injected
+downstream (see [cross-attention](/concepts/cross-attention) vs. [joint attention](/concepts/joint-attention)
+for that separate question). Instead of a text-only encoder ([CLIP](/concepts/clip-text-encoder),
+[T5](/concepts/t5-text-encoder)), the prompt is run through a vision-language model — one already trained
+to jointly reason over images and instructions — and its output embeddings condition the generator.
+[Qwen-Image](/papers/qwen-image-2025) uses Qwen2.5-VL for exactly this reason: complex in-image text
+rendering, the paper's central contribution, needs an encoder that already understands layout and
+instructions, not just semantics a CLIP- or T5-style embedding would carry. FLUX.2 is reported to use a
+Mistral LLM as its text encoder, continuing this trend, but no verified official technical report for
+that claim was found in this session — it is recorded as reported, not confirmed.
+
+## Trade-offs
+
+**Parameter cost:** a full VLM is substantially larger than a CLIP text tower and often larger than a
+T5-XXL, adding real inference cost to every generation step's conditioning pass. **Flexibility:** an
+instruction-tuned VLM can parse compositional and layout instructions a semantic-embedding-only encoder
+cannot, which is precisely the capability gap Qwen-Image's text-rendering result depends on. **Coupling
+risk:** as with the [query-bridge](/concepts/query-bridge) mechanism, using a large pretrained model as
+the conditioning source means the generator now inherits that model's own instruction-following and
+hallucination failure modes as part of its conditioning pathway.

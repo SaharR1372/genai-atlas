@@ -1,0 +1,25 @@
+---
+id: identity-preserving-conditioning
+title: Identity-preserving face conditioning
+---
+
+## Mechanism
+
+[InstantID](/papers/instantid-2024) preserves a specific person's identity from a single reference photo,
+with no per-identity fine-tuning, by "imposing strong semantic and weak spatial conditions" through a
+dedicated IdentityNet: a face-recognition embedding supplies the semantic signal, and facial landmark
+images supply a weaker spatial signal, both integrated alongside the text prompt to steer generation on
+top of an existing frozen checkpoint (SD1.5, SDXL). [PuLID](/papers/pulid-2024) takes a different route to
+the same goal, pairing a standard diffusion branch with a parallel "Lightning T2I" branch and adding a
+contrastive alignment loss plus an accurate-ID loss, explicitly to minimize how much identity injection
+disturbs the base model's other behavior (background, lighting, composition, style).
+
+## Trade-offs
+
+**Parameter cost:** both are adapter-scale additions to a frozen base model, not full fine-tunes — this
+is what makes "zero-shot... in seconds" (InstantID) and "tuning-free" (PuLID) possible from one photo.
+**Flexibility:** both plug into existing community checkpoints rather than requiring a dedicated base
+model. **Precision vs. base-model disruption:** the core tension both papers are solving is that a strong
+enough identity signal tends to leak into and override other aspects of the generation (style, pose,
+background) unless it is explicitly isolated — InstantID by separating semantic from spatial conditioning
+strength, PuLID by adding losses specifically penalizing that disruption.

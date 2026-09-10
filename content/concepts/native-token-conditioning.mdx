@@ -1,0 +1,31 @@
+---
+id: native-token-conditioning
+title: Native autoregressive token conditioning
+---
+
+## Mechanism
+
+There is no separate conditioning module to describe here, and that is the point. [Chameleon](/papers/chameleon-2024)
+represents text and images as one unified token vocabulary and trains a single decoder-only transformer
+on interleaved sequences of both from the start of pretraining — "early-fusion, token-based mixed-modal
+models capable of understanding and generating images and text in any arbitrary sequence." A prompt
+"conditions" an image purely by occupying earlier positions in the same sequence the model already
+predicts next-tokens over; there is no cross-attention layer, no adaLN block, and no separate encoder to
+point to. [Emu3](/papers/emu3-2024) makes the same architectural bet independently a few months later,
+arguing explicitly that "next-token prediction is a promising path towards building general multimodal
+intelligence" without any diffusion or compositional generation module at all.
+
+## Trade-offs
+
+**Parameter/compute cost:** no extra conditioning machinery, but image tokens are typically far more
+numerous than text tokens for a given resolution, so the sequence a decoder-only transformer must
+attend over (and generate autoregressively, one token at a time) is much longer than an equivalent
+diffusion model's. **Flexibility:** conditioning on arbitrary mixes of text and image context is
+"free" — anything earlier in the sequence conditions anything later, with no architecture change needed
+to add a new modality combination, which is the appeal driving [HunyuanImage 3.0](/papers/hunyuanimage3-2025)
+and [Janus-Pro](/papers/janus-pro-2025) toward variants of this same idea at larger scale. **Quality/speed
+trade-off:** sequential token-by-token generation is inherently slower than a diffusion model's parallel
+denoising steps, and next-token prediction over discrete image tokens has historically lagged diffusion
+on raw sample fidelity, which is part of why several unified models (see [line-unified-models](/lines/line-unified-models))
+instead pair an autoregressive backbone with a diffusion *head* rather than going fully autoregressive
+over image tokens.

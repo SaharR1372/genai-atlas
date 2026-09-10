@@ -1,0 +1,38 @@
+id: roentgen-2022
+type: paper
+title: 'RoentGen: Vision-Language Foundation Model for Chest X-ray Generation'
+short: RoentGen
+arxiv: '2211.12737'
+date: 2022-11
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- Stanford University
+authors:
+- Pierre Chambon
+- Christian Bluethgen
+- Jean-Benoit Delbrouck
+tier: landmark
+sections:
+- medical
+lines:
+- line-medical-transfer-vae
+problems:
+- medical-latent-transfer
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: Adapts Stable Diffusion to chest X-rays by fine-tuning the U-Net and text encoder while freezing
+  Stable Diffusion's natural-image VAE, and shows the synthetic images improve downstream classifiers
+  by up to five points. The frozen natural-image latent is a pragmatic transfer-learning choice; the paper
+  does not test whether that VAE discards clinically relevant detail.
+explanation: null

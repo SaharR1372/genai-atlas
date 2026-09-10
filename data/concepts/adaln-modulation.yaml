@@ -1,0 +1,13 @@
+id: adaln-modulation
+type: concept
+name: adaLN / adaLN-Zero modulation
+axis: conditioning
+one_line: Condition every transformer block by regressing per-channel scale-and-shift (and, in adaLN-Zero,
+  a gating factor initialized to zero) from a single fused embedding of timestep and class label, instead
+  of attending over a token sequence at all.
+sections:
+- generation
+- rae
+introduced_by:
+- dit-2023
+explains: content/concepts/adaln-modulation.mdx

@@ -1,0 +1,41 @@
+id: stream-2026
+type: paper
+title: 'STREAM: Stochastic Riemannian Flow Matching with Anisotropic Decoder for Digital Histopathology
+  Image Generation'
+short: STREAM
+arxiv: '2606.07036'
+date: 2026-06
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Cho
+- Jeong
+- Lim
+- Yoon
+tier: core
+sections:
+- medical
+- rae
+lines:
+- line-medical-fm-latent
+problems:
+- medical-latent-transfer
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: 'The first genuine representation-space generator in medical imaging: it runs Riemannian flow
+  matching directly inside a pretrained histopathology foundation model''s patch-token feature space,
+  which is L2-normalized and therefore lives on a hypersphere, with a custom anisotropic decoder back
+  to pixels. Its stated motivation mirrors RAE''s: conditioning on foundation features (as PixCell does)
+  causes conditioning collapse, and using that space as the generative substrate is proposed as the fix.'
+explanation: null

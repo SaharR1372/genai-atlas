@@ -1,0 +1,34 @@
+id: line-medical-domain-vae
+type: line
+name: 'Medical: domain-trained latent'
+one_line: Train an autoencoder on medical data itself, then run diffusion in that latent.
+core_bet: A latent is necessary for 3D volumes, but it must be trained on the target anatomy rather than
+  borrowed from natural images.
+primary_axis: representation
+status: ascendant
+since: 2022-09
+sections:
+- medical
+arc:
+- paper: pinaya-2022
+  role: origin
+  note: Latent diffusion for 3D brain MRI conditioned on age, sex and structure volumes, with 100,000
+    synthetic brains released.
+- paper: monai-gen-2023
+  role: evidence
+  note: Turns the recipe into shared infrastructure most later medical generative work builds on.
+- paper: maisi-2024
+  role: scaling
+  note: 3D CT at 512-cubed via a domain-trained VAE-GAN compressing to 128-cubed, with the memory constraint
+    stated outright as the reason.
+strengths:
+- The only practical route to full 3D volumes at clinical resolution
+- Latent statistics match the anatomy rather than natural photographs
+- 'Explicitly reasoned: the memory argument is stated, not assumed'
+weaknesses:
+- Needs enough in-domain data to train an autoencoder, which many modalities lack
+- Demonstrated memorization risk in the 3D latent setting
+- Little downstream clinical evidence compared with the pixel-space line
+open_questions:
+- medical-latent-transfer
+explains: null

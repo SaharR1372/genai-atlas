@@ -1,0 +1,13 @@
+id: native-token-conditioning
+type: concept
+name: Native autoregressive token conditioning
+axis: conditioning
+one_line: Discretize images into tokens from the same vocabulary space text uses (or a space a single
+  decoder-only transformer treats uniformly), and generate images by ordinary next-token prediction conditioned
+  on whatever text or image tokens already sit earlier in the same sequence — there is no separate conditioning
+  pathway because there is no separate architecture for condition versus target.
+sections:
+- unified
+introduced_by:
+- chameleon-2024
+explains: content/concepts/native-token-conditioning.mdx

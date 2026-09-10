@@ -1,0 +1,25 @@
+id: line-medical-counterfactual
+type: line
+name: 'Medical: causal counterfactuals'
+one_line: Generate counterfactual images through an explicit causal model, not a conditional generator.
+core_bet: A medically meaningful 'what if this patient were older' requires causal machinery, and conditional
+  generation alone does not provide it.
+primary_axis: objective
+status: ascendant
+since: 2020-06
+sections:
+- medical
+arc:
+- paper: dscm-2020
+  role: origin
+  note: Normalizing flows and variational inference give the tractable invertibility that abduction-action-prediction
+    counterfactuals need.
+strengths:
+- Answers a question conditional generators cannot even pose
+- Evaluated against causal axioms rather than distribution distance
+- Directly relevant to fairness and treatment-effect questions
+weaknesses:
+- Requires an explicit causal graph, which is hard to specify for imaging
+- Sample quality lags behind mainstream diffusion
+- Thin literature relative to its importance
+explains: null

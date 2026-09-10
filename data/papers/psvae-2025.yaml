@@ -1,0 +1,36 @@
+id: psvae-2025
+type: paper
+title: PS-VAE
+short: PS-VAE
+arxiv: '2512.17909'
+date: 2025-12
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors: []
+tier: core
+sections:
+- editing
+- rae
+lines:
+- line-editing-representation-latent
+problems:
+- semantic-latent-detail-loss
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: 'Starts from DINOv2 and SigLIP2 features and does general instruction editing with a Transfusion-style
+  transformer diffusing in a 96-channel latent. Its importance to this atlas is the reason it does not
+  keep the encoder frozen: the ablation states that a representation autoencoder''s performance is strongly
+  limited by weak reconstruction, producing details inconsistent with the input image. The paper unfreezes
+  the encoder in its second stage to fix exactly that.'
+explanation: null

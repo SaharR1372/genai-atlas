@@ -1,0 +1,35 @@
+id: monai-gen-2023
+type: paper
+title: 'Generative AI for Medical Imaging: extending the MONAI Framework'
+short: MONAI Generative Models
+arxiv: '2307.15208'
+date: 2023-07
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- Project MONAI
+authors:
+- Walter H. L. Pinaya
+- Mark S. Graham
+- Eric Kerfoot
+tier: core
+sections:
+- medical
+links:
+  code: https://github.com/Project-MONAI/GenerativeModels
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: released
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: The open-source infrastructure most medical generative work is built on, providing reference
+  implementations of diffusion, autoregressive and adversarial models for 2D and 3D medical data. Infrastructure
+  rather than a claim about which space is right.
+explanation: null
+lines:
+- line-medical-domain-vae

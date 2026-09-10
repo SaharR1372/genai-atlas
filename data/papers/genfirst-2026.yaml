@@ -1,0 +1,35 @@
+id: genfirst-2026
+type: paper
+title: 'GenFirst: Generation Before Reconstruction for Stable End-to-End Latent Generative Modeling'
+short: GenFirst
+arxiv: '2608.29335'
+date: 2026-08
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors: []
+tier: core
+sections:
+- rae
+- generation
+lines:
+- line-latent-hybrid
+problems:
+- reconstruction-generation-dilemma
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: 'Attacks the same latent-collapse problem as the representation-latent line but from the opposite
+  direction: instead of freezing a semantic encoder, it trains generation-first under weak reconstruction
+  pressure. Reports gFID 0.97 on ImageNet 256. Worth watching precisely because it is a competing answer
+  rather than a follow-on.'
+explanation: null

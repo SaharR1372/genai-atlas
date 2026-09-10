@@ -17,6 +17,7 @@ tier: core
 sections:
 - editing
 lines:
+- line-editing-vae-latent
 - line-in-context-editing
 links:
   code: null

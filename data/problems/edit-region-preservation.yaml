@@ -1,0 +1,27 @@
+id: edit-region-preservation
+type: problem
+statement: No editing method reliably guarantees that the regions a user did not ask to change come back
+  unchanged.
+why_it_matters: This is the constraint that separates editing from generation. A model that produces a
+  beautiful image which subtly alters a face, a logo or an instrument reading has failed at the task regardless
+  of its sample quality, and in clinical or forensic settings it has failed dangerously.
+sections:
+- editing
+attacked_by:
+- kv-edit-2025
+- masactrl-2023
+- magicbrush-2023
+- editscore-2025
+- kontext-2025
+status: partially-solved
+solved_by: []
+candidate_approaches:
+- Learn preservation statistically from annotated triplets where annotators were told to leave unrelated
+  regions alone (MagicBrush) — weakest guarantee
+- Condition architecturally, via inpainting-style masks or in-context concatenation
+- Inject source attention and features to bias toward the original layout
+- Derive an explicit mask from cross-attention and restrict the edit to it (MasaCtrl)
+- 'Never regenerate the unedited content at all: freeze its key-value pairs and only attend to them (KV-Edit)
+  — the only architecturally earned guarantee'
+- Add a reward term that scores region preservation directly and optimize it with RL (EditScore, and the
+  identity-preservation reward head in Qwen-Image-2.0-RL)

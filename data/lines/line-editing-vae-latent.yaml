@@ -1,0 +1,46 @@
+id: line-editing-vae-latent
+type: line
+name: Editing in the VAE latent
+one_line: Train an editor that reads an instruction and rewrites the image inside a standard reconstruction-trained
+  latent.
+core_bet: 'Editing is a supervised generation problem: given enough instruction-image-result triplets,
+  a model learns what to change and what to leave.'
+primary_axis: conditioning
+status: dominant
+since: 2022-11
+sections:
+- editing
+arc:
+- paper: instructpix2pix-2022
+  role: origin
+  note: Manufactures the training data the task needed, with a language model writing instructions and
+    a prompt-to-prompt pipeline rendering before and after images.
+- paper: magicbrush-2023
+  role: evidence
+  note: Human annotators required to leave unrelated regions untouched; concludes even tuned models fall
+    short of practical use.
+- paper: emu-edit-2023
+  role: improvement
+  note: One editor across region, free-form and recognition tasks, steered by learned task embeddings.
+- paper: step1x-edit-2025
+  role: improvement
+  note: A multimodal language model parses the instruction and a diffusion decoder executes it; source
+    of GEdit-Bench.
+- paper: kontext-2025
+  role: scaling
+  note: Concatenates reference and target tokens into one sequence in a rectified-flow model, and concedes
+    multi-turn character drift as its named limitation.
+strengths:
+- By far the best-populated line, with mature tooling and open weights
+- Handles open-vocabulary instructions rather than a fixed operation set
+- Inherits every improvement to the underlying text-to-image model
+weaknesses:
+- Preservation of untouched regions is learned statistically, never guaranteed
+- Drift compounds across multi-turn edits
+- Depends on synthetic training triplets whose quality bounds the result
+open_questions:
+- edit-region-preservation
+competes_with:
+- line-editing-attention
+- line-editing-representation-latent
+explains: null

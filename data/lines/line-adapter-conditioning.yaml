@@ -1,0 +1,54 @@
+id: line-adapter-conditioning
+type: line
+name: Adapter-based conditioning
+one_line: Bolt a small trainable side network onto a frozen pretrained diffusion model to inject a new
+  control signal, instead of retraining or restructuring the backbone itself.
+core_bet: A frozen base model already knows how to generate; new conditioning signals (edges, pose, depth,
+  an image prompt, a face identity) can be added cheaply and safely without touching its weights.
+primary_axis: conditioning
+status: contested
+since: 2023-02
+sections:
+- generation
+- editing
+arc:
+- paper: controlnet-2023
+  role: origin
+  note: Trainable copy of the frozen UNet's encoder blocks, connected back through zero-initialized convolutions
+    so training starts as a no-op.
+- paper: t2i-adapter-2023
+  role: origin
+  note: Independently published the same month with a much smaller external adapter network aligning internal
+    features to an external control signal.
+- paper: ip-adapter-2023
+  role: improvement
+  note: Moves the idea from spatial control to image-prompt conditioning via a decoupled cross-attention
+    branch, so image and text prompts stop competing for one shared cross-attention layer.
+- paper: instantid-2024
+  role: improvement
+  note: Combines an IP-Adapter-style semantic face branch with a ControlNet-style spatial landmark branch
+    (IdentityNet) for zero-shot identity preservation.
+- paper: pulid-2024
+  role: improvement
+  note: Adds contrastive and accurate-ID losses on a parallel Lightning-T2I branch to further reduce interference
+    with the base model's own behavior.
+- paper: ominicontrol-2024
+  role: challenge
+  note: Shows a DiT's own frozen weights and attention absorb condition tokens directly via sequence concatenation,
+    matching adapter-level control for about 0.1% extra parameters and no separate adapter network — the
+    opening move of the shift line-in-context-editing documents.
+strengths:
+- Frozen base model stays untouched and reusable across community checkpoints
+- Composable — multiple adapters (e.g. several ControlNets) can stack on one generation
+- Each adapter is cheap to train relative to retraining or fine-tuning the base model
+weaknesses:
+- Every new control type needs its own trained adapter or branch
+- An adapter can fight the base model's existing text conditioning if not carefully isolated — the problem
+  IP-Adapter's decoupled cross-attention was built specifically to fix
+- DiT-native in-context conditioning (line-in-context-editing) increasingly matches or beats adapters
+  with less architecture for image/reference conditioning, leaving adapters' long-run role contested outside
+  of spatial control signals (edges, depth, pose) that have no established in-context equivalent yet
+open_questions: []
+competes_with:
+- line-in-context-editing
+explains: content/lines/line-adapter-conditioning.mdx

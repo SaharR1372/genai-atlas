@@ -1,0 +1,32 @@
+---
+id: query-bridge
+title: Learnable query-token bridge
+---
+
+## Mechanism
+
+This is a mechanism for producing a conditioning *source*, not for injecting it — a distinction worth
+holding onto, since it is the piece of this design space most often confused with cross- or joint
+attention. A fixed-size set of learnable query tokens is prepended to the prompt; a multimodal LLM (kept
+frozen in [MetaQueries](/papers/metaquery-2025), the originating paper) processes text and queries
+jointly, and the *query positions'* output embeddings — not the LLM's hidden states over the prompt
+itself — are passed through a small trainable connector into a diffusion decoder. MetaQueries' own
+description of what happens next: the connector "projects [query embeddings] to align with the input
+space of text-to-image diffusion models... these models can be arbitrary as long as they have a
+conditional input interface; we simply replace its original condition with [the query embeddings]." The
+downstream decoder's own conditioning mechanism — cross-attention, joint attention, whatever it already
+has — is untouched. [Scale-RAE](/papers/scale-rae-2026) adopts this architecture directly (256 queries,
+a Qwen-2.5 1.5B LLM, a 2-layer MLP connector into a DiT) as its answer to text-to-image conditioning in
+a frozen-encoder semantic latent; [BLIP3-o](/papers/blip3o-2025) uses the same pattern independently.
+
+## Trade-offs
+
+**Parameter cost:** the query tokens and connector are small; the real cost is carrying a full MLLM
+(often several billion parameters) as part of the conditioning pathway, whether or not it is fine-tuned.
+**Flexibility:** because the frozen MLLM can be kept exactly as it was trained, this is the only
+mechanism in this survey explicitly motivated by *preserving a separate capability* — MetaQueries states
+the transfer works "even when the MLLM backbone remains frozen, thereby preserving its state-of-the-art
+multimodal understanding capabilities." **Cost:** the generator now inherits the MLLM's own failure
+modes (hallucination, instruction-following gaps, prompt misreading) as part of how it is conditioned,
+not just what it is conditioned on — a cost that is specific to this mechanism and not shared by
+cross-attention or joint attention over a plain text encoder's output.

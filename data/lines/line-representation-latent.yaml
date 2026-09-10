@@ -65,4 +65,4 @@ competes_with:
 - line-pixel-space
 - line-latent-hybrid
 - line-aligned-vae-latent
-explains: null
+explains: content/lines/representation-latent.mdx

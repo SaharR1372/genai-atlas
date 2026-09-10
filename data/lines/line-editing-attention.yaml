@@ -1,0 +1,45 @@
+id: line-editing-attention
+type: line
+name: Training-free attention manipulation
+one_line: Edit by intervening in attention maps and features at sampling time, with no training and often
+  no change to the latent at all.
+core_bet: A pretrained generator already contains the structure of the source image in its activations;
+  editing is a matter of reaching in and holding the right parts fixed.
+primary_axis: inference
+status: ascendant
+since: 2022-08
+sections:
+- editing
+arc:
+- paper: prompt-to-prompt-2022
+  role: origin
+  note: Cross-attention maps bind words to regions, so recording and reinjecting them edits the prompt
+    without touching the model.
+- paper: plug-and-play-2022
+  role: improvement
+  note: Injects spatial features and self-attention maps from an inverted guidance image into specific
+    decoder layers.
+- paper: masactrl-2023
+  role: improvement
+  note: Mutual self-attention retrieves content from the source branch rather than resampling it, handling
+    non-rigid edits.
+- paper: stable-flow-2024
+  role: improvement
+  note: Finds the few vital layers that drive image formation in a diffusion transformer, since transformers
+    lack the UNet hierarchy.
+- paper: kv-edit-2025
+  role: improvement
+  note: Freezes background key-value pairs so unedited content never re-enters generation — the only architecturally
+    earned preservation guarantee in this section.
+strengths:
+- No training cost, so it applies immediately to any released model
+- Provides the strongest preservation guarantees available, by not regenerating the unedited content at
+  all
+- 'Interpretable: the intervention point is an identifiable layer or attention map'
+weaknesses:
+- Intervention points must be rediscovered for each new architecture
+- Bounded by what the base model can already produce
+- Struggles when the edit requires the whole scene to change
+open_questions:
+- edit-region-preservation
+explains: null

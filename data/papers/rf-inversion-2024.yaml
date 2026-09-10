@@ -1,0 +1,31 @@
+id: rf-inversion-2024
+type: paper
+title: Semantic Image Inversion and Editing using Rectified Stochastic Differential Equations
+short: RF-Inversion
+arxiv: '2410.10792'
+date: 2024-10
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors: []
+tier: core
+sections:
+- editing
+lines:
+- line-editing-inversion
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: Reframes inversion for rectified-flow models as an optimal-control problem, equivalent to a rectified
+  stochastic differential equation, so the trajectory is actively steered rather than passively re-integrated.
+  Addresses drift, one of three distinct residual errors the 2024 flow-inversion papers each isolate.
+explanation: null

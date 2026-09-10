@@ -1,0 +1,26 @@
+---
+id: decoupled-cross-attention
+title: Decoupled cross-attention (image-prompt adapter)
+---
+
+## Mechanism
+
+[IP-Adapter](/papers/ip-adapter-2023) extends [adapter-based conditioning](/concepts/adapter-conditioning)
+from spatial control to image-prompt conditioning by adding a *second* cross-attention branch with its
+own key/value projections for an image prompt's embedding, computed in parallel with the frozen model's
+existing text cross-attention and summed into the same query. The paper's own framing of why: prior
+direct-fine-tuning approaches for image-prompt capability "require large computing resources and are not
+compatible with other base models, text prompt, and structural controls." The "key design... is decoupled
+cross-attention... that separates cross-attention layers for text features and image features" — so the
+two conditioning signals never compete for one shared set of attention weights.
+
+## Trade-offs
+
+**Parameter cost:** very low — the paper reports "an IP-Adapter with only 22M parameters" reaching
+performance comparable to or better than a fully fine-tuned image-prompt model. **Flexibility:** because
+text and image conditioning are architecturally separated, both can be supplied simultaneously without
+one degrading the other, and the same adapter composes with other adapters (spatial [ControlNet](/papers/controlnet-2023)
+branches, other IP-Adapters) on the same frozen base. **What it motivated next:** the specific failure
+mode this design fixes — a single shared cross-attention layer being pulled in two directions by text
+and image conditioning at once — is echoed in later [identity-preserving conditioning](/concepts/identity-preserving-conditioning)
+methods that likewise keep semantic and spatial identity signals on separate branches.

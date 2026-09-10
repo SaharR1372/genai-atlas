@@ -1,0 +1,31 @@
+id: conditioning-mechanism-in-semantic-latent
+type: problem
+statement: No paper has directly studied whether a text-conditioning mechanism behaves differently when
+  the generator runs in a high-dimensional, semantically structured frozen-encoder latent (RAE, SVG)
+  versus a low-dimensional, reconstruction-trained VAE latent. The two published text-to-image RAE-family
+  systems (Scale-RAE, SVG-T2I) picked different conditioning mechanisms without a stated comparison
+  against each other or against the VAE-latent baseline.
+why_it_matters: If conditioning mechanism and representation choice are truly independent design axes,
+  results should transfer freely between them; if they interact (e.g. a much higher-dimensional or more
+  anisotropic latent needs a different amount or kind of conditioning bandwidth than a compact VAE latent
+  does), then RAE-family results that reuse an off-the-shelf conditioning recipe from the VAE-latent
+  literature could be systematically under- or over-conditioning the model without anyone having measured
+  it.
+sections:
+- rae
+- generation
+attacked_by:
+- svg-t2i-2025
+- scale-rae-2026
+status: open
+solved_by: []
+candidate_approaches:
+- 'SVG-T2I''s answer: single-stream joint attention (Unified Next-DiT) over concatenated Gemma2-2B text
+  tokens and image tokens, i.e. the same MM-DiT family of mechanisms used with VAE latents (SD3, Qwen-Image),
+  just applied unchanged to a frozen-DINOv3 latent.'
+- 'Scale-RAE''s answer: the MetaQuery learnable-query-bridge mechanism (a Qwen-2.5 LLM jointly processes
+  256 learnable queries and the prompt, projected by a 2-layer MLP connector into the DiT) — also an
+  unmodified transplant of a mechanism first developed for CLIP-feature/VAE-latent unified models, not
+  a mechanism designed for the frozen-encoder latent''s own geometry.'
+- No published ablation isolates conditioning mechanism from representation choice on a matched RAE-family
+  backbone; this atlas is watching for one.

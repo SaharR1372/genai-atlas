@@ -1,0 +1,106 @@
+---
+id: representation-latent
+title: Representation-space generation
+---
+
+## The assumption nobody examined
+
+For most of the latent-diffusion era the autoencoder was treated as settled infrastructure. Stable
+Diffusion shipped one, everything downstream inherited it, and research attention moved to the
+denoiser. The diffusion transformer replaced the UNet backbone but kept the same latent. Rectified
+flow replaced the objective but kept the same latent. Text encoders migrated from CLIP to T5 to full
+vision-language models, and still the latent stayed put.
+
+The assumption underneath was that a compression code is a neutral substrate: squeeze the image, run
+the generative model in the smaller space, decode. What that assumption misses is that an
+autoencoder trained purely to reconstruct pixels has no reason to organize its latent semantically.
+Two images differing only in compression artifacts sit far apart in such a space. Two images of the
+same object under different lighting may sit far apart too. The generative model is then asked to
+learn a distribution over a space that encodes appearance without encoding meaning.
+
+## The measurement that made it a research question
+
+REPA turned this from a philosophical objection into a number. It added an auxiliary loss aligning a
+diffusion transformer's intermediate hidden states to a frozen DINOv2's features, changed nothing
+else, and cut the training needed to match a strong baseline by more than an order of magnitude.
+
+That result admits two readings. The conservative one is that the generator benefits from a semantic
+teaching signal, so add the loss and keep everything else. VA-VAE and REPA-E take this route, pushing
+the alignment pressure into the autoencoder itself and then into joint end-to-end training. REG
+sharpens it further by entangling a semantic token into the denoising target rather than attaching a
+side loss.
+
+The radical reading is that if aligning *toward* a semantic space helps this much, the semantic space
+was the better place to work all along.
+
+## Two groups arrive at the same answer within days
+
+RAE and SVG appeared within days of each other in October 2025, independently, with the same core
+move: stop training an encoder at all. Freeze a pretrained vision foundation model, treat its feature
+space as the generative latent, and train only a decoder back to pixels.
+
+This is a smaller change than it sounds and a larger one than it looks. Smaller, because the
+architecture is still a diffusion transformer and the objective is still flow matching. Larger,
+because it inverts the relationship between reconstruction and generation. In the VAE picture, the
+latent exists to be decodable and generation is a downstream consumer. Here the latent exists because
+it is meaningful, and decodability becomes the decoder's problem.
+
+Making it train required more than swapping the encoder. RAE reports that the decoder width has to
+meet or exceed the token dimension, a constraint no VAE-scale decoder ever had to satisfy, because
+these latents are high-dimensional where VAE latents are deliberately narrow. It needs a
+dimension-dependent shift in the noise schedule, and noise-augmented decoding, and a diffusion head
+rather than a linear projection to decode well. The recipe is specific, and the specificity is the
+evidence that high-dimensional semantic latents are a genuinely different regime rather than a
+drop-in substitution.
+
+## What the evidence supports, and what it does not
+
+Scale-RAE carries the recipe to open-vocabulary text-to-image and reports something more interesting
+than a better score: under fine-tuning on high-quality data, VAE-based models overfit catastrophically
+by epoch 64 while RAE-based models remain stable through 256. Stability under long training is a
+different kind of claim from a better FID, and harder to explain away as tuning.
+
+The FID numbers themselves need care. RAEv2 reaches 1.06 on ImageNet 256, which reads as a decisive
+win over a diffusion transformer's 2.27 until you notice the guidance column. That same paper reports
+the identical model at 1.65 with no guidance, 1.49 with classifier-free guidance, 1.14 with
+autoguidance, and 1.06 with representation guidance. The sampler accounts for a 0.59 swing, larger
+than most of the architectural gaps being argued about across papers. The honest summary is that
+representation latents train faster and stay stable longer, and that the headline quality numbers are
+too entangled with guidance choices to settle the question.
+
+## Where it breaks
+
+A frozen semantic encoder discards high-frequency detail, because discarding it is what made the
+representation semantic in the first place. The whole burden of pixel fidelity moves to the decoder.
+This is not a minor engineering wrinkle: it is the reason no instruction-editing method operates in
+this space, since editing requires leaving untouched regions untouched, and detail the latent never
+carried cannot be preserved.
+
+The second problem is geometric. These latents are severely anisotropic on a per-token basis, so
+transporting an isotropic Gaussian to them forces curved trajectories. Straight-path objectives do
+not produce straight paths in a space shaped like this, which obstructs the distillation that fast
+sampling depends on.
+
+## What the field did next
+
+Two responses, pulling in opposite directions.
+
+The hybrids accept the diagnosis and patch it. Give the semantic latent a detail channel: a residual
+branch, queries that pull fine structure from shallower encoder layers, or a VAE compressing the
+foundation features into something smaller. Several report better reconstruction *and* better
+generation than pure RAE, which is the outcome the reconstruction-generation dilemma said was hard.
+
+The pixel-space line rejects the premise entirely. JiT argues that pixel-space diffusion was never
+unstable because of pixels, only because of epsilon-prediction, and that fixing the prediction target
+makes a plain transformer on raw patches competitive with no tokenizer at all. If that holds, the
+entire debate about which latent is best was optimizing something optional. The most pointed evidence
+comes from an unrelated direction: a one-step method reports 1.54 in latent space and 1.61 in pixel
+space with everything else fixed. A gap that small is weak support for the latent being essential.
+
+## The open question
+
+Nobody has run the experiment that would settle it: one architecture, one budget, one guidance
+method, four latents — pixel, VAE, foundation, hybrid — measured on the same benchmark. Every
+comparison currently available varies at least two of those simultaneously. Until someone does that,
+the field's confident statements about which space is better are, at best, well-motivated
+conjecture.

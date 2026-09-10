@@ -1,0 +1,11 @@
+id: clip-text-encoder
+type: concept
+name: CLIP text encoder as conditioning source
+axis: conditioning
+one_line: Use the text tower of an image-text contrastive model (CLIP) as the source of prompt embeddings,
+  so the conditioning vector already lives in a space jointly trained to align with image content.
+sections:
+- generation
+introduced_by:
+- clip-2021
+explains: content/concepts/clip-text-encoder.mdx

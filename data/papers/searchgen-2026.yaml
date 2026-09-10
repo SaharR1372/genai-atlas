@@ -1,0 +1,29 @@
+id: searchgen-2026
+type: paper
+title: 'Search Beyond What Can Be Taught: Evolving the Knowledge Boundary in Agentic Visual Generation'
+short: SearchGen
+arxiv: '2607.05382'
+date: 2026-07
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- TIGER-Lab
+authors: []
+tier: emerging
+sections:
+- generation
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: Gives an image generator search access so it can render subjects its training data never covered,
+  closing world-knowledge gaps rather than capability gaps. Releases a 20,000-example dataset and a benchmark.
+explanation: null

@@ -39,7 +39,7 @@ ATOM_NS = {"a": "http://www.w3.org/2005/Atom"}
 
 
 # arXiv asks API clients to leave ~3s between requests and rate-limits (HTTP 429) otherwise.
-ARXIV_MIN_INTERVAL = 3.0
+ARXIV_MIN_INTERVAL = 6.0
 _last_request_at = 0.0
 
 

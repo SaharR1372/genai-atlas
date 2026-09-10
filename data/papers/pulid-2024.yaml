@@ -1,0 +1,38 @@
+id: pulid-2024
+type: paper
+title: 'PuLID: Pure and Lightning ID Customization via Contrastive Alignment'
+short: PuLID
+arxiv: '2404.16022'
+date: 2024-04
+venue:
+  name: NeurIPS
+  status: conference
+orgs:
+- ByteDance
+authors:
+- Zinan Guo
+- Yanze Wu
+- Zhuowei Chen
+tier: strong-followup
+sections:
+- editing
+axes:
+  conditioning:
+  - identity-preserving-conditioning
+lines:
+- line-adapter-conditioning
+links:
+  code: https://github.com/ToTheBeginning/PuLID
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: released
+  weights: released
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: sonnet
+summary: Tuning-free ID customization that pairs a standard diffusion branch with a parallel 'Lightning
+  T2I' branch, adding a contrastive alignment loss and an accurate-ID loss so identity injection disturbs
+  the base model's existing behavior (background, lighting, composition, style) as little as possible.
+explanation: null

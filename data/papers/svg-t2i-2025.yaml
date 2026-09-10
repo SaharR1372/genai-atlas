@@ -17,6 +17,10 @@ sections:
 axes:
   representation:
   - semantic-latent
+  architecture:
+  - single-stream-dit
+  conditioning:
+  - joint-attention
 links:
   code: https://github.com/KlingAIResearch/SVG-T2I
   weights: null

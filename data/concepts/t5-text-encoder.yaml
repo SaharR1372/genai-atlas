@@ -1,0 +1,12 @@
+id: t5-text-encoder
+type: concept
+name: Frozen large-language-model text encoder (T5-style)
+axis: conditioning
+one_line: Replace or supplement the CLIP text tower with a much larger text-only pretrained language model
+  (T5) as the source of prompt embeddings, on the finding that scaling the text encoder improves fidelity
+  and prompt alignment more than scaling the image diffusion model does.
+sections:
+- generation
+introduced_by:
+- imagen-2022
+explains: content/concepts/t5-text-encoder.mdx

@@ -26,6 +26,8 @@ axes:
   - vae-latent
   architecture:
   - unet
+  conditioning:
+  - cross-attention
 links:
   code: https://github.com/CompVis/latent-diffusion
   weights: null

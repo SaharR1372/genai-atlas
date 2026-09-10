@@ -38,7 +38,7 @@ const concepts = conceptsByAxis(axis);
         );
         return (
           <div class="card section-border" style={`--section-color: var(--section-${section});`}>
-            <h2 style="font-size:1.15rem; margin:0 0 0.4rem;">{c.data.name}</h2>
+            <h2 style="font-size:1.15rem; margin:0 0 0.4rem;"><a href={`/concepts/${c.id}`}>{c.data.name}</a></h2>
             <p style="margin:0 0 0.6rem; color:var(--text);">{c.data.one_line}</p>
             {papers.length > 0 && (
               <p style="margin:0; font-size:0.85rem; color:var(--text-muted);">

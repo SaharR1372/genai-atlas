@@ -81,3 +81,27 @@ Format: id · date · decision · why · consequences. Revise by adding a new en
   and 2 searched outward from a fixed seed list rather than searching the design space for unknown
   branches. Fix: when adding any paper, check what it *builds on* and whether that ancestor is in the
   atlas; the `builds_on` relation is now the audit trail for exactly this failure.
+- **D018 · 2026-09-10 · Pre-2023 papers whose primary contribution is to the conditioning axis are full
+  entities, not background-concept-only.** D008 excludes "GANs, early VAEs, DDPM-era diffusion, and
+  pre-2023 editing" from full treatment. CLIP (2103.00020) and Imagen (2205.11487) both predate 2023;
+  Imagen is specifically a DDPM-era pixel-space diffusion paper, literally inside D008's exclusion list.
+  Both were added as full `paper` entities anyway (tier landmark), because their contribution the atlas
+  needs is not their diffusion/contrastive-learning architecture but their origination of a conditioning-axis
+  option (CLIP text encoder; T5-as-text-encoder) that every 2023-2026 text-conditioning system in this
+  atlas still responds to. *Why:* D008's intent is to avoid re-litigating superseded *generation*
+  architectures (GAN, VAE, DDPM UNet diffusion), not to exclude foundational conditioning-lineage papers
+  whose finding is still load-bearing. *Consequence:* the general rule is narrowed — a pre-2023 GAN/VAE/DDPM
+  paper is background-concept-only *unless* its indispensable contribution is to a still-active axis
+  option, in which case it gets a full (but minimal — no `lines` membership, tier capped where the paper
+  itself is not central to any research line) paper entity with this decision cited in its summary.
+- **D019 · 2026-09-10 · Conditioning-mechanism research task done on Sonnet, not Fable, despite D007.**
+  This session mapped the full conditioning-mechanism design space (cross-attention, joint/MM-DiT
+  attention, adaLN, sequence-concat, adapters, query-bridge, native-token) on Sonnet 5, though D007
+  assigns "hard architecture problems" and cross-paper synthesis to Fable/Opus. *Why:* the task arrived
+  as a direct Sonnet-session assignment; every claim was grounded in a freshly fetched abstract or HTML
+  source (D004) rather than recalled synthesis, which is the failure mode the Fable/Sonnet split exists
+  to guard against. *Consequence:* flagged here per D007's own instruction to log the deviation. A future
+  Fable/Opus pass should still review the taxonomy framing in `content/transitions/text-conditioning-evolution.mdx`
+  and the new `line-adapter-conditioning` arc for judgment calls (tier assignments, the `contested` status
+  call, the decision to keep `line-in-context-editing`'s origin as ACE++ rather than reassign it to
+  OminiControl) that D007 would normally route to a stronger model.

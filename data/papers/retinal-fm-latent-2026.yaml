@@ -1,0 +1,36 @@
+id: retinal-fm-latent-2026
+type: paper
+title: Evaluation of Clinically Steerable Retinal Image Generation from Foundation Model Latent Spaces
+short: Retinal FM tokenizers
+arxiv: '2608.13455'
+date: 2026-08
+venue:
+  name: MICCAI SASHIMI
+  status: workshop
+orgs:
+- University of Oxford
+authors: []
+tier: core
+sections:
+- medical
+- rae
+lines:
+- line-medical-fm-latent
+problems:
+- medical-latent-transfer
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: 'Tests four retinal foundation models as generative latent spaces and reports the cautionary
+  result the representation-latent line most needs: generation inside a foundation model''s space beats
+  conventional latent diffusion when scored by that same foundation model, but the advantage largely disappears
+  under classifiers trained on real images. The paper names this a synthetic-to-real representation gap.'
+explanation: null

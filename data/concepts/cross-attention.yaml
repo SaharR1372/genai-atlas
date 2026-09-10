@@ -7,5 +7,6 @@ one_line: Condition a generator on text/image context via dedicated cross-attent
 sections:
 - generation
 - editing
-introduced_by: []
-explains: null
+introduced_by:
+- ldm-2022
+explains: content/concepts/cross-attention.mdx

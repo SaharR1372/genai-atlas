@@ -1,0 +1,38 @@
+id: line-editing-unified
+type: line
+name: Editing inside a unified model
+one_line: Treat editing as one more thing a single multimodal model does, with no editing-specific pipeline.
+core_bet: A model that understands images and generates them needs no separate editing machinery; the
+  source image is simply more context.
+primary_axis: architecture
+status: ascendant
+since: 2025-05
+sections:
+- editing
+- unified
+arc:
+- paper: bagel-2025
+  role: origin
+  note: Mixture-of-transformer-experts routing understanding and generation over shared sequences, trained
+    on interleaved data.
+- paper: omnigen2-2025
+  role: improvement
+  note: Unified at the sequence level but explicit that it uses two decoding pathways with unshared parameters.
+- paper: emu35-2025
+  role: improvement
+  note: 'The closest to literally one network: a single autoregressive transformer over interleaved tokens
+    with one objective.'
+- paper: hidream-o1-2026
+  role: improvement
+  note: Removes the VAE and the separate text encoder entirely, embedding pixels, text and condition tokens
+    in one shared space processed by the same blocks, so editing and generation are the same forward pass.
+strengths:
+- One model to train and serve for understanding, generation and editing
+- Instruction understanding comes from the language side rather than a bolt-on parser
+- The direction every frontier lab is visibly pursuing
+weaknesses:
+- '''Unified'' hides real architectural differences: most still route generation through a separate head
+  or expert'
+- Generation training can degrade understanding
+- The most unified example so far is limited to 512 pixel training
+explains: null

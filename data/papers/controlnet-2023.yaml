@@ -1,0 +1,40 @@
+id: controlnet-2023
+type: paper
+title: Adding Conditional Control to Text-to-Image Diffusion Models
+short: ControlNet
+arxiv: '2302.05543'
+date: 2023-02
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- Stanford University
+authors:
+- Lvmin Zhang
+- Anyi Rao
+- Maneesh Agrawala
+tier: landmark
+sections:
+- generation
+- editing
+axes:
+  conditioning:
+  - adapter-conditioning
+lines:
+- line-adapter-conditioning
+links:
+  code: https://github.com/lllyasviel/ControlNet
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: released
+  weights: released
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: sonnet
+summary: 'Freezes a pretrained UNet diffusion model entirely and adds a trainable copy of its encoder
+  blocks, fed a spatial control signal (edges, depth, pose, segmentation) and connected back into the
+  frozen backbone through zero-initialized convolutions, so training starts as a no-op and can never
+  inject harmful noise into the base model. The origin of adapter-based spatial conditioning.'
+explanation: null

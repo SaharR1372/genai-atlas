@@ -1,0 +1,37 @@
+id: maisi-2024
+type: paper
+title: 'MAISI: Medical AI for Synthetic Imaging'
+short: MAISI
+arxiv: '2409.11169'
+date: 2024-09
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- NVIDIA
+- National Cancer Institute
+authors:
+- Pengfei Guo
+- Can Zhao
+- Dong Yang
+tier: core
+sections:
+- medical
+lines:
+- line-medical-domain-vae
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: 'Synthesizes full 3D CT volumes with anatomical control, using a domain-trained 3D VAE-GAN rather
+  than a natural-image autoencoder, compressing 512-cubed volumes to 128-cubed and splitting tensors across
+  GPUs. The clearest case in medical imaging of a latent chosen for an explicitly stated reason: full-resolution
+  3D volumes do not fit in memory otherwise.'
+explanation: null

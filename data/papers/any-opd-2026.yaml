@@ -1,0 +1,33 @@
+id: any-opd-2026
+type: paper
+title: 'Any-OPD: Heterogeneous On-Policy Distillation for Flow-Matching Models via Representation-Space
+  Bridging'
+short: Any-OPD
+arxiv: '2608.03316'
+date: 2026-08
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors: []
+tier: emerging
+sections:
+- generation
+- rae
+lines:
+- line-one-step-objectives
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: Distills a 12B model into a 2.5B one while treating the teacher as a black-box sampler, requiring
+  no shared latent space between them — relevant to the atlas because it makes distillation independent
+  of the representation choice.
+explanation: null

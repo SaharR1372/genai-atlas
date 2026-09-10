@@ -1,0 +1,40 @@
+id: instantid-2024
+type: paper
+title: 'InstantID: Zero-shot Identity-Preserving Generation in Seconds'
+short: InstantID
+arxiv: '2401.07519'
+date: 2024-01
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- InstantX Team
+- Xiaohongshu
+authors:
+- Qixun Wang
+- Xu Bai
+- Haofan Wang
+tier: core
+sections:
+- editing
+axes:
+  conditioning:
+  - identity-preserving-conditioning
+lines:
+- line-adapter-conditioning
+links:
+  code: https://github.com/InstantID/InstantID
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: released
+  weights: released
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: sonnet
+summary: 'From a single face photo, preserves identity in seconds with no per-identity fine-tuning by
+  imposing "strong semantic and weak spatial conditions" through a novel IdentityNet: facial embedding
+  and landmark images are integrated with the text prompt to steer generation, plugging into existing
+  pretrained checkpoints (SD1.5, SDXL) as an adapter.'
+explanation: null

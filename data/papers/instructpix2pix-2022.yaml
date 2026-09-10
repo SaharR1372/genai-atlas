@@ -1,0 +1,37 @@
+id: instructpix2pix-2022
+type: paper
+title: 'InstructPix2Pix: Learning to Follow Image Editing Instructions'
+short: InstructPix2Pix
+arxiv: '2211.09800'
+date: 2022-11
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- UC Berkeley
+authors:
+- Tim Brooks
+- Aleksander Holynski
+- Alexei A. Efros
+tier: landmark
+sections:
+- editing
+lines:
+- line-editing-vae-latent
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: 'Creates the instruction-editing task by manufacturing its training data: a language model writes
+  edit instructions and a prompt-to-prompt pipeline renders the before and after images, giving supervised
+  triplets that never existed. Edits in one forward pass with separate guidance scales for the image and
+  the instruction. Nothing constrains what stays fixed, which is the failure every later paper measures
+  against.'
+explanation: null

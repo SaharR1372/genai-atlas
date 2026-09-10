@@ -1,0 +1,47 @@
+id: line-medical-transfer-vae
+type: line
+name: 'Medical: borrowed natural-image latent'
+one_line: Fine-tune Stable Diffusion on medical data while keeping its natural-image VAE frozen.
+core_bet: The pretrained natural-image autoencoder is good enough for medical images, and the transfer-learning
+  saving outweighs any domain mismatch.
+primary_axis: representation
+status: dominant
+since: 2022-11
+sections:
+- medical
+- editing
+arc:
+- paper: roentgen-2022
+  role: origin
+  note: Adapts Stable Diffusion to chest X-rays with the VAE frozen; downstream classifiers improve by
+    up to five points.
+- paper: radedit-2023
+  role: improvement
+  note: Masked editing to manufacture the distribution shifts a deployed model will meet, as a stress
+    test.
+- paper: biomedjourney-2023
+  role: improvement
+  note: Disease-progression editing learned from pairs of longitudinal radiology reports.
+- paper: mededit-2024
+  role: evidence
+  note: A neuroradiologist could not distinguish generated strokes from real ones — a reader study rather
+    than a distribution metric.
+- paper: pixcell-2025
+  role: scaling
+  note: A pathology foundation generator on SD3's VAE, using foundation-model embeddings as the condition
+    because pathology has no captions.
+strengths:
+- Cheapest path to a working medical generator, reusing a large pretrained model
+- Best-populated line, with real editing systems and at least one reader study
+- Inherits the entire Stable Diffusion tooling ecosystem
+weaknesses:
+- The autoencoder was trained on natural photographs and is never validated for clinically relevant detail
+  retention
+- No paper in this line ablates its own central assumption
+- Evidence that ImageNet-family features miss clinical structure argues against it
+open_questions:
+- medical-latent-transfer
+competes_with:
+- line-medical-domain-vae
+- line-medical-fm-latent
+explains: null

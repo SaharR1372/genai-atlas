@@ -1,0 +1,28 @@
+id: contextbias-2026
+type: paper
+title: 'ContextBias: Controlled Evaluation of Bias Persistence Under Context Shift in Text-to-Image Models'
+short: ContextBias
+arxiv: '2608.29847'
+date: 2026-08
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors: []
+tier: emerging
+sections:
+- generation
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: Tests whether stereotyped attributes persist when the prompt context changes, across 92 roles
+  and more than 66,000 generated images from four current systems, and finds that they do.
+explanation: null

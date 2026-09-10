@@ -1,0 +1,48 @@
+---
+id: line-adapter-conditioning
+title: Adapter-based conditioning
+---
+
+## The bet
+
+Retraining or restructuring a large pretrained text-to-image model for every new kind of control signal
+is wasteful and risky. The base model already knows how to generate convincingly; freeze it, and train
+only a small side network that learns to steer it.
+
+## The arc
+
+[ControlNet](/papers/controlnet-2023) and [T2I-Adapter](/papers/t2i-adapter-2023) answer this
+independently, the same month (February 2023), for spatial control (edges, depth, pose, segmentation).
+ControlNet duplicates the frozen UNet's encoder blocks and reconnects them through zero-initialized
+convolutions so training starts as a no-op; T2I-Adapter uses a much smaller external network aligning
+internal features to the control signal. [IP-Adapter](/papers/ip-adapter-2023) moves the same idea from
+spatial control to image-prompt conditioning via [decoupled cross-attention](/concepts/decoupled-cross-attention) —
+a second cross-attention branch, with its own key/value projections, that keeps image-prompt conditioning
+from fighting the base model's existing text conditioning. [InstantID](/papers/instantid-2024) and
+[PuLID](/papers/pulid-2024) specialize the same pattern for face identity, each solving the same core
+tension — a strong enough conditioning signal tends to leak into and override everything else the base
+model does — with a different isolation mechanism (semantic/spatial separation for InstantID;
+contrastive and accurate-ID losses for PuLID).
+
+The challenge to the whole family arrives from inside the DiT era, not from a better adapter.
+[OminiControl](/papers/ominicontrol-2024) shows that a sufficiently capable DiT's own frozen weights and
+attention can absorb a condition image directly — reusing the model's own VAE encoder and transformer
+blocks, concatenating condition and generation tokens into one sequence — for about 0.1% additional
+parameters and no separate trained network, matching or beating specialized adapters on their own tasks.
+This is the opening move of [in-context editing](/lines/line-in-context-editing), which this atlas records
+as the line adapters now compete against for image and reference conditioning specifically.
+
+## What holds up, what doesn't
+
+Adapters remain the practical default wherever no established in-context substitute exists yet — most
+visibly, spatial control signals (edges, depth, pose) still overwhelmingly ship as ControlNet-style
+modules even in 2026 toolchains, because DiT-native sequence-concatenation was demonstrated for image and
+reference conditioning first and has not been shown at the same maturity for arbitrary spatial control
+signals. For image-prompt and identity conditioning specifically, though, the shift documented above is
+real: OminiControl, then FLUX.1 Kontext and its successors, increasingly do with plain attention what
+IP-Adapter and InstantID needed a dedicated second attention branch or side network to do. Composability —
+stacking several adapters on one generation — is a genuine advantage no in-context method has fully
+replicated, since concatenating many reference images into one sequence has its own quadratic attention
+cost and grounding failure modes (see [line-in-context-editing](/lines/line-in-context-editing)'s own
+weaknesses). This is why this line's status is recorded as *contested* rather than *superseded*: real,
+live disagreement about which approach wins where, not a settled loss.

@@ -1,0 +1,33 @@
+id: staindiffuser-2024
+type: paper
+title: 'StainDiffuser: MultiTask Dual Diffusion Model for Virtual Staining'
+short: StainDiffuser
+arxiv: '2403.11340'
+date: 2024-03
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- University of Utah
+authors:
+- Tushar Kataria
+- Beatrice Knudsen
+- Shireen Elhabian
+tier: strong-followup
+sections:
+- medical
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: Virtual staining from H&E to immunohistochemistry with a dual diffusion model that trains staining
+  and cell-segmentation jointly. Explicitly motivated by the small-data regime of pathology, where thousands
+  rather than millions of paired samples are available.
+explanation: null

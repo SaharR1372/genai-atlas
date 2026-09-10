@@ -1,0 +1,36 @@
+id: dscm-2020
+type: paper
+title: Deep Structural Causal Models for Tractable Counterfactual Inference
+short: Deep SCM
+arxiv: '2006.06485'
+date: 2020-06
+venue:
+  name: NeurIPS
+  status: conference
+orgs:
+- Imperial College London
+authors:
+- Nick Pawlowski
+- Daniel C. Castro
+- Ben Glocker
+tier: landmark
+sections:
+- medical
+lines:
+- line-medical-counterfactual
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: Builds counterfactual image generation on normalizing flows and variational inference rather
+  than diffusion, because the abduction-action-prediction procedure counterfactuals require needs a tractable
+  invertible model. A different lineage from the rest of this section, chosen for causal correctness rather
+  than sample quality.
+explanation: null

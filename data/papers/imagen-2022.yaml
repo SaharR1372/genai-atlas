@@ -1,0 +1,40 @@
+id: imagen-2022
+type: paper
+title: 'Photorealistic Text-to-Image Diffusion Models with Deep Language Understanding'
+short: Imagen
+arxiv: '2205.11487'
+date: 2022-05
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- Google Research
+authors:
+- Chitwan Saharia
+- William Chan
+- Saurabh Saxena
+tier: landmark
+sections:
+- generation
+axes:
+  conditioning:
+  - t5-text-encoder
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: sonnet
+summary: 'A pre-2023, pixel-space (not latent) cascaded diffusion model, kept as a full entity despite
+  D008 (see DECISIONS.md D018) because its conditioning-axis finding is load-bearing for 2023-2026
+  systems: a generic large language model pretrained on text only (T5), used as a frozen text encoder,
+  is "surprisingly effective" at encoding prompts for image synthesis, and scaling that text encoder
+  improves sample fidelity and image-text alignment more than scaling the image diffusion model does.
+  This finding is the reason T5 (then T5+CLIP, then full VLMs) displaced CLIP-alone as the conditioning
+  source in later systems.'
+explanation: null

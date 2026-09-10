@@ -11,6 +11,12 @@ since: 2025-01
 sections:
 - editing
 arc:
+- paper: ominicontrol-2024
+  role: precursor
+  note: Predates ACE++ by about two months and demonstrates the same sequence-concatenation mechanism
+    for general DiT control (subject-driven generation, spatial control), not editing specifically; no
+    confirmed citation links it directly to ACE++ or Kontext, so it is recorded here as a precursor
+    rather than reassigning this line's origin.
 - paper: acepp-2025
   role: origin
   note: Unifies creation and editing under a long-context conditioning unit, implemented cheaply as a
@@ -43,4 +49,6 @@ weaknesses:
 - Depends on a strong base generator, so it inherits that model's biases
 open_questions:
 - semantic-latent-detail-loss
+competes_with:
+- line-adapter-conditioning
 explains: null

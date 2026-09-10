@@ -20,6 +20,7 @@ axes:
   conditioning:
   - sequence-concat
 lines:
+- line-editing-vae-latent
 - line-in-context-editing
 links:
   code: null

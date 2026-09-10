@@ -1,0 +1,30 @@
+id: chimera-2026
+type: paper
+title: 'Chimera: Designing and Chinchilla-Scaling Hybrid Visual Diffusion Transformers'
+short: Chimera
+arxiv: '2607.28611'
+date: 2026-07
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors: []
+tier: emerging
+sections:
+- generation
+lines:
+- line-vae-latent
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: A hybrid linear-attention and latent-attention diffusion transformer, with a scaling law fitted
+  specifically for visual diffusion backbones rather than borrowed from language modelling.
+explanation: null

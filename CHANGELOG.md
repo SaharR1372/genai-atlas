@@ -2,6 +2,82 @@
 
 ## Unreleased
 
+### 2026-09-10 — Session 4 (Opus 5) — conditioning, editing, medical, and a live pipeline
+- **Living-update pipeline built** (the "every 3 days" requirement): discovery from arXiv and
+  Hugging Face daily papers, rule-based relevance and quality scoring, duplicate detection, a ranked
+  candidate queue, and a GitHub Actions cron. Nothing auto-merges (D006). A hard core-topic gate was
+  needed: the first live run surfaced world-action models and LLM post-training papers, since they
+  share nearly all of generative vision's vocabulary. 310 raw candidates now reduce to ~5 relevant.
+- **Conditioning section**: 14 mechanism explainers, 10 papers, a new adapter-conditioning line, a
+  text-conditioning-evolution narrative, and the finding that RAE-family systems borrow their
+  conditioning wholesale — Scale-RAE adopts MetaQuery, SVG-T2I uses Lumina's joint attention, and
+  RAE/SVG themselves are class-conditional with no text pathway.
+- **Editing section**, categorized by which space the edit happens in: five lines covering VAE
+  latent, training-free attention manipulation, flow inversion, representation latent, and unified
+  models. HiDream-O1-Image confirmed as the pixel-level unified case with no VAE at all.
+- **Medical section**: 19 papers, five lines organized by generation space, and the finding that
+  medical work splits by task rather than era — pixel space where inverse problems demand it,
+  domain-trained 3D VAEs for volumes, borrowed natural-image VAEs for 2D, and exactly two 2026
+  papers generating inside a medical foundation model's space.
+- **Currency**: brought up to September 2026, including LLaDA-Image, GenFirst, dRAE and Second Order
+  Drifting Models.
+- 264 entities, 124 papers, 25 lines, 221 pages, 28 tests. Six title errors caught by verification.
+
+### 2026-09-10 — Session 4 (Sonnet 5) — conditioning-mechanism design space
+- **Research task**: mapped the full conditioning-mechanism design space (how text/reference/control
+  signals reach the generator) across UNet, DiT, unified-model, and RAE-family systems, per direct
+  request. Every mechanism claim traces to a freshly fetched arXiv abstract or HTML source this session
+  (D004); several were quoted verbatim from paper text via `arxiv.org/html/<id>`.
+- **9 new concepts** (`data/concepts/`): `adaln-modulation`, `query-bridge`, `clip-text-encoder`,
+  `t5-text-encoder`, `adapter-conditioning`, `decoupled-cross-attention`, `identity-preserving-conditioning`,
+  `native-token-conditioning`, `single-stream-dit` — filling gaps in the `conditioning` axis (previously
+  only `cross-attention`, `joint-attention`, `mmdit`, `sequence-concat`, `vlm-text-encoder` existed, all
+  with `explains: null`).
+- **10 new papers, all arXiv-verified**: ControlNet (2302.05543), T2I-Adapter (2302.08453), IP-Adapter
+  (2308.06721), InstantID (2401.07519), PuLID (2404.16022), OminiControl (2411.15098), Chameleon
+  (2405.09818), Emu3 (2409.18869), CLIP (2103.00020), Imagen (2205.11487 — the last two are pre-2023
+  exceptions to D008, justified and logged as **D018**).
+- **New line**: `line-adapter-conditioning` (ControlNet → T2I-Adapter → IP-Adapter → InstantID/PuLID →
+  challenged by OminiControl), `competes_with: [line-in-context-editing]`. `line-in-context-editing`'s
+  arc gained OminiControl as a `precursor` (predates ACE++ by ~2 months with the same mechanism for
+  general control, not editing specifically — flagged, not silently reassigned as origin).
+- **New problem**: `conditioning-mechanism-in-semantic-latent` — no paper has directly compared
+  conditioning mechanisms on a matched RAE-family backbone; Scale-RAE and SVG-T2I each transplanted an
+  existing mechanism from the VAE-latent literature unmodified.
+- **New transition**: `text-conditioning-evolution` (`content/transitions/text-conditioning-evolution.mdx`,
+  full narrative + site page at `/transitions/text-conditioning-evolution`), covering UNet cross-attention
+  (2022) through MM-DiT/single-stream joint attention, adapters and their in-context challenger, native-token
+  unified models, and the query-bridge mechanism, to the 2025-26 RAE-family split.
+- **Key finding (the session's central ask)**: the two published RAE-family text-to-image systems use
+  *different* conditioning mechanisms, transplanted unmodified from the VAE-latent literature — SVG-T2I
+  uses Lumina-Image 2.0's single-stream joint attention (Gemma2-2B text encoder); Scale-RAE explicitly
+  states it "adopts the MetaQuery architecture" (256 learnable queries, Qwen-2.5 1.5B, MLP connector into
+  a DiT). Both confirmed via `arxiv.org/html/<id>` fetches, not recollection. RAE (2510.11690) and SVG
+  (2510.15301) themselves are class-conditional ImageNet models with no text conditioning at all —
+  a fact the previous sessions' summaries did not state explicitly.
+- **14 new `explains`/`narrative` MDX files** written in `content/concepts/` and `content/lines/`
+  (mechanism + verified quotes + trade-offs, 2-4 sentences per the requested format), plus the transition
+  narrative above.
+- **16 new relations** in a new `data/relations/conditioning.yaml`, including two paper-internal
+  mechanism ablations found and cited as the closest things to a systematic conditioning-mechanism
+  comparison in the literature this session found: DiT's in-context/cross-attention/adaLN-Zero ablation,
+  and SD3's cross-attention/"vanilla"/MM-DiT ablation (SD3's own text: MM-DiT "significantly outperforms
+  the cross-attention and vanilla variants").
+- **Axes backfilled** on 13 existing papers that were missing `axes.conditioning` (ldm-2022, dit-2023,
+  metaquery-2025, blip3o-2025, scale-rae-2026, svg-t2i-2025, lumina2-2025, qwen-image-2025,
+  hunyuanimage3-2025, janus-pro-2025, icedit-2025) and 2 concepts with empty `introduced_by`
+  (cross-attention → ldm-2022).
+- **Governance**: `DECISIONS.md` D018 (pre-2023 conditioning-lineage exception to D008) and D019 (logs
+  that this task ran on Sonnet, not Fable, despite D007 — flags the taxonomy/line-arc judgment calls a
+  Fable/Opus pass should still review).
+- `python scripts/validate.py --strict` and `pytest` (28 tests) both pass clean: 227 entities, 66
+  relations, 0 errors/warnings. `npm run build` succeeds: 185 static pages (up from 145).
+- Not done, left open: D14/D15 (a dedicated survey paper systematically comparing conditioning
+  mechanisms, and confirmed genuinely-new 2025-26 mechanisms beyond OminiControl) — WebSearch quota was
+  exhausted and arXiv's search API rate-limited (HTTP 429) partway through this session; stated as
+  unresolved rather than guessed. FLUX.2's reported Mistral text encoder is recorded as unverified (no
+  arXiv paper found) rather than asserted as fact.
+
 ### 2026-09-09 — Session 3 (Opus 5) — restructured around research lines
 - **Pushed to GitHub**: https://github.com/SaharR1372/genai-atlas (branch `main`).
 - **New primary structure**: added the `line` entity type (D015) and rebuilt navigation around it.

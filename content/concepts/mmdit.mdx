@@ -1,0 +1,25 @@
+---
+id: mmdit
+title: MM-DiT (dual-stream joint attention)
+---
+
+## Mechanism
+
+[SD3](/papers/sd3-2024) gives text tokens and image tokens *separate* transformer weights — separate
+QKV projections, separate MLPs — for every block, then joins the two token sequences only at the
+attention operation itself, so each modality "can work in their own space yet take the other one into
+account." This is [joint attention](/concepts/joint-attention) plus modality-specific parameters; the
+contrast is with [single-stream DiT](/concepts/single-stream-dit) (Lumina-Image 2.0's Unified Next-DiT),
+which runs the identical joint-sequence idea through one shared weight set instead of two.
+
+## Trade-offs
+
+**Parameter cost:** roughly double the per-block parameters of a single-stream design, since text and
+image each carry their own full transformer capacity rather than sharing it. **Flexibility:** the
+separate weights let each modality's processing specialize (text tokens don't need to learn spatial
+patch structure, image tokens don't need to learn subword structure) without either modality's capacity
+being diluted by the other. **Quality vs. efficiency:** this is the exact trade single-stream designs
+give up capacity to avoid — Lumina-Image 2.0 reports strong results at only 2.6B parameters using the
+single-stream variant, suggesting the extra modality-specific capacity MM-DiT spends may not be strictly
+necessary at every scale, though no paper in this atlas runs a controlled single- vs. dual-stream
+ablation at matched parameter count to confirm this directly.

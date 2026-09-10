@@ -1,0 +1,27 @@
+---
+id: adapter-conditioning
+title: Adapter-based spatial conditioning
+---
+
+## Mechanism
+
+The base text-to-image diffusion model is frozen entirely. [ControlNet](/papers/controlnet-2023) adds a
+trainable *copy* of the frozen UNet's encoder blocks, fed a spatial control signal (edges, depth, pose,
+segmentation), and connects that copy's outputs back into the frozen backbone through zero-initialized
+convolutions — "zero convolutions... progressively grow the parameters from zero and ensure that no
+harmful noise could affect the finetuning," so training starts as a mathematical no-op.
+[T2I-Adapter](/papers/t2i-adapter-2023), published the same month, uses a much smaller external network
+instead of a full duplicated encoder, aligning "internal knowledge in T2I models with external control
+signals" while the base model stays frozen throughout.
+
+## Trade-offs
+
+**Parameter cost:** ControlNet's duplicated-encoder branch is substantial (roughly half the base UNet's
+own parameter count); T2I-Adapter's external network is far smaller, trading some capability for a much
+lighter add-on. **Flexibility:** both are composable — multiple adapters can stack on one generation, and
+a released base checkpoint stays reusable across every adapter trained for it. **Cost:** each new control
+type needs its own trained adapter; [OminiControl](/papers/ominicontrol-2024) later directly challenges
+this by showing a DiT's own weights, reused via [sequence concatenation](/concepts/sequence-concat)
+instead of a separate trained network, "match or surpass the performance of specialized methods" for
+about 0.1% additional parameters — see [line-adapter-conditioning](/lines/line-adapter-conditioning) for
+the full arc and what displaced it.

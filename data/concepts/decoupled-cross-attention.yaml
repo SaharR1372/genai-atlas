@@ -1,0 +1,14 @@
+id: decoupled-cross-attention
+type: concept
+name: Decoupled cross-attention (image-prompt adapter)
+axis: conditioning
+one_line: Add a second, separate cross-attention branch with its own key/value projections for an image
+  prompt's embedding, computed in parallel with the frozen model's existing text cross-attention and summed
+  into the same query, so image and text conditioning no longer compete for one shared cross-attention
+  layer.
+sections:
+- generation
+- editing
+introduced_by:
+- ip-adapter-2023
+explains: content/concepts/decoupled-cross-attention.mdx

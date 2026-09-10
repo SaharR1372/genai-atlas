@@ -1,0 +1,119 @@
+- from: scale-rae-2026
+  to: metaquery-2025
+  type: uses_architecture_from
+  evidence: 'Scale-RAE''s paper states it explicitly: "We adopt the MetaQuery architecture for text-to-image
+    (T2I) generation." It prepends 256 learnable query tokens to the prompt, processes them jointly with
+    a Qwen-2.5 1.5B LLM, and projects the result through a 2-layer MLP connector into the DiT backbone —
+    the same query-bridge mechanism MetaQuery introduced, applied on top of RAE''s frozen-encoder latent.'
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: svg-t2i-2025
+  to: lumina2-2025
+  type: uses_architecture_from
+  evidence: 'SVG-T2I''s paper states it uses "the Unified Next-DiT (Qin et al., 2025) architecture as
+    our backbone," which the citation identifies as Lumina-Image 2.0''s single-stream joint-sequence
+    DiT variant, combining Gemma2-2B text tokens with image tokens as one shared-weight sequence rather
+    than MM-DiT''s two-weight-set design.'
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: t2i-adapter-2023
+  to: controlnet-2023
+  type: competes_with
+  evidence: Published the same month (February 2023) with the identical goal — adding spatial control
+    to a frozen pretrained text-to-image diffusion model — via a smaller external adapter network rather
+    than ControlNet's duplicated-and-zero-connected encoder branch.
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: ip-adapter-2023
+  to: controlnet-2023
+  type: competes_with
+  evidence: Both are lightweight trainable side-networks added to a frozen base diffusion model to
+    inject a new conditioning signal without touching its weights; IP-Adapter targets image-prompt
+    conditioning where ControlNet targets spatial structure signals, and later systems commonly compose
+    both.
+  confidence: medium
+  added_by: sonnet
+  status: verified
+- from: instantid-2024
+  to: ip-adapter-2023
+  type: combines
+  evidence: 'InstantID''s own description of IdentityNet ("strong semantic and weak spatial conditions,
+    integrating facial and landmark images with textual prompts") reads as an IP-Adapter-style semantic
+    image branch combined with a ControlNet-style spatial branch; this is an inference from the abstract''s
+    mechanism description, not a confirmed direct citation of IP-Adapter — flagged as medium confidence
+    accordingly.'
+  confidence: medium
+  added_by: sonnet
+  status: verified
+- from: pulid-2024
+  to: instantid-2024
+  type: competes_with
+  evidence: Both are tuning-free, zero-shot identity-preservation methods for pretrained text-to-image
+    diffusion models, published within four months of each other with different mechanisms (contrastive
+    alignment + Lightning-T2I branch for PuLID; IdentityNet's dual semantic/spatial branches for InstantID).
+  confidence: medium
+  added_by: sonnet
+  status: verified
+- from: ominicontrol-2024
+  to: controlnet-2023
+  type: challenges
+  evidence: 'OminiControl''s own framing: "Current image conditioning methods either introduce substantial
+    parameter overhead or handle only specific control tasks effectively"; it reports matching or
+    surpassing specialized adapter methods using about 0.1% additional parameters by reusing the DiT''s
+    own VAE encoder and transformer blocks instead of a separate trained adapter network.'
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: ominicontrol-2024
+  to: sequence-concat
+  type: uses_architecture_from
+  evidence: OminiControl's "unified sequence processing strategy that combines condition tokens with
+    image tokens" is the same in-context sequence-concatenation mechanism the sequence-concat concept
+    names, applied about seven months before FLUX.1 Kontext to general DiT control rather than editing
+    specifically.
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: chameleon-2024
+  to: emu3-2024
+  type: competes_with
+  evidence: Both are decoder-only, token-based, early-fusion multimodal transformers that unify text and
+    image generation as one next-token-prediction stream, published about four months apart (Meta,
+    May 2024; BAAI, September 2024) with no diffusion or compositional generation module.
+  confidence: medium
+  added_by: sonnet
+  status: verified
+- from: dit-2023
+  to: adaln-modulation
+  type: enables
+  evidence: DiT's ablation compares in-context (token-concatenation) conditioning, cross-attention
+    conditioning, and adaLN/adaLN-Zero conditioning for injecting the timestep and class-label embedding,
+    and adopts adaLN-Zero as the default — the earliest systematic within-paper comparison of conditioning
+    mechanisms this atlas has found.
+  confidence: medium
+  added_by: sonnet
+  status: verified
+- from: sd3-2024
+  to: cross-attention
+  type: challenges
+  evidence: 'SD3''s own ablation (Sec. 4 / Figure 4 of the paper) reports that its dual-stream MM-DiT
+    ("two separate sets of weights for the two modalities," joined only through the shared attention
+    operation) "significantly outperforms the cross-attention and vanilla variants" it was compared
+    against — a direct, paper-internal head-to-head of conditioning mechanisms.'
+  confidence: high
+  added_by: sonnet
+  status: verified
+- from: metaquery-2025
+  to: cross-attention
+  type: enables
+  evidence: 'MetaQuery''s connector "projects [query embeddings] to align with the input space of
+    text-to-image diffusion models... These models can be arbitrary as long as they have a conditional
+    input interface; we simply replace its original condition with our C" — i.e. MetaQuery supplies a
+    new conditioning *source*, not a new injection *mechanism*; it is designed to plug into whatever
+    mechanism (cross-attention, joint-attention) the downstream diffusion decoder already exposes.'
+  confidence: high
+  added_by: sonnet
+  status: verified

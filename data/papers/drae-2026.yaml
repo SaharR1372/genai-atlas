@@ -1,0 +1,34 @@
+id: drae-2026
+type: paper
+title: 'dRAE: Representation Autoencoder with Hyper-Spherical Codes'
+short: dRAE
+arxiv: '2607.22148'
+date: 2026-07
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Tianren Ma
+tier: strong-followup
+sections:
+- rae
+lines:
+- line-representation-latent
+- line-discrete-tokens
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: Discretizes the continuous semantic latent that representation autoencoders produce, using hyper-spherical
+  quantization to avoid the codebook collapse that Euclidean quantization suffers on anisotropic features,
+  and scales to a 131,072-entry codebook. The bridge between the representation-latent line and discrete-token
+  generation.
+explanation: null

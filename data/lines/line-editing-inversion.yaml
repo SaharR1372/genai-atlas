@@ -1,0 +1,31 @@
+id: line-editing-inversion
+type: line
+name: Inversion for flow models
+one_line: Recover the noise that produced a real image so it can be re-generated with a change, and control
+  the error that recovery introduces.
+core_bet: Editing a real image requires first mapping it back into the generator's own trajectory, and
+  doing that accurately is a numerical problem in its own right.
+primary_axis: inference
+status: ascendant
+since: 2024-10
+sections:
+- editing
+arc:
+- paper: rf-inversion-2024
+  role: origin
+  note: Treats inversion as optimal control, equivalent to a rectified stochastic differential equation,
+    to steer against drift.
+- paper: rf-solver-2024
+  role: improvement
+  note: Isolates per-step truncation error and replaces Euler integration with a high-order expansion.
+- paper: fireflow-2024
+  role: improvement
+  note: Targets the cost of precision, claiming second-order accuracy at first-order expense.
+strengths:
+- Necessary for editing real photographs rather than generated ones
+- Straight-path flow objectives make the problem more tractable than it was for diffusion
+weaknesses:
+- Straighter paths reduce error without eliminating it
+- Three papers within three months, none treating the problem as settled
+- Inversion is lossy, and the loss shows up as over-smoothing
+explains: null

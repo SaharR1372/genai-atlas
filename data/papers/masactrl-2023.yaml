@@ -1,0 +1,31 @@
+id: masactrl-2023
+type: paper
+title: 'MasaCtrl: Tuning-Free Mutual Self-Attention Control for Consistent Image Synthesis and Editing'
+short: MasaCtrl
+arxiv: '2304.08465'
+date: 2023-04
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors: []
+tier: core
+sections:
+- editing
+lines:
+- line-editing-attention
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: 'Converts self-attention into mutual self-attention: queries come from the target branch while
+  keys and values are pulled from the source, so content is retrieved rather than resampled. A mask derived
+  from cross-attention reduces foreground and background confusion, and degrades on cluttered scenes.'
+explanation: null

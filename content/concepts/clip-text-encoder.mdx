@@ -1,0 +1,26 @@
+---
+id: clip-text-encoder
+title: CLIP text encoder as conditioning source
+---
+
+## Mechanism
+
+[CLIP](/papers/clip-2021) trains an image encoder and a text encoder jointly with a contrastive objective
+over 400M (image, text) pairs — "the simple pre-training task of predicting which caption goes with which
+image is an efficient and scalable way to learn SOTA image representations." The text tower's output
+embeddings became the first widely used prompt-conditioning source for text-to-image diffusion, entering
+the UNet through [cross-attention](/concepts/cross-attention) in the Stable Diffusion models built on
+[LDM](/papers/ldm-2022). CLIP predates this atlas's 2023-2026 scope and is not itself a diffusion paper
+(kept as a full entity per DECISIONS.md D018, since the conditioning axis cannot be explained without its
+origin point).
+
+## Trade-offs
+
+**Parameter cost:** small relative to later text encoders — CLIP's text tower is far smaller than T5-XXL
+or a full VLM. **Flexibility:** the embedding space is jointly trained to align with image content, which
+helped early text-to-image alignment, but a contrastive objective compresses a caption to what
+distinguishes it from other captions in a batch, not to everything a generator might need for fine-grained
+instruction following. **Successor pressure:** [Imagen](/papers/imagen-2022) directly motivated moving
+past CLIP-alone by finding that a much larger, text-only language model (T5) produced better fidelity and
+alignment than scaling the image model did; [SD3](/papers/sd3-2024) kept CLIP anyway — alongside T5-XXL,
+not instead of it — concatenating both rather than replacing one with the other.

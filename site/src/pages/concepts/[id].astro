@@ -1,0 +1,103 @@
+---
+import Base from "../../layouts/Base.astro";
+import { getEntry, render } from "astro:content";
+import { nodesByType, nodeById, allNodes } from "../../lib/graph";
+
+export function getStaticPaths() {
+  return nodesByType("concepts").map((c) => ({ params: { id: c.id } }));
+}
+
+const { id } = Astro.params;
+const concept = nodeById(id as string)!;
+const d = concept.data;
+
+const entry = await getEntry("concepts", id as string);
+const { Content } = entry ? await render(entry) : { Content: null };
+
+const introducedBy = (d.introduced_by ?? []).map((pid: string) => nodeById(pid)).filter(Boolean);
+
+// every paper that lists this concept on any axis
+const users = allNodes().filter(
+  (n) =>
+    n.nodeType === "papers" &&
+    Object.values((n.data.axes ?? {}) as Record<string, string[]>).some((ids) => ids.includes(concept.id))
+);
+
+// sibling options on the same axis — the alternatives a system could have picked instead
+const siblings = nodesByType("concepts").filter(
+  (c) => c.data.axis === d.axis && c.id !== concept.id
+);
+
+const sectionKey = concept.sections?.[0] ?? "generation";
+const AXIS_LABEL: Record<string, string> = {
+  representation: "Representation", objective: "Objective", architecture: "Architecture",
+  conditioning: "Conditioning & control", "training-signal": "Training signal",
+  inference: "Inference", background: "Background",
+};
+---
+<Base title={d.name} description={d.one_line}>
+  <p class="badge" style="margin-bottom:0.75rem;">
+    {d.axis === "background" ? "Background concept" : `${AXIS_LABEL[d.axis] ?? d.axis} option`}
+  </p>
+  <h1 style={`font-size:1.85rem; margin:0 0 0.6rem; color:var(--section-${sectionKey});`}>{d.name}</h1>
+  <p class="measure" style="font-size:1.06rem; margin:0 0 2rem;">{d.one_line}</p>
+
+  {Content && (
+    <article class="measure" style="font-size:1.02rem; margin-bottom:2.5rem;">
+      <Content />
+    </article>
+  )}
+
+  <section style="display:grid; grid-template-columns:repeat(auto-fit, minmax(250px,1fr)); gap:1.5rem; margin-bottom:2rem;">
+    {introducedBy.length > 0 && (
+      <div>
+        <h2 style="font-size:0.8rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin:0 0 0.5rem;">
+          Introduced by
+        </h2>
+        <ul style="margin:0; padding-left:1.2rem;">
+          {introducedBy.map((p: any) => (
+            <li><a href={`/papers/${p.id}`}>{p.data.short ?? p.label}</a> <span style="color:var(--text-muted); font-size:0.85rem;">{p.date}</span></li>
+          ))}
+        </ul>
+      </div>
+    )}
+
+    {users.length > 0 && (
+      <div>
+        <h2 style="font-size:0.8rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin:0 0 0.5rem;">
+          Used by ({users.length})
+        </h2>
+        <p style="margin:0;">
+          {users.map((p, i) => (
+            <>
+              {i > 0 && ", "}
+              <a href={`/papers/${p.id}`}>{p.data.short ?? p.label}</a>
+            </>
+          ))}
+        </p>
+      </div>
+    )}
+
+    {siblings.length > 0 && d.axis !== "background" && (
+      <div>
+        <h2 style="font-size:0.8rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin:0 0 0.5rem;">
+          Alternatives on this axis
+        </h2>
+        <p style="margin:0;">
+          {siblings.map((c, i) => (
+            <>
+              {i > 0 && ", "}
+              <a href={`/concepts/${c.id}`}>{c.data.name}</a>
+            </>
+          ))}
+        </p>
+      </div>
+    )}
+  </section>
+
+  <p style="font-size:0.88rem;">
+    <a href={`/axes/${d.axis === "background" ? "representation" : d.axis}`}>
+      &larr; All {AXIS_LABEL[d.axis] ?? d.axis} options
+    </a>
+  </p>
+</Base>

@@ -1,0 +1,27 @@
+---
+id: t5-text-encoder
+title: Frozen large-language-model text encoder (T5-style)
+---
+
+## Mechanism
+
+[Imagen](/papers/imagen-2022) swaps a frozen, text-only pretrained language model (T5) in for a CLIP-style
+text tower as the source of prompt embeddings for diffusion conditioning. The paper's central, explicitly
+stated finding: "generic large language models (e.g. T5), pretrained on text-only corpora, are surprisingly
+effective at encoding text for image synthesis: increasing the size of the language model in Imagen boosts
+both sample fidelity and image-text alignment much more than increasing the size of the image diffusion
+model." Imagen predates this atlas's 2023-2026 scope and is a pixel-space, not latent, diffusion model —
+kept as a full entity per DECISIONS.md D018 specifically for this conditioning-axis finding, which every
+later text-encoder choice in this atlas responds to.
+
+## Trade-offs
+
+**Parameter cost:** T5-XXL is far larger than a CLIP text tower, and this cost is paid at every
+conditioning pass, independent of the image model's own size. **Flexibility:** a text-only language
+model captures compositional and syntactic structure a contrastive image-text objective does not
+optimize for directly, which is the gap Imagen's finding attributes the fidelity/alignment gain to.
+**What it does not solve:** T5 has no visual grounding at all — it was never trained to align with image
+content the way CLIP's text tower was — which is part of why [SD3](/papers/sd3-2024) concatenates T5-XXL
+with CLIP embeddings rather than replacing CLIP outright, and why later systems moved to a
+[vision-language model](/concepts/vlm-text-encoder) that has both language competence and visual grounding
+at once.

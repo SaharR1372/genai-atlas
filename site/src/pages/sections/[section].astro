@@ -1,0 +1,153 @@
+---
+import Base from "../../layouts/Base.astro";
+import { allLines, allNodes, allProblems, nodeById } from "../../lib/graph";
+
+export function getStaticPaths() {
+  const sections = [
+    {
+      section: "generation",
+      name: "Image generation",
+      lede: "How an image gets made from noise or from tokens: the objectives, backbones, and latent spaces that produce a picture from a prompt.",
+      question: "What space do you generate in, and what do you train the model to predict?",
+    },
+    {
+      section: "rae",
+      name: "Representation-space generation",
+      lede: "The question of what the generative latent should be. Reconstruction codes, foundation-model features, hybrids of the two, or nothing at all.",
+      question: "Should the latent be learned for reconstruction, inherited from a pretrained encoder, or skipped entirely?",
+    },
+    {
+      section: "editing",
+      name: "Image editing",
+      lede: "Changing an existing image rather than making a new one, which imposes a constraint generation never faces: everything you did not ask to change must stay exactly as it was.",
+      question: "Where does the edit happen, and what guarantees the rest of the image survives it?",
+    },
+    {
+      section: "unified",
+      name: "Unified understanding and generation",
+      lede: "One model that both interprets images and produces them. What is actually shared varies enormously between systems, so the label alone tells you little.",
+      question: "What is genuinely unified: the tokenizer, the backbone, the parameters, or only the training loop?",
+    },
+    {
+      section: "vfm",
+      name: "Vision foundation models",
+      lede: "The pretrained encoders that generative models increasingly depend on, either as an alignment target or as the generative latent itself.",
+      question: "What makes a representation good enough to generate inside?",
+    },
+    {
+      section: "vlm",
+      name: "Vision-language models",
+      lede: "Covered only where it bears on generation: as text encoders, as instruction parsers for editing, and as the understanding half of unified models.",
+      question: "How does language understanding reach the generator?",
+    },
+    {
+      section: "medical",
+      name: "Medical imaging",
+      lede: "Generative models applied to clinical images, where the evaluation bar is downstream clinical utility rather than a better distribution distance.",
+      question: "Which latent space survives contact with anatomy, and is there evidence the generated images actually help?",
+    },
+  ];
+  return sections.map((s) => ({ params: { section: s.section }, props: s }));
+}
+
+const { section, name, lede, question } = Astro.props;
+
+const lines = allLines().filter((l) => (l.sections ?? []).includes(section));
+const papers = allNodes()
+  .filter((n) => n.nodeType === "papers" && (n.sections ?? []).includes(section))
+  .sort((a, b) => (b.date ?? "").localeCompare(a.date ?? ""));
+const problems = allProblems().filter((p) => (p.sections ?? []).includes(section));
+
+const TIER_ORDER = ["landmark", "core", "strong-followup", "emerging", "watchlist"];
+const byTier = TIER_ORDER.map((t) => ({
+  tier: t,
+  papers: papers.filter((p) => p.tier === t),
+})).filter((g) => g.papers.length > 0);
+
+// papers in this section that no line claims — a visible to-do rather than a silent gap
+const unlined = papers.filter((p) => (p.data.lines ?? []).length === 0);
+---
+<Base title={name} description={lede}>
+  <p class="badge" style="margin-bottom:0.75rem;">Section</p>
+  <h1 style={`font-size:2rem; margin:0 0 0.6rem; color:var(--section-${section});`}>{name}</h1>
+  <p class="measure" style="font-size:1.08rem; margin:0 0 0.5rem;">{lede}</p>
+  <p class="measure" style="color:var(--text-muted); margin:0 0 2.5rem;">
+    <strong>The question this section answers:</strong> {question}
+  </p>
+
+  {papers.length === 0 ? (
+    <div class="card">
+      <p style="margin:0;">
+        Nothing in the atlas covers this section yet. See <code>PROJECT_STATE.md</code> for where it
+        sits in the build order.
+      </p>
+    </div>
+  ) : (
+    <>
+      {lines.length > 0 && (
+        <section style="margin-bottom:3rem;">
+          <h2 style="font-size:1.35rem; margin:0 0 1rem;">Research lines here</h2>
+          <div style="display:flex; flex-direction:column; gap:1rem;">
+            {lines.map((l) => (
+              <a class="card section-border" style={`--section-color: var(--section-${section}); display:block;`} href={`/lines/${l.id}`}>
+                <div style="display:flex; align-items:baseline; gap:0.6rem; flex-wrap:wrap; margin-bottom:0.35rem;">
+                  <h3 style="font-size:1.1rem; margin:0;">{l.data.name}</h3>
+                  <span class="badge">{l.data.status}</span>
+                </div>
+                <p style="margin:0;">{l.data.one_line}</p>
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <section style="margin-bottom:3rem;">
+        <h2 style="font-size:1.35rem; margin:0 0 1rem;">Papers ({papers.length})</h2>
+        {byTier.map(({ tier, papers: group }) => (
+          <div style="margin-bottom:1.75rem;">
+            <h3 style="font-size:0.8rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin:0 0 0.6rem;">
+              {tier.replace("-", " ")}
+            </h3>
+            <div style="display:flex; flex-direction:column; gap:0.75rem;">
+              {group.map((p) => (
+                <div style="border-left:2px solid var(--border); padding-left:1rem;">
+                  <p style="margin:0 0 0.15rem;">
+                    <a href={`/papers/${p.id}`} style="font-weight:500;">{p.data.short ?? p.label}</a>
+                    <span style="color:var(--text-muted); font-size:0.85rem;"> · {p.date}</span>
+                    {(p.data.lines ?? []).map((lid: string) => {
+                      const l = nodeById(lid);
+                      return l ? <a href={`/lines/${lid}`} class="badge" style="margin-left:0.4rem;">{l.data.name}</a> : null;
+                    })}
+                  </p>
+                  <p style="margin:0; font-size:0.92rem; color:var(--text-muted);">
+                    {(p.data.summary ?? "").slice(0, 230)}{(p.data.summary ?? "").length > 230 ? "…" : ""}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </section>
+
+      {problems.length > 0 && (
+        <section style="margin-bottom:2rem;">
+          <h2 style="font-size:1.35rem; margin:0 0 1rem;">Open problems in this section</h2>
+          <ul style="margin:0; padding-left:1.2rem;">
+            {problems.map((p) => (
+              <li style="margin-bottom:0.5rem;">
+                <a href={`/problems#${p.id}`}>{p.data.statement}</a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {unlined.length > 0 && (
+        <p style="font-size:0.85rem; color:var(--text-muted); border-left:2px solid var(--border-strong); padding-left:0.75rem;">
+          {unlined.length} paper{unlined.length === 1 ? "" : "s"} here belong to no research line yet:
+          {" "}{unlined.map((p) => p.data.short ?? p.label).join(", ")}.
+        </p>
+      )}
+    </>
+  )}
+</Base>

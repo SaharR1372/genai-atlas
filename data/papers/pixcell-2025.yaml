@@ -1,0 +1,36 @@
+id: pixcell-2025
+type: paper
+title: 'PixCell: A generative foundation model for digital histopathology images'
+short: PixCell
+arxiv: '2506.05127'
+date: 2025-06
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- Stony Brook University
+authors:
+- Srikar Yellapragada
+- Alexandros Graikos
+- Zilinghan Li
+tier: core
+sections:
+- medical
+lines:
+- line-medical-transfer-vae
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: A diffusion foundation model for pathology built on Stable Diffusion 3's natural-image VAE, conditioned
+  on UNI-2h pathology foundation-model embeddings because pathology images have no captions to prompt
+  with. The foundation model supplies the condition, not the latent — the distinction that STREAM later
+  argues is the limiting choice.
+explanation: null

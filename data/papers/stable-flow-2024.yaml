@@ -1,0 +1,34 @@
+id: stable-flow-2024
+type: paper
+title: 'Stable Flow: Vital Layers for Training-Free Image Editing'
+short: Stable Flow
+arxiv: '2411.14430'
+date: 2024-11
+venue:
+  name: CVPR
+  status: conference
+orgs:
+- Snap
+- Tel Aviv University
+authors: []
+tier: strong-followup
+sections:
+- editing
+lines:
+- line-editing-attention
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: Diffusion transformers lack the UNet's coarse-to-fine hierarchy, so the question of which layer
+  to inject into has no obvious answer. This paper finds the small set of vital layers that actually drive
+  image formation and injects only there. The identification is empirical and has to be redone for each
+  architecture.
+explanation: null

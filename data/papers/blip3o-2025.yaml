@@ -21,6 +21,8 @@ sections:
 axes:
   representation:
   - semantic-latent
+  conditioning:
+  - query-bridge
 links:
   code: https://github.com/JiuhaiChen/BLIP3o
   weights: null

@@ -1,0 +1,14 @@
+id: adapter-conditioning
+type: concept
+name: Adapter-based spatial conditioning
+axis: conditioning
+one_line: Freeze a pretrained text-to-image diffusion model entirely and add a small trainable side network
+  (a duplicated-and-shrunk encoder branch, or a lightweight external feature extractor) whose output is
+  injected into the frozen backbone, so a new control signal (edges, depth, pose) can be learned without
+  touching or risking the base model's weights.
+sections:
+- generation
+- editing
+introduced_by:
+- controlnet-2023
+explains: content/concepts/adapter-conditioning.mdx

@@ -1,0 +1,34 @@
+id: bagel-2025
+type: paper
+title: Emerging Properties in Unified Multimodal Pretraining
+short: BAGEL
+arxiv: '2505.14683'
+date: 2025-05
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- ByteDance Seed
+authors: []
+tier: core
+sections:
+- unified
+- editing
+lines:
+- line-editing-unified
+- line-unified-models
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: A mixture-of-transformer-experts model with one expert for understanding and one for generation,
+  routed over shared token sequences, trained on large-scale interleaved data. Unified at the sequence
+  level, but not literally one network.
+explanation: null

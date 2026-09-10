@@ -8,5 +8,6 @@ sections:
 - editing
 - generation
 introduced_by:
+- ominicontrol-2024
 - kontext-2025
-explains: null
+explains: content/concepts/sequence-concat.mdx

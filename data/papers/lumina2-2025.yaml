@@ -16,6 +16,11 @@ authors:
 tier: strong-followup
 sections:
 - generation
+axes:
+  architecture:
+  - single-stream-dit
+  conditioning:
+  - joint-attention
 lines:
 - line-vae-latent
 links:

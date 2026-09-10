@@ -31,6 +31,8 @@ axes:
   - frozen-encoder
   objective:
   - flow-matching
+  conditioning:
+  - query-bridge
 links:
   code: https://github.com/ZitengWangNYU/Scale-RAE
   weights: null

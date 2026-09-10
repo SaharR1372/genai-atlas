@@ -1,0 +1,27 @@
+---
+id: single-stream-dit
+title: Single-stream (unified-weight) DiT
+---
+
+## Mechanism
+
+Text and image tokens are concatenated into one sequence, exactly as in [MM-DiT](/concepts/mmdit), but
+processed by *one* shared set of transformer weights instead of two parallel modality-specific sets.
+[Lumina-Image 2.0](/papers/lumina2-2025) names this "Unified Next-DiT": it "adopts a unified architecture
+... that treats text and image tokens as a joint sequence, enabling natural cross-modal interactions and
+allowing seamless task expansion." [SVG-T2I](/papers/svg-t2i-2025) later adopts this same architecture
+wholesale — citing Lumina-Image 2.0 directly — to combine a Gemma2-2B text encoder's tokens with tokens
+from a frozen-DINOv3-derived semantic latent, making it the joint-attention answer to how RAE-family
+models condition on text (contrast with [Scale-RAE](/papers/scale-rae-2026)'s
+[query-bridge](/concepts/query-bridge) answer to the same question).
+
+## Trade-offs
+
+**Parameter cost:** lower than MM-DiT at matched depth/width, since capacity is not duplicated per
+modality — Lumina-Image 2.0 reports competitive results at only 2.6B parameters. **Flexibility:**
+"seamless task expansion" is the paper's own framing — a single set of weights processing a joint
+sequence generalizes to additional conditioning modalities (extra reference images, control signals)
+without adding a second weight set per modality. **Cost:** no modality-specific capacity means text and
+image processing must share representational bandwidth; whether this measurably trades away quality
+relative to MM-DiT's dual-stream design at matched total parameter count has not been directly tested
+by a controlled ablation in any paper this atlas has reviewed.

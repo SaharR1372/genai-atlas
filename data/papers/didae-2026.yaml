@@ -1,0 +1,39 @@
+id: didae-2026
+type: paper
+title: 'Visual Disentangled Diffusion Autoencoders: Scalable Counterfactual Generation for Foundation
+  Models'
+short: DiDAE
+arxiv: '2601.21851'
+date: 2026-01
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors: []
+tier: core
+sections:
+- editing
+- rae
+lines:
+- line-editing-representation-latent
+problems:
+- semantic-latent-detail-loss
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: 'The cleanest existing case of editing inside a genuinely frozen representation latent. It finds
+  editing directions by Procrustes alignment and SVD directly in a frozen CLIP embedding space, transplanting
+  the InterFaceGAN and GANSpace idea onto a foundation latent, and decodes with a diffusion-autoencoder
+  decoder, reaching real images through DDIM inversion. It works, but only on narrow well-behaved domains:
+  face attributes and a synthetic shape benchmark, not general instruction editing. The paper states its
+  own costs plainly, including over-smoothing from lossy inversion and edited points occasionally leaving
+  the decoder''s support.'
+explanation: null

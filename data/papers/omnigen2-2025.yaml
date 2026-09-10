@@ -18,6 +18,7 @@ sections:
 - unified
 - editing
 lines:
+- line-editing-unified
 - line-in-context-editing
 - line-unified-models
 links:

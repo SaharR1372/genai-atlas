@@ -1,0 +1,40 @@
+id: ip-adapter-2023
+type: paper
+title: 'IP-Adapter: Text Compatible Image Prompt Adapter for Text-to-Image Diffusion Models'
+short: IP-Adapter
+arxiv: '2308.06721'
+date: 2023-08
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- Tencent AI Lab
+authors:
+- Hu Ye
+- Jun Zhang
+- Sibo Liu
+tier: landmark
+sections:
+- generation
+- editing
+axes:
+  conditioning:
+  - decoupled-cross-attention
+lines:
+- line-adapter-conditioning
+links:
+  code: https://github.com/tencent-ailab/IP-Adapter
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: released
+  weights: released
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: sonnet
+summary: 'Moves adapter-based conditioning from spatial control to image-prompt conditioning: adds a
+  second cross-attention branch with its own key/value projections just for image-prompt features,
+  summed with the frozen model''s existing text cross-attention output. Only 22M parameters, and the
+  decoupling keeps image and text prompts from fighting over one shared attention layer.'
+explanation: null

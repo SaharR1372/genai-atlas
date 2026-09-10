@@ -1,8 +1,47 @@
 # PROJECT_STATE
 
-Last updated: 2026-09-09 (session 3, Opus 5) — P2 in progress: restructured around research lines.
+Last updated: 2026-09-10 (session 4, Sonnet 5) — P2 in progress: conditioning-mechanism design space
+mapped (concepts, papers, a new line, a new transition narrative). See CHANGELOG.md's 2026-09-10 entry
+and DECISIONS.md D018/D019 for full detail; summary below.
+
+### Session 4 addendum (2026-09-10, Sonnet 5)
+Answered a direct research request to map the full conditioning-mechanism design space (how text,
+reference images, and control signals reach the generator — cross-attention, MM-DiT/joint attention,
+single- vs. dual-stream, adaLN, adapters, sequence-concat, query-bridge, native-token) and, specifically,
+how RAE-family models condition on text. Added 9 concepts, 10 arXiv-verified papers, 1 new line
+(`line-adapter-conditioning`), 1 new problem, 1 new transition (`text-conditioning-evolution`, with a
+full MDX narrative and site page), 16 relations, and backfilled `axes.conditioning` on 13 existing
+papers. **Key finding**: Scale-RAE and SVG-T2I — the two published RAE-family text-to-image systems —
+use different conditioning mechanisms, each transplanted unmodified from the VAE-latent literature
+(Scale-RAE: MetaQuery's query-bridge, confirmed via direct quote — "we adopt the MetaQuery architecture";
+SVG-T2I: Lumina-Image 2.0's single-stream joint attention). RAE and SVG themselves are class-conditional
+ImageNet models with no text conditioning at all. `validate.py --strict`, `pytest` (28 tests), and
+`npm run build` (185 pages) all pass. This ran on Sonnet rather than Fable per direct assignment; D019
+flags several judgment calls (tier assignments, `line-adapter-conditioning`'s `contested` status, keeping
+`line-in-context-editing`'s origin as ACE++ over reassigning to OminiControl) for a future Fable/Opus
+review pass. Nothing was committed to git this session — files are staged in the working tree only.
 
 ## Current phase
+
+**Session 4 (2026-09-10).** Built the three sections the user asked for, plus the living-update
+pipeline. 264 entities, 124 papers (123 arXiv-verified; Ktena et al. is a Nature Medicine paper with
+a DOI and no arXiv id, correctly skipped), 25 research lines, 221 site pages, 28 tests.
+
+### Three findings worth carrying forward
+1. **Medical RAE gap is real but narrower than "nobody tried".** STREAM (2606.07036, Jun 2026) does
+   Riemannian flow matching inside a histopathology foundation model's token space — a genuine RAE
+   analogue. A retinal study (2608.13455, Aug 2026) found gains that vanish under classifiers trained
+   on real images, calling it a synthetic-to-real representation gap. **Chest X-ray and general
+   radiology remain untouched** (RAD-DINO, BiomedCLIP, MedSAM are used only for understanding).
+   That is the actionable opening.
+2. **RAE editing: the bottleneck is named, not merely unexplored.** PS-VAE (2512.17909) and RPiAE
+   (2603.19206) independently concluded a frozen encoder's reconstruction fidelity degrades editing,
+   and both unfroze the encoder to fix it. DiDAE (2601.21851) keeps it frozen but only works on
+   narrow domains. This is a sharper claim than the earlier "underexplored" hypothesis.
+3. **RAE-family text conditioning is borrowed, not designed.** Scale-RAE explicitly adopts the
+   MetaQuery architecture; SVG-T2I instead uses Lumina's single-stream joint attention. RAE and SVG
+   themselves have no text conditioning at all. Nobody has isolated conditioning-mechanism choice
+   from representation choice — recorded as `conditioning-mechanism-in-semantic-latent`.
 
 **P2 in progress.** The atlas was restructured around **research lines** after user review found the
 axis-first structure thin and the coverage incomplete. Pushed to
@@ -163,20 +202,50 @@ Sonnet.
   `LegacyContentConfigError` on Astro 7. Already fixed; noted here so a future session doesn't
   "fix" it back.
 
-## Exact next tasks (continuing P2)
+## Exact next tasks (session 5)
 
-1. **Line deep-dive MDX.** Every line has a structured arc but `explains` is null for all 15. Write
-   the long-form narrative for at least: representation-latent, latent-hybrid, one-step-objectives,
-   pixel-space. Fable/Opus work per D007.
-2. **Topic sections still thin**: editing has 7 papers and one line but no section page; unified has
-   6 papers and one line; VFM/VLM/medical have nothing. The user explicitly asked for these.
-3. **Full-PDF reads** still not done for any paper (`explanation` null on all 74). Landmark/core
+1. **Line deep-dive MDX**: only `representation-latent` and `line-adapter-conditioning` have prose.
+   23 lines have structured arcs but no narrative. Highest value: latent-hybrid, one-step-objectives,
+   editing-representation-latent, medical-fm-latent.
+2. **VFM and VLM sections are still empty.** Papers exist (DINOv2/v3, SigLIP2, MAE, Web-SSL) but no
+   line groups them and the section pages render the empty state.
+3. **Unverified items from the recency sweep** that were deliberately NOT added: Qwen-Image-3.0,
+   FLUX 3 open weights, GPT-Image 2.5, Nano Banana 2 Lite, MAI-Image-2.6, SD4. All secondary-source
+   only — verify against vendor primary sources before adding.
+4. **Coverage gap acknowledged by the recency agent**: the raw arXiv cs.CV listing sweep for
+   2607/2608/2609 never completed; only targeted search plus trending signals were used. A fuller
+   pass would likely surface academic papers with no Hugging Face presence.
+5. **Pipeline hardening**: monitor.py (code/weights/venue changes on existing papers) is designed in
+   the blueprint but not built. Also, arXiv rate-limits bulk verification hard; ARXIV_MIN_INTERVAL is
+   now 6s with backoff, but a 120-paper sweep takes ~15 minutes.
+6. Full-PDF reads still not done for any paper; every `explanation` field is null.
+
+## Superseded next tasks (session 3)
+
+1. **Line deep-dive MDX.** 15 of 16 lines still have `explains: null` (only `line-adapter-conditioning`,
+   written this session, has its narrative). Write the long-form narrative for at least:
+   representation-latent, latent-hybrid, one-step-objectives, pixel-space. Fable/Opus work per D007.
+2. **Topic sections still thin**: editing has 7+ papers and one line but no section page; unified has
+   8+ papers and one line; VFM/VLM/medical have nothing. The user explicitly asked for these.
+3. **Full-PDF reads** still not done for any paper (`explanation` null on all papers). Landmark/core
    first: drifting-2026, rae-2025, meanflow-2025, jit-2025, scale-rae-2026.
 4. **Second transition narrative** (diffusion → flow matching) still unwritten.
 5. **Closed systems** (Nano Banana / Gemini 3 Pro Image, GPT-Image) have no arXiv paper and are not
    yet in the atlas as watchlist pointer nodes with non-arXiv sources.
 6. **GenEval 2 finding** (up to 17.7% drift from human judgment) should propagate a warning onto
    every GenEval number in `/compare` — currently only stated in the benchmark's own notes.
+7. **Conditioning-mechanism follow-ups (session 4, D019)**: a Fable/Opus review of
+   `content/transitions/text-conditioning-evolution.mdx` and `line-adapter-conditioning`'s arc/status
+   calls; a dedicated search (once WebSearch quota resets / arXiv API is not rate-limited) for a
+   standalone survey systematically comparing conditioning mechanisms (D14) and for confirmed
+   genuinely-new 2025-26 mechanisms beyond OminiControl (D15); verify FLUX.2's reported Mistral text
+   encoder once an official technical report exists (currently unverified, `arxiv: null`).
+   (Note: a concurrent session added `concepts`/`lines` collections to `site/src/content.config.ts` and
+   `/concepts/[id]`, `/lines/[id]`, `/sections/[section]` dynamic routes during this same window — the
+   14 concept `.mdx` files and `line-adapter-conditioning.mdx` from this session already render
+   correctly through that new routing, confirmed via `npm run build`. That other session also appears
+   to be building out the medical section — see its own `data/lines/line-medical-*.yaml` and
+   `data/papers/*` additions, untouched by this session.)
 
 ## Superseded next tasks (from session 2)
 

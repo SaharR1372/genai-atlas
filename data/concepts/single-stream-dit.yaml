@@ -1,0 +1,13 @@
+id: single-stream-dit
+type: concept
+name: Single-stream (unified-weight) DiT
+axis: architecture
+one_line: Give text and image tokens one shared set of transformer weights (rather than MM-DiT's two parallel
+  weight sets) and rely purely on the joint sequence concatenation to let self-attention mix modalities,
+  trading modality-specific capacity for a smaller, simpler backbone.
+sections:
+- generation
+- rae
+introduced_by:
+- lumina2-2025
+explains: content/concepts/single-stream-dit.mdx

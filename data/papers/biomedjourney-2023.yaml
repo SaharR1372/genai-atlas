@@ -1,0 +1,38 @@
+id: biomedjourney-2023
+type: paper
+title: 'BiomedJourney: Counterfactual Biomedical Image Generation by Instruction-Learning from Multimodal
+  Patient Journeys'
+short: BiomedJourney
+arxiv: '2310.10765'
+date: 2023-10
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- Microsoft
+- University of Washington
+authors:
+- Yu Gu
+- Jianwei Yang
+- Naoto Usuyama
+tier: core
+sections:
+- medical
+- editing
+lines:
+- line-medical-transfer-vae
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: Learns disease-progression editing from pairs of longitudinal radiology reports, using a language
+  model to turn two visits into an edit instruction. Latent diffusion, and one of the few genuine image-editing
+  systems in the medical literature.
+explanation: null

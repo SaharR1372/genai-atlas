@@ -1,0 +1,47 @@
+---
+import Base from "../../layouts/Base.astro";
+import { getEntry, render } from "astro:content";
+import { nodeById } from "../../lib/graph";
+
+const transitionData = nodeById("text-conditioning-evolution");
+const entry = await getEntry("transitions", "text-conditioning-evolution");
+const { Content } = entry ? await render(entry) : { Content: null };
+
+const fromConcept = nodeById(transitionData?.data.from_option);
+const toConcept = nodeById(transitionData?.data.to_option);
+---
+<Base title={transitionData?.label ?? "Transition"} description={transitionData?.data.cost}>
+  <p class="badge" style="margin-bottom:0.75rem;">Transition · {transitionData?.data.era}</p>
+  <h1 style="font-size:1.9rem; margin:0 0 0.75rem;">{transitionData?.label}</h1>
+  <p style="display:flex; gap:0.6rem; align-items:center; color:var(--text-muted); margin-bottom:0.5rem;">
+    <span class="badge">{fromConcept?.data.name}</span>
+    <span>&rarr;</span>
+    <span class="badge">{toConcept?.data.name}</span>
+  </p>
+  <p style="font-size:0.88rem; color:var(--text-muted); margin-bottom:2rem;">
+    Driven by the <strong>{transitionData?.data.driver}</strong> axis becoming the binding constraint.
+  </p>
+
+  {Content ? (
+    <article class="measure" style="font-size:1.02rem;">
+      <Content />
+    </article>
+  ) : (
+    <p style="color:var(--text-muted);">Narrative not yet written.</p>
+  )}
+
+  <div class="card section-border" style="--section-color: var(--section-rae); margin-top:2.5rem;">
+    <h2 style="font-size:1rem; margin:0 0 0.5rem;">What this transition cost</h2>
+    <p style="margin:0;">{transitionData?.data.cost}</p>
+  </div>
+
+  <div style="margin-top:1.5rem;">
+    <h2 style="font-size:1rem; color:var(--text-muted); margin-bottom:0.6rem;">Key papers</h2>
+    <ul>
+      {(transitionData?.data.key_papers ?? []).map((id: string) => {
+        const p = nodeById(id);
+        return <li><a href={`/papers/${id}`}>{p?.label ?? id}</a></li>;
+      })}
+    </ul>
+  </div>
+</Base>

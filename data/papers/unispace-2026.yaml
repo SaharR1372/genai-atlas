@@ -1,0 +1,33 @@
+id: unispace-2026
+type: paper
+title: 'UniSpace: Unified Visual Representation and Scalable Multimodal Modeling'
+short: UniSpace
+arxiv: '2608.08676'
+date: 2026-08
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors: []
+tier: emerging
+sections:
+- editing
+- unified
+- rae
+lines:
+- line-editing-representation-latent
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: An 8B mixture-of-experts unified understanding, generation and editing model built on a reparameterized
+  frozen vision-transformer feature space rather than a VAE pathway. Flagged as needing an independent
+  verification pass before any claim in this atlas leans on it.
+explanation: null

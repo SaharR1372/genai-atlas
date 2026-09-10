@@ -1,0 +1,42 @@
+id: ominicontrol-2024
+type: paper
+title: 'OminiControl: Minimal and Universal Control for Diffusion Transformer'
+short: OminiControl
+arxiv: '2411.15098'
+date: 2024-11
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- National University of Singapore
+authors:
+- Zhenxiong Tan
+- Songhua Liu
+- Xingyi Yang
+tier: landmark
+sections:
+- generation
+- editing
+axes:
+  conditioning:
+  - sequence-concat
+lines:
+- line-adapter-conditioning
+- line-in-context-editing
+links:
+  code: https://github.com/Yuanshi9815/OminiControl
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: released
+  weights: released
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: sonnet
+summary: 'Predates FLUX.1 Kontext by about seven months and generalizes the same core move beyond editing:
+  reuse the DiT''s own VAE encoder and transformer blocks for the condition image, concatenate condition
+  and generation tokens into one sequence, and add a dynamic position-encoding scheme so the same
+  mechanism handles both spatially-aligned control (edges, depth) and non-aligned control (subject-driven
+  generation) — for about 0.1% additional parameters versus a trained adapter.'
+explanation: null

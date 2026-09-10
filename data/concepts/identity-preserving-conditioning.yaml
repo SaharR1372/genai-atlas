@@ -1,0 +1,12 @@
+id: identity-preserving-conditioning
+type: concept
+name: Identity-preserving face conditioning
+axis: conditioning
+one_line: Combine a semantic face-embedding branch (from a face-recognition encoder) with a spatial landmark/structure
+  branch, injected through some mix of decoupled cross-attention and adapter-style side networks, to preserve
+  a specific person's identity across generations without per-identity fine-tuning.
+sections:
+- editing
+introduced_by:
+- instantid-2024
+explains: content/concepts/identity-preserving-conditioning.mdx

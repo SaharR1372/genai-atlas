@@ -1,0 +1,39 @@
+id: clip-2021
+type: paper
+title: Learning Transferable Visual Models From Natural Language Supervision
+short: CLIP
+arxiv: '2103.00020'
+date: 2021-02
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- OpenAI
+authors:
+- Alec Radford
+- Jong Wook Kim
+- Chris Hallacy
+tier: landmark
+sections:
+- generation
+axes:
+  conditioning:
+  - clip-text-encoder
+links:
+  code: https://github.com/openai/CLIP
+  weights: released
+  project: null
+  pdf: null
+status:
+  code: released
+  weights: released
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: sonnet
+summary: 'Trains an image encoder and a text encoder jointly with a contrastive objective on 400M
+  (image, text) pairs. Predates this atlas''s 2023-2026 window and is not a diffusion paper, but its
+  text tower became the first widely used prompt-embedding source for text-to-image diffusion (via
+  cross-attention in LDM/Stable Diffusion) and remains one of the three encoders SD3/SDXL-class models
+  concatenate — kept as a full entity (see DECISIONS.md D018) because the conditioning axis cannot be
+  explained without its origin point.'
+explanation: null

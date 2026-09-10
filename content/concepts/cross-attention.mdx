@@ -1,0 +1,27 @@
+---
+id: cross-attention
+title: Cross-attention conditioning
+---
+
+## Mechanism
+
+The generation stream (a UNet's spatial feature map, in the originating system) supplies queries; a
+context sequence encoded entirely separately — [LDM](/papers/ldm-2022) names "text or bounding boxes" as
+the general case, and the Stable Diffusion models built on it use CLIP text tokens specifically —
+supplies keys and values at one or more dedicated cross-attention layers spliced into the network. LDM's
+own description: "by introducing cross-attention layers into the model architecture, we turn diffusion
+models into powerful and flexible generators for general conditioning inputs." No other coupling between
+the two pathways exists; the image stream never sees the raw text tokens, only what the cross-attention
+layers pull from them at each layer they're inserted into.
+
+## Trade-offs
+
+**Parameter cost:** small and fixed — one extra K/V projection pair per cross-attention layer, independent
+of how large the text encoder is. **Flexibility:** high — because the coupling is confined to a few
+well-defined layers, this is the mechanism that later let [ControlNet](/papers/controlnet-2023),
+[T2I-Adapter](/papers/t2i-adapter-2023), and [IP-Adapter](/papers/ip-adapter-2023) bolt new conditioning
+signals onto a *frozen* pretrained model — see [adapter-based conditioning](/lines/line-adapter-conditioning).
+**Quality ceiling:** [SD3](/papers/sd3-2024)'s own ablation reports that giving text and image tokens
+[joint self-attention](/concepts/joint-attention) instead "significantly outperforms the cross-attention...
+variant" at production text-to-image scale — the field's clearest internal evidence that the modularity
+cross-attention buys costs measurable quality once compute for a fully joint mechanism is affordable.

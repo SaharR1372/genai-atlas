@@ -9,4 +9,4 @@ sections:
 - editing
 introduced_by:
 - qwen-image-2025
-explains: null
+explains: content/concepts/vlm-text-encoder.mdx

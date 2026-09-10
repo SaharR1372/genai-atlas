@@ -1,0 +1,39 @@
+id: jalal-2021
+type: paper
+title: Robust Compressed Sensing MRI with Deep Generative Priors
+short: CSGM-MRI
+arxiv: '2108.01368'
+date: 2021-08
+venue:
+  name: NeurIPS
+  status: conference
+orgs:
+- UT Austin
+- Google
+authors:
+- Ajil Jalal
+- Marius Arvinte
+- Giannis Daras
+- Eric Price
+- Alexandros G. Dimakis
+- Jonathan I. Tamer
+tier: core
+sections:
+- medical
+lines:
+- line-medical-pixel-space
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: Uses a score-based generative prior for compressed-sensing MRI and shows it generalizes out of
+  distribution better than end-to-end supervised reconstruction, which fails when the anatomy or sampling
+  pattern shifts.
+explanation: null

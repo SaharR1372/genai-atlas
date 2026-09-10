@@ -1,0 +1,24 @@
+id: medical-latent-transfer
+type: problem
+statement: Most medical image generation runs inside an autoencoder trained on natural photographs, and
+  nobody has tested whether that latent preserves clinically relevant detail.
+why_it_matters: If a borrowed natural-image latent silently discards the fine texture that distinguishes
+  a lesion from an artifact, then every downstream result built on it is measuring the wrong thing — and
+  the standard evaluation metrics, which come from the same ImageNet feature family, would not reveal
+  it.
+sections:
+- medical
+- rae
+attacked_by:
+- stream-2026
+- retinal-fm-latent-2026
+- frd-2024
+- maisi-2024
+status: open
+solved_by: []
+candidate_approaches:
+- Train the autoencoder on the target modality instead of borrowing one (MAISI)
+- Generate inside a medical foundation model's feature space (STREAM)
+- Evaluate with radiomics-native rather than ImageNet-derived features (Fréchet Radiomic Distance)
+- 'Run the controlled ablation nobody has published: pixel versus borrowed-VAE versus domain-VAE versus
+  foundation latent, on one modality with a downstream clinical task'

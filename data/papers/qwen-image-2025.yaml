@@ -21,6 +21,7 @@ axes:
   - mmdit
   conditioning:
   - vlm-text-encoder
+  - joint-attention
 lines:
 - line-vae-latent
 links:

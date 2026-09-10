@@ -1,0 +1,45 @@
+id: line-editing-representation-latent
+type: line
+name: Editing in a representation latent
+one_line: Perform the edit inside a foundation-model feature space rather than a reconstruction latent.
+core_bet: If generation is better in a semantic space, editing should be too, because the axes of that
+  space correspond to meaningful attributes.
+primary_axis: representation
+status: emerging
+since: 2025-12
+sections:
+- editing
+- rae
+arc:
+- paper: psvae-2025
+  role: origin
+  note: Builds instruction editing from DINOv2 and SigLIP2 features, and states that a frozen representation
+    autoencoder's weak reconstruction leaves details inconsistent with the input — so it unfreezes the
+    encoder.
+- paper: didae-2026
+  role: evidence
+  note: Gets genuinely frozen-latent editing to work by finding directions through Procrustes alignment
+    and SVD in a frozen CLIP space, at the price of restricting to face attributes and synthetic shapes.
+- paper: rpiae-2026
+  role: challenge
+  note: 'Independently reaches the same diagnosis: frozen-encoder tokenizers have limited reconstruction
+    fidelity, which degrades editing, so it fine-tunes the encoder too.'
+- paper: unispace-2026
+  role: improvement
+  note: A unified model on a reparameterized frozen vision-transformer space; flagged as needing independent
+    verification.
+strengths:
+- Edit directions in a semantic space are meaningful by construction
+- Directly extends the representation-latent generation line into editing
+- The one genuinely open frontier in an otherwise crowded area
+weaknesses:
+- Reconstruction fidelity is the named bottleneck, by two independent groups
+- The only strictly-frozen success is confined to narrow domains
+- Both general-purpose attempts abandoned strict freezing to make it work
+- No inversion, adapter or control analogue exists yet for this latent family
+open_questions:
+- semantic-latent-detail-loss
+- edit-region-preservation
+competes_with:
+- line-editing-vae-latent
+explains: null

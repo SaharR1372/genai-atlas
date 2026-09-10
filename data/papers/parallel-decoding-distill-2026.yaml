@@ -1,0 +1,33 @@
+id: parallel-decoding-distill-2026
+type: paper
+title: Parallel Decoding Distillation for Fast Image and Video Generation
+short: Parallel Decoding Distillation
+arxiv: '2607.26004'
+date: 2026-07
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- NVIDIA
+authors:
+- Neta Shaul
+- Arash Vahdat
+tier: strong-followup
+sections:
+- generation
+lines:
+- line-one-step-objectives
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: Trajectory-based few-step distillation that avoids the Jacobian-vector-product and finite-difference
+  machinery MeanFlow-style objectives rely on, reporting state of the art at four to eight function evaluations.
+explanation: null

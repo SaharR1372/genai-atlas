@@ -22,6 +22,8 @@ axes:
   - dit
   representation:
   - vae-latent
+  conditioning:
+  - adaln-modulation
 links:
   code: https://github.com/facebookresearch/DiT
   weights: null

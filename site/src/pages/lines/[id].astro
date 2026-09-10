@@ -1,5 +1,6 @@
 ---
 import Base from "../../layouts/Base.astro";
+import { getEntry, render } from "astro:content";
 import {
   allLines, nodeById, papersInLine, resultsForPaper, allBenchmarks,
 } from "../../lib/graph";
@@ -11,6 +12,9 @@ export function getStaticPaths() {
 const { id } = Astro.params;
 const line = nodeById(id as string)!;
 const d = line.data;
+
+const entry = await getEntry("lines", id as string);
+const { Content } = entry ? await render(entry) : { Content: null };
 const sectionKey = line.sections?.[0] ?? "generation";
 
 const ROLE_LABEL: Record<string, string> = {
@@ -53,6 +57,12 @@ const benchName = (bid: string) => nodeById(bid)?.data.name ?? bid;
     </h2>
     <p style="margin:0;">{d.core_bet}</p>
   </div>
+
+  {Content && (
+    <article class="measure" style="font-size:1.03rem; margin-bottom:3rem;">
+      <Content />
+    </article>
+  )}
 
   {arcGroups.length > 0 && (
     <section style="margin-bottom:3rem;">

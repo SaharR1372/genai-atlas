@@ -1,0 +1,29 @@
+---
+id: sequence-concat
+title: In-context sequence concatenation
+---
+
+## Mechanism
+
+A reference image is encoded through the same pathway the model already uses for the image it is
+generating (the same VAE encoder, the same patchify step), and its tokens are concatenated directly onto
+the generation sequence — no adapter network, no inversion, no task-specific head. Ordinary self-attention
+(already present for [joint text/image attention](/concepts/joint-attention)) does the rest.
+[OminiControl](/papers/ominicontrol-2024) is the earliest paper this atlas has verified using this exact
+mechanism, for general DiT control (subject-driven generation, spatial control) at "about 0.1% additional
+parameters" versus a trained adapter, via "a unified sequence processing strategy that combines condition
+tokens with image tokens" plus a dynamic position-encoding scheme for spatially-aligned versus
+non-aligned tasks. [FLUX.1 Kontext](/papers/kontext-2025) applies the same idea specifically to editing
+about seven months later and became the open reference point for it.
+
+## Trade-offs
+
+**Parameter cost:** close to zero beyond the base model — this is the mechanism's whole appeal relative
+to [adapter-based conditioning](/lines/line-adapter-conditioning), which needs a new trained module per
+condition type. **Flexibility:** one mechanism handles both spatially-aligned control (edges, depth) and
+non-aligned reference conditioning (subject-driven generation, style transfer, editing) without switching
+architectures. **Quality/precision:** [ICEdit](/papers/icedit-2025) reports state-of-the-art instruction
+editing from roughly 0.1% of the data and 1% of the trainable parameters earlier adapter- or fine-tune-based
+editors needed — but preserving untouched regions of the reference exactly, and grounding a referring
+expression when several similar objects are present, both remain open weaknesses of this mechanism (see
+[line-in-context-editing](/lines/line-in-context-editing) and [semantic-latent-detail-loss](/problems/semantic-latent-detail-loss)).

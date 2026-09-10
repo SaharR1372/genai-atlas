@@ -1,0 +1,35 @@
+id: emu-edit-2023
+type: paper
+title: 'Emu Edit: Precise Image Editing via Recognition and Generation Tasks'
+short: Emu Edit
+arxiv: '2311.10089'
+date: 2023-11
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- Meta AI
+authors:
+- Shelly Sheynin
+- Adam Polyak
+- Uriel Singer
+tier: core
+sections:
+- editing
+lines:
+- line-editing-vae-latent
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: Trains one editor across region-based edits, free-form edits and recognition tasks such as detection
+  and segmentation recast as generation, steering between them with learned task embeddings. Generalizes
+  poorly to instructions outside that taxonomy.
+explanation: null

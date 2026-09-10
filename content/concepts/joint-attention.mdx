@@ -1,0 +1,27 @@
+---
+id: joint-attention
+title: Joint (shared) attention conditioning
+---
+
+## Mechanism
+
+Text and image tokens are concatenated into a single sequence before self-attention runs, so every token
+attends to every other token — condition and target are no longer architecturally distinguished once
+they reach the attention operation. [SD3](/papers/sd3-2024) introduces this as [MM-DiT](/concepts/mmdit):
+"since text and image embeddings are conceptually quite different, we use two separate sets of weights
+for the two modalities... equivalent to having two independent transformers for each modality, but
+joining the sequences of the two modalities for the attention operation." [Lumina-Image 2.0](/papers/lumina2-2025)
+later shows the two-weight-set part is not required — its [single-stream](/concepts/single-stream-dit)
+variant runs the same joint-sequence idea through one shared set of weights.
+
+## Trade-offs
+
+**Parameter cost:** MM-DiT's dual-stream form roughly doubles the parameters devoted to the combined
+forward pass relative to a single-stream design, since text and image each get their own full transformer
+capacity; compute cost also grows with (text+image) tokens squared rather than image tokens squared plus
+a linear cross-attention term. **Flexibility:** conditioning and generation share the same representational
+space by construction, which is exactly what made concatenating an entire *reference image's* tokens
+([sequence-concat](/concepts/sequence-concat)) a natural next step once this attention pattern was
+established. **Quality:** SD3's own ablation (Sec. 4) reports this design "significantly outperforms the
+cross-attention and vanilla variants" it was tested against — the paper's own head-to-head comparison,
+not an external benchmark.

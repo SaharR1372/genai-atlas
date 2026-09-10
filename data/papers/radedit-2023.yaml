@@ -1,0 +1,36 @@
+id: radedit-2023
+type: paper
+title: 'RadEdit: stress-testing biomedical vision models via diffusion image editing'
+short: RadEdit
+arxiv: '2312.12865'
+date: 2023-12
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- Microsoft Research
+authors:
+- Fernando Pérez-García
+- Sam Bond-Taylor
+- Pedro P. Sanchez
+tier: core
+sections:
+- medical
+- editing
+lines:
+- line-medical-transfer-vae
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: Uses masked diffusion editing to synthesize the dataset shifts a deployed model will face, so
+  a vision model can be stress-tested without collecting new clinical data. Editing as an evaluation instrument
+  rather than as a content-creation tool.
+explanation: null

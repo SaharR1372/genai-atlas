@@ -1,0 +1,26 @@
+---
+id: adaln-modulation
+title: adaLN / adaLN-Zero modulation
+---
+
+## Mechanism
+
+Fuse the timestep embedding (and, for class-conditional models, a class-label embedding) into one vector,
+then use it to regress a per-channel scale and shift applied to the normalized activations before every
+attention and MLP block — no attention over a token sequence is involved at all. [DiT](/papers/dit-2023)'s
+ablation compares this against in-context token conditioning and cross-attention for injecting timestep
+and class label, and adopts **adaLN-Zero**: the same regression, plus a third per-block gating factor
+initialized to zero, so every block starts as an identity function and the network has to learn to use
+the conditioning signal rather than being forced to from step one.
+
+## Trade-offs
+
+**Parameter cost:** very low — a small MLP regressing scale/shift/gate from one fused vector, reused at
+every block, with no added sequence length or attention cost. **Flexibility:** this mechanism is built
+for a *single global vector* per sample, not a variable-length sequence — it is not a substitute for
+[cross-attention](/concepts/cross-attention) or [joint attention](/concepts/joint-attention) on text
+prompts, which is why systems needing both scalar conditioning (timestep, sometimes class) and sequence
+conditioning (text) have historically used adaLN for the former and a separate mechanism for the latter,
+rather than one mechanism for everything. **Training stability:** the zero-initialized gate is
+specifically what lets very deep DiT stacks train stably from the start, at the cost of one more learned
+parameter set per block than plain adaLN.

@@ -1,0 +1,41 @@
+id: t2i-adapter-2023
+type: paper
+title: 'T2I-Adapter: Learning Adapters to Dig out More Controllable Ability for Text-to-Image Diffusion
+  Models'
+short: T2I-Adapter
+arxiv: '2302.08453'
+date: 2023-02
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- TencentARC
+authors:
+- Chong Mou
+- Xintao Wang
+- Liangbin Xie
+tier: core
+sections:
+- generation
+axes:
+  conditioning:
+  - adapter-conditioning
+lines:
+- line-adapter-conditioning
+links:
+  code: https://github.com/TencentARC/T2I-Adapter
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: released
+  weights: released
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: sonnet
+summary: >-
+  Published the same month as ControlNet with the same goal but a much smaller design — a compact
+  external adapter network aligns internal T2I-model features with an external control signal while the
+  base model stays frozen, giving composable, generalizable spatial control at lower parameter cost than
+  ControlNet's duplicated-encoder approach.
+explanation: null

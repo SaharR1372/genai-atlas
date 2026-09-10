@@ -1,0 +1,33 @@
+id: kv-edit-2025
+type: paper
+title: 'KV-Edit: Training-Free Image Editing for Precise Background Preservation'
+short: KV-Edit
+arxiv: '2502.17363'
+date: 2025-02
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- Tsinghua University
+authors: []
+tier: core
+sections:
+- editing
+lines:
+- line-editing-attention
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: 'The strictest preservation guarantee available: background tokens'' key and value pairs are
+  cached and held fixed, so only edit-region tokens regenerate while attending to the frozen background.
+  Inversion-free with constant cache overhead. It earns its precision claim architecturally rather than
+  statistically, at the cost of struggling with edits where the background itself must change.'
+explanation: null

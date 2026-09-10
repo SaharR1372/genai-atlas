@@ -1,0 +1,38 @@
+id: ktena-2024
+type: paper
+title: Generative models improve fairness of medical classifiers under distribution shifts
+short: Ktena et al.
+arxiv: null
+doi: 10.1038/s41591-024-02838-6
+date: 2024-04
+venue:
+  name: Nature Medicine
+  status: journal
+orgs:
+- Google DeepMind
+authors:
+- Ira Ktena
+- Olivia Wiles
+- Isabela Albuquerque
+tier: landmark
+sections:
+- medical
+lines:
+- line-medical-pixel-space
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: 'The strongest downstream evidence in medical generative imaging: pixel-space cascaded diffusion
+  models, with no VAE anywhere, generate synthetic training data that improves both in-distribution and
+  out-of-distribution diagnostic accuracy and narrows demographic subgroup gaps, demonstrated across chest
+  X-ray, histopathology and dermatology. Notably, the choice of pixel space is never argued — it is inherited
+  from the Imagen lineage the authors were using.'
+explanation: null

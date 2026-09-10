@@ -1,0 +1,39 @@
+id: line-medical-fm-latent
+type: line
+name: 'Medical: foundation-model latent'
+one_line: Generate inside a medical foundation model's feature space, the RAE idea applied to clinical
+  images.
+core_bet: A medical vision foundation model's representation is a better generative substrate than either
+  a borrowed natural-image latent or a reconstruction-trained domain latent.
+primary_axis: representation
+status: emerging
+since: 2026-06
+sections:
+- medical
+- rae
+arc:
+- paper: stream-2026
+  role: origin
+  note: Riemannian flow matching directly inside a histopathology foundation model's patch-token space,
+    with an anisotropic decoder; motivated by the conditioning collapse that appears when foundation features
+    only supply a condition.
+- paper: retinal-fm-latent-2026
+  role: challenge
+  note: 'Four retinal foundation models tested as generative latents: the advantage over conventional
+    latent diffusion largely vanishes when judged by classifiers trained on real images.'
+strengths:
+- Inherits the semantics of a model already trained on the target anatomy
+- Directly addresses the unvalidated assumption underneath the borrowed-VAE line
+- Medical foundation models already exist and are widely used for understanding
+weaknesses:
+- Two papers old, both from 2026, with no independent replication
+- The retinal result suggests gains may be partly an artifact of evaluating with the same foundation model
+  that defines the latent
+- 'Untouched outside pathology and retina: no chest X-ray or general radiology work'
+open_questions:
+- medical-latent-transfer
+- semantic-latent-detail-loss
+competes_with:
+- line-medical-transfer-vae
+- line-medical-domain-vae
+explains: null

@@ -1,0 +1,14 @@
+id: query-bridge
+type: concept
+name: Learnable query-token bridge
+axis: conditioning
+one_line: A fixed-size set of learnable query tokens is prepended to the prompt and processed jointly
+  by a (frozen or lightly-tuned) multimodal LLM; the resulting query embeddings, not the LLM's own hidden
+  states over the prompt, are projected by a small connector and handed to a diffusion decoder as its
+  conditioning signal.
+sections:
+- rae
+- unified
+introduced_by:
+- metaquery-2025
+explains: content/concepts/query-bridge.mdx

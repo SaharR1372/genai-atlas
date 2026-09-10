@@ -1,0 +1,39 @@
+id: emu3-2024
+type: paper
+title: 'Emu3: Next-Token Prediction is All You Need'
+short: Emu3
+arxiv: '2409.18869'
+date: 2024-09
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- BAAI
+authors:
+- Xinlong Wang
+- Xiaosong Zhang
+- Zhengxiong Luo
+tier: core
+sections:
+- unified
+axes:
+  conditioning:
+  - native-token-conditioning
+lines:
+- line-unified-models
+links:
+  code: https://github.com/baaivision/Emu3
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: released
+  weights: released
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: sonnet
+summary: Tokenizes text, images, and video into one discrete vocabulary and trains a single decoder-only
+  transformer purely on next-token prediction — no diffusion, no compositional modules — arguing this
+  single objective is enough to match or beat specialized diffusion (SDXL) and vision-language (LLaVA-1.6)
+  systems on their own tasks.
+explanation: null

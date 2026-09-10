@@ -1,0 +1,165 @@
+---
+id: text-conditioning-evolution
+title: From UNet cross-attention to native multimodal conditioning
+---
+
+## Two different questions that get conflated
+
+"How is a generator conditioned on text" is really two independent questions, and most confusion about
+this design space comes from answering one while thinking about the other.
+
+1. **Mechanism** — *where in the network does the condition enter, and what gets attended to what?*
+   Cross-attention, [joint/shared self-attention](/concepts/joint-attention), [adaLN modulation](/concepts/adaln-modulation),
+   sequence concatenation, and the [query bridge](/concepts/query-bridge) are five different answers.
+2. **Source** — *what produces the embedding being fed in?* A [CLIP text encoder](/concepts/clip-text-encoder),
+   a [frozen T5](/concepts/t5-text-encoder), a full vision-language model, or a set of
+   [learnable queries](/concepts/query-bridge) run through an MLLM are different answers to this
+   separate question, and — as the MetaQuery section below shows precisely — a source-side innovation
+   can be completely agnostic to which mechanism receives it.
+
+## 2022: cross-attention into a frozen-shape UNet
+
+[Latent Diffusion Models](/papers/ldm-2022) states the mechanism plainly: "by introducing cross-attention
+layers into the model architecture, we turn diffusion models into powerful and flexible generators for
+general conditioning inputs such as text or bounding boxes." Concretely: the UNet's own spatial feature
+map supplies queries; a separately encoded context sequence (CLIP text tokens, in the Stable Diffusion
+implementations built on this paper) supplies keys and values. No parameters are added to the UNet's own
+processing of the image beyond the cross-attention layers themselves — the image pathway and the text
+pathway stay architecturally separate the entire time, meeting only at these dedicated junctions. That
+separation is the mechanism's whole appeal: text conditioning is modular and cheap to add to an existing
+image model, and it is exactly why cross-attention could also carry [spatial control signals](/concepts/adapter-conditioning)
+(ControlNet, T2I-Adapter) and [image prompts](/concepts/decoupled-cross-attention) (IP-Adapter) a year
+later without touching the base model's weights.
+
+## 2022-2023: a second, unrelated mechanism for scalar conditioning
+
+When [DiT](/papers/dit-2023) replaced the UNet with a plain transformer, it needed to inject the
+timestep and (for class-conditional ImageNet) the class label — conditioning that is a single vector per
+image, not a token sequence. DiT's ablation compares in-context token conditioning, cross-attention, and
+[adaLN-Zero](/concepts/adaln-modulation) for this job, and adopts adaLN-Zero: regress a per-channel
+scale, shift, and a zero-initialized gate from the fused timestep+class embedding, and apply it before
+every attention and MLP block. This is not a competitor to cross-attention for *text* conditioning — it
+answers a different sub-problem (single global vector, not a variable-length sequence) — but the two
+mechanisms coexisted uneasily once systems needed both, which is part of what joint attention resolved.
+
+## 2022-2025: the text-encoder-source ladder, independent of mechanism
+
+[Imagen](/papers/imagen-2022) made the source question its own axis: swapping a [frozen T5](/concepts/t5-text-encoder)
+in for CLIP's text tower, finding that "increasing the size of the language model... boosts both sample
+fidelity and image-text alignment much more than increasing the size of the image diffusion model." SD3
+then used *both* — two CLIP encoders and T5-XXL, concatenated — before [Qwen-Image](/papers/qwen-image-2025)
+replaced the whole stack with a single vision-language model (Qwen2.5-VL), motivated by a very specific
+failure mode: complex text rendering inside generated images needs an encoder that already understands
+layout and instructions, not just semantics. FLUX.2 is reported to use a Mistral LLM as its text encoder,
+continuing the trend, but the atlas has not found or verified an official technical report for this claim
+and states it here only as reported, not confirmed (see `data/systems/flux.yaml`).
+
+## 2024: SD3 replaces cross-attention itself with joint attention
+
+[SD3](/papers/sd3-2024) is the mechanism transition, not just a scaling paper. Its own text: "since text
+and image embeddings are conceptually quite different, we use two separate sets of weights for the two
+modalities... equivalent to having two independent transformers for each modality, but joining the
+sequences of the two modalities for the attention operation, such that both representations can work in
+their own space yet take the other one into account." Crucially, the paper ran the head-to-head
+comparison this whole design space usually lacks: its own ablation reports that this [MM-DiT](/concepts/mmdit)
+design "significantly outperforms the cross-attention and vanilla variants" it was tested against — the
+clearest internal, paper-reported evidence in this atlas that joint attention beats cross-attention for
+production-scale text-to-image, at the cost of full self-attention over the combined sequence instead of
+a cheaper dedicated cross-attention module.
+
+[Lumina-Image 2.0](/papers/lumina2-2025) then dropped the "two separate sets of weights" part of MM-DiT:
+its [single-stream](/concepts/single-stream-dit) "Unified Next-DiT" treats text and image tokens as one
+joint sequence through *one* shared set of weights, not two. This is the architecture
+[SVG-T2I](/papers/svg-t2i-2025) later adopts wholesale for RAE-family generation — see below.
+
+## 2023-2024: the adapter era for image and control conditioning, then its challenge
+
+In parallel, a separate lineage answered a separate question — how to add a *new* condition (an edge
+map, a face, an image prompt) to an *already-trained* model without retraining it. See
+[Adapter-based conditioning](/lines/line-adapter-conditioning) for the full arc from
+[ControlNet](/papers/controlnet-2023) through [IP-Adapter](/papers/ip-adapter-2023)'s
+[decoupled cross-attention](/concepts/decoupled-cross-attention) to identity-preserving methods. The
+challenge to this whole family arrived from inside the DiT era: [OminiControl](/papers/ominicontrol-2024)
+showed a DiT's own frozen weights, reused for the condition image and concatenated into the same
+sequence, could match specialized adapters for about 0.1% additional parameters — the same
+[sequence-concatenation](/concepts/sequence-concat) idea SD3 used for text, now applied to a reference
+image instead. [FLUX.1 Kontext](/papers/kontext-2025) scaled this specifically for editing seven months
+later, and it is now the open reference point that line documents.
+
+## 2024-2025: conditioning disappears into the architecture
+
+[Chameleon](/papers/chameleon-2024) and [Emu3](/papers/emu3-2024) remove the mechanism question rather
+than answer it: text and image are the same token vocabulary in the same autoregressive sequence from
+pretraining onward, so an "earlier" image or caption is conditioning simply by being earlier in the
+sequence a decoder-only transformer already predicts next-tokens over. There is no separate conditioning
+module to name. [HunyuanImage 3.0](/papers/hunyuanimage3-2025) and [Janus-Pro](/papers/janus-pro-2025)
+are 2025 instances of this same [native-token conditioning](/concepts/native-token-conditioning) idea at
+larger scale.
+
+## 2025: MetaQuery separates the source question from the mechanism question, formally
+
+[MetaQueries](/papers/metaquery-2025) is easy to mis-file as "a new conditioning mechanism" because it is
+so often discussed alongside cross-attention and joint attention. It is not one. Its own description of
+the interface: a trainable connector "projects [query embeddings] to align with the input space of
+text-to-image diffusion models... these models can be arbitrary as long as they have a conditional input
+interface; we simply replace its original condition with our [query embeddings]." MetaQuery's actual
+contribution is upstream — a fixed-size set of [learnable query tokens](/concepts/query-bridge), prepended
+to the prompt and processed jointly by a frozen multimodal LLM, produces the conditioning *source*
+without ever fine-tuning that LLM (preserving its understanding ability, the paper's explicit motivation).
+What mechanism receives that source downstream is left to whatever diffusion decoder is plugged in —
+cross-attention, joint attention, or otherwise. [BLIP3-o](/papers/blip3o-2025) follows the same pattern
+independently, within weeks.
+
+## 2025-2026: two different answers inside the RAE line, at once
+
+This is where the field's current lack of convergence is most visible. Both published text-to-image
+extensions of the frozen-foundation-encoder ("RAE-family") line picked *existing* mechanisms from
+elsewhere in this narrative, not a new one built for the semantic latent itself — and they picked
+different ones:
+
+- **[SVG-T2I](/papers/svg-t2i-2025)** uses Lumina-Image 2.0's single-stream Unified Next-DiT: a Gemma2-2B
+  text encoder, tokens concatenated with image tokens into one joint sequence, one shared set of
+  transformer weights. This is the joint-attention branch of the narrative, unmodified, transplanted
+  onto a frozen-DINOv3-derived latent instead of a VAE latent.
+- **[Scale-RAE](/papers/scale-rae-2026)** states directly that it "adopts the MetaQuery architecture":
+  256 learnable queries, a Qwen-2.5 1.5B LLM, a 2-layer MLP connector into a LightningDiT backbone. This
+  is the query-bridge branch of the narrative, also unmodified, transplanted onto a frozen-SigLIP-2
+  latent.
+
+So the user intuition that motivated this whole survey — "in the RAE field it was like the MetaQuery
+framework" — is correct for *one* of the two published RAE-family text-to-image systems, and wrong for
+the other, which instead used joint attention. No paper in this atlas has directly compared the two
+mechanisms on a matched RAE-family backbone, or asked whether a high-dimensional, anisotropic semantic
+latent needs a different amount or kind of conditioning than a compact VAE latent does — see
+[Conditioning mechanism choice in semantic latents](/problems/conditioning-mechanism-in-semantic-latent),
+which this atlas records as an open problem rather than a solved one.
+
+## What forced each move, in one line each
+
+- UNet &rarr; DiT/adaLN: a transformer backbone made regressing scale/shift from a fused embedding a
+  natural fit for *scalar* conditioning (timestep, class); it does not compete with cross-attention,
+  which stayed the tool for *sequence-shaped* conditioning (text).
+- Cross-attention &rarr; joint/MM-DiT attention: SD3's own ablation reported joint attention
+  significantly outperforming both a cross-attention and a "vanilla" variant at production text-to-image
+  scale — the clearest paper-internal evidence this survey found for any single mechanism transition.
+- CLIP &rarr; T5 &rarr; T5+CLIP &rarr; full VLM as the encoder: each step chased a specific measured gap
+  — Imagen found text-encoder scale mattered more than image-model scale; SD3 found combining encoders
+  measurably helped; Qwen-Image needed an encoder that understood instructions and layout well enough to
+  render text correctly inside images, which semantic-only embeddings could not supply.
+- Adapters &rarr; sequence concatenation: adapters need one trained module per task, and can fight a
+  frozen model's existing text conditioning (the problem IP-Adapter's decoupled cross-attention was
+  built specifically to solve); OminiControl showed a sufficiently capable DiT absorbs a reference image
+  as plain context tokens for a small fraction of an adapter's added parameters.
+- Cross/joint attention &rarr; native-token conditioning: unified models removed the conditioning
+  pathway as a design choice at all, motivated by wanting one training loop and one set of weights that
+  transfers reasoning ability between understanding and generation, rather than by any measured
+  weakness in cross- or joint attention specifically.
+- Cross/joint attention &rarr; query bridge: MetaQuery's motivation is explicit and different again — not
+  "make conditioning cheaper" but "upgrade the conditioning source to a full MLLM without damaging that
+  MLLM's own understanding ability," which ruling out end-to-end fine-tuning made necessary.
+
+The throughline is that "how text reaches the generator" has never been one design decision converging on
+one answer. By 2026 it is at least three coexisting, actively used mechanism families (joint attention,
+query bridge, native-token) sitting on top of an independently evolving source ladder (CLIP &rarr; T5
+&rarr; VLM/LLM) — and the newest representation family in this atlas, RAE-style semantic latents, has
+inherited that same unresolved plurality rather than settling it.
