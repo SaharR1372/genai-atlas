@@ -34,3 +34,22 @@ summary: A diffusion foundation model for pathology built on Stable Diffusion 3'
   with. The foundation model supplies the condition, not the latent — the distinction that STREAM later
   argues is the limiting choice.
 explanation: null
+abstract: 'The digitization of histology slides has revolutionized pathology, providing massive datasets
+  for cancer diagnosis and research. Self-supervised and vision-language models have been shown to effectively
+  mine large pathology datasets to learn discriminative representations. On the other hand, there are
+  unique problems in pathology, such as annotated data scarcity, privacy regulations in data sharing,
+  and inherently generative tasks like virtual staining. Generative models, capable of synthesizing realistic
+  and diverse images, present a compelling solution to address these problems through image synthesis.
+  We introduce PixCell, the first generative foundation model for histopathology images. PixCell is a
+  diffusion model trained on PanCan-30M, a large, diverse dataset derived from 69,184 H&E-stained whole
+  slide images of various cancer types. We employ a progressive training strategy and a self-supervision-based
+  conditioning that allows us to scale up training without any human-annotated data. By conditioning on
+  real slides, the synthetic images capture the properties of the real data and can be used as data augmentation
+  for small-scale datasets to boost classification performance. We prove the foundational versatility
+  of PixCell by applying it to two generative downstream tasks: privacy-preserving synthetic data generation
+  and virtual IHC staining. PixCell''s high-fidelity conditional generation enables institutions to use
+  their private data to synthesize highly realistic, site-specific surrogate images that can be shared
+  in place of raw patient data. Furthermore, using datasets of roughly paired H&E-IHC tiles, we learn
+  to translate PixCell''s conditioning from H&E to multiple IHC stains, allowing the generation of IHC
+  images from H&E inputs. Our trained models are publicly released to accelerate research in computational
+  pathology.'

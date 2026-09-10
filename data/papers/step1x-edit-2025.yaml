@@ -28,9 +28,26 @@ status:
   code: none
   weights: none
   verified: true
-  verified_on: '2026-09-09'
+  verified_on: '2026-09-10'
   verified_by: opus
 summary: An open instruction-editing system pairing a multimodal LLM that parses the instruction with
   a DiT that executes it, and the source of GEdit-Bench — the real-world editing benchmark most 2025-26
   editing papers now report.
 explanation: null
+abstract: In recent years, image editing models have witnessed remarkable and rapid development. The recent
+  unveiling of cutting-edge multimodal models such as GPT-4o and Gemini2 Flash has introduced highly promising
+  image editing capabilities. These models demonstrate an impressive aptitude for fulfilling a vast majority
+  of user-driven editing requirements, marking a significant advancement in the field of image manipulation.
+  However, there is still a large gap between the open-source algorithm with these closed-source models.
+  Thus, in this paper, we aim to release a state-of-the-art image editing model, called Step1X-Edit, which
+  can provide comparable performance against the closed-source models like GPT-4o and Gemini2 Flash. More
+  specifically, we adopt the Multimodal LLM to process the reference image and the user's editing instruction.
+  A latent embedding has been extracted and integrated with a diffusion image decoder to obtain the target
+  image. To train the model, we build a data generation pipeline to produce a high-quality dataset. For
+  evaluation, we develop the GEdit-Bench, a novel benchmark rooted in real-world user instructions. Experimental
+  results on GEdit-Bench demonstrate that Step1X-Edit outperforms existing open-source baselines by a
+  substantial margin and approaches the performance of leading proprietary models, thereby making significant
+  contributions to the field of image editing.
+capabilities:
+- image-editing
+openness: open-weights

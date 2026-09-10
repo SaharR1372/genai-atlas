@@ -25,8 +25,21 @@ status:
   code: none
   weights: none
   verified: true
-  verified_on: '2026-09-09'
+  verified_on: '2026-09-10'
   verified_by: opus
 summary: Moves autoregressive prediction down to the bit level rather than the codebook-entry level, sidestepping
   the vocabulary-size and codebook-collapse problems that constrain discrete token generation.
 explanation: null
+abstract: This paper challenges the dominance of continuous pipelines in visual generation. We systematically
+  investigate the performance gap between discrete and continuous methods. Contrary to the belief that
+  discrete tokenizers are intrinsically inferior, we demonstrate that the disparity arises primarily from
+  the total number of bits allocated in the latent space (i.e., the compression ratio). We show that scaling
+  up the codebook size effectively bridges this gap, allowing discrete tokenizers to match or surpass
+  their continuous counterparts. However, existing discrete generation methods struggle to capitalize
+  on this insight, suffering from performance degradation or prohibitive training costs with scaled codebook.
+  To address this, we propose masked Bit AutoRegressive modeling (BAR), a scalable framework that supports
+  arbitrary codebook sizes. By equipping an autoregressive transformer with a masked bit modeling head,
+  BAR predicts discrete tokens through progressively generating their constituent bits. BAR achieves a
+  new state-of-the-art gFID of 0.99 on ImageNet-256, outperforming leading methods across both continuous
+  and discrete paradigms, while significantly reducing sampling costs and converging faster than prior
+  continuous approaches. Project page is available at https://bar-gen.github.io/

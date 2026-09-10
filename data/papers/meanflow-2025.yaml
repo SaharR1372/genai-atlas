@@ -33,10 +33,23 @@ status:
   code: none
   weights: none
   verified: true
-  verified_on: '2026-09-09'
+  verified_on: '2026-09-10'
   verified_by: opus
 summary: Replaces flow matching's instantaneous velocity target with an *average* velocity over a finite
   interval, giving a self-contained identity that supports one-step sampling trained from scratch with
   no distillation and no pretrained teacher. Reaches 3.43 FID at 1 NFE on ImageNet 256, and anchors the
   whole natively-few-step family that follows.
 explanation: null
+abstract: 'We propose a principled and effective framework for one-step generative modeling. We introduce
+  the notion of average velocity to characterize flow fields, in contrast to instantaneous velocity modeled
+  by Flow Matching methods. A well-defined identity between average and instantaneous velocities is derived
+  and used to guide neural network training. Our method, termed the MeanFlow model, is self-contained
+  and requires no pre-training, distillation, or curriculum learning. MeanFlow demonstrates strong empirical
+  performance: it achieves an FID of 3.43 with a single function evaluation (1-NFE) on ImageNet 256x256
+  trained from scratch, significantly outperforming previous state-of-the-art one-step diffusion/flow
+  models. Our study substantially narrows the gap between one-step diffusion/flow models and their multi-step
+  predecessors, and we hope it will motivate future research to revisit the foundations of these powerful
+  models.'
+capabilities:
+- text-to-image
+openness: open-code-only

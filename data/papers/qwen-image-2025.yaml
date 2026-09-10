@@ -33,9 +33,29 @@ status:
   code: released
   weights: none
   verified: true
-  verified_on: '2026-09-09'
+  verified_on: '2026-09-10'
   verified_by: opus
 summary: A 20B MM-DiT whose distinguishing contribution is a data pipeline built for complex text rendering,
   an area every prior open system was visibly weak at. Uses a vision-language model as the text encoder
   rather than CLIP or T5, and became the base most 2025-26 open editing and RL work builds on.
 explanation: null
+abstract: We present Qwen-Image, an image generation foundation model in the Qwen series that achieves
+  significant advances in complex text rendering and precise image editing. To address the challenges
+  of complex text rendering, we design a comprehensive data pipeline that includes large-scale data collection,
+  filtering, annotation, synthesis, and balancing. Moreover, we adopt a progressive training strategy
+  that starts with non-text-to-text rendering, evolves from simple to complex textual inputs, and gradually
+  scales up to paragraph-level descriptions. This curriculum learning approach substantially enhances
+  the model's native text rendering capabilities. As a result, Qwen-Image not only performs exceptionally
+  well in alphabetic languages such as English, but also achieves remarkable progress on more challenging
+  logographic languages like Chinese. To enhance image editing consistency, we introduce an improved multi-task
+  training paradigm that incorporates not only traditional text-to-image (T2I) and text-image-to-image
+  (TI2I) tasks but also image-to-image (I2I) reconstruction, effectively aligning the latent representations
+  between Qwen2.5-VL and MMDiT. Furthermore, we separately feed the original image into Qwen2.5-VL and
+  the VAE encoder to obtain semantic and reconstructive representations, respectively. This dual-encoding
+  mechanism enables the editing module to strike a balance between preserving semantic consistency and
+  maintaining visual fidelity. Qwen-Image achieves state-of-the-art performance, demonstrating its strong
+  capabilities in both image generation and editing across multiple benchmarks.
+capabilities:
+- text-to-image
+- image-editing
+openness: open-weights

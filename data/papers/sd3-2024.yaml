@@ -39,8 +39,8 @@ status:
   code: none
   weights: none
   verified: true
-  verified_on: '2026-09-09'
-  verified_by: sonnet
+  verified_on: '2026-09-10'
+  verified_by: opus
 summary: Takes rectified flow to production scale with a new dual-stream 'MM-DiT' architecture (separate
   weights for text/image tokens, joined by shared attention) plus a logit-normal timestep-sampling schedule;
   establishes the flow-matching + MM-DiT recipe that FLUX, Qwen-Image, Seedream and most 2025 open T2I
@@ -49,3 +49,64 @@ explanation: null
 lines:
 - line-flow-matching
 - line-vae-latent
+explained:
+  depth: full-text
+  before: Rectified flow, which connects data and noise along a straight line, had better theoretical
+    properties than standard diffusion and should in principle allow low-error few-step sampling, but
+    it had only been validated in small and medium-scale, mostly class-conditional experiments and had
+    not displaced diffusion as standard practice for text-to-image generation.
+  problem: Uniform timestep sampling during rectified-flow training wastes capacity, since the velocity-prediction
+    target is hardest to learn for timesteps in the middle of the interval and easiest near the boundaries,
+    so treating all timesteps equally does not use training compute well. No architecture had been shown
+    to let a text-to-image rectified-flow model scale predictably to production size either.
+  idea: Reweight rectified-flow training toward the timesteps that matter most using a logit-normal
+    timestep distribution, and replace single-stream conditioning with an MM-DiT architecture that gives
+    text and image tokens separate weights joined by shared joint attention, so information flows bidirectionally
+    between the two modalities instead of only from text into image.
+  method: Training samples timesteps t from a logit-normal distribution with location m and scale s
+    rather than uniformly. Empirically m=0, s=1 outperformed uniform rectified-flow sampling and matched
+    established diffusion schedules such as LDM-Linear. MM-DiT gives image and text tokens separate
+    weight sets, each with hidden dimension scaled by model depth, joined at every block by one joint
+    attention operation so both streams can attend to each other. Text conditioning combines three frozen
+    encoders, CLIP-L/14, CLIP-G/14 and T5-XXL, each independently dropped out 46.3% of the time during
+    training so the model tolerates missing encoders at inference. QK-normalization, RMSNorm with a
+    learnable scale applied to queries and keys before attention, was added to stabilize high-resolution
+    fine-tuning from 256x256 up to 1024px, since attention entropy would otherwise collapse under bf16
+    mixed precision. Models from 264M (depth 15) to 8B parameters (depth 38) were trained at 256x256
+    for 500k steps at batch size 4096 to study scaling.
+  evidence: Validation loss decreases smoothly with model size from 264M to 8B parameters with no observed
+    saturation, and correlates with GenEval, human preference, and T2I-CompBench scores. The 8B model
+    reaches GenEval overall 0.74, with objects 0.99, counting 0.94 and position 0.89, against DALL-E
+    3's overall 0.67, SDXL's 0.55 and PixArt-alpha's 0.48. Increasing the autoencoder's latent channels
+    from 8 to 16 improves reconstruction FID from 1.56 to 1.06. Larger models tolerate fewer sampling
+    steps better, since at 5 steps the 8B model's CLIP score drops only 2.71% from its 50-step value
+    against a 4.30% drop for the 264M model, consistent with the 8B model's shorter, straighter ODE
+    path length of 185.96 versus 191.13.
+  limitations: The authors concede that T5-XXL is critical specifically for complex prompts with detailed
+    scene descriptions or rendered text. Dropping it at inference costs roughly half the aesthetic-quality
+    parity and drives typography win rate down to about 38%. Training the 8B model required roughly
+    5x10^22 FLOPs, and QK-normalization was needed to prevent divergence at the largest depth, which
+    suggests even larger models may need further stabilization. The authors explicitly frame the scaling
+    trend as unresolved, stating that results show no saturation for image or video models, so the ceiling
+    of the approach is not established by this paper.
+  why_it_matters: SD3 is the point at which rectified flow and joint dual-stream text-image attention
+    move from small-scale demonstrations to a production-scale, predictably scaling recipe. MM-DiT plus
+    rectified flow becomes the architecture that FLUX, Qwen-Image, Seedream and most 2025 open text-to-image
+    systems build on.
+abstract: Diffusion models create data from noise by inverting the forward paths of data towards noise
+  and have emerged as a powerful generative modeling technique for high-dimensional, perceptual data such
+  as images and videos. Rectified flow is a recent generative model formulation that connects data and
+  noise in a straight line. Despite its better theoretical properties and conceptual simplicity, it is
+  not yet decisively established as standard practice. In this work, we improve existing noise sampling
+  techniques for training rectified flow models by biasing them towards perceptually relevant scales.
+  Through a large-scale study, we demonstrate the superior performance of this approach compared to established
+  diffusion formulations for high-resolution text-to-image synthesis. Additionally, we present a novel
+  transformer-based architecture for text-to-image generation that uses separate weights for the two modalities
+  and enables a bidirectional flow of information between image and text tokens, improving text comprehension,
+  typography, and human preference ratings. We demonstrate that this architecture follows predictable
+  scaling trends and correlates lower validation loss to improved text-to-image synthesis as measured
+  by various metrics and human evaluations. Our largest models outperform state-of-the-art models, and
+  we will make our experimental data, code, and model weights publicly available.
+capabilities:
+- text-to-image
+openness: open-weights

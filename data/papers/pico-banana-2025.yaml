@@ -25,9 +25,25 @@ status:
   code: none
   weights: none
   verified: true
-  verified_on: '2026-09-09'
+  verified_on: '2026-09-10'
   verified_by: opus
 summary: 400K edit pairs on real photographs, distilled from a frontier closed editor onto OpenImages.
   Notable both as Apple entering open editing data and as evidence that closed-model distillation is now
   a standard way to build open training sets.
 explanation: null
+abstract: 'Recent advances in multimodal models have demonstrated remarkable text-guided image editing
+  capabilities, with systems like GPT-4o and Nano-Banana setting new benchmarks. However, the research
+  community''s progress remains constrained by the absence of large-scale, high-quality, and openly accessible
+  datasets built from real images. We introduce Pico-Banana-400K, a comprehensive 400K-image dataset for
+  instruction-based image editing. Our dataset is constructed by leveraging Nano-Banana to generate diverse
+  edit pairs from real photographs in the OpenImages collection. What distinguishes Pico-Banana-400K from
+  previous synthetic datasets is our systematic approach to quality and diversity. We employ a fine-grained
+  image editing taxonomy to ensure comprehensive coverage of edit types while maintaining precise content
+  preservation and instruction faithfulness through MLLM-based quality scoring and careful curation. Beyond
+  single turn editing, Pico-Banana-400K enables research into complex editing scenarios. The dataset includes
+  three specialized subsets: (1) a 72K-example multi-turn collection for studying sequential editing,
+  reasoning, and planning across consecutive modifications; (2) a 56K-example preference subset for alignment
+  research and reward model training; and (3) paired long-short editing instructions for developing instruction
+  rewriting and summarization capabilities. By providing this large-scale, high-quality, and task-rich
+  resource, Pico-Banana-400K establishes a robust foundation for training and benchmarking the next generation
+  of text-guided image editing models.'

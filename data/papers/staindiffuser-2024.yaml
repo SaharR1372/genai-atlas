@@ -31,3 +31,22 @@ summary: Virtual staining from H&E to immunohistochemistry with a dual diffusion
   and cell-segmentation jointly. Explicitly motivated by the small-data regime of pathology, where thousands
   rather than millions of paired samples are available.
 explanation: null
+abstract: 'Hematoxylin and Eosin (H&E) staining is widely regarded as the standard in pathology for diagnosing
+  diseases and tracking tumor recurrence. While H&E staining shows tissue structures, it lacks the ability
+  to reveal specific proteins that are associated with disease severity and treatment response. Immunohistochemical
+  (IHC) stains use antibodies to highlight the expression of these proteins on their respective cell types,
+  improving diagnostic accuracy, and assisting with drug selection for treatment. Despite their value,
+  IHC stains require additional time and resources, limiting their utilization in some clinical settings.
+  Recent advances in deep learning have positioned Image-to-Image (I2I) translation as a computational,
+  cost-effective alternative for IHC. I2I generates high fidelity stain transformations digitally, potentially
+  replacing manual staining in IHC. Diffusion models, the current state of the art in image generation
+  and conditional tasks, are particularly well suited for virtual IHC due to their ability to produce
+  high quality images and resilience to mode collapse. However, these models require extensive and diverse
+  datasets (often millions of samples) to achieve a robust performance, a challenge in virtual staining
+  applications where only thousands of samples are typically available. Inspired by the success of multitask
+  deep learning models in scenarios with limited data, we introduce STAINDIFFUSER, a novel multitask diffusion
+  architecture tailored to virtual staining that achieves convergence with smaller datasets. STAINDIFFUSER
+  simultaneously trains two diffusion processes: (a) generating cell specific IHC stains from H&E images
+  and (b) performing H&E based cell segmentation, utilizing coarse segmentation labels exclusively during
+  training. STAINDIFFUSER generates high-quality virtual stains for two markers, outperforming over twenty
+  I2I baselines.'

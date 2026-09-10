@@ -26,8 +26,8 @@ status:
   code: none
   weights: none
   verified: true
-  verified_on: '2026-09-09'
-  verified_by: sonnet
+  verified_on: '2026-09-10'
+  verified_by: opus
 summary: 'Fixes RAE''s rough edges: multilayer representation aggregation for a richer frozen feature,
   explicit combination of RAE with a REPA-style alignment loss, and a re-parameterized DiT output that
   fixes classifier-free guidance (which the original RAE struggled with). Reaches SOTA ImageNet gFID 1.06
@@ -35,3 +35,69 @@ summary: 'Fixes RAE''s rough edges: multilayer representation aggregation for a 
 explanation: null
 lines:
 - line-representation-latent
+explained:
+  depth: full-text
+  before: RAE had shown a frozen pretrained encoder can replace the VAE and get strong generation, but
+    the recipe left rough edges, and adoption was held back by practical rather than conceptual problems.
+  problem: RAE left three practical rough edges unresolved. Reconstruction quality lagged specialized VAEs,
+    classifier-free guidance did not work well and required training a second, weaker AutoGuidance model,
+    and the recipe used only the encoder's final layer, discarding representational structure other layers
+    carry.
+  idea: Fix RAE with three linked changes. Sum the last K encoder layers into the representation instead
+    of using only the final layer, show that RAE and REPA are complementary rather than redundant since
+    one supplies global semantics and the other spatial structure, and reinterpret REPA's alignment target
+    as an x-prediction that yields guidance from a single forward pass.
+  method: The generalized representation encoder sums the last K layers of the frozen encoder into the
+    latent, a parameter-free change with the original RAE recovered at K=1. A random-matrix projection
+    alternative was tested but simple summation performed better and became the default. Analysis across
+    27 vision encoders shows RAE's benefit tracks global semantic quality, measured by linear probing accuracy,
+    while REPA's benefit tracks the spatial structure of diffusion features, measured by local distance
+    similarity. The average of the two predicts generation quality far better than either alone, with a
+    correlation around 0.83. Since REPA's projection head already predicts the clean latent from early
+    diffusion features, it is itself an x-predictor. Reframing the model output this way lets guidance
+    be computed within a single forward pass by comparing the full prediction against the REPA-derived
+    prediction, avoiding the doubled forward pass CFG needs and the second trained model AutoGuidance needs.
+  evidence: RAEv2 reaches gFID 1.06 at 80 epochs on ImageNet-256, beating original RAE's 800-epoch numbers
+    of 1.51 unguided and 1.13 with autoguidance using a tenth of the training. Using EPFID at k, the epochs
+    needed to reach unguided gFID under k, RAEv2 hits EPFID at 2 in 35 epochs against 177 for original
+    RAE. On FDr6 it reaches 2.17 at 80 epochs against the previous best of 3.26 at 800 epochs, without
+    any post-training. In a guidance ablation on DiTDH-XL with K=7, the new REPA-derived guidance reaches
+    gFID 1.06 versus 1.65 with no guidance, 1.49 with CFG and 1.14 with AutoGuidance, at roughly half the
+    function evaluations CFG needs. Reconstruction improves sharply with more layers, rFID 0.60 and PSNR
+    18.93 at K=1 versus rFID 0.18 and PSNR 27.03 summing all 23 layers, though guided generation peaks
+    at the smaller K=7, so the best K differs between reconstruction and generation. On text-to-image generation
+    using MJHQ and DiTDH-XL, RAEv2 reaches GenEval 62.4 and DPG 81.7 against original RAE's 58.4 and 80.1
+    and Flux-VAE's 41.7 and 77.6. On navigation world modeling using RECON, RAEv2 reaches FVD 105.61 against
+    original RAE's 312.01 and the NWM baseline's 200.97.
+  limitations: The authors concede that training only on ImageNet leaves reconstruction behind proprietary
+    VAEs, and that training the decoder on additional curated data further improves it, so layer aggregation
+    alone is not the whole reconstruction story. They concede the best K differs by task, K=1 for unguided
+    generation, K=7 for guided generation, K=23 for reconstruction, leaving practitioners to tune it without
+    a principled rule. Validation covers vision generation and world models only; audio and 3D are untested,
+    and performance on diverse or out-of-distribution data is not thoroughly examined.
+  why_it_matters: It turns RAE from a promising but rough idea into a practical default. Guidance that
+    used to require a second trained model or a doubled forward pass now comes from the same network, and
+    the reconstruction-generation tension the RAE line kept hitting gets a clearer diagnosis. Global semantics
+    and spatial structure are separate axes best supplied by RAE and REPA respectively, not redundant alternatives.
+abstract: 'Representation Autoencoders (RAE) replace traditional VAE with pretrained vision encoders.
+  In this paper, we systematically investigate several design choices and find three insights which simplify
+  and improve RAE. First, we study a generalized formulation where the representation is defined as sum
+  of the last k encoder layers rather than solely the final layer. This simple change greatly improves
+  reconstruction without encoder finetuning or specialized data (e.g., text, faces). Second, we study
+  the prevalent assumption that RAE (using pretrained representation as encoder) replaces representation
+  alignment (REPA), which distills the same representation to intermediate layers instead. Through large-scale
+  empirical analysis, we uncover a surprising finding: RAE and REPA exhibit complementary working mechanisms,
+  allowing the same representation to be used as both encoder and target for intermediate diffusion layers.
+  Finally, the original RAE struggles with classifier-free guidance (CFG) and requires training a second,
+  weaker diffusion model for AutoGuidance (AG). We show that REPA itself can be viewed as x-prediction
+  in RAE latent space. By simply re-parameterizing the output of the DiT model, it can provide guidance
+  for "free". Overall, RAEv2 leads to more than 10x faster convergence over the original RAE, achieving
+  a state-of-the-art gFID of 1.06 in just 80 epochs on ImageNet-256. On FDr6, RAEv2 achieves a state-of-the-art
+  2.17 at just 80 epochs compared to the previous best 3.26 (800 epochs) without any post-training. This
+  motivates EPFID@k (epochs to reach unguided gFID < k) as a measure of training efficiency. RAEv2 attains
+  an EPFID@2 of 35 epochs, versus 177 for the original RAE. We also validate our approach across diverse
+  settings for text-to-image generation and navigation world models, showing consistent improvements.
+  The code is available at https://raev2.github.io.'
+capabilities:
+- reconstruction
+openness: open-code-only

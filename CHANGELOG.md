@@ -2,6 +2,29 @@
 
 ## Unreleased
 
+### 2026-09-10 — Session 7 (Sonnet 5) — WORK_QUEUE Q1/Q2, 23 more full explanations
+- **23 more `explained` blocks written**, all in the representation/latent-design area, from
+  fetched arXiv full text: repa-2024, vavae-2025, repae-2025, maetok-2025, svg-2025, svg-t2i-2025,
+  raev2-2026, dcae-2024, decq-2026, lvrae-2026, flatdino-2026, pae-2026, genfirst-2026,
+  latent-diffusability-2026, dinov2-2023, siglip2-2025, mae-2021, unclip-2022, tokenflow-2024,
+  dit-2023, sit-2024, ldm-2022, sd3-2024. 22 at `depth: full-text`; genfirst-2026 at
+  `depth: abstract` since its arXiv HTML render does not exist under v1/v2/ar5iv and its PDF
+  exceeded the fetch size limit.
+- **Findings that refine or correct the atlas's own prior claims**, all recorded directly in each
+  paper's `explained` block rather than only here: REPA-E's gFID numbers differ between arXiv v1
+  (1.83/1.26) and v2 (1.69/1.12) — v2 matches the stored abstract and is the source of record.
+  latent-diffusability-2026's fetched text explicitly states it does not compare a pure frozen-encoder
+  RAE tokenizer against VAE tokenizers, which nuances the existing `summary`'s "reconstruction-only,
+  representation-only, and hybrid" framing. genfirst-2026's abstract describes a purely trained,
+  VAE-style end-to-end curriculum with no frozen foundation encoder mentioned anywhere, which is a
+  meaningfully different kind of "hybrid" than `line-latent-hybrid` implies. svg-2025's existing
+  summary claim of "62x faster training, 35x faster inference" could not be confirmed anywhere in
+  the fetched paper body and was not repeated in `explained`. SVG-T2I's conditioning mechanism
+  (Lumina-Image-2.0-style single-stream joint attention, not a MetaQuery query-bridge) was confirmed
+  directly from the text, matching what the atlas already recorded.
+- Validator clean after every file (`scripts/validate.py`: 0 errors); no file outside
+  `data/papers/*.yaml` touched by this batch.
+
 ### 2026-09-10 — Session 6 (Opus 5) — real paper explanations
 - **Abstracts stored verbatim.** `verify_paper.py` now writes the authors' own abstract onto every
   paper (`--refresh` backfills), so no paper page is ever empty of substance.

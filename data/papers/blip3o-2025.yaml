@@ -58,3 +58,7 @@ abstract: Unifying image understanding and generation has gained growing attenti
   superior performance across most of the popular benchmarks spanning both image understanding and generation
   tasks. To facilitate future research, we fully open-source our models, including code, model weights,
   training scripts, and pretraining and instruction tuning datasets.
+capabilities:
+- text-to-image
+- image-understanding
+openness: open-weights

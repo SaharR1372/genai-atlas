@@ -55,3 +55,8 @@ abstract: The evolution of visual generative models has long been constrained by
   unprecedented generative capabilities and superior performance, establishing new state-of-the-art benchmarks.
   Ultimately, HiDream-O1-Image highlights the immense potential of natively unified architectures and
   charts a highly scalable path toward next-generation multimodal AI.
+capabilities:
+- text-to-image
+- image-editing
+- image-understanding
+openness: open-weights

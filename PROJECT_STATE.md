@@ -1,6 +1,47 @@
 # PROJECT_STATE
 
-Last updated: 2026-09-10 (session 4, Sonnet 5) — P2 in progress: conditioning-mechanism design space
+Last updated: 2026-09-10 (session 7, Sonnet 5) — WORK_QUEUE Q1/Q2: wrote full-text `explained` blocks
+for 23 more papers in the representation/latent-design area. See CHANGELOG.md's session 7 entry.
+
+### Session 7 (2026-09-10, Sonnet 5)
+Worked WORK_QUEUE.md Q1/Q2 top to bottom: wrote the `explained` block (before/problem/idea/method/
+evidence/limitations/why_it_matters/depth) for 23 papers, fanned out across 5 parallel subagents each
+fetching `arxiv.org/html/<id>vN` and writing directly into `data/papers/*.yaml`. Papers: repa-2024,
+vavae-2025, repae-2025, maetok-2025, svg-2025, svg-t2i-2025, raev2-2026, dcae-2024, decq-2026,
+lvrae-2026, flatdino-2026, pae-2026, genfirst-2026, latent-diffusability-2026, dinov2-2023,
+siglip2-2025, mae-2021, unclip-2022, tokenflow-2024, dit-2023, sit-2024, ldm-2022, sd3-2024. 22 at
+`depth: full-text`; genfirst-2026 at `depth: abstract` (no arXiv HTML render exists for it, PDF too
+large to fetch). `scripts/validate.py` clean (0 errors) after every file. Only `data/papers/*.yaml`
+touched, per the task's own constraint — did not update site/schema code.
+
+**Findings worth carrying forward:**
+1. REPA-E's reported gFID differs between arXiv v1 (1.83/1.26 without/with CFG at 800 epochs) and v2
+   (1.69/1.12); v2 matches the stored abstract and was used as the source of record.
+2. latent-diffusability-2026's fetched text explicitly says it does not include a pure frozen-encoder
+   RAE tokenizer in its 86-tokenizer comparison, only VAE tokenizers with various regularizers
+   (including REPA-style alignment) layered on. The existing `summary`'s "reconstruction-only,
+   representation-only, and hybrid" framing overstates what was actually compared.
+3. genfirst-2026 is filed under `line-latent-hybrid` but its abstract describes a purely trained,
+   VAE-style end-to-end curriculum (generation-before-reconstruction) with no frozen foundation
+   encoder mentioned anywhere — a different kind of "hybrid" than the line label implies. Worth a
+   second look once its full text becomes fetchable.
+4. svg-2025's existing summary claims "62x faster training and 35x faster inference than VAE-based
+   diffusion"; this could not be confirmed anywhere in the fetched arXiv v1 body (likely a project-page
+   claim, not a paper claim) and was deliberately not repeated in `explained`.
+5. SVG-T2I's conditioning mechanism was independently reconfirmed from fetched text: Lumina-Image-2.0-
+   style single-stream joint attention ("Unified Next-DiT"), not a MetaQuery query-bridge — matches
+   what session 4 already recorded.
+
+**Noted, not acted on:** the working tree at session start showed ~100 other `data/papers/*.yaml`
+files plus `schema/paper.schema.json` and `site/src/layouts/Base.astro` already modified but
+uncommitted, apparently a concurrent session's in-flight work on WORK_QUEUE Q3 (`capabilities`/
+`openness` fields, a capability matrix). This session's subagents left all of that untouched and did
+not attempt to reconcile or commit it — flagging here so the next session knows it's there and whose
+it is before doing anything destructive (`git stash`, `git checkout .`, etc.) to that tree.
+
+---
+
+Prior top-of-file note (session 4): P2 in progress: conditioning-mechanism design space
 mapped (concepts, papers, a new line, a new transition narrative). See CHANGELOG.md's 2026-09-10 entry
 and DECISIONS.md D018/D019 for full detail; summary below.
 

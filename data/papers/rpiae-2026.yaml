@@ -34,3 +34,20 @@ summary: 'Initializes from a representation encoder but fine-tunes it, built exp
   is the strongest evidence available that the obstacle to representation-space editing is reconstruction
   fidelity rather than lack of attention.'
 explanation: null
+abstract: Diffusion models have become the dominant paradigm for image generation and editing, with latent
+  diffusion models shifting denoising to a compact latent space for efficiency and scalability. Recent
+  attempts to leverage pretrained visual representation models as tokenizer priors either align diffusion
+  features to representation features or directly reuse representation encoders as frozen tokenizers.
+  Although such approaches can improve generation metrics, they often suffer from limited reconstruction
+  fidelity due to frozen encoders, which in turn degrades editing quality, as well as overly high-dimensional
+  latents that make diffusion modeling difficult. To address these limitations, We propose Representation-Pivoted
+  AutoEncoder, a representation-based tokenizer that improves both generation and editing. We introduce
+  Representation-Pivot Regularization, a training strategy that enables a representation-initialized encoder
+  to be fine-tuned for reconstruction while preserving the semantic structure of the pretrained representation
+  space, followed by a variational bridge which compress latent space into a compact one for better diffusion
+  modeling. We adopt an objective-decoupled stage-wise training strategy that sequentially optimizes generative
+  tractability and reconstruction-fidelity objectives. Together, these components yield a tokenizer that
+  preserves strong semantics, reconstructs faithfully, and produces latents with reduced diffusion modeling
+  complexity. Experiments demonstrate that RPiAE outperforms other visual tokenizers on text-to-image
+  generation and image editing, while delivering the best reconstruction fidelity among representation-based
+  tokenizers.

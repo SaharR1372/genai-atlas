@@ -74,3 +74,6 @@ explained:
     family, and it reaches one-step quality without a teacher. The admitted dependence on a feature encoder
     is also a data point for the representation argument: even a method built to avoid iterative sampling
     could not escape needing a learned representation to work.'
+capabilities:
+- text-to-image
+openness: open-code-only

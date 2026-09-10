@@ -26,7 +26,7 @@ arc:
 - paper: svg-2025
   role: origin
   note: Reaches the same conclusion independently within days, using frozen DINOv3 plus a residual detail
-    branch; reports 62x faster training.
+    branch, reaching the same conclusion by a different route.
 - paper: vfmvae-2025
   role: evidence
   note: Finds distilling foundation features into a trained tokenizer weakens them, supporting the keep-it-frozen

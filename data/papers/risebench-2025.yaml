@@ -32,3 +32,16 @@ summary: 'The first benchmark for edits that require reasoning rather than recog
 explanation: null
 lines:
 - line-evaluation
+abstract: 'Large Multi-modality Models (LMMs) have made significant progress in visual understanding and
+  generation, but they still face challenges in General Visual Editing, particularly in following complex
+  instructions, preserving appearance consistency, and supporting flexible input formats. To study this
+  gap, we introduce RISEBench, the first benchmark for evaluating Reasoning-Informed viSual Editing (RISE).
+  RISEBench focuses on four key reasoning categories: Temporal, Causal, Spatial, and Logical Reasoning.
+  We curate high-quality test cases for each category and propose an robust evaluation framework that
+  assesses Instruction Reasoning, Appearance Consistency, and Visual Plausibility with both human judges
+  and the LMM-as-a-judge approach. We conducted experiments evaluating nine prominent visual editing models,
+  comprising both open-source and proprietary models. The evaluation results demonstrate that current
+  models face significant challenges in reasoning-based editing tasks. Even the most powerful model evaluated,
+  GPT-4o-Image, achieves an accuracy of merely 28.8%. RISEBench effectively highlights the limitations
+  of contemporary editing models, provides valuable insights, and indicates potential future directions
+  for the field of reasoning-aware visual editing. Our code and data have been released at https://github.com/PhoenixZ810/RISEBench.'

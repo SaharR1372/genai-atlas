@@ -1,0 +1,182 @@
+---
+import Base from "../layouts/Base.astro";
+import { allNodes, nodeById, isMedical } from "../lib/graph";
+
+const systems = allNodes()
+  .filter((n) => n.nodeType === "papers" && (n.data.capabilities ?? []).length > 0 && !isMedical(n))
+  .sort((a, b) => (b.date ?? "").localeCompare(a.date ?? ""));
+
+const CAPS = [
+  { key: "text-to-image", label: "Generate", hint: "makes an image from a text prompt" },
+  { key: "image-editing", label: "Edit", hint: "changes an existing image" },
+  { key: "multi-reference", label: "Multi-ref", hint: "takes several reference images at once" },
+  { key: "image-understanding", label: "Understand", hint: "answers questions about an image" },
+  { key: "reconstruction", label: "Tokenize", hint: "is an autoencoder, not a full generator" },
+];
+
+// The "basis" a reader asks about is the representation line the system sits in.
+const BASIS: Record<string, { label: string; color: string }> = {
+  "line-vae-latent": { label: "VAE latent", color: "var(--section-generation)" },
+  "line-representation-latent": { label: "Representation latent", color: "var(--section-rae)" },
+  "line-latent-hybrid": { label: "Hybrid latent", color: "var(--section-rae)" },
+  "line-aligned-vae-latent": { label: "Aligned VAE latent", color: "var(--section-vfm)" },
+  "line-pixel-space": { label: "Pixel space", color: "var(--section-editing)" },
+  "line-discrete-tokens": { label: "Discrete tokens", color: "var(--section-unified)" },
+  "line-continuous-tokens": { label: "Continuous tokens", color: "var(--section-unified)" },
+};
+
+function basisOf(p: any) {
+  for (const lid of p.data.lines ?? []) {
+    if (BASIS[lid]) return { ...BASIS[lid], id: lid };
+  }
+  return null;
+}
+
+const OPEN_LABEL: Record<string, string> = {
+  "open-weights": "open weights",
+  "open-code-only": "code only",
+  "api-only": "API only",
+  closed: "closed",
+  unknown: "unclear",
+};
+
+const bothGenAndEdit = systems.filter(
+  (p) => (p.data.capabilities ?? []).includes("text-to-image") &&
+         (p.data.capabilities ?? []).includes("image-editing")
+);
+const allThree = bothGenAndEdit.filter((p) => (p.data.capabilities ?? []).includes("image-understanding"));
+---
+<Base
+  title="Models"
+  description="Which model does what, and what it is built on top of: generation, editing, understanding, and the latent space underneath each."
+>
+  <h1 style="font-size:1.9rem; margin:0 0 0.6rem;">Which model does what</h1>
+  <p class="measure" style="color:var(--text-muted); margin:0 0 1.5rem;">
+    The question most people arrive with is whether a given model can both generate and edit, and
+    what it is working on top of. This table answers both. The basis column is the space the model
+    actually operates in, which is what determines its failure modes.
+  </p>
+
+  <div class="card" style="margin-bottom:2rem;">
+    <p style="margin:0 0 0.5rem;">
+      <strong>{bothGenAndEdit.length} of {systems.length}</strong> systems here do both generation and
+      editing. <strong>{allThree.length}</strong> also do image understanding in the same model.
+    </p>
+    <p style="margin:0; font-size:0.9rem; color:var(--text-muted);">
+      Almost all of them sit on a VAE latent. The exception worth knowing is
+      {" "}<a href="/papers/hidream-o1-2026">HiDream-O1-Image</a>, which drops the autoencoder
+      entirely and embeds raw pixel patches, text and condition tokens into one shared transformer,
+      so editing and generation are literally the same forward pass.
+    </p>
+  </div>
+
+  <div style="display:flex; gap:0.6rem; flex-wrap:wrap; margin-bottom:1rem; align-items:center;">
+    <label style="font-size:0.85rem; color:var(--text-muted);">
+      Show:
+      <select id="cap-filter" style="margin-left:0.4rem; font-family:var(--font-mono); font-size:0.8rem; padding:0.25em 0.4em; background:var(--bg-raised); color:var(--text); border:1px solid var(--border-strong); border-radius:4px;">
+        <option value="">everything</option>
+        <option value="both">generates AND edits</option>
+        <option value="text-to-image">generates</option>
+        <option value="image-editing">edits</option>
+        <option value="image-understanding">understands</option>
+        <option value="reconstruction">tokenizers only</option>
+      </select>
+    </label>
+    <label style="font-size:0.85rem; color:var(--text-muted);">
+      Basis:
+      <select id="basis-filter" style="margin-left:0.4rem; font-family:var(--font-mono); font-size:0.8rem; padding:0.25em 0.4em; background:var(--bg-raised); color:var(--text); border:1px solid var(--border-strong); border-radius:4px;">
+        <option value="">any</option>
+        {Object.entries(BASIS).map(([id, b]) => <option value={id}>{b.label}</option>)}
+      </select>
+    </label>
+    <label style="font-size:0.85rem; color:var(--text-muted);">
+      <input type="checkbox" id="open-filter" /> open weights only
+    </label>
+    <span id="row-count" style="font-size:0.8rem; color:var(--text-muted); font-family:var(--font-mono);"></span>
+  </div>
+
+  <div style="overflow-x:auto;">
+    <table id="models-table">
+      <thead>
+        <tr>
+          <th>Model</th>
+          {CAPS.map((c) => <th style="text-align:center;" title={c.hint}>{c.label}</th>)}
+          <th>Built on</th>
+          <th>Availability</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {systems.map((p) => {
+          const caps = p.data.capabilities ?? [];
+          const basis = basisOf(p);
+          return (
+            <tr
+              data-caps={caps.join(" ")}
+              data-basis={basis?.id ?? ""}
+              data-open={p.data.openness === "open-weights" ? "1" : "0"}
+            >
+              <td><a href={`/papers/${p.id}`}>{p.data.short ?? p.label}</a></td>
+              {CAPS.map((c) => (
+                <td style="text-align:center;">
+                  {caps.includes(c.key)
+                    ? <span style="color:var(--section-vfm); font-weight:600;">&#10003;</span>
+                    : <span style="color:var(--border-strong);">&middot;</span>}
+                </td>
+              ))}
+              <td style="font-size:0.85rem;">
+                {basis
+                  ? <a href={`/lines/${basis.id}`} style={`color:${basis.color};`}>{basis.label}</a>
+                  : <span style="color:var(--text-muted);">not recorded</span>}
+              </td>
+              <td style="font-size:0.82rem; color:var(--text-muted);">{OPEN_LABEL[p.data.openness ?? "unknown"]}</td>
+              <td style="font-family:var(--font-mono); font-size:0.8rem; color:var(--text-muted);">{p.date}</td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  </div>
+
+  <p style="margin-top:1.5rem; font-size:0.85rem; color:var(--text-muted);">
+    A blank basis means the paper is a method or analysis contribution rather than a system built on
+    one particular latent. Medical models are listed separately under
+    {" "}<a href="/medical">medical imaging</a>.
+  </p>
+
+  <script is:inline>
+    (function () {
+      const capSel = document.getElementById("cap-filter");
+      const basisSel = document.getElementById("basis-filter");
+      const openBox = document.getElementById("open-filter");
+      const rows = Array.from(document.querySelectorAll("#models-table tbody tr"));
+      const count = document.getElementById("row-count");
+
+      function apply() {
+        const cap = capSel.value;
+        const basis = basisSel.value;
+        const openOnly = openBox.checked;
+        let shown = 0;
+        for (const r of rows) {
+          const caps = (r.dataset.caps || "").split(" ");
+          let ok = true;
+          if (cap === "both") {
+            ok = caps.includes("text-to-image") && caps.includes("image-editing");
+          } else if (cap) {
+            ok = caps.includes(cap);
+          }
+          if (ok && basis) ok = r.dataset.basis === basis;
+          if (ok && openOnly) ok = r.dataset.open === "1";
+          r.hidden = !ok;
+          if (ok) shown++;
+        }
+        count.textContent = shown + " of " + rows.length + " shown";
+      }
+
+      capSel.addEventListener("change", apply);
+      basisSel.addEventListener("change", apply);
+      openBox.addEventListener("change", apply);
+      apply();
+    })();
+  </script>
+</Base>

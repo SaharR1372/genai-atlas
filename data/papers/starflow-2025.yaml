@@ -32,10 +32,27 @@ status:
   code: none
   weights: none
   verified: true
-  verified_on: '2026-09-09'
+  verified_on: '2026-09-10'
   verified_by: opus
 summary: Revives normalizing flows as a serious high-resolution generator using a transformer autoregressive
   flow with a deep-shallow architecture, trained in a pretrained autoencoder's latent space. Notable for
   an explicit ablation finding latent-space modeling beats pixel-level for this family, and for giving
   exact likelihoods that diffusion and flow matching do not.
 explanation: null
+abstract: 'We present STARFlow, a scalable generative model based on normalizing flows that achieves strong
+  performance in high-resolution image synthesis. The core of STARFlow is Transformer Autoregressive Flow
+  (TARFlow), which combines the expressive power of normalizing flows with the structured modeling capabilities
+  of Autoregressive Transformers. We first establish the theoretical universality of TARFlow for modeling
+  continuous distributions. Building on this foundation, we introduce several key architectural and algorithmic
+  innovations to significantly enhance scalability: (1) a deep-shallow design, wherein a deep Transformer
+  block captures most of the model representational capacity, complemented by a few shallow Transformer
+  blocks that are computationally efficient yet substantially beneficial; (2) modeling in the latent space
+  of pretrained autoencoders, which proves more effective than direct pixel-level modeling; and (3) a
+  novel guidance algorithm that significantly boosts sample quality. Crucially, our model remains an end-to-end
+  normalizing flow, enabling exact maximum likelihood training in continuous spaces without discretization.
+  STARFlow achieves competitive performance in both class-conditional and text-conditional image generation
+  tasks, approaching state-of-the-art diffusion models in sample quality. To our knowledge, this work
+  is the first successful demonstration of normalizing flows operating effectively at this scale and resolution.'
+capabilities:
+- text-to-image
+openness: unknown

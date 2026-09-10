@@ -35,3 +35,13 @@ summary: 'Synthesizes full 3D CT volumes with anatomical control, using a domain
   GPUs. The clearest case in medical imaging of a latent chosen for an explicitly stated reason: full-resolution
   3D volumes do not fit in memory otherwise.'
 explanation: null
+abstract: Medical imaging analysis faces challenges such as data scarcity, high annotation costs, and
+  privacy concerns. This paper introduces the Medical AI for Synthetic Imaging (MAISI), an innovative
+  approach using the diffusion model to generate synthetic 3D computed tomography (CT) images to address
+  those challenges. MAISI leverages the foundation volume compression network and the latent diffusion
+  model to produce high-resolution CT images (up to a landmark volume dimension of 512 x 512 x 768 ) with
+  flexible volume dimensions and voxel spacing. By incorporating ControlNet, MAISI can process organ segmentation,
+  including 127 anatomical structures, as additional conditions and enables the generation of accurately
+  annotated synthetic images that can be used for various downstream tasks. Our experiment results show
+  that MAISI's capabilities in generating realistic, anatomically accurate images for diverse regions
+  and conditions reveal its promising potential to mitigate challenges using synthetic data.

@@ -27,9 +27,59 @@ status:
   code: none
   weights: none
   verified: true
-  verified_on: '2026-09-09'
-  verified_by: sonnet
+  verified_on: '2026-09-10'
+  verified_by: opus
 summary: Extends SigLIP's sigmoid contrastive language-image objective with captioning, self-distillation
   and masked-prediction losses in one recipe, improving dense/localization features specifically; the
   frozen encoder Scale-RAE uses for text-to-image.
 explanation: null
+explained:
+  depth: full-text
+  before: SigLIP replaced CLIP's softmax contrastive loss with a simpler sigmoid loss over image-text
+    pairs, but like other CLIP-style encoders it still lagged specifically on localization and dense semantic
+    feature quality. Captioning pretraining, self-distillation and masked prediction had each independently
+    been shown to help, but open releases combined only some of them rather than folding all of them into
+    one recipe.
+  problem: Whether a single unified training recipe can close CLIP-style encoders' gap on localization
+    and dense prediction while keeping or improving their strengths in zero-shot classification and retrieval,
+    without training separate specialist models.
+  idea: Combine the sigmoid contrastive loss with a captioning-decoder objective in the style of LocCa,
+    a self-distillation consistency loss in the style of SILC, and masked prediction in the style of TIPS
+    into one staged recipe, then add a variable-resolution native-aspect-ratio variant (NaFlex) and distill
+    the smallest checkpoints from a curated larger teacher.
+  method: Training runs in stages on WebLI (10B images, 90% English and 10% multilingual) with a multilingual
+    Gemma tokenizer. For the first 80% of training the sigmoid loss is combined with a transformer decoder
+    trained on captioning, referring-expression prediction and grounded captioning; the decoder is discarded
+    afterward. From 80% onward a self-distillation consistency loss, matching 8 local crops to an EMA
+    teacher's global view, and a masked-patch prediction loss are added, both weighted by model size.
+    The final stage resizes position embeddings and trains at increasing resolution up to 512px, or, for
+    NaFlex, samples variable native-aspect-ratio sequence lengths directly. Small B/16 and B/32 checkpoints
+    are distilled from a curated So400m teacher via active data curation rather than trained from scratch.
+    Model sizes span ViT-B (86M) to ViT-g (1B).
+  evidence: Zero-shot ImageNet-1k accuracy rises at every scale, reaching 83.4% for So400m/16 and 84.5%
+    for ViT-g/16. Localization improves sharply, with RefCOCO referring-expression accuracy for L/16 rising
+    from 67.33% to 86.04%. Dense prediction with a frozen encoder and DPT head improves ADE20k segmentation
+    mIoU from 40.8 to 45.4 and NYUv2 depth RMSE from 0.563 to 0.466 for So400m/14 at 384px. A gender-association
+    bias probe drops from 35.5% to 7.3% for L/16 at 256px.
+  limitations: The authors concede the NaFlex variant does not extrapolate well beyond the sequence lengths
+    seen in training, though it interpolates reasonably within them. They also concede that fairness gains
+    are uneven, since disaggregating results by geographic region or by income level on Dollar Street shows,
+    in their words, "very minor benefits, or no benefits" in several breakdowns even where aggregate bias
+    metrics improved.
+  why_it_matters: It shows that the field's separate improvements to CLIP-style pretraining, captioning,
+    self-distillation, masking and variable resolution, are compatible and additive in one model rather
+    than competing design choices, producing a single encoder strong enough at dense and localization
+    tasks to serve as the frozen backbone for both VLMs and, as in Scale-RAE, generative latents.
+abstract: 'We introduce SigLIP 2, a family of new multilingual vision-language encoders that build on
+  the success of the original SigLIP. In this second iteration, we extend the original image-text training
+  objective with several prior, independently developed techniques into a unified recipe -- this includes
+  captioning-based pretraining, self-supervised losses (self-distillation, masked prediction) and online
+  data curation. With these changes, SigLIP 2 models outperform their SigLIP counterparts at all model
+  scales in core capabilities, including zero-shot classification, image-text retrieval, and transfer
+  performance when extracting visual representations for Vision-Language Models (VLMs). Furthermore, the
+  new training recipe leads to significant improvements on localization and dense prediction tasks. We
+  also train variants which support multiple resolutions and preserve the input''s native aspect ratio.
+  Finally, we train on a more diverse data-mixture that includes de-biasing techniques, leading to much
+  better multilingual understanding and improved fairness. To allow users to trade off inference cost
+  with performance, we release model checkpoints at four sizes: ViT-B (86M), L (303M), So400m (400M),
+  and g (1B).'

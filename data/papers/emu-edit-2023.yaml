@@ -47,3 +47,6 @@ abstract: Instruction-based image editing holds immense potential for a variety 
   scarce. Lastly, to facilitate a more rigorous and informed assessment of instructable image editing
   models, we release a new challenging and versatile benchmark that includes seven different image editing
   tasks.
+capabilities:
+- image-editing
+openness: closed

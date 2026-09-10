@@ -31,9 +31,21 @@ status:
   code: none
   weights: none
   verified: true
-  verified_on: '2026-09-09'
+  verified_on: '2026-09-10'
   verified_by: opus
 summary: Scales MAR's continuous-token idea to a 14B autoregressive model with a 157M flow-matching head,
   reaching state of the art among autoregressive text-to-image systems. An ICLR 2026 oral, and the strongest
   evidence that continuous-token autoregression is a real competitor to diffusion rather than a curiosity.
 explanation: null
+abstract: Prevailing autoregressive (AR) models for text-to-image generation either rely on heavy, computationally-intensive
+  diffusion models to process continuous image tokens, or employ vector quantization (VQ) to obtain discrete
+  tokens with quantization loss. In this paper, we push the autoregressive paradigm forward with NextStep-1,
+  a 14B autoregressive model paired with a 157M flow matching head, training on discrete text tokens and
+  continuous image tokens with next-token prediction objectives. NextStep-1 achieves state-of-the-art
+  performance for autoregressive models in text-to-image generation tasks, exhibiting strong capabilities
+  in high-fidelity image synthesis. Furthermore, our method shows strong performance in image editing,
+  highlighting the power and versatility of our unified approach. To facilitate open research, we will
+  release our code and models to the community.
+capabilities:
+- text-to-image
+openness: open-weights

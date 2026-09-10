@@ -28,8 +28,19 @@ status:
   code: none
   weights: none
   verified: true
-  verified_on: '2026-09-09'
+  verified_on: '2026-09-10'
   verified_by: opus
 summary: Conditions the network on the step size it is about to take, so a single model can jump accurately
   at any budget from many steps down to one, without a separate distillation stage or a second model.
 explanation: null
+abstract: Diffusion models and flow-matching models have enabled generating diverse and realistic images
+  by learning to transfer noise to data. However, sampling from these models involves iterative denoising
+  over many neural network passes, making generation slow and expensive. Previous approaches for speeding
+  up sampling require complex training regimes, such as multiple training phases, multiple networks, or
+  fragile scheduling. We introduce shortcut models, a family of generative models that use a single network
+  and training phase to produce high-quality samples in a single or multiple sampling steps. Shortcut
+  models condition the network not only on the current noise level but also on the desired step size,
+  allowing the model to skip ahead in the generation process. Across a wide range of sampling step budgets,
+  shortcut models consistently produce higher quality samples than previous approaches, such as consistency
+  models and reflow. Compared to distillation, shortcut models reduce complexity to a single network and
+  training phase and additionally allow varying step budgets at inference time.

@@ -34,8 +34,8 @@ status:
   code: released
   weights: none
   verified: true
-  verified_on: '2026-09-09'
-  verified_by: sonnet
+  verified_on: '2026-09-10'
+  verified_by: opus
 summary: Shows naive end-to-end VAE+diffusion training collapses the VAE's latent space, but training
   through the REPA alignment loss instead (with a batch-norm bridge and a stop-gradient on the diffusion
   loss's path back to the VAE) makes joint end-to-end training work — 17-45x faster than REPA/vanilla
@@ -43,3 +43,56 @@ summary: Shows naive end-to-end VAE+diffusion training collapses the VAE's laten
 explanation: null
 lines:
 - line-aligned-vae-latent
+explained:
+  depth: full-text
+  before: REPA and VA-VAE had each shown that aligning a diffusion transformer, or its tokenizer, to a
+    frozen DINOv2 helps, but the tokenizer and the diffusion model were still trained in separate stages,
+    the VAE frozen before the diffusion model ever sees it.
+  problem: The paper asks directly whether the VAE and the diffusion model can be trained end to end together,
+    and shows the naive answer is no. Backpropagating the plain diffusion loss into the VAE collapses the
+    latent space, since the denoiser can trivially lower its loss by shrinking spatial variance until the
+    task degenerates into predicting a near-constant bias term. The paper measures this collapse directly,
+    with spatial variance falling from 17.06 to 0.02 and total variation from 6627.35 to 89.80 under naive
+    end-to-end training.
+  idea: Diffusion loss cannot safely reach back into the VAE, but the REPA alignment loss can. Route only
+    the REPA gradient into the VAE's encoder while stopping the diffusion loss's gradient at the latent,
+    and joint training becomes stable and beneficial to both halves.
+  method: Training jointly optimizes a VAE and a SiT-XL diffusion transformer under three losses, an ordinary
+    diffusion loss, a REPA loss aligning diffusion hidden states to a frozen DINOv2, and the VAE's usual
+    reconstruction regularizers (KL, MSE, LPIPS, adversarial). A stop-gradient blocks the diffusion loss
+    from reaching the VAE encoder, so only the REPA loss and the VAE's own reconstruction losses update
+    it; without this stop-gradient gFID explodes to 444.1. Because the VAE's latent statistics keep shifting
+    as it is updated, a batch-norm layer with disabled affine parameters and EMA-tracked running statistics
+    sits between the VAE and the diffusion model to keep the diffusion model's input normalization stable;
+    removing it degrades gFID from 16.3 to 18.1.
+  evidence: On SiT-XL without classifier-free guidance, REPA-E reaches gFID 12.83, 7.17 and 4.07 at 20,
+    40 and 80 epochs, against plain REPA's 19.40, 11.10 and 7.90 at the same epochs. At 800 epochs the final
+    system reaches gFID 1.69 without guidance and 1.12 with classifier-free guidance, the paper's SOTA result,
+    while the jointly tuned VAE itself reaches reconstruction FID 0.28. The authors report this as over
+    17x faster than REPA and 45x faster than vanilla diffusion training to reach comparable quality. End-to-end
+    tuning also improves the VAE as a standalone tokenizer. Dropped back into a frozen downstream diffusion
+    model it lowers gFID relative to the original SD-VAE, for example DiT-XL from 19.82 to 6.75 and SiT-XL
+    from 17.20 to 5.26.
+  limitations: The authors concede the mechanism is demonstrated empirically rather than theoretically,
+    without a formal account of why REPA gradients specifically avoid the collapse that diffusion gradients
+    cause. All primary experiments are ImageNet 256x256 class-conditional generation with SiT; the paper
+    gives no systematic treatment of wall-clock or memory overhead from training VAE and diffusion model
+    jointly, and does not test U-Net-based diffusion backbones or text-conditioned generation in depth.
+  why_it_matters: It closes the loop VA-VAE opened. Instead of just constraining a VAE toward a good latent
+    space before diffusion training starts, the diffusion model's own training signal, routed carefully,
+    can keep reshaping that latent space throughout training and improve both the tokenizer and the generator
+    together. It reframes the VAE from a fixed preprocessing stage into a component still worth training
+    jointly with the model that consumes it.
+abstract: 'In this paper we tackle a fundamental question: "Can we train latent diffusion models together
+  with the variational auto-encoder (VAE) tokenizer in an end-to-end manner?" Traditional deep-learning
+  wisdom dictates that end-to-end training is often preferable when possible. However, for latent diffusion
+  transformers, it is observed that end-to-end training both VAE and diffusion-model using standard diffusion-loss
+  is ineffective, even causing a degradation in final performance. We show that while diffusion loss is
+  ineffective, end-to-end training can be unlocked through the representation-alignment (REPA) loss --
+  allowing both VAE and diffusion model to be jointly tuned during the training process. Despite its simplicity,
+  the proposed training recipe (REPA-E) shows remarkable performance; speeding up diffusion model training
+  by over 17x and 45x over REPA and vanilla training recipes, respectively. Interestingly, we observe
+  that end-to-end tuning with REPA-E also improves the VAE itself; leading to improved latent space structure
+  and downstream generation performance. In terms of final performance, our approach sets a new state-of-the-art;
+  achieving FID of 1.12 and 1.69 with and without classifier-free guidance on ImageNet 256 x 256. Code
+  is available at https://end2end-diffusion.github.io.'

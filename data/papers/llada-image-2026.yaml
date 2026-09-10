@@ -77,3 +77,8 @@ explained:
   why_it_matters: It is the strongest evidence so far that the expensive part of training a generator
     does not need captions at all. If a frozen understanding model can supply the semantic condition from
     the image itself, the caption bottleneck that shapes most open training pipelines becomes optional.
+capabilities:
+- text-to-image
+- image-editing
+- image-understanding
+openness: open-weights

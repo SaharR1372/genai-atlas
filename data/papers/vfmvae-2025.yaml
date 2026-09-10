@@ -27,10 +27,24 @@ status:
   code: none
   weights: none
   verified: true
-  verified_on: '2026-09-09'
+  verified_on: '2026-09-10'
   verified_by: opus
 summary: 'A useful negative result for the hybrid camp: distilling foundation-model features into a trained
   tokenizer weakens the representation''s robustness, so this work keeps the foundation encoder frozen
   and redesigns only the decoder. Independent support for RAE''s central choice, arrived at from the tokenizer
   side.'
 explanation: null
+abstract: 'The performance of Latent Diffusion Models (LDMs) is critically dependent on the quality of
+  their visual tokenizers. While recent works have explored incorporating Vision Foundation Models (VFMs)
+  into the tokenizers training via distillation, we empirically find this approach inevitably weakens
+  the robustness of learnt representation from original VFM. In this paper, we bypass the distillation
+  by proposing a more direct approach by leveraging the frozen VFM for the LDMs tokenizer, named VFM Variational
+  Autoencoder (VFM-VAE).To fully exploit the potential to leverage frozen VFM for the LDMs tokenizer,
+  we design a new decoder to reconstruct realistic images from the semantic-rich representation of VFM.
+  With the proposed VFM-VAE, we conduct a systematic study on how the representation from different tokenizers
+  impact the representation learning process throughout diffusion training, enabling synergistic benefits
+  of dual-side alignment on both tokenizers and diffusion models. Our effort in tokenizer design and training
+  strategy lead to superior performance and efficiency: our system reaches a gFID (w/o CFG) of 2.22 in
+  merely 80 epochs (a 10$\times$ speedup over prior tokenizers). With continued training to 640 epochs,
+  it further attains a gFID (w/o CFG) of 1.62. These results offer solid evidence for the substantial
+  potential of VFMs to serve as visual tokenizers to accelerate the LDM training progress.'

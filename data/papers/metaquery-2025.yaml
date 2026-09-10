@@ -32,8 +32,8 @@ status:
   code: none
   weights: none
   verified: true
-  verified_on: '2026-09-09'
-  verified_by: sonnet
+  verified_on: '2026-09-10'
+  verified_by: opus
 summary: Bridges a frozen, understanding-only multimodal LLM to a diffusion image decoder with a small
   set of learnable query tokens, so the MLLM's weights (and its reasoning/understanding ability) never
   have to change to gain generation. Trains only on paired image-caption data with a standard diffusion
@@ -41,3 +41,18 @@ summary: Bridges a frozen, understanding-only multimodal LLM to a diffusion imag
 explanation: null
 lines:
 - line-unified-models
+abstract: Unified multimodal models aim to integrate understanding (text output) and generation (pixel
+  output), but aligning these different modalities within a single architecture often demands complex
+  training recipes and careful data balancing. We introduce MetaQueries, a set of learnable queries that
+  act as an efficient interface between autoregressive multimodal LLMs (MLLMs) and diffusion models. MetaQueries
+  connects the MLLM's latents to the diffusion decoder, enabling knowledge-augmented image generation
+  by leveraging the MLLM's deep understanding and reasoning capabilities. Our method simplifies training,
+  requiring only paired image-caption data and standard diffusion objectives. Notably, this transfer is
+  effective even when the MLLM backbone remains frozen, thereby preserving its state-of-the-art multimodal
+  understanding capabilities while achieving strong generative performance. Additionally, our method is
+  flexible and can be easily instruction-tuned for advanced applications such as image editing and subject-driven
+  generation.
+capabilities:
+- text-to-image
+- image-understanding
+openness: open-code-only

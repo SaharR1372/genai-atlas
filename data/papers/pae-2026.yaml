@@ -31,10 +31,65 @@ status:
   code: none
   weights: none
   verified: true
-  verified_on: '2026-09-09'
+  verified_on: '2026-09-10'
   verified_by: opus
 summary: 'Asks the design question directly rather than picking a side: instead of inheriting a frozen
   foundation encoder (RAE) or training for reconstruction alone (VAE), it explicitly shapes a tokenizer''s
   latent manifold using priors distilled from foundation models — spatial structure, local continuity,
   global semantics. Reports RAE-comparable quality at 13x faster convergence and gFID 1.03.'
 explanation: null
+explained:
+  depth: full-text
+  before: RAE showed that inheriting a frozen VFM's semantic structure beats training an autoencoder
+    for reconstruction alone, which the field largely treated as a binary choice between freezing a
+    foundation encoder and training reconstruction-only like a VAE, without asking what property of
+    the resulting latent actually drives generation quality.
+  problem: A controlled pilot study in the paper shows that reconstruction fidelity does not predict
+    downstream generation quality, so it was unclear what a diffusion-friendly latent manifold
+    actually looks like, or how to engineer one directly rather than hope it emerges from
+    reconstruction or from inheriting a VFM.
+  idea: Identify measurable manifold properties, coherent spatial structure, local perceptual
+    continuity, and global semantic quality, that correlate with generation quality, and train a
+    tokenizer that explicitly optimizes for these properties using refined priors distilled from a
+    VFM as regularization targets, rather than freezing the VFM as the latent itself.
+  method: PAE trains its own encoder, projector, deprojector, and pixel decoder rather than freezing
+    a VFM as the latent; the frozen VFM supplies supervision only. A Detail-Aware Modulator injects
+    pixel detail into the trained latent while preserving VFM dominance through zero-initialized
+    scale-and-shift fusion. A lightweight prior projector first compresses raw VFM features into a
+    bottleneck-matched target, using upsampling, low-pass spatial refinement, and downsampling to
+    suppress noise while keeping coarse spatial relations, rather than using raw VFM features
+    directly as targets. Three losses derived from this refined target regularize the trained
+    latent. Spatial Structure Regularization aligns the Gram matrices of the latent and the target.
+    Manifold Continuity Regularization is a cascaded perturbation-consistency objective enforcing
+    perceptual similarity under progressively larger latent perturbations. Semantic Consistency
+    Regularization aligns latent tokens to projected target tokens by cosine similarity, at both
+    pooled and patch-token level. Total loss combines reconstruction with all three regularizers.
+  evidence: PAE reaches a new state-of-the-art gFID of 1.03 on ImageNet 256x256 at 800 epochs with
+    guidance, and 1.43 unguided at 800 epochs, with reconstruction rFID 0.26. It reaches quality
+    comparable to RAE with up to 13x faster convergence under the same LightningDiT setup; at 80
+    epochs, PAE with a DINOv2 prior already reaches guided gFID 1.27, versus RAE's DiTDH-XL needing
+    800 epochs to reach 1.41. An ablation at 25 tokenizer epochs shows gFID 7.18 with no
+    regularization at all, falling to 1.86 once all three regularizers are applied together.
+  limitations: The method still depends on access to a strong frozen VFM, so it changes how that
+    dependency is used rather than removing it. The authors report effectiveness varies by backbone,
+    with DINO outperforming SigLIP, which in turn outperforms MAE. They also describe their three
+    manifold metrics as empirical diagnostics rather than formally derived complexity measures.
+  why_it_matters: It reframes RAE's success as evidence for a more general principle, that spatial
+    structure, local continuity, and global semantics are what make a latent diffusable, and shows
+    those properties can be trained into a latent explicitly and converge far faster than waiting
+    for them to emerge either from reconstruction or from directly freezing a foundation encoder.
+abstract: 'Tokenizers are a crucial component of latent diffusion models, as they define the latent space
+  in which diffusion models operate. However, existing tokenizers are primarily designed to improve reconstruction
+  fidelity or inherit pretrained representations, leaving unclear what kind of latent space is truly friendly
+  for generative modeling. In this paper, we study this question from the perspective of latent manifold
+  organization. By constructing controlled tokenizer variants, we identify three key properties of a diffusion-friendly
+  latent manifold: coherent spatial structure, local manifold continuity, and global manifold semantics.
+  We find that these properties are more consistent with downstream generation quality than reconstruction
+  fidelity. Motivated by this finding, we propose the Prior-Aligned AutoEncoder (PAE), which explicitly
+  shapes the latent manifold instead of leaving diffusion-friendly manifold to emerge indirectly from
+  reconstruction or inheritance. Specifically, PAE leverages refined priors derived from VFMs and perturbation-based
+  regularization to turn spatial structure, local continuity, and global semantics into explicit training
+  objectives. On ImageNet 256x256, PAE improves both training efficiency and generation quality over existing
+  tokenizers, reaching performance comparable to RAE with up to 13x faster convergence under the same
+  training setup and achieving a new state-of-the-art gFID of 1.03. These results highlight the importance
+  of organizing the latent manifold for latent diffusion models.'

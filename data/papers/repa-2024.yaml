@@ -37,8 +37,8 @@ status:
   code: released
   weights: none
   verified: true
-  verified_on: '2026-09-09'
-  verified_by: sonnet
+  verified_on: '2026-09-10'
+  verified_by: opus
 summary: Adds a simple auxiliary loss that aligns a diffusion transformer's intermediate hidden states
   to a frozen DINOv2's features during training. Speeds up SiT-XL training by 17.5x and sets a new ImageNet
   FID, with no change to the model's own latent space or architecture — the paper RAE explicitly re-reads
@@ -46,3 +46,52 @@ summary: Adds a simple auxiliary loss that aligns a diffusion transformer's inte
 explanation: null
 lines:
 - line-aligned-vae-latent
+explained:
+  depth: full-text
+  before: Diffusion transformers were known to develop discriminative structure inside their hidden states
+    as a side effect of denoising, but that structure lagged well behind what dedicated self-supervised
+    encoders like DINOv2 learn, and training relied on the model discovering it unaided.
+  problem: A central bottleneck in training large diffusion transformers is that they must learn good
+    internal representations on their own, purely from the denoising objective, and this is slow and produces
+    weaker representations than self-supervised pretraining does.
+  idea: Do not make the diffusion transformer discover useful representations by itself. Align its intermediate
+    hidden states directly to the clean-image features of a frozen, pretrained self-supervised encoder,
+    as an auxiliary loss during ordinary diffusion training.
+  method: A REPA loss maximizes patch-wise cosine similarity between a frozen DINOv2's features on the
+    clean image and a projected version of the diffusion transformer's hidden states at an early layer,
+    typically the eighth of the network. A three-layer MLP with SiLU activations projects the hidden states
+    before comparison. This alignment loss is added to the ordinary velocity or diffusion loss with a coefficient
+    of 0.5. Only the diffusion transformer is trained; the DINOv2 encoder stays frozen throughout and is
+    discarded at inference. The transformer's own latent space and architecture are otherwise unchanged.
+  evidence: On SiT-XL/2 at 400K iterations without classifier-free guidance, REPA brings FID from 17.2
+    to 7.9, and the paper states this matches the FID a vanilla SiT-XL reaches only after 7M steps, an
+    over 17.5x speedup in steps. With guidance and the guidance-interval schedule, SiT-XL/2 plus REPA reaches
+    FID 1.42, the paper's state-of-the-art result. Ablations show DINOv2 variants clearly outperform MAE,
+    DINO, MoCov3, I-JEPA and CLIP as the alignment target, aligning only the first 8 of the transformer's
+    layers is sufficient and later layers give diminishing returns, and the loss weight is robust across
+    0.25 to 1.0 with saturation past 0.5.
+  limitations: The authors concede that even after alignment, the diffusion transformer's representations
+    remain significantly inferior to DINOv2's own, so the gap to self-supervised quality is narrowed but
+    not closed. They offer no theoretical account of why alignment to clean-image features improves generation
+    of noisy inputs, and the method still depends on an external pretrained encoder rather than learning
+    representations from scratch.
+  why_it_matters: It shows that a diffusion transformer's weak internal semantics were not an inherent
+    property of the denoising objective but a symptom of the model having to learn them unsupervised, and
+    that a cheap external signal fixes most of the gap. This reframes representation quality as a target
+    to optimize directly rather than a byproduct, and the same alignment idea is what VA-VAE and REPA-E
+    later move from an auxiliary loss into the tokenizer's own training.
+abstract: 'Recent studies have shown that the denoising process in (generative) diffusion models can induce
+  meaningful (discriminative) representations inside the model, though the quality of these representations
+  still lags behind those learned through recent self-supervised learning methods. We argue that one main
+  bottleneck in training large-scale diffusion models for generation lies in effectively learning these
+  representations. Moreover, training can be made easier by incorporating high-quality external visual
+  representations, rather than relying solely on the diffusion models to learn them independently. We
+  study this by introducing a straightforward regularization called REPresentation Alignment (REPA), which
+  aligns the projections of noisy input hidden states in denoising networks with clean image representations
+  obtained from external, pretrained visual encoders. The results are striking: our simple strategy yields
+  significant improvements in both training efficiency and generation quality when applied to popular
+  diffusion and flow-based transformers, such as DiTs and SiTs. For instance, our method can speed up
+  SiT training by over 17.5$\times$, matching the performance (without classifier-free guidance) of a
+  SiT-XL model trained for 7M steps in less than 400K steps. In terms of final generation quality, our
+  approach achieves state-of-the-art results of FID=1.42 using classifier-free guidance with the guidance
+  interval.'

@@ -36,6 +36,45 @@ summary: 'Literally composes the two rival representations: it takes DINOv2 patc
   256 at 8x fewer FLOPs per forward pass than diffusing on uncompressed foundation features, arguing the
   dense patch grid RAE inherits is largely redundant.'
 explanation: null
+explained:
+  depth: full-text
+  before: The RAE line showed diffusion can operate directly on a frozen SSL model's patch features
+    rather than on pixel-space or trained VAE latents, but the resulting grid, 256 patches of 768
+    dimensions for DINOv2, is comparable in raw size to the pixel signal itself and gives no
+    computational advantage over pixel-space diffusion.
+  problem: Neighboring patches in a dense DINOv2 feature grid share substantial semantic content, so
+    the grid carries significant spatial redundancy that makes diffusion on uncompressed foundation
+    features needlessly expensive.
+  idea: Train a small variational autoencoder that flattens, the authors' term is laminating, the
+    frozen DINOv2 patch grid into a compact one-dimensional sequence of continuous tokens, then run
+    the diffusion model on that compressed sequence instead of on the raw patch grid.
+  method: DINOv2-B/14 with registers stays entirely frozen and encodes an image into 256 patch
+    embeddings of 768 dimensions. A trained ViT-B encoder (768 dim, 12 layers) prepends T learnable
+    register tokens to the patch sequence and keeps only the processed registers as the latent, 32
+    tokens of 128 dimensions by default. A trained ViT-L decoder (1024 dim, 24 layers) uses its own
+    learnable registers as queries that attend to the latent tokens to reconstruct the DINOv2 patch
+    embeddings, trained with a standard beta-VAE objective whose beta is normalized by latent
+    dimensionality. LightningDiT then runs flow matching on the 32-token FlatDINO latent, with 50
+    Euler steps at inference; generated tokens pass through the FlatDINO decoder back into
+    DINOv2-embedding space and then through a separately frozen RAE decoder to pixels.
+  evidence: On ImageNet 256x256 with a DiT-XL trained on FlatDINO latents, gFID reaches 3.34 at 600
+    epochs and 3.21 at 800 epochs without classifier-free guidance; with CFG (weight 4.5, interval
+    0.225 to 1.0), gFID reaches 1.85 at 600 epochs and 1.80 at 800 epochs. The compression gives an
+    8x shorter token sequence (256 to 32), a 48x reduction in total dimensionality, 8x fewer FLOPs
+    per forward pass, and up to 4.5x fewer FLOPs per training step versus diffusing on uncompressed
+    DINOv2 features. After 150 epochs, reconstruction rFID is 0.77 at 32x128 (48x compression)
+    against the uncompressed RAE baseline's 0.62.
+  limitations: The authors explicitly describe these as preliminary results, stating the work is in
+    progress. They concede generation quality does not yet match methods that operate on
+    uncompressed DINOv2 features, and attribute the gap to insufficient training, since the model has
+    not fully converged, to the need for diffusion recipes specifically tailored to compressed
+    semantic latents, and to their 600-epoch runs being shorter than RAE's 800-epoch training. They
+    also note that out-of-distribution images show color distortions when decoded through the frozen
+    RAE decoder.
+  why_it_matters: If compact latents distilled from frozen semantic features can approach RAE's
+    quality at a fraction of the compute, it shows that compressing a semantic representation and
+    freezing the encoder that produced it are separable design choices, and that the field's newly
+    adopted dense-patch semantic latents are not yet an efficient endpoint.
 abstract: Recent work has shown that diffusion models can generate high-quality images by operating directly
   on SSL patch features rather than pixel-space latents. However, the dense patch grids from encoders
   like DINOv2 contain significant redundancy, making diffusion needlessly expensive. We introduce FlatDINO,

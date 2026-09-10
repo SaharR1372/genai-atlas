@@ -28,8 +28,8 @@ status:
   code: none
   weights: none
   verified: true
-  verified_on: '2026-09-09'
-  verified_by: sonnet
+  verified_on: '2026-09-10'
+  verified_by: opus
 summary: 'Independently derives the same straight-path ODE idea as flow matching, and adds ''reflow'':
   iteratively re-coupling noise/data pairs along the learned ODE to make paths even straighter, enabling
   near-one-step sampling. The ''rectified'' in ''rectified flow transformer'' (SD3, FLUX) traces back
@@ -37,3 +37,19 @@ summary: 'Independently derives the same straight-path ODE idea as flow matching
 explanation: null
 lines:
 - line-flow-matching
+abstract: We present rectified flow, a surprisingly simple approach to learning (neural) ordinary differential
+  equation (ODE) models to transport between two empirically observed distributions π_0 and π_1, hence
+  providing a unified solution to generative modeling and domain transfer, among various other tasks involving
+  distribution transport. The idea of rectified flow is to learn the ODE to follow the straight paths
+  connecting the points drawn from π_0 and π_1 as much as possible. This is achieved by solving a straightforward
+  nonlinear least squares optimization problem, which can be easily scaled to large models without introducing
+  extra parameters beyond standard supervised learning. The straight paths are special and preferred because
+  they are the shortest paths between two points, and can be simulated exactly without time discretization
+  and hence yield computationally efficient models. We show that the procedure of learning a rectified
+  flow from data, called rectification, turns an arbitrary coupling of π_0 and π_1 to a new deterministic
+  coupling with provably non-increasing convex transport costs. In addition, recursively applying rectification
+  allows us to obtain a sequence of flows with increasingly straight paths, which can be simulated accurately
+  with coarse time discretization in the inference phase. In empirical studies, we show that rectified
+  flow performs superbly on image generation, image-to-image translation, and domain adaptation. In particular,
+  on image generation and translation, our method yields nearly straight flows that give high quality
+  results even with a single Euler discretization step.

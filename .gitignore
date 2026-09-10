@@ -9,3 +9,5 @@ site/src/data/graph.json
 site/public/graph.json
 .env
 .DS_Store
+# generated from notebooks/*.ipynb by notebooks/publish.sh
+site/public/notebooks/

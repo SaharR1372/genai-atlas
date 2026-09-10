@@ -32,8 +32,8 @@ status:
   code: released
   weights: none
   verified: true
-  verified_on: '2026-09-09'
-  verified_by: sonnet
+  verified_on: '2026-09-10'
+  verified_by: opus
 summary: Argues pixel-space diffusion was never unstable because of pixels — it was unstable because of
   epsilon-prediction. Switching to x-prediction on large patches lets a plain ViT ('Just image Transformers')
   match tokenizer-based DiT/PixArt-alpha at 256-1024px with no VAE, no pretraining, and no auxiliary losses
@@ -66,3 +66,19 @@ explained:
   why_it_matters: If a plain transformer on raw pixels is competitive once the prediction target is fixed,
     then the entire argument about which latent is best was optimizing something that may be optional.
     This is the sharpest live challenge to the premise every latent-based line shares.
+abstract: 'Today''s denoising diffusion models do not "denoise" in the classical sense, i.e., they do
+  not directly predict clean images. Rather, the neural networks predict noise or a noised quantity. In
+  this paper, we suggest that predicting clean data and predicting noised quantities are fundamentally
+  different. According to the manifold assumption, natural data should lie on a low-dimensional manifold,
+  whereas noised quantities do not. With this assumption, we advocate for models that directly predict
+  clean data, which allows apparently under-capacity networks to operate effectively in very high-dimensional
+  spaces. We show that simple, large-patch Transformers on pixels can be strong generative models: using
+  no tokenizer, no pre-training, and no extra loss. Our approach is conceptually nothing more than "Just
+  image Transformers", or JiT, as we call it. We report competitive results using JiT with large patch
+  sizes of 16 and 32 on ImageNet at resolutions of 256 and 512, where predicting high-dimensional noised
+  quantities can fail catastrophically. With our networks mapping back to the basics of the manifold,
+  our research goes back to basics and pursues a self-contained paradigm for Transformer-based diffusion
+  on raw natural data.'
+capabilities:
+- text-to-image
+openness: open-weights

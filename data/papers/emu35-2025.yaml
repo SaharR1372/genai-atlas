@@ -47,3 +47,8 @@ abstract: We introduce Emu3.5, a large-scale multimodal world model that nativel
   to Gemini 2.5 Flash Image (Nano Banana) on image generation and editing tasks and demonstrates superior
   results on a suite of interleaved generation tasks. We open-source Emu3.5 at https://github.com/baaivision/Emu3.5
   to support community research.
+capabilities:
+- text-to-image
+- image-editing
+- image-understanding
+openness: open-weights

@@ -40,8 +40,8 @@ status:
   code: released
   weights: none
   verified: true
-  verified_on: '2026-09-09'
-  verified_by: sonnet
+  verified_on: '2026-09-10'
+  verified_by: opus
 summary: 'Replaces the VAE with a Representation Autoencoder: a frozen pretrained encoder (DINO, SigLIP,
   or MAE) plus a lightweight trained ViT decoder. The resulting latent is high-dimensional (width must
   be >= token dimension) and semantically rich rather than reconstruction-only; needs a dimension-dependent
@@ -80,3 +80,22 @@ explained:
     the latent exists to be decodable and generation consumes it; here the latent exists because it is
     meaningful, and decodability becomes the decoder's problem. The specificity of the fixes is itself
     the evidence that high-dimensional semantic latents are a different regime, not a drop-in swap.
+abstract: 'Latent generative modeling, where a pretrained autoencoder maps pixels into a latent space
+  for the diffusion process, has become the standard strategy for Diffusion Transformers (DiT); however,
+  the autoencoder component has barely evolved. Most DiTs continue to rely on the original VAE encoder,
+  which introduces several limitations: outdated backbones that compromise architectural simplicity, low-dimensional
+  latent spaces that restrict information capacity, and weak representations that result from purely reconstruction-based
+  training and ultimately limit generative quality. In this work, we explore replacing the VAE with pretrained
+  representation encoders (e.g., DINO, SigLIP, MAE) paired with trained decoders, forming what we term
+  Representation Autoencoders (RAEs). These models provide both high-quality reconstructions and semantically
+  rich latent spaces, while allowing for a scalable transformer-based architecture. Since these latent
+  spaces are typically high-dimensional, a key challenge is enabling diffusion transformers to operate
+  effectively within them. We analyze the sources of this difficulty, propose theoretically motivated
+  solutions, and validate them empirically. Our approach achieves faster convergence without auxiliary
+  representation alignment losses. Using a DiT variant equipped with a lightweight, wide DDT head, we
+  achieve strong image generation results on ImageNet: 1.51 FID at 256x256 (no guidance) and 1.13 at both
+  256x256 and 512x512 (with guidance). RAE offers clear advantages and should be the new default for diffusion
+  transformer training.'
+capabilities:
+- reconstruction
+openness: open-weights

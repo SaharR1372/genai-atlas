@@ -48,3 +48,7 @@ abstract: We present HunyuanImage 3.0, a native multimodal model that unifies mu
   weights of HunyuanImage 3.0, we aim to enable the community to explore new ideas with a state-of-the-art
   foundation model, fostering a dynamic and vibrant multimodal ecosystem. All open source assets are publicly
   available at https://github.com/Tencent-Hunyuan/HunyuanImage-3.0
+capabilities:
+- text-to-image
+- image-understanding
+openness: open-weights

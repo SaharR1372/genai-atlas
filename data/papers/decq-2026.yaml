@@ -40,6 +40,42 @@ summary: 'Attacks RAE''s core weakness without giving up its frozen encoder: lig
   decoder alongside the semantic tokens. Reported to lift reconstruction PSNR from 19.13 to 22.76 dB while
   improving generation, which is the have-it-both-ways result the pure-RAE recipe could not reach.'
 explanation: null
+explained:
+  depth: full-text
+  before: RAE established that a frozen vision foundation model plus a trained decoder gives
+    semantically rich, fast-converging latents, but the paper's own empirical study (its Figure
+    1) shows every obvious fix for RAE's weak reconstruction — fine-tuning the encoder, distilling
+    into it, or concatenating extra features — degrades generation quality instead.
+  problem: VFMs are trained with multimodal-alignment or self-distillation objectives that reward
+    invariance across augmented views, which strengthens semantic robustness but leaves the frozen
+    features with little sensitivity to low-level cues like color and texture, and touching the
+    encoder to recover that detail disrupts the pretrained semantic space.
+  idea: Keep the VFM completely frozen, but attach small learnable "detail-condensing queries"
+    that cross-attend into the VFM's shallower intermediate layers to pull out fine-grained detail,
+    and feed those queries into the decoder alongside the usual semantic patch tokens.
+  method: Four condenser modules (each a cross-attention block followed by an FFN) sit at VFM
+    layers 0, 3, 6 and 9 by default, with 8 detail-condensing queries in total; queries act as the
+    attention query and patch features as key/value, so information flows one way from patches to
+    queries and no VFM parameter is ever updated. Query and patch tokens are concatenated with
+    separate positional embeddings for the decoder, but only patch tokens are used for pixel
+    prediction; during generative modeling the query tokens are generated jointly with the patch
+    tokens. The scheme adds about 29.3M trainable parameters and roughly 3.9% extra compute (5.0
+    of 128.9 GFLOPs).
+  evidence: On DINOv2-B reconstruction at 256x256, PSNR rises from RAE's 19.13 dB to 22.76 dB, rFID
+    from 0.69 to 0.47, and SSIM from 0.49 to 0.63. Generation without guidance reaches FID 1.41 at
+    800 epochs against RAE's 1.51, and 1.80 at 80 epochs against RAE's 2.16; DecQ matches RAE's
+    800-epoch quality by epoch 240, a 3.3x convergence speedup. With guidance it reaches FID 1.05.
+  limitations: The authors concede evaluation is limited to ImageNet at 256x256, that higher
+    resolutions such as 512x512 are not extensively studied, and that experiments mainly used
+    DINOv2 and SigLIP2, leaving other VFM families unverified. Their own ablation (more queries,
+    K=16) shows the trade-off is not free either, since reconstruction improves further (rFID 0.32) but
+    generation quality drops (FID 6.43), so query count and layer placement must be tuned rather
+    than simply maximized.
+  why_it_matters: It shows the RAE reconstruction-generation trade-off is not intrinsic to freezing
+    the encoder, only to which layers' information reaches the decoder, so a cheap, strictly
+    additive side-channel can recover detail without the encoder ever being unfrozen, which is a
+    different fix from PS-VAE's and RPiAE's choice to unfreeze the encoder to solve the same
+    problem.
 abstract: 'Representation Autoencoders (RAEs) leverage frozen vision foundation models (VFMs) as tokenizer
   encoders, providing robust high-level representations that facilitate fast convergence and high-quality
   generation in latent diffusion models. However, freezing the VFM inherently constrains its spatial reconstruction

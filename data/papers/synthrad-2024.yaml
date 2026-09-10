@@ -33,3 +33,21 @@ summary: 'A multi-centre benchmark for generating CT from MRI or cone-beam CT fo
   clinical dose accuracy, so a method can look good by FID-style measures and still be wrong where it
   matters.'
 explanation: null
+abstract: 'Radiation therapy plays a crucial role in cancer treatment, necessitating precise delivery
+  of radiation to tumors while sparing healthy tissues over multiple days. Computed tomography (CT) is
+  integral for treatment planning, offering electron density data crucial for accurate dose calculations.
+  However, accurately representing patient anatomy is challenging, especially in adaptive radiotherapy,
+  where CT is not acquired daily. Magnetic resonance imaging (MRI) provides superior soft-tissue contrast.
+  Still, it lacks electron density information while cone beam CT (CBCT) lacks direct electron density
+  calibration and is mainly used for patient positioning. Adopting MRI-only or CBCT-based adaptive radiotherapy
+  eliminates the need for CT planning but presents challenges. Synthetic CT (sCT) generation techniques
+  aim to address these challenges by using image synthesis to bridge the gap between MRI, CBCT, and CT.
+  The SynthRAD2023 challenge was organized to compare synthetic CT generation methods using multi-center
+  ground truth data from 1080 patients, divided into two tasks: 1) MRI-to-CT and 2) CBCT-to-CT. The evaluation
+  included image similarity and dose-based metrics from proton and photon plans. The challenge attracted
+  significant participation, with 617 registrations and 22/17 valid submissions for tasks 1/2. Top-performing
+  teams achieved high structural similarity indices (>0.87/0.90) and gamma pass rates for photon (>98.1%/99.0%)
+  and proton (>97.3%/97.0%) plans. However, no significant correlation was found between image similarity
+  metrics and dose accuracy, emphasizing the need for dose evaluation when assessing the clinical applicability
+  of sCT. SynthRAD2023 facilitated the investigation and benchmarking of sCT generation techniques, providing
+  insights for developing MRI-only and CBCT-based adaptive radiotherapy.'

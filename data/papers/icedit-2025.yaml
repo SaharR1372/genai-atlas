@@ -47,3 +47,6 @@ abstract: 'Instruction-based image editing enables precise modifications via nat
   0.1\% of the training data and 1\% trainable parameters compared to previous methods. Our approach establishes
   a new paradigm for balancing precision and efficiency in instructional image editing. Codes and demos
   can be found in https://river-zhang.github.io/ICEdit-gh-pages/.'
+capabilities:
+- image-editing
+openness: open-weights

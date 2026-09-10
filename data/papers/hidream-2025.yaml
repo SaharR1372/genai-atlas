@@ -51,3 +51,6 @@ abstract: 'Recent advancements in image generative foundation models have priori
   all the codes and model weights of HiDream-I1-Full, HiDream-I1-Dev, HiDream-I1-Fast, HiDream-E1 through
   our project websites: https://github.com/HiDream-ai/HiDream-I1 and https://github.com/HiDream-ai/HiDream-E1.
   All features can be directly experienced via https://vivago.ai/studio.'
+capabilities:
+- text-to-image
+openness: open-weights

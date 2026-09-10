@@ -32,8 +32,23 @@ status:
   code: none
   weights: none
   verified: true
-  verified_on: '2026-09-09'
+  verified_on: '2026-09-10'
   verified_by: opus
 summary: An efficiency-oriented unified text-to-image framework using a Gemma-2 text encoder, reported
   to beat SD3 and Janus-Pro on several axes at lower cost. A common open efficiency baseline.
 explanation: null
+abstract: 'We introduce Lumina-Image 2.0, an advanced text-to-image generation framework that achieves
+  significant progress compared to previous work, Lumina-Next. Lumina-Image 2.0 is built upon two key
+  principles: (1) Unification - it adopts a unified architecture (Unified Next-DiT) that treats text and
+  image tokens as a joint sequence, enabling natural cross-modal interactions and allowing seamless task
+  expansion. Besides, since high-quality captioners can provide semantically well-aligned text-image training
+  pairs, we introduce a unified captioning system, Unified Captioner (UniCap), specifically designed for
+  T2I generation tasks. UniCap excels at generating comprehensive and accurate captions, accelerating
+  convergence and enhancing prompt adherence. (2) Efficiency - to improve the efficiency of our proposed
+  model, we develop multi-stage progressive training strategies and introduce inference acceleration techniques
+  without compromising image quality. Extensive evaluations on academic benchmarks and public text-to-image
+  arenas show that Lumina-Image 2.0 delivers strong performances even with only 2.6B parameters, highlighting
+  its scalability and design efficiency. We have released our training details, code, and models at https://github.com/Alpha-VLLM/Lumina-Image-2.0.'
+capabilities:
+- text-to-image
+openness: open-weights

@@ -34,3 +34,17 @@ summary: 'Induces pathology into healthy brain MRI while preserving the surround
   its evaluation: a board-certified neuroradiologist judged the generated strokes indistinguishable from
   real ones, which is a stronger bar than any distribution metric.'
 explanation: null
+abstract: Denoising diffusion probabilistic models enable high-fidelity image synthesis and editing. In
+  biomedicine, these models facilitate counterfactual image editing, producing pairs of images where one
+  is edited to simulate hypothetical conditions. For example, they can model the progression of specific
+  diseases, such as stroke lesions. However, current image editing techniques often fail to generate realistic
+  biomedical counterfactuals, either by inadequately modeling indirect pathological effects like brain
+  atrophy or by excessively altering the scan, which disrupts correspondence to the original images. Here,
+  we propose MedEdit, a conditional diffusion model for medical image editing. MedEdit induces pathology
+  in specific areas while balancing the modeling of disease effects and preserving the integrity of the
+  original scan. We evaluated MedEdit on the Atlas v2.0 stroke dataset using Frechet Inception Distance
+  and Dice scores, outperforming state-of-the-art diffusion-based methods such as Palette (by 45%) and
+  SDEdit (by 61%). Additionally, clinical evaluations by a board-certified neuroradiologist confirmed
+  that MedEdit generated realistic stroke scans indistinguishable from real ones. We believe this work
+  will enable counterfactual image editing research to further advance the development of realistic and
+  clinically useful imaging tools.

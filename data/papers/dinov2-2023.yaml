@@ -34,6 +34,42 @@ summary: Scales self-distillation-based self-supervised ViT training to produce 
   features that transfer without finetuning; becomes the default frozen encoder that REPA, VA-VAE, and
   RAE all align to or generate directly inside.
 explanation: null
+explained:
+  depth: full-text
+  before: Self-supervised vision methods produced strong features only when trained on small curated
+    datasets such as ImageNet, and quality dropped when the same recipes were scaled to larger uncurated
+    web data. CLIP-style weakly supervised training filled that gap, but its features are shaped by captions,
+    which only approximate what an image actually contains.
+  problem: Whether self-supervised learning, with no text supervision at all, can match or beat CLIP-style
+    features as a general-purpose visual representation once data curation and model scale are pushed
+    far enough.
+  idea: Combine DINO's image-level self-distillation loss with iBOT's patch-level masked prediction loss,
+    add a KoLeo regularizer for feature spread, and scale training to a 1.1B-parameter ViT-g on a purpose-built
+    142M-image curated dataset, then distill that model down into smaller ViT-S/B/L checkpoints.
+  method: Student-teacher self-distillation with untied heads for the DINO and iBOT losses, Sinkhorn-Knopp
+    centering on the teacher, and a KoLeo term encouraging uniform feature spread within a batch. The
+    LVD-142M dataset is built by embedding 1.2B raw web images with a self-supervised ViT-H/16, retrieving
+    nearest neighbors of curated seed datasets such as ImageNet-22k and Google Landmarks via k-means clustering,
+    then deduplicating by copy-detection. Training at this scale relies on FlashAttention, nested tensors
+    to batch crops of different token counts together, and FSDP sharding with float16 communication. ViT-g/14
+    is trained from scratch and then used as a frozen teacher to distill ViT-L, ViT-B and ViT-S students.
+  evidence: Frozen ViT-g/14 features under linear probing reach 86.5% ImageNet-1k top-1 accuracy, matching
+    OpenCLIP ViT-G/14's 86.2% and beating the prior best self-supervised method, iBOT ViT-L/16, by 4.2
+    points. Gains are largest on dense and instance tasks, with ADE20k linear segmentation mIoU 49.0 against
+    OpenCLIP's 39.3, NYUd depth RMSE 0.279 against 0.414 with a DPT head, and Oxford-Hard retrieval mAP
+    52.3 against 19.7. Training on curated LVD-142M instead of an equal-size uncurated sample raises ImageNet-1k
+    linear accuracy from 83.3% to 85.8% at matched iteration count. Distilled ViT-L outperforms a ViT-L
+    trained from scratch on 10 of 12 benchmarks.
+  limitations: The authors concede significant geographic and income bias in a fairness evaluation on
+    Dollar Street, where accuracy is 74.0% for Africa against 89.7% for Europe, and 67.4% for low-income households
+    against 90.5% for high-income ones. They write that they observe "significant biases in our models
+    toward wealthy households from Western countries." Supervised finetuning of the giant model adds only
+    about 2 points over its frozen linear features, and dense segmentation still trails specialist supervised
+    heads by roughly 10 mIoU points.
+  why_it_matters: It establishes that self-supervision without any language signal can produce features
+    as strong as CLIP-style contrastive training, given deliberate curation and scale. That is why later
+    work, including REPA, VA-VAE and RAE, treats DINOv2 as an interchangeable frozen semantic encoder
+    on equal footing with CLIP or SigLIP rather than a lesser alternative.
 abstract: The recent breakthroughs in natural language processing for model pretraining on large quantities
   of data have opened the way for similar foundation models in computer vision. These models could greatly
   simplify the use of images in any system by producing all-purpose visual features, i.e., features that

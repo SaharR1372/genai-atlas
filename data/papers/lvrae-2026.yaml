@@ -31,9 +31,65 @@ status:
   code: none
   weights: none
   verified: true
-  verified_on: '2026-09-09'
+  verified_on: '2026-09-10'
   verified_by: opus
 summary: Augments RAE's semantic features with the low-level colour and texture information a frozen semantic
   encoder discards, and separately hardens the decoder against latent perturbation through fine-tuning
   with noise injection — a fix for the artifact sensitivity that high-dimensional semantic latents introduce.
 explanation: null
+explained:
+  depth: full-text
+  before: RAE-style tokenizers give diffusion models strong, fast-converging semantic latents from
+    a frozen vision foundation model, but reconstruction fidelity from those latents lags, and the
+    paper frames this reconstruction gap as the primary bottleneck to scaling LDMs further; naively
+    fine-tuning the VFM with combined reconstruction and alignment losses fails because the semantic
+    base manifold keeps shifting during training, leaving low-level detail with no stable reference.
+  problem: VFM semantic features lack low-level information such as color and texture, degrading
+    reconstruction fidelity, and separately, the high-dimensional, information-rich latents that
+    result make decoders hypersensitive to small perturbations, producing severe artifacts when
+    decoding imperfect generated latents rather than clean encoded ones.
+  idea: Model the data manifold as a smooth semantic base, supplied by the frozen VFM, plus local
+    low-level variation that the VFM ignores; learn only that residual with a small trained encoder
+    and add it to the frozen semantic feature, then separately harden the decoder against latent
+    perturbation through noise-injected fine-tuning.
+  method: A lightweight 6-layer, 768-dimensional trained encoder takes the pixel input, projects it
+    to patch tokens, concatenates them with the frozen VFM's semantic features, and predicts
+    low-level residual tokens r; the final latent is z = LayerNorm(r + u), with u the frozen
+    semantic feature, so the VFM itself never updates. Stage 1 trains a 12-layer decoder with L1 and
+    LPIPS reconstruction loss plus an alignment regularizer (weight eta=5) that keeps the output
+    grounded in the semantic manifold. A toy analysis attributes decoder fragility to excessively
+    large Jacobian magnitudes along directions off the data manifold. Stage 2 fine-tunes the decoder
+    with stochastic noise injected into the latent during training (z-tilde = z + sigma*epsilon,
+    sigma ~ U(0, tau), tau=0.2) plus an adaptive reconstruction-and-GAN loss; at inference, controlled
+    noise is likewise injected into generated latents before decoding to suppress off-manifold
+    artifacts.
+  evidence: Reconstruction PSNR reaches about 32.32 on ImageNet, ahead of FLUX-VAE's 31.01 and SVG's
+    21.87, with SSIM 0.941, LPIPS 0.015, and CKNNA semantic alignment about 0.987 against a
+    fine-tuned-VFM ablation's 0.925 (PSNR 30.88). On class-conditional ImageNet 256x256 generation,
+    gFID reaches 3.77 without guidance (DiT-XL, 400 epochs); with guidance, gFID 2.42 (DiTDH-XL, 800 epochs),
+    with gFDD 58.2 against VA-VAE's 74.3 and SVG's 130.4. On latents corrupted with z + 0.2*epsilon,
+    the original decoder's PSNR collapses to 13.68, while the noise-fine-tuned decoder holds at
+    21.61.
+  limitations: The paper does not quantify the compute overhead of its two-stage training pipeline.
+    The optimal inference noise scale (sigma-bar about 0.08) is manually selected and architecture-
+    dependent. The authors concede that fine-tuning the decoder with a fixed rather than randomly
+    sampled noise scale severely harms reconstruction on clean latents, so the randomized-noise
+    recipe is load-bearing rather than incidental.
+  why_it_matters: It gives an independent confirmation that RAE's reconstruction bottleneck can be
+    closed with a small additive trained residual rather than by unfreezing the encoder, and it
+    isolates a separate failure mode, decoder sensitivity to off-manifold latent perturbation, that
+    traces generation-time artifacts to a cause distinct from reconstruction-time fidelity.
+abstract: Recent work leverages Vision Foundation Models as image encoders to boost the generative performance
+  of latent diffusion models (LDMs), as their semantic feature distributions are easy to learn. However,
+  such semantic features often lack low-level information (\eg, color and texture), leading to degraded
+  reconstruction fidelity, which has emerged as a primary bottleneck in further scaling LDMs. To address
+  this limitation, we propose LV-RAE, a representation autoencoder that augments semantic features with
+  missing low-level information, enabling high-fidelity reconstruction while remaining highly aligned
+  with the semantic distribution. We further observe that the resulting high-dimensional, information-rich
+  latent make decoders sensitive to latent perturbations, causing severe artifacts when decoding generated
+  latent and consequently degrading generation quality. Our analysis suggests that this sensitivity primarily
+  stems from excessive decoder responses along directions off the data manifold. Building on these insights,
+  we propose fine-tuning the decoder to increase its robustness and smoothing the generated latent via
+  controlled noise injection, thereby enhancing generation quality. Experiments demonstrate that LV-RAE
+  significantly improves reconstruction fidelity while preserving the semantic abstraction and achieving
+  strong generative quality. Our code is available at https://github.com/modyu-liu/LVRAE.

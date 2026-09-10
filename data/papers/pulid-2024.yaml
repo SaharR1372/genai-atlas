@@ -31,8 +31,15 @@ status:
   weights: released
   verified: true
   verified_on: '2026-09-10'
-  verified_by: sonnet
+  verified_by: opus
 summary: Tuning-free ID customization that pairs a standard diffusion branch with a parallel 'Lightning
   T2I' branch, adding a contrastive alignment loss and an accurate-ID loss so identity injection disturbs
   the base model's existing behavior (background, lighting, composition, style) as little as possible.
 explanation: null
+abstract: We propose Pure and Lightning ID customization (PuLID), a novel tuning-free ID customization
+  method for text-to-image generation. By incorporating a Lightning T2I branch with a standard diffusion
+  one, PuLID introduces both contrastive alignment loss and accurate ID loss, minimizing disruption to
+  the original model and ensuring high ID fidelity. Experiments show that PuLID achieves superior performance
+  in both ID fidelity and editability. Another attractive property of PuLID is that the image elements
+  (e.g., background, lighting, composition, and style) before and after the ID insertion are kept as consistent
+  as possible. Codes and models are available at https://github.com/ToTheBeginning/PuLID

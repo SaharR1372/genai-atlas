@@ -32,10 +32,21 @@ status:
   weights: released
   verified: true
   verified_on: '2026-09-10'
-  verified_by: sonnet
-summary: >-
-  Published the same month as ControlNet with the same goal but a much smaller design — a compact
+  verified_by: opus
+summary: Published the same month as ControlNet with the same goal but a much smaller design — a compact
   external adapter network aligns internal T2I-model features with an external control signal while the
   base model stays frozen, giving composable, generalizable spatial control at lower parameter cost than
   ControlNet's duplicated-encoder approach.
 explanation: null
+abstract: The incredible generative ability of large-scale text-to-image (T2I) models has demonstrated
+  strong power of learning complex structures and meaningful semantics. However, relying solely on text
+  prompts cannot fully take advantage of the knowledge learned by the model, especially when flexible
+  and accurate controlling (e.g., color and structure) is needed. In this paper, we aim to ``dig out"
+  the capabilities that T2I models have implicitly learned, and then explicitly use them to control the
+  generation more granularly. Specifically, we propose to learn simple and lightweight T2I-Adapters to
+  align internal knowledge in T2I models with external control signals, while freezing the original large
+  T2I models. In this way, we can train various adapters according to different conditions, achieving
+  rich control and editing effects in the color and structure of the generation results. Further, the
+  proposed T2I-Adapters have attractive properties of practical value, such as composability and generalization
+  ability. Extensive experiments demonstrate that our T2I-Adapter has promising generation quality and
+  a wide range of applications.

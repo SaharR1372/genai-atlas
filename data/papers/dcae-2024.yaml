@@ -40,6 +40,54 @@ summary: Pushes autoencoder spatial compression up to 128x (vs. the standard 8x)
 explanation: null
 lines:
 - line-vae-latent
+explained:
+  depth: full-text
+  before: Standard latent diffusion autoencoders such as SD-VAE operate at a fixed 8x spatial compression.
+    Prior attempts to push compression higher, to cut the token count a diffusion transformer must process,
+    saw reconstruction quality collapse well before useful ratios were reached.
+  problem: Naively scaling a convolutional autoencoder from 8x to 64x spatial compression on ImageNet 256x256
+    lets reconstruction FID degrade from 0.90 to 28.3. Adding more encoder and decoder capacity while holding
+    the latent size fixed with space-to-channel operations does not fix this; the added stages simply optimize
+    worse than a plain space-to-channel operation, pointing to an optimization difficulty rather than a
+    capacity limit.
+  idea: Give the network something easy to learn near a high-compression operating point. Have downsample
+    and upsample blocks learn only a residual on top of a parameter-free space-to-channel shortcut, and
+    separate the phase that adapts to high resolution from the phase that refines local detail with an
+    adversarial loss.
+  method: Residual Autoencoding adds a non-parametric shortcut alongside each downsample and upsample block.
+    A downsample block maps H by W by C to H/2 by W/2 by 2C; its shortcut applies space-to-channel to get
+    H/2 by W/2 by 4C, then averages channels down to H/2 by W/2 by 2C, and the block output is the learned
+    path added to this shortcut. Upsample mirrors this with channel-to-space plus channel duplication.
+    Decoupled High-Resolution Adaptation trains in three phases. Phase 1 trains the full autoencoder at
+    low resolution, 256x256. Phase 2 adapts only the encoder's final stage and the decoder's first stage
+    to 1024x1024 images, cutting memory from 153.98GB to 67.81GB while leaving the shared latent space
+    intact. Phase 3 fine-tunes only the decoder's head layers at low resolution with an added GAN loss,
+    since direct high-resolution GAN training proved highly unstable, keeping the reconstruction loss responsible
+    for content and the GAN loss responsible for local detail without letting it corrupt the latent space.
+    The backbone follows the SD-VAE design with EfficientViT blocks replacing transformer blocks for high-resolution
+    efficiency, and the autoencoder is deterministic rather than variational, which the authors find equally
+    effective and simpler.
+  evidence: On ImageNet 512x512, DC-AE-f64c128 reaches rFID 0.22 against SD-VAE's 16.84, and DC-AE-f128c512
+    reaches rFID 0.23 against SD-VAE's 100.74. On ImageNet 256x256, DC-AE-f64c128 reaches rFID 0.81 and
+    PSNR 23.60 dB against SD-VAE's 26.65 rFID and 18.07 dB. For latent diffusion, DC-AE-f64p1 paired with
+    UViT-H on ImageNet 512x512 reaches FID 2.66 with classifier-free guidance against SD-VAE-f8p2's 3.55,
+    while giving 17.9x higher H100 training throughput, 984 against 55 images per second, and 19.1x higher
+    H100 inference throughput, 6706 against 351 images per second, measured on the full diffusion pipeline
+    rather than the autoencoder alone. At 1024x1024, DC-AE-f32p1 with DiT-S reaches FFHQ FID 13.65 against
+    SD-VAE-f8p4's 23.81. On text-to-image with PixArt-alpha at 512x512, DC-AE-f32 reaches FID 6.1 and CLIP
+    score 26.41 against the SD-VAE baseline's 6.3 and 26.36.
+  limitations: The authors concede DC-AE-f64 underperforms SD-VAE-f8 on smaller diffusion backbones such
+    as UViT-S, and conjecture that larger diffusion transformers benefit more from the higher-dimensional
+    latent channel count, so the gains are capacity-dependent rather than universal. They also concede
+    that direct GAN loss training at high resolution is highly unstable, which is why the local-refinement
+    phase is decoupled and kept at low resolution instead. Experiments are confined to visual data; applicability
+    to other modalities is not explored.
+  why_it_matters: It shows the VAE-latent line still has headroom orthogonal to the RAE line's semantic-latent
+    bet. Instead of enriching what the latent means, DC-AE compresses it far harder while preserving reconstruction
+    fidelity, cutting the token count a diffusion transformer must process well below the standard 8x setting.
+    That makes DC-AE close to the opposite pole from RAE's high-dimensional, low-compression latents, and
+    the pairing shows compression ratio and semantic richness are separate axes a tokenizer can be optimized
+    along.
 abstract: 'We present Deep Compression Autoencoder (DC-AE), a new family of autoencoder models for accelerating
   high-resolution diffusion models. Existing autoencoder models have demonstrated impressive results at
   a moderate spatial compression ratio (e.g., 8x), but fail to maintain satisfactory reconstruction accuracy

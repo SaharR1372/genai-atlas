@@ -29,9 +29,55 @@ status:
   code: none
   weights: none
   verified: true
-  verified_on: '2026-09-09'
-  verified_by: sonnet
+  verified_on: '2026-09-10'
+  verified_by: opus
 summary: Masks most of an image's patches and trains a ViT to reconstruct the missing pixels; one of the
   three encoder families (with DINO, CLIP/SigLIP) RAE ablates as candidate frozen representations, and
   the weakest of the three by RAE's own results.
 explanation: null
+explained:
+  depth: full-text
+  before: Masked modeling had transformed language pretraining through BERT, but the same idea had not
+    produced comparable gains in vision. Convolutional networks, the dominant vision architecture, made
+    it awkward to insert mask tokens or positional indicators the way a transformer could.
+  problem: Why masked prediction had lagged in vision and what changes are needed to make it work at the
+    scale and simplicity BERT achieved for language.
+  idea: Images are spatially redundant compared to language, so a missing patch is easy to guess from
+    its neighbors unless most of the image is masked. Mask a very high fraction, 75%, of patches, encode
+    only the visible ones, and reconstruct raw pixels with a small separate decoder.
+  method: An asymmetric encoder-decoder design. The ViT encoder processes only the visible 25% of patches
+    with no mask tokens at all, and a lightweight decoder, about 9% of the encoder's per-token compute,
+    takes the encoded visible tokens plus learned mask tokens and reconstructs normalized pixel values
+    for the masked patches, under an MSE loss computed only on those masked patches. Because the encoder
+    never sees mask tokens, this cuts compute substantially, giving roughly a 3x or greater wall-clock
+    speedup over encoders that process the full masked sequence.
+  evidence: A vanilla ViT-Huge finetuned at 448x448 after MAE pretraining on ImageNet-1k alone reaches
+    87.8% top-1 accuracy, the best result among methods using only IN1K data; ViT-L reaches 85.9% and
+    ViT-B 83.6%. MAE-pretrained ViT-L beats a ViT-L trained from scratch by 2.4 points, 84.9% against 82.5%,
+    and transfers strongly, with COCO object detection gains of 4.0 AP, 53.3 against 49.3, and ADE20k segmentation
+    gains 3.7 mIoU, 53.6 against 49.9, over supervised pretraining. Ablations show 75% masking is near
+    optimal for both finetuning and linear probing, and accuracy keeps improving through 1600 epochs without
+    saturating.
+  limitations: Linear-probe accuracy, 75.8% for ViT-L, trails contrastive methods such as MoCo v3 at 77.6%,
+    which the authors attribute to the pixel-reconstruction objective producing features that are less
+    linearly separable, though finetuning closes and reverses this gap. The authors concede reconstructions
+    are qualitatively blurry, especially under block-wise masking, that no loss is computed on visible
+    patches so their quality is not directly controlled, and that predictions can reflect dataset biases
+    with negative societal impact.
+  why_it_matters: It gives vision a masked-modeling recipe as simple and scalable as BERT's, and because
+    the encoder never processes mask tokens, MAE pretraining is cheap enough to scale to very large ViTs
+    on unlabeled data alone. It is one of the three self-supervised encoder families, with DINO and CLIP/SigLIP,
+    that RAE later reuses frozen as a generative latent, and the weakest of the three there by RAE's own
+    results, since pixel reconstruction yields less semantic structure than self-distillation or language
+    alignment.
+abstract: 'This paper shows that masked autoencoders (MAE) are scalable self-supervised learners for computer
+  vision. Our MAE approach is simple: we mask random patches of the input image and reconstruct the missing
+  pixels. It is based on two core designs. First, we develop an asymmetric encoder-decoder architecture,
+  with an encoder that operates only on the visible subset of patches (without mask tokens), along with
+  a lightweight decoder that reconstructs the original image from the latent representation and mask tokens.
+  Second, we find that masking a high proportion of the input image, e.g., 75%, yields a nontrivial and
+  meaningful self-supervisory task. Coupling these two designs enables us to train large models efficiently
+  and effectively: we accelerate training (by 3x or more) and improve accuracy. Our scalable approach
+  allows for learning high-capacity models that generalize well: e.g., a vanilla ViT-Huge model achieves
+  the best accuracy (87.8%) among methods that use only ImageNet-1K data. Transfer performance in downstream
+  tasks outperforms supervised pre-training and shows promising scaling behavior.'

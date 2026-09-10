@@ -44,3 +44,6 @@ abstract: 'We propose a method for editing images from human instructions: given
   edits in the forward pass and does not require per example fine-tuning or inversion, our model edits
   images quickly, in a matter of seconds. We show compelling editing results for a diverse collection
   of input images and written instructions.'
+capabilities:
+- image-editing
+openness: open-weights

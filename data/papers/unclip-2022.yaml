@@ -30,8 +30,8 @@ status:
   code: none
   weights: none
   verified: true
-  verified_on: '2026-09-09'
-  verified_by: sonnet
+  verified_on: '2026-09-10'
+  verified_by: opus
 summary: Generates a CLIP image embedding from a text prompt (the 'prior'), then decodes that embedding
   to pixels with a diffusion decoder. The first time a generative system's primary latent was a semantic,
   language-aligned feature space rather than a reconstruction-optimized autoencoder latent — the idea
@@ -39,3 +39,60 @@ summary: Generates a CLIP image embedding from a text prompt (the 'prior'), then
 explanation: null
 lines:
 - line-representation-latent
+explained:
+  depth: full-text
+  before: Text-to-image diffusion models such as GLIDE generated directly in pixel space conditioned on
+    text, using classifier-free guidance to raise photorealism and caption alignment. Turning up guidance
+    to improve fidelity reliably collapsed sample diversity, since stronger guidance pushed generations
+    toward a narrower, more generic mode.
+  problem: How to improve photorealism and caption alignment through guidance without paying for it in
+    sample diversity, and whether a semantically rich but non-generative representation like CLIP's image
+    embedding can itself be made the generative target.
+  idea: Split generation into two stages, a prior that generates a CLIP image embedding from a text caption,
+    and a decoder that generates pixels conditioned on that embedding. Because the CLIP embedding already
+    fixes what the image depicts, guidance on the decoder only needs to refine visual quality rather than
+    fight to preserve semantics, decoupling fidelity gains from diversity loss.
+  method: The prior is trained two ways. An autoregressive version PCA-reduces CLIP embeddings and quantizes
+    them into discrete buckets predicted causally; a diffusion version uses a causal-attention decoder-only
+    transformer that directly denoises the continuous CLIP embedding, predicting the clean embedding rather
+    than noise. The diffusion prior wins on FID and human preference at comparable compute, so it is the
+    one used. The decoder is a modified 3.5B-parameter GLIDE diffusion model conditioned on the CLIP image
+    embedding, projected into the timestep embedding and appended as four extra context tokens; classifier-free
+    guidance is enabled by randomly dropping the CLIP embedding 10% of the time and the caption 50% of
+    the time during training. Two cascaded unconditional diffusion upsamplers take the 64x64 decoder output
+    to 256x256 then 1024x1024. Encoding an image as a CLIP embedding plus a DDIM-inversion latent also
+    gives image variations, since decoding with nonzero DDIM stochasticity keeps semantics and style fixed
+    while varying other details.
+  evidence: unCLIP with the diffusion prior reaches zero-shot MS-COCO FID 10.39, better than GLIDE's 12.24
+    and the autoregressive-prior variant's 10.63, state of the art among models not trained on COCO. In
+    human evaluation against GLIDE, unCLIP is preferred 70.5% of the time on diversity, while GLIDE edges
+    out unCLIP on photorealism, 51.1%, and caption similarity, 54.7%. The authors summarize this as achieving
+    similar photorealism to GLIDE while maintaining substantially more diversity. As guidance scale increases,
+    unCLIP's FID degrades less than GLIDE's, evidence that fixing semantics in the CLIP embedding protects
+    diversity as guidance rises.
+  limitations: The authors concede unCLIP struggles to bind attributes to the correct objects, for instance
+    producing mixed-up colors for "a red cube on top of a blue cube," because the CLIP embedding does
+    not explicitly encode which attribute belongs to which object. It also fails to render coherent text
+    in images, which they attribute to CLIP embeddings not precisely capturing spelling information, worsened
+    by BPE tokenization. Complex scenes lose detail, which they attribute to the decoder's 64x64 base
+    resolution before upsampling. They note explicitly that improved photorealism makes it easier to mistake
+    generated images for authentic ones.
+  why_it_matters: It is the first system to make a semantic, language-aligned embedding, rather than a
+    reconstruction-optimized autoencoder latent, the primary object a generative model produces, showing
+    that decoupling what to depict from how to render it buys a better diversity-fidelity trade-off. That
+    same move, generating into a frozen semantic representation instead of a reconstruction latent, is
+    the idea RAE and SVG revisit three years later for diffusion transformers.
+abstract: 'Contrastive models like CLIP have been shown to learn robust representations of images that
+  capture both semantics and style. To leverage these representations for image generation, we propose
+  a two-stage model: a prior that generates a CLIP image embedding given a text caption, and a decoder
+  that generates an image conditioned on the image embedding. We show that explicitly generating image
+  representations improves image diversity with minimal loss in photorealism and caption similarity. Our
+  decoders conditioned on image representations can also produce variations of an image that preserve
+  both its semantics and style, while varying the non-essential details absent from the image representation.
+  Moreover, the joint embedding space of CLIP enables language-guided image manipulations in a zero-shot
+  fashion. We use diffusion models for the decoder and experiment with both autoregressive and diffusion
+  models for the prior, finding that the latter are computationally more efficient and produce higher-quality
+  samples.'
+capabilities:
+- text-to-image
+openness: closed

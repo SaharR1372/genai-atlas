@@ -270,6 +270,31 @@
         "why_it_matters",
         "depth"
       ]
+    },
+    "capabilities": {
+      "type": "array",
+      "description": "What the SYSTEM this paper describes can actually do. Present only on papers that release or describe a usable model, not on method or analysis papers. Drives the capability matrix at /models, which answers the question a reader most often arrives with: can this model both generate and edit, and what does it work on top of?",
+      "items": {
+        "type": "string",
+        "enum": [
+          "text-to-image",
+          "image-editing",
+          "image-understanding",
+          "multi-reference",
+          "reconstruction"
+        ]
+      }
+    },
+    "openness": {
+      "type": "string",
+      "enum": [
+        "open-weights",
+        "open-code-only",
+        "api-only",
+        "closed",
+        "unknown"
+      ],
+      "description": "How available the system is in practice."
     }
   }
 }

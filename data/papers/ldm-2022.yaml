@@ -37,11 +37,69 @@ status:
   code: released
   weights: none
   verified: true
-  verified_on: '2026-09-09'
-  verified_by: sonnet
+  verified_on: '2026-09-10'
+  verified_by: opus
 summary: Moves diffusion training from pixel space into the latent space of a pretrained autoencoder,
   cutting compute by orders of magnitude while keeping quality; introduces the VAE + UNet + cross-attention
   recipe every 'latent diffusion' system since has started from.
 explanation: null
 lines:
 - line-vae-latent
+explained:
+  depth: full-text
+  before: Diffusion models produced state-of-the-art image samples but operated directly on pixels.
+    Training the strongest pixel-space models took 150 to 1000 V100 GPU-days, and producing 50,000
+    samples took roughly 5 days on a single A100, putting them out of reach for most researchers.
+  problem: Most bits in a digital image are imperceptible detail. A diffusion model trained directly
+    on pixels still has to evaluate its network and compute gradients over all of those bits, so compute
+    is spent on information a viewer never notices.
+  idea: Separate the generative model from the pixel-level compression it does not need. First train
+    an autoencoder that removes imperceptible high-frequency detail while preserving the true image
+    manifold, then run the diffusion process entirely inside that compact latent space, adding cross-attention
+    layers so the same architecture can be conditioned on text, layouts, or other signals.
+  method: An encoder E downsamples an image by a factor f=2^m and a decoder D reconstructs it, trained
+    with a perceptual loss plus a patch-based adversarial objective and either a mild KL penalty toward
+    a standard normal (KL-regularization, close to a VAE) or a vector-quantization layer in the decoder
+    (VQ-regularization). A time-conditional UNet then denoises latents z_t with the standard noise-prediction
+    objective and never touches pixels directly; E and D are frozen once trained, so decoding a sample
+    needs one forward pass through D. Conditioning enters through added cross-attention layers, where
+    a domain-specific encoder tau_theta maps input y, such as text or a class label, to an intermediate
+    representation that supplies the keys and values, while the UNet's own features supply the queries,
+    so tau_theta and the UNet are trained jointly under one loss. Downsampling factor is an explicit
+    design choice. f=1, pixel space, leaves an FID gap of 38 versus LDM-8 after 2M training steps on
+    the same architecture, f=4 and f=8 give the best balance of compression and fidelity, and f=32 loses
+    too much information.
+  evidence: LDM-4 reaches FID 5.11 on CelebA-HQ, 4.98 on FFHQ, 4.02 on LSUN-Churches (LDM-8) and 2.95
+    on LSUN-Bedrooms, approaching pixel-space ADM's 1.90 on LSUN-Bedrooms at a fraction of the compute.
+    In text-to-image synthesis LDM-4 reaches FID 17.01 with 645M parameters, ahead of VQGAN+T's 28.86
+    and ImageBART's 22.61 despite roughly half ImageBART's parameter count. On Places inpainting at
+    512x512 LDM-4 (big, fine-tuned) reaches FID 9.39 against LaMa's 12.0. Across tasks the paper reports
+    at least a 2.7x training speed-up and at least 1.6x better FID relative to pixel-space diffusion
+    at matched settings.
+  limitations: The authors concede that sequential sampling remains slower than GANs even in latent
+    space. They also concede that using an autoencoder is questionable when high precision is required,
+    since although reconstruction loss is small for their f=4 models, the autoencoder's reconstruction
+    fidelity can become a bottleneck for tasks needing fine-grained pixel accuracy, such as super-resolution.
+  why_it_matters: This is the VAE-plus-UNet-plus-cross-attention recipe that Stable Diffusion shipped,
+    and that essentially every later latent diffusion system, including DiT and SD3 further down this
+    lineage, has started from. Moving the expensive iterative process out of pixel space cut training
+    cost from hundreds of GPU-days to a range within reach of ordinary university and startup compute
+    budgets.
+abstract: By decomposing the image formation process into a sequential application of denoising autoencoders,
+  diffusion models (DMs) achieve state-of-the-art synthesis results on image data and beyond. Additionally,
+  their formulation allows for a guiding mechanism to control the image generation process without retraining.
+  However, since these models typically operate directly in pixel space, optimization of powerful DMs
+  often consumes hundreds of GPU days and inference is expensive due to sequential evaluations. To enable
+  DM training on limited computational resources while retaining their quality and flexibility, we apply
+  them in the latent space of powerful pretrained autoencoders. In contrast to previous work, training
+  diffusion models on such a representation allows for the first time to reach a near-optimal point between
+  complexity reduction and detail preservation, greatly boosting visual fidelity. By introducing cross-attention
+  layers into the model architecture, we turn diffusion models into powerful and flexible generators for
+  general conditioning inputs such as text or bounding boxes and high-resolution synthesis becomes possible
+  in a convolutional manner. Our latent diffusion models (LDMs) achieve a new state of the art for image
+  inpainting and highly competitive performance on various tasks, including unconditional image generation,
+  semantic scene synthesis, and super-resolution, while significantly reducing computational requirements
+  compared to pixel-based DMs. Code is available at https://github.com/CompVis/latent-diffusion .
+capabilities:
+- text-to-image
+openness: open-weights

@@ -30,11 +30,61 @@ status:
   code: released
   weights: none
   verified: true
-  verified_on: '2026-09-09'
-  verified_by: sonnet
+  verified_on: '2026-09-10'
+  verified_by: opus
 summary: Argues understanding and generation genuinely need different granularities of visual information,
   and resolves the conflict with a dual-codebook design — a CLIP-style semantic encoder and a pixel encoder,
   kept aligned through a shared index mapping — rather than one shared latent trying to serve both.
 explanation: null
 lines:
 - line-latent-hybrid
+explained:
+  depth: full-text
+  before: Unified tokenizers meant to serve both multimodal understanding and generation had converged
+    on a single VQ codebook trained purely for pixel reconstruction, since that objective is what generation
+    needs. Evaluated as input to an MLLM, that codebook badly underperformed continuous semantic encoders
+    such as CLIP; the paper reports VQGAN scoring 756.1 on MME-Perception against CLIP ViT-B/14's 1460.9.
+  problem: Whether understanding and generation can be served by one shared discrete visual codebook,
+    given that a codebook clustered for pixel similarity misses the semantics understanding needs, while
+    a codebook clustered for semantic similarity, as in CLIP-distilled VQKD, reconstructs images poorly
+    and loses high-frequency detail.
+  idea: Stop forcing one codebook to do both jobs. Use two encoders, a CLIP-initialized semantic encoder
+    and a pixel encoder, with two paired codebooks tied together through a shared index, so each discrete
+    token is chosen by joint nearest-neighbor search across both codebooks and retrieving one index recovers
+    both a semantic feature and a pixel feature at once.
+  method: The semantic encoder starts from CLIP ViT-B/14 and is trained with an L2 loss against teacher
+    features; the pixel encoder is trained with L2 reconstruction plus LPIPS and adversarial losses. Quantization
+    picks the index that minimizes a weighted sum of semantic distance and pixel distance, forcing the
+    two codebooks into alignment through a shared mapping rather than a shared representation. A multi-scale
+    VQ structure enlarges effective codebook capacity, and codebook utilization stays above 95% even at
+    131,072 entries.
+  evidence: Image reconstruction reaches FID 0.63 at 384x384, better than VILA-U's 1.25. On multimodal
+    understanding, TokenFlow-XL paired with Qwen-2.5-14B reaches 67.4% average across benchmarks against
+    LLaVA-1.5 13B's 62.9%, a 7.2% relative improvement, which the paper presents as the first time discrete
+    visual tokens surpass LLaVA-1.5 13B. For generation, GenEval reaches 0.55 at 256x256, which the paper
+    positions as comparable to SDXL's 0.55 at 1024x1024, rising to 0.63 with prompt rewriting.
+  limitations: The authors concede a residual performance gap in understanding between TokenFlow's discrete
+    tokens and its continuous CLIP teacher, which they attribute to the vector-quantization distillation
+    process itself; the gap narrows from 6.3% at 224x224 to 2.9% at 384x384 but does not close. They also
+    note the paper validates understanding and generation separately rather than jointly, and describe
+    a fully unified model trained end to end on interleaved vision-language data as a natural extension
+    left for future work.
+  why_it_matters: It reframes the unified-tokenizer problem. Rather than searching for one latent that
+    is simultaneously semantic and pixel-precise, it keeps two specialized representations and solves
+    alignment at the indexing level, showing that the RAE-adjacent question of what a generative latent
+    should contain has more than one defensible answer depending on whether a single downstream task or
+    a shared understanding-generation system is the target.
+abstract: We present TokenFlow, a novel unified image tokenizer that bridges the long-standing gap between
+  multimodal understanding and generation. Prior research attempt to employ a single reconstruction-targeted
+  Vector Quantization (VQ) encoder for unifying these two tasks. We observe that understanding and generation
+  require fundamentally different granularities of visual information. This leads to a critical trade-off,
+  particularly compromising performance in multimodal understanding tasks. TokenFlow addresses this challenge
+  through an innovative dual-codebook architecture that decouples semantic and pixel-level feature learning
+  while maintaining their alignment via a shared mapping mechanism. This design enables direct access
+  to both high-level semantic representations crucial for understanding tasks and fine-grained visual
+  features essential for generation through shared indices. Our extensive experiments demonstrate TokenFlow's
+  superiority across multiple dimensions. Leveraging TokenFlow, we demonstrate for the first time that
+  discrete visual input can surpass LLaVA-1.5 13B in understanding performance, achieving a 7.2\% average
+  improvement. For image reconstruction, we achieve a strong FID score of 0.63 at 384*384 resolution.
+  Moreover, TokenFlow establishes state-of-the-art performance in autoregressive image generation with
+  a GenEval score of 0.55 at 256*256 resolution, achieving comparable results to SDXL.

@@ -43,3 +43,8 @@ abstract: Unifying multimodal understanding and generation has shown impressive 
   In the hope of facilitating further opportunities for multimodal research, we share the key findings,
   pretraining details, data creation protocal, and release our code and checkpoints to the community.
   The project page is at https://bagel-ai.org/
+capabilities:
+- text-to-image
+- image-editing
+- image-understanding
+openness: open-weights

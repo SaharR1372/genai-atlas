@@ -47,3 +47,6 @@ abstract: 'We report ACE++, an instruction-based diffusion framework that tackle
   applicability and applicability in vertical scenarios. The qualitative analysis showcases the superiority
   of ACE++ in terms of generating image quality and prompt following ability. Code and models will be
   available on the project page: https://ali-vilab. github.io/ACE_plus_page/.'
+capabilities:
+- image-editing
+openness: open-weights

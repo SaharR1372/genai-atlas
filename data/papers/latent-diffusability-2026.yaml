@@ -31,10 +31,74 @@ status:
   code: none
   weights: none
   verified: true
-  verified_on: '2026-09-09'
+  verified_on: '2026-09-10'
   verified_by: opus
 summary: 'The empirical grounding the whole latent-design argument lacked: trains a large family of tokenizers
   spanning reconstruction-only, representation-only, and hybrid regularization, then measures which latent
   properties actually predict downstream generation quality. Finds reconstruction fidelity is not the
   right predictor and proposes Velocity Irreducible Variance as a more stable one.'
 explanation: null
+explained:
+  depth: full-text
+  before: RAE and the surrounding hybrid-tokenizer literature had each proposed its own explanation
+    for why a latent space is diffusion-friendly, semantic separability, affine equivariance,
+    distribution uniformity, spatial structure, spectral smoothness, manifold continuity, but each
+    property was validated on only a limited set of tokenizers.
+  problem: A tokenizer with better reconstruction quality does not necessarily produce better
+    generation quality, and no systematic study had established which of the proposed latent
+    properties are most predictive of downstream generation quality, or whether conclusions from one
+    setting generalize to others.
+  idea: Train a large, controlled sweep of tokenizers spanning different regularization strategies,
+    architectures, and latent configurations, evaluate each with several downstream diffusion
+    backbones, and measure which latent properties actually correlate with generation quality; the
+    paper's own proposed measure, Velocity Irreducible Variance (VIV), captures velocity ambiguity
+    from trajectory crossings in flow matching and turns out to be the most consistent predictor.
+  method: 86 tokenizers in total were trained, 43 convolutional at an f16d32 latent configuration, 22
+    convolutional at f16d64, and 21 transformer-based, all built on a Variational Autoencoder base
+    with L1, LPIPS, GAN, and KL losses, with regularization variants layered on top including
+    representation alignment to frozen foundation models, equivariance, loss-coefficient and
+    latent-masking regularization, and masked-autoencoder-style objectives. VIV is derived by
+    decomposing the flow-matching loss into a reducible error term and an irreducible variance term;
+    for class-conditional Gaussian latents, the time-integrated irreducible variance for class k is
+    proportional to the sum of the square roots of that class's latent eigenvalues, which can be
+    rewritten in terms of total latent variance and the spectral anisotropy of the standard
+    deviations. Four diffusion backbones were trained per tokenizer, SiT-B for 400k steps, SiT-XL for
+    80k steps, and LightningDiT-B and LightningDiT-XL for 100k steps each.
+  evidence: On conv-f16d32 tokenizers evaluated with SiT-B, VIV correlates with gFID at Pearson r =
+    0.87, the strongest single predictor found, ahead of a semantic-separability metric and a
+    spatial-structure metric. The two next-best properties together, spatial structure and semantic
+    separability, fit gFID with R^2 = 0.91 as a pair. VIV and spatial structure remain the most
+    stable predictors across SiT-XL, LightningDiT-B, and LightningDiT-XL, and continue to hold under
+    classifier-free guidance scales of 1.5 to 2.0.
+  limitations: The authors concede the study mostly compares tokenizers within the same architecture,
+    latent configuration, and comparable reconstruction quality, leaving cross-family comparisons for
+    future work; under that controlled setting, reconstruction-oriented metrics have limited dynamic
+    range and become less reliable as a signal. They also concede that spectral smoothness,
+    distribution uniformity, and Velocity Irreducible Variance show collinearity that may reflect a
+    shared underlying mechanism or may simply reflect how the tokenizers were constructed, so the
+    properties are not cleanly separable. Broader tokenizer families such as 1D tokenizers are left
+    to future work. Notably, all 86 tokenizers are built on the VAE framework with regularizers
+    layered on, including representation alignment to a frozen foundation model as one regularizer
+    among several; the study does not include a pure frozen-encoder RAE tokenizer as a distinct
+    architectural class alongside them.
+  why_it_matters: It gives the latent-hybrid cluster its first large-scale empirical grounding rather
+    than a single paper's argument, shows reconstruction fidelity is the wrong metric to optimize for
+    generation, and proposes a specific, computable alternative that predicts generation quality
+    across architectures and backbones, implying that hybrid tokenizer designs should be judged by
+    their effect on velocity ambiguity and spatial structure rather than by reconstruction PSNR or
+    FID alone.
+abstract: Latent diffusion models leverage visual tokenizers to compress images into latent spaces for
+  efficient generative modeling. However, better reconstruction quality of a tokenizer does not necessarily
+  translate into better generation quality, suggesting that latent representations should be evaluated
+  not only by fidelity but also by their diffusability. Recent studies have proposed diverse explanations
+  for diffusion-friendly latent spaces, including semantic separability, affine equivariance, distribution
+  uniformity, spatial structure, spectral smoothness, and manifold continuity. Yet these properties are
+  often validated on a limited set of tokenizers, leaving it unclear which factors are most predictive
+  of downstream generation quality and whether such conclusions hold beyond the specific settings in which
+  they are introduced. In this work, we conduct a systematic study of latent diffusability by training
+  a large collection of tokenizers with diverse regularization strategies, architectures, and latent configurations,
+  and evaluating them with multiple downstream diffusion backbones. Our analysis identifies several latent
+  properties that consistently correlate with generation quality and exhibit strong generalization across
+  experimental settings. Beyond existing metrics, we introduce Velocity Irreducible Variance (VIV), a
+  measure of velocity ambiguity induced by trajectory crossings. Extensive experiments show that VIV is
+  one of the most stable predictors of generation quality.

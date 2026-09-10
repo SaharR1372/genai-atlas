@@ -30,11 +30,65 @@ status:
   code: released
   weights: none
   verified: true
-  verified_on: '2026-09-09'
-  verified_by: sonnet
+  verified_on: '2026-09-10'
+  verified_by: opus
 summary: Scales SVG's frozen-DINOv3 recipe from ImageNet to text-to-image, reporting a 0.75 GenEval score
   and 85.78 DPG-Bench with full open-source release — the direct competitor to Scale-RAE, published about
   a month apart on essentially the same question.
 explanation: null
 lines:
 - line-representation-latent
+explained:
+  depth: full-text
+  before: SVG had shown a frozen DINOv3 feature space could support class-conditional ImageNet generation
+    using a small trained residual branch, but the authors state that large-scale, systematic investigation
+    of text-to-image generation in a VFM feature space remained largely absent.
+  problem: Whether VFM-derived representations are compatible with large-scale, high-resolution text-to-image
+    diffusion training, since ImageNet-only validation cannot demonstrate generalization in realistic text-to-image
+    scenarios.
+  idea: Scale the SVG recipe of a frozen DINOv3 encoder plus a trained decoder up to text-to-image, feeding
+    text and DINO image tokens into one joint sequence processed by a shared self-attention stack rather
+    than cross-attention.
+  method: DINOv3-ViT-S/16+ is the frozen image encoder, mapping an image to (H/16) by (W/16) spatial tokens
+    at 384 channels. Two autoencoder variants are offered. Autoencoder-P uses the frozen DINOv3 features
+    directly with a 29M-parameter encoder and 43M-parameter decoder. Autoencoder-R adds an optional residual
+    ViT branch, 51M parameters, to compensate for high-frequency detail and color-cast artifacts. Text
+    is encoded with Gemma2-2B, using 256 tokens early in training and 512 tokens during high-quality tuning.
+    The diffusion backbone is a 2.6B-parameter Unified Next-DiT, 26 layers, hidden dimension 2304, 24 attention
+    heads. It is a single-stream design similar to Z-Image that treats text and DINO image tokens as one
+    joint sequence attending jointly, rather than a cross-attention or query-bridge design, trained with
+    a flow-matching, v-prediction objective. Training proceeds through four progressive stages over roughly
+    76M images, 60M general, 15M high-quality realistic and 1M high-aesthetic, plus 1.2M ImageNet and 3M
+    multi-resolution data used to pretrain the autoencoder, with batch size shrinking from 1536 to 32 across
+    stages and about 265K total steps.
+  evidence: GenEval overall score is 0.75, with 0.94 on single object, 0.89 on two objects, 0.49 on counting,
+    0.89 on colors, 0.69 on position and 0.62 on color attributes. This matches SD3-Medium's 0.74 and exceeds
+    SDXL's 0.55 and DALL-E 2's 0.52, though it trails FLUX.1-dev's 0.82 and Janus-Pro-7B's 0.80. DPG-Bench
+    overall score is 85.78, with 88.50 global, 91.00 entity, 91.86 attribute, 92.21 relation and 91.86
+    other, comparable to HiDream-I1-Full's 85.89, FLUX.1-Dev's 83.84 and Lumina-Image 2.0's 87.20. All
+    generation is evaluated at 1024x1024.
+  limitations: The authors concede DINOv3 and DINOv2 features are unstable across resolutions in a way
+    VAE features are not. Cross-resolution cosine similarity stays close to 1.0 for VAE latents but varies
+    substantially for DINO features, which they flag as an open problem requiring training pipelines that
+    encourage consistent feature geometry. They also concede the model struggles with detailed human faces,
+    anatomically accurate fingers and text rendering, attributing this to insufficient fine-grained coverage
+    in the training corpus and the compute cost of modeling high-frequency patterns.
+  why_it_matters: It is the first large-scale demonstration that a frozen VFM feature space, not just a
+    VAE latent, can carry a full text-to-image diffusion pipeline at competitive quality. It also settles
+    the question of how such a system conditions on text in favor of single-stream joint attention rather
+    than a query-bridge design, aligning it with the FLUX and Lumina-Image-2.0 architecture family instead
+    of MetaQuery's.
+abstract: Visual generation grounded in Visual Foundation Model (VFM) representations offers a highly
+  promising unified pathway for integrating visual understanding, perception, and generation. Despite
+  this potential, training large-scale text-to-image diffusion models entirely within the VFM representation
+  space remains largely unexplored. To bridge this gap, we scale the SVG (Self-supervised representations
+  for Visual Generation) framework, proposing SVG-T2I to support high-quality text-to-image synthesis
+  directly in the VFM feature domain. By leveraging a standard text-to-image diffusion pipeline, SVG-T2I
+  achieves competitive performance, reaching 0.75 on GenEval and 85.78 on DPG-Bench. This performance
+  validates the intrinsic representational power of VFMs for generative tasks. We fully open-source the
+  project, including the autoencoder and generation model, together with their training, inference, evaluation
+  pipelines, and pre-trained weights, to facilitate further research in representation-driven visual generation.
+capabilities:
+- text-to-image
+- reconstruction
+openness: open-weights

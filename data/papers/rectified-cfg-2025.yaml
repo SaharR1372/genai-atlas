@@ -28,8 +28,20 @@ status:
   code: none
   weights: none
   verified: true
-  verified_on: '2026-09-09'
+  verified_on: '2026-09-10'
   verified_by: opus
 summary: Reworks classifier-free guidance specifically for rectified-flow models, where the original diffusion-era
   formulation is mismatched to straight-path transport and degrades samples at high guidance scales.
 explanation: null
+abstract: 'Classifier-free guidance (CFG) is the workhorse for steering large diffusion models toward
+  text-conditioned targets, yet its native application to rectified flow (RF) based models provokes severe
+  off-manifold drift, yielding visual artifacts, text misalignment, and brittle behaviour. We present
+  Rectified-CFG++, an adaptive predictor-corrector guidance that couples the deterministic efficiency
+  of rectified flows with a geometry-aware conditioning rule. Each inference step first executes a conditional
+  RF update that anchors the sample near the learned transport path, then applies a weighted conditional
+  correction that interpolates between conditional and unconditional velocity fields. We prove that the
+  resulting velocity field is marginally consistent and that its trajectories remain within a bounded
+  tubular neighbourhood of the data manifold, ensuring stability across a wide range of guidance strengths.
+  Extensive experiments on large-scale text-to-image models (Flux, Stable Diffusion 3/3.5, Lumina) show
+  that Rectified-CFG++ consistently outperforms standard CFG on benchmark datasets such as MS-COCO, LAION-Aesthetic,
+  and T2I-CompBench. Project page: https://rectified-cfgpp.github.io/'

@@ -41,6 +41,46 @@ summary: Replaces the UNet backbone of latent diffusion with a plain Vision Tran
 explanation: null
 lines:
 - line-vae-latent
+explained:
+  depth: full-text
+  before: Every diffusion model since Ho et al.'s original work used a convolutional UNet backbone.
+    Dhariwal and Nichol had ablated UNet design choices, but the high-level architecture itself had
+    gone essentially unquestioned even as transformers replaced convolutional and recurrent backbones
+    almost everywhere else.
+  problem: It was unclear whether the UNet's convolutional inductive bias was actually necessary for
+    diffusion models to work well, or whether it was simply the architecture nobody had gotten around
+    to replacing.
+  idea: Replace the UNet with a plain Vision Transformer operating on patchified latent tokens, inject
+    timestep and class conditioning through adaptive layer norm, and let the model's forward-pass compute,
+    measured in Gflops, be the main lever on sample quality rather than any architectural prior.
+  method: DiT operates on the latent space of a frozen, pretrained VAE, the same one used by Stable
+    Diffusion, with 8x spatial downsampling. A 32x32x4 latent is patchified with patch size p in {2,
+    4, 8} into a sequence of T=(I/p)^2 tokens, then processed by a standard transformer stack. Four
+    conditioning mechanisms were compared at matched settings, in-context conditioning, cross-attention,
+    adaptive layer norm (adaLN), and adaLN-Zero, which regresses per-block scale and shift parameters
+    plus a residual-gating coefficient from the timestep and class embedding and initializes each block
+    as the identity function. adaLN-Zero won and became the default block. Model size (DiT-S through
+    DiT-XL, 12 to 28 layers) and patch size jointly control Gflops, and all 12 configurations were trained
+    with identical hyperparameters so that Gflops, not tuning, explains differences in FID.
+  evidence: adaLN-Zero reaches FID-50K around 19.47 at 400K steps versus roughly 25.21 for plain adaLN,
+    26.14 for cross-attention, and 35.24 for in-context conditioning, with the same ranking holding
+    across scales. The flagship DiT-XL/2 reaches FID 9.62 at 256x256 without guidance and 2.27 with
+    classifier-free guidance at scale 1.50, beating the prior state of the art LDM-4-G's 3.60 under
+    the same guidance scale and StyleGAN-XL's 2.30. At 512x512, trained for 3M steps, DiT-XL/2 reaches
+    FID 12.03 unguided and 3.04 guided, ahead of ADM-U+G's 3.85, while using 524.6 Gflops against ADM-U's
+    2813 Gflops. FID-50K correlates inversely with Gflops across all 12 model variants regardless of
+    whether the extra compute comes from depth, width, or token count, and DiT-XL/2 sampled at 128 steps
+    still beats DiT-L/2 sampled at 1000 steps.
+  limitations: The paper relies entirely on a frozen, pretrained VAE and does not explore training the
+    autoencoder and transformer jointly. It reports no inference-time speed comparison, so the UNet's
+    compute advantage at generation time, if any, is left unmeasured. Hyperparameters, including learning
+    rate, warmup, and Adam settings, were held identical across all model sizes rather than tuned per
+    scale, which the authors note leaves room for improvement. Guidance was applied to only 3 of the
+    4 latent channels without deeper investigation.
+  why_it_matters: DiT establishes that diffusion models obey the same compute-scaling relationship as
+    language models, where more Gflops reliably buys lower FID, and that this holds with a completely
+    generic transformer and no UNet-specific inductive bias. It is the direct architectural ancestor
+    of every DiT and MM-DiT system in this atlas, including SiT and SD3.
 abstract: We explore a new class of diffusion models based on the transformer architecture. We train latent
   diffusion models of images, replacing the commonly-used U-Net backbone with a transformer that operates
   on latent patches. We analyze the scalability of our Diffusion Transformers (DiTs) through the lens
@@ -49,3 +89,6 @@ abstract: We explore a new class of diffusion models based on the transformer ar
   to possessing good scalability properties, our largest DiT-XL/2 models outperform all prior diffusion
   models on the class-conditional ImageNet 512x512 and 256x256 benchmarks, achieving a state-of-the-art
   FID of 2.27 on the latter.
+capabilities:
+- text-to-image
+openness: open-weights

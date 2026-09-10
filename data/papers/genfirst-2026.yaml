@@ -33,6 +33,36 @@ summary: 'Attacks the same latent-collapse problem as the representation-latent 
   pressure. Reports gFID 0.97 on ImageNet 256. Worth watching precisely because it is a competing answer
   rather than a follow-on.'
 explanation: null
+explained:
+  depth: abstract
+  before: Standard latent generative modeling trains a variational autoencoder for reconstruction
+    first, then trains a generative model on that frozen latent space, even though
+    reconstruction-optimized latents are not necessarily the latents generation learns best from.
+  problem: Direct end-to-end joint training of the autoencoder and the generative model is appealing
+    but has proven difficult in practice, since it is prone to latent collapse and to a
+    generation-reconstruction conflict where the two objectives compete for control of the latent
+    space.
+  idea: Two mechanisms explain and fix that instability. The entropy term in the KL-divergence
+    objective is what prevents posterior collapse, because reconstruction and prior-fitting alone
+    tend to shrink the posterior while entropy preserves non-degenerate latent uncertainty, and
+    because reconstruction is fast and strongly supervised while generation is slower and harder to
+    optimize, letting the generative objective shape the latent first, under deliberately weak
+    reconstruction pressure, and only strengthening reconstruction afterward, avoids the conflict.
+  method: According to the abstract, this generation-before-reconstruction curriculum, GenFirst,
+    produces the first direct end-to-end training without latent collapse. It is validated with
+    continuous autoregressive priors that have exact likelihoods and with SiT priors that have
+    implicit likelihoods, and the authors extend the framework to shared visual latents for combined
+    generation and representation learning and to continuous unified text-image generation. The
+    atlas could not confirm further architectural detail, including whether any frozen foundation
+    encoder such as DINO, SigLIP, or MAE is used anywhere in the pipeline, since only the abstract
+    was fetched; the abstract itself does not mention one.
+  evidence: With the end-to-end objective and the generation-before-reconstruction curriculum, a SiT
+    prior reaches gFID 0.97 with classifier-free guidance and 1.45 without it on ImageNet-256, and an
+    MMDiT prior reaches a GenEval score of 0.90 on text-to-image generation.
+  why_it_matters: If joint end-to-end training of a tokenizer and its generator can be made stable,
+    it removes the two-stage pipeline every other paper in this cluster still assumes, including the
+    frozen-encoder RAE line, and reopens the question of whether a frozen semantic encoder is
+    necessary at all rather than merely a good current solution.
 abstract: 'Latent generative models typically follow a two-stage pipeline, training a variational autoencoder
   for reconstruction and then a generative model on the frozen latent space. Since reconstruction-optimized
   latents are not necessarily generation-friendly, jointly training both models is an appealing alternative.

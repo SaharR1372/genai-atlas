@@ -30,9 +30,19 @@ status:
   code: none
   weights: none
   verified: true
-  verified_on: '2026-09-09'
+  verified_on: '2026-09-10'
   verified_by: opus
 summary: Decouples the visual encoder used for understanding from the one used for generation while keeping
   a single shared language backbone, then scales data and model size. One of the most reused open unified
   baselines of the period.
 explanation: null
+abstract: In this work, we introduce Janus-Pro, an advanced version of the previous work Janus. Specifically,
+  Janus-Pro incorporates (1) an optimized training strategy, (2) expanded training data, and (3) scaling
+  to larger model size. With these improvements, Janus-Pro achieves significant advancements in both multimodal
+  understanding and text-to-image instruction-following capabilities, while also enhancing the stability
+  of text-to-image generation. We hope this work will inspire further exploration in the field. Code and
+  models are publicly available.
+capabilities:
+- text-to-image
+- image-understanding
+openness: open-weights

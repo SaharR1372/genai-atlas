@@ -34,11 +34,25 @@ status:
   code: released
   weights: none
   verified: true
-  verified_on: '2026-09-09'
-  verified_by: sonnet
+  verified_on: '2026-09-10'
+  verified_by: opus
 summary: 'Shows vector quantization is not required for autoregressive image generation: predict continuous
   per-token vectors and score them with a small conditional diffusion loss instead of a softmax over a
   discrete codebook, removing quantization error entirely while keeping AR''s flexible generation order.'
 explanation: null
 lines:
 - line-continuous-tokens
+abstract: 'Conventional wisdom holds that autoregressive models for image generation are typically accompanied
+  by vector-quantized tokens. We observe that while a discrete-valued space can facilitate representing
+  a categorical distribution, it is not a necessity for autoregressive modeling. In this work, we propose
+  to model the per-token probability distribution using a diffusion procedure, which allows us to apply
+  autoregressive models in a continuous-valued space. Rather than using categorical cross-entropy loss,
+  we define a Diffusion Loss function to model the per-token probability. This approach eliminates the
+  need for discrete-valued tokenizers. We evaluate its effectiveness across a wide range of cases, including
+  standard autoregressive models and generalized masked autoregressive (MAR) variants. By removing vector
+  quantization, our image generator achieves strong results while enjoying the speed advantage of sequence
+  modeling. We hope this work will motivate the use of autoregressive generation in other continuous-valued
+  domains and applications. Code is available at: https://github.com/LTH14/mar.'
+capabilities:
+- text-to-image
+openness: open-weights

@@ -35,8 +35,8 @@ status:
   code: released
   weights: none
   verified: true
-  verified_on: '2026-09-09'
-  verified_by: sonnet
+  verified_on: '2026-09-10'
+  verified_by: opus
 summary: Reframes diffusion and flow matching as two points in one family of stochastic interpolants,
   isolating objective, coupling, and sampler as independent design choices on the exact DiT backbone;
   SiT-XL beats DiT-XL at matched size and FLOPs. Becomes the standard testbed the REPA/RAE line builds
@@ -45,3 +45,55 @@ explanation: null
 lines:
 - line-flow-matching
 - line-vae-latent
+explained:
+  depth: full-text
+  before: DiT had shown that a plain transformer trained with the standard DDPM-style diffusion objective
+    scales well, but that objective ties together several choices, the noise schedule, the model's
+    prediction target, and the sampler, that in principle need not be linked.
+  problem: Score-based diffusion formulations couple the interpolation path between data and noise,
+    the model's prediction target, and the sampling procedure into one fixed recipe, which makes it
+    hard to tell which ingredient is responsible for a given gain in sample quality.
+  idea: Treat diffusion and flow matching as two points inside one family of stochastic interpolants,
+    x_t = alpha_t x* + sigma_t epsilon, and show that the interpolant path, the prediction target, discrete
+    versus continuous time, and the deterministic-versus-stochastic sampler can each be chosen independently
+    while keeping the exact DiT architecture unchanged, isolating which choices actually improve sample
+    quality.
+  method: SiT keeps DiT's backbone, patch size, VAE encoder and decoder, and per-scale configuration
+    (SiT-S through SiT-XL) completely fixed, changing only the objective and sampling framework, so
+    any FID difference is attributable to that change alone. The velocity and score fields are shown
+    to depend only on the interpolant path (alpha_t, sigma_t) and not on the diffusion coefficient w_t
+    used at sampling time, which lets w_t be tuned separately after training. Design axes tested include
+    the interpolant (VP, Linear, or generalized-VP), the prediction target (noise, score, or velocity),
+    discrete DDPM-style time versus continuous time, and the sampler, a deterministic probability-flow
+    ODE versus an SDE with a tunable diffusion coefficient.
+  evidence: At matched size, architecture, and 400K training steps, SiT beats DiT uniformly. SiT-XL
+    reaches FID 17.2 against DiT-XL's 19.5, and the gap holds at every scale down to SiT-S's 57.6 against
+    DiT-S's 68.4. Ablations on a DiT-B backbone isolate each choice's contribution starting from a DDPM
+    baseline of FID 44.2, switching to velocity prediction under a VP interpolant reaches 39.8, switching
+    the interpolant to generalized-VP reaches 34.6, and switching the sampler from ODE to an SDE with
+    a beta_t diffusion coefficient reaches 32.9, an 11.3-point cumulative improvement at identical compute.
+    At full training budget with classifier-free guidance at 1.5, SiT-XL reaches FID-50K 2.06 at 256x256
+    and 2.62 at 512x512, both settings ahead of DiT-XL's 2.27 at 256x256 under the same guidance scale.
+  limitations: The authors concede that the best sampler and diffusion coefficient are both model- and
+    interpolant-dependent, so there is no single rule and practitioners must validate the choice for
+    their own configuration. They note the SDE sampler needs a large step budget, 250 function evaluations
+    in their setup, to reach its lowest FID, while the ODE sampler converges faster to a slightly worse
+    score with fewer steps. The score estimate becomes singular as t approaches 0 because sigma_t vanishes,
+    which they work around by tying w_t to sigma_t but acknowledge can cause numerical instability more
+    generally. Evaluation is limited to ImageNet at 256x256 and 512x512.
+  why_it_matters: By decoupling the objective, the interpolant, and the sampler from the architecture,
+    SiT turns diffusion-model design into a set of independently tunable choices rather than one fixed
+    recipe. Its ImageNet setup, matched exactly to DiT, becomes the standard testbed later work, including
+    REPA and RAE, uses to isolate its own contributions.
+abstract: 'We present Scalable Interpolant Transformers (SiT), a family of generative models built on
+  the backbone of Diffusion Transformers (DiT). The interpolant framework, which allows for connecting
+  two distributions in a more flexible way than standard diffusion models, makes possible a modular study
+  of various design choices impacting generative models built on dynamical transport: learning in discrete
+  or continuous time, the objective function, the interpolant that connects the distributions, and deterministic
+  or stochastic sampling. By carefully introducing the above ingredients, SiT surpasses DiT uniformly
+  across model sizes on the conditional ImageNet 256x256 and 512x512 benchmark using the exact same model
+  structure, number of parameters, and GFLOPs. By exploring various diffusion coefficients, which can
+  be tuned separately from learning, SiT achieves an FID-50K score of 2.06 and 2.62, respectively.'
+capabilities:
+- text-to-image
+openness: open-weights

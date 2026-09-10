@@ -1,0 +1,98 @@
+---
+import Base from "../layouts/Base.astro";
+
+// Kept as an explicit list rather than a directory scan, because each notebook needs a
+// framing that says what question it answers and what it uses.
+const NOTEBOOKS = [
+  {
+    slug: "latents",
+    title: "What does the latent actually throw away?",
+    question: "The atlas argues about which space to generate in. This measures the difference.",
+    body: "Round-trips a real image through the autoencoders that successive generations of latent diffusion used, measures what each loses, and shows where the loss lives. Then looks at DINOv2's features and shows why they are a different kind of object, not just a better compression.",
+    uses: ["SD 1.5 VAE", "SDXL VAE", "SD 3 16-channel VAE", "DINOv2"],
+    runtime: "about a minute",
+  },
+  {
+    slug: "editing",
+    title: "How editing methods actually differ",
+    question: "Every editing method claims to preserve what you did not change. They mean different things by it.",
+    body: "Runs three editing mechanisms on the same image and shows what each disturbs: regenerating from noise, enforcing a mask in the latent at every step, and conditioning a fresh generation on a reference. The difference maps make the strength of each guarantee visible.",
+    uses: ["SD 1.5", "SDEdit", "latent masked blending", "IP-Adapter"],
+    runtime: "a couple of minutes",
+  },
+];
+---
+<Base
+  title="Notebooks"
+  description="Runnable notebooks with real outputs, showing how the major approaches actually behave on a GPU."
+>
+  <h1 style="font-size:1.9rem; margin:0 0 0.6rem;">Notebooks</h1>
+  <p class="measure" style="color:var(--text-muted); margin:0 0 1.25rem;">
+    Reading about a method tells you what it claims. Running it tells you how it behaves. These
+    notebooks do the second, with outputs produced on an NVIDIA A100 80GB and committed to the
+    repository, so you can see the results before deciding whether to run anything yourself.
+  </p>
+
+  <div class="card section-border" style="--section-color: var(--section-vfm); margin-bottom:2.5rem;">
+    <h2 style="font-size:1rem; margin:0 0 0.5rem;">What these are and are not</h2>
+    <p style="margin:0 0 0.5rem;">
+      They assemble the original authors' released weights and code so you can compare methods
+      without cloning six repositories and reconciling six environments. Every cell that uses a
+      released model credits the repository it came from.
+    </p>
+    <p style="margin:0; color:var(--text-muted); font-size:0.92rem;">
+      Nothing here is reimplemented, and nothing here is a new result. Where a measurement in a
+      notebook disagrees with the tidy story, the notebook says so rather than hiding it.
+    </p>
+  </div>
+
+  <div style="display:flex; flex-direction:column; gap:1.5rem; margin-bottom:2.5rem;">
+    {NOTEBOOKS.map((nb) => (
+      <div class="card">
+        <h2 style="font-size:1.25rem; margin:0 0 0.4rem;">{nb.title}</h2>
+        <p style="margin:0 0 0.75rem; color:var(--text-muted); font-style:italic;">{nb.question}</p>
+        <p style="margin:0 0 1rem;">{nb.body}</p>
+        <div style="display:flex; gap:0.4rem; flex-wrap:wrap; margin-bottom:1rem;">
+          {nb.uses.map((u) => <span class="badge">{u}</span>)}
+          <span class="badge" style="border-color:var(--section-vfm); color:var(--section-vfm);">
+            runs in {nb.runtime}
+          </span>
+        </div>
+        <p style="margin:0;">
+          <a href={`/notebooks/${nb.slug}.html`} style="font-weight:500;">
+            Read it with its outputs &rarr;
+          </a>
+          <span style="color:var(--text-muted);"> · </span>
+          <a href={`https://github.com/SaharR1372/genai-atlas/blob/main/notebooks/${nb.slug}.ipynb`}>
+            notebook on GitHub
+          </a>
+          <span style="color:var(--text-muted);"> · </span>
+          <a href={`https://github.com/SaharR1372/genai-atlas/blob/main/notebooks/specs/${nb.slug}.py`}>
+            source
+          </a>
+        </p>
+      </div>
+    ))}
+  </div>
+
+  <section class="card">
+    <h2 style="font-size:1.1rem; margin:0 0 0.75rem;">Running them yourself</h2>
+    <p style="margin:0 0 0.75rem;">
+      You need a CUDA GPU with roughly 16GB or more, and the model weights, which download on first
+      use. The notebooks pin seeds, so your outputs should match the committed ones.
+    </p>
+    <pre style="margin:0 0 0.75rem;"><code>git clone https://github.com/SaharR1372/genai-atlas
+cd genai-atlas
+pip install torch diffusers transformers accelerate matplotlib jupyter
+jupyter lab notebooks/</code></pre>
+    <p style="margin:0 0 0.75rem; color:var(--text-muted); font-size:0.92rem;">
+      The notebooks pass <code>local_files_only=True</code> so they never silently download during a
+      run. Remove that argument on first use, or pre-fetch the weights listed in each notebook's
+      credits table.
+    </p>
+    <p style="margin:0; color:var(--text-muted); font-size:0.92rem;">
+      To rebuild and re-execute everything from source:
+      <code>python notebooks/build.py</code>, then <code>./notebooks/publish.sh</code>.
+    </p>
+  </section>
+</Base>

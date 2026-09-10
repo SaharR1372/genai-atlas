@@ -34,3 +34,20 @@ summary: 'Starts from DINOv2 and SigLIP2 features and does general instruction e
   limited by weak reconstruction, producing details inconsistent with the input image. The paper unfreezes
   the encoder in its second stage to fix exactly that.'
 explanation: null
+abstract: 'Modern Latent Diffusion Models (LDMs) typically operate in low-level Variational Autoencoder
+  (VAE) latent spaces that are primarily optimized for pixel-level reconstruction. To unify vision generation
+  and understanding, a burgeoning trend is to adopt high-dimensional features from representation encoders
+  as generative latents. However, we empirically identify two fundamental obstacles in this paradigm:
+  (1) the discriminative feature space lacks compact regularization, making diffusion models prone to
+  off-manifold latents that lead to inaccurate object structures; and (2) the encoder''s inherently weak
+  pixel-level reconstruction hinders the generator from learning accurate fine-grained geometry and texture.
+  In this paper, we propose a systematic framework to adapt understanding-oriented encoder features for
+  generative tasks. We introduce a semantic-pixel reconstruction objective to regularize the latent space,
+  enabling the compression of both semantic information and fine-grained details into a highly compact
+  representation (96 channels with 16x16 spatial downsampling). This design ensures that the latent space
+  remains semantically rich and achieves state-of-the-art image reconstruction, while remaining compact
+  enough for accurate generation. Leveraging this representation, we design a unified Text-to-Image (T2I)
+  and image editing model. Benchmarking against various feature spaces, we demonstrate that our approach
+  achieves state-of-the-art reconstruction, faster convergence, and substantial performance gains in both
+  T2I and editing tasks, validating that representation encoders can be effectively adapted into robust
+  generative components.'

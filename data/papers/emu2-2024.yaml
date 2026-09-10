@@ -53,3 +53,7 @@ abstract: The human ability to easily solve multimodal tasks in context (i.e., w
   as question answering benchmarks for large multimodal models and open-ended subject-driven generation.
   These achievements demonstrate that Emu2 can serve as a base model and general-purpose interface for
   a wide range of multimodal tasks. Code and models are publicly available to facilitate future research.
+capabilities:
+- text-to-image
+- image-understanding
+openness: open-weights

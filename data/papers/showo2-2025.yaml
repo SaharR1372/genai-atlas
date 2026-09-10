@@ -28,9 +28,23 @@ status:
   code: none
   weights: none
   verified: true
-  verified_on: '2026-09-09'
+  verified_on: '2026-09-10'
   verified_by: opus
 summary: Refines the single-transformer recipe that runs autoregressive text and diffusion image generation
   in one set of weights, and moves to 3D-VAE latents. Evidence the native-unified line is maturing rather
   than stalling.
 explanation: null
+abstract: This paper presents improved native unified multimodal models, \emph{i.e.,} Show-o2, that leverage
+  autoregressive modeling and flow matching. Built upon a 3D causal variational autoencoder space, unified
+  visual representations are constructed through a dual-path of spatial (-temporal) fusion, enabling scalability
+  across image and video modalities while ensuring effective multimodal understanding and generation.
+  Based on a language model, autoregressive modeling and flow matching are natively applied to the language
+  head and flow head, respectively, to facilitate text token prediction and image/video generation. A
+  two-stage training recipe is designed to effectively learn and scale to larger models. The resulting
+  Show-o2 models demonstrate versatility in handling a wide range of multimodal understanding and generation
+  tasks across diverse modalities, including text, images, and videos. Code and models are released at
+  https://github.com/showlab/Show-o.
+capabilities:
+- text-to-image
+- image-understanding
+openness: open-weights

@@ -25,12 +25,69 @@ status:
   code: none
   weights: none
   verified: true
-  verified_on: '2026-09-09'
-  verified_by: sonnet
+  verified_on: '2026-09-10'
+  verified_by: opus
 summary: 'Independently arrives at the same core move as RAE within days: drop the VAE, generate directly
   in a frozen DINOv3 feature space, and add a lightweight residual branch specifically to recover the
-  fine-grained pixel detail semantic features drop. Reports 62x faster training and 35x faster inference
-  than VAE-based diffusion at comparable quality.'
+  fine-grained pixel detail semantic features drop. The paper''s project page advertises large training
+  and inference speedups; those specific figures could not be located in the paper body on a full-text
+  read, so they are not repeated here.'
 explanation: null
 lines:
 - line-representation-latent
+explained:
+  depth: full-text
+  before: Latent diffusion transformers pair the denoiser with a VAE whose latent space is trained purely
+    for pixel reconstruction. The RAE line had already argued this leaves the latent semantically weak
+    and slow to train on, but that argument was made for class-conditional ImageNet generation with DINOv2/SigLIP/MAE
+    encoders.
+  problem: A t-SNE analysis of vanilla VAE latents shows heavy semantic entanglement, with representations
+    from different classes mixed together. The authors argue this weak structure is a root cause of the
+    VAE paradigm's slow convergence, its need for many sampling steps, and its poor transferability to
+    perception and understanding tasks.
+  idea: Drop the VAE and generate directly in a frozen DINOv3 feature space. Since DINO features discard
+    the fine-grained pixel detail needed for faithful reconstruction, add a small trained residual branch
+    whose only job is to recover that missing detail.
+  method: The frozen encoder is DINOv3-ViT-S/16+, giving 16 by 16 spatial tokens at 384 channels for a
+    256x256 image. A lightweight residual encoder, about 29M plus 11M parameters, is trained to capture
+    the fine-grained detail absent from DINO features; its output is distribution-aligned to the DINO
+    features so the decoder does not over-rely on it and distort the semantic space, then concatenated
+    along the channel dimension to form the full representation. Training happens in two stages. First
+    the residual encoder and decoder are trained with a reconstruction loss, then a SiT-style flow-matching
+    diffusion transformer (SVG-XL) is trained directly on the resulting high-dimensional latent, using
+    QK-norm and per-channel normalization to keep training stable.
+  evidence: SVG-XL reaches gFID 6.57 without classifier-free guidance at 80 epochs and 25 sampling steps,
+    improving to 3.94 at 500 epochs and 3.36 at 1400 epochs; with guidance these become 3.54, 2.10 and
+    1.92. At the same 80-epoch, 25-step budget it beats DiT-XL's 9.62 and LlamaGen's 9.38 gFID without
+    guidance. The advantage is sharpest under few-step sampling. At 5 steps SVG-XL reaches FID 12.26 against
+    SiT-XL with VA-VAE's 74.46, and at 10 steps 9.39 against 17.41. Reconstruction FID is 0.65. Downstream,
+    the SVG encoder preserves DINO's discriminative quality, reaching 81.80% ImageNet-1K top-1 versus
+    DINO's 81.71%, 46.51% ADE20K mIoU versus 46.37%, and 0.361 NYUv2 depth RMSE versus 0.362.
+  limitations: The authors concede that classifier-free guidance is less effective in this framework than
+    in standard VAE-based diffusion and say better alternatives are needed. They flag the added dimensionality
+    of the residual encoder as a cost worth reducing, and state that scaling to larger datasets, higher
+    resolutions, and text-to-image or text-to-video generation remains unexplored.
+  why_it_matters: It is an independent arrival at RAE's core claim from a different starting point, self-supervised
+    representation learning for perception rather than diffusion-transformer scaling, which strengthens
+    the case that semantic latents are the right target rather than an artifact of one group's setup.
+    The residual-detail branch is also a concrete answer to the fine-detail-loss problem semantic latents
+    raise.
+abstract: 'Recent progress in diffusion-based visual generation has largely relied on latent diffusion
+  models with variational autoencoders (VAEs). While effective for high-fidelity synthesis, this VAE+diffusion
+  paradigm suffers from limited training efficiency, slow inference, and poor transferability to broader
+  vision tasks. These issues stem from a key limitation of VAE latent spaces: the lack of clear semantic
+  separation and strong discriminative structure. Our analysis confirms that these properties are crucial
+  not only for perception and understanding tasks, but also for the stable and efficient training of latent
+  diffusion models. Motivated by this insight, we introduce SVG, a novel latent diffusion model without
+  variational autoencoders, which leverages self-supervised representations for visual generation. SVG
+  constructs a feature space with clear semantic discriminability by leveraging frozen DINO features,
+  while a lightweight residual branch captures fine-grained details for high-fidelity reconstruction.
+  Diffusion models are trained directly on this semantically structured latent space to facilitate more
+  efficient learning. As a result, SVG enables accelerated diffusion training, supports few-step sampling,
+  and improves generative quality. Experimental results further show that SVG preserves the semantic and
+  discriminative capabilities of the underlying self-supervised representations, providing a principled
+  pathway toward task-general, high-quality visual representations. Code and interpretations are available
+  at https://howlin-wang.github.io/svg/.'
+capabilities:
+- reconstruction
+openness: open-weights
