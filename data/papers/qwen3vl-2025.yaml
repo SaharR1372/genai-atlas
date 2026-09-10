@@ -29,6 +29,58 @@ status:
 summary: Interleaved multimodal rotary embeddings, multi-level vision feature fusion, and text-timestamp
   alignment. The current generation of the family most open generators depend on.
 explanation: null
+explained:
+  depth: full-text
+  before: Qwen2.5-VL and the earlier Qwen-VL line established native-resolution visual encoding with M-RoPE
+    for joint text, image, and video positions, and T-RoPE for temporal alignment in video. Multimodal
+    training still tended to erode the underlying language model's pure text-only linguistic proficiency,
+    M-RoPE's frequency allocation chunked temporal, height, and width components separately into an imbalanced
+    spectrum that hurt long-video understanding, only the ViT's final output tokens reached the language
+    model, and T-RoPE produced excessively large and sparse temporal position ids for long videos while
+    needing costly uniform frame-rate sampling during training.
+  problem: The paper targets five things at once, preserving text-only capability while adding multimodal
+    reasoning, extending native context to 256K tokens with faithful long-video comprehension, tightening
+    vision-language alignment by using more than just the ViT's final layer, achieving more precise temporal
+    grounding in video, and supporting downstream agentic and coding workflows.
+  idea: Redistribute the rotary position frequencies for temporal, height, and width axes so each is represented
+    uniformly across both low and high frequency bands instead of being chunked separately, feed the language
+    model visual features from multiple depths of the vision transformer rather than only its output, and
+    replace positional tricks for video timing with explicit timestamp text tokens the model reads directly.
+  method: The vision encoder continues training from a pretrained SigLIP-2 backbone, SigLIP2-SO-400M by
+    default or SigLIP2-Large for the 2B and 4B variants, using dynamic input resolution and 2D-RoPE. A
+    two-layer MLP compresses each 2 by 2 group of patch features into one visual token before it enters
+    the language model, an MLP-projector fusion. DeepStack additionally takes visual features from three
+    distinct levels of the ViT, projects each through a dedicated lightweight merger, and adds them directly
+    into the hidden states of the first three LLM layers via residual connections, so the language model
+    receives multi-depth visual information rather than only the encoder's final output. The LLM backbone
+    is Qwen3, in dense 2B, 4B, 8B, and 32B sizes and mixture-of-experts 30B-A3B and 235B-A22B sizes, where
+    the A-suffix number gives active parameters. Training has four stages. Stage S0 trains only the merger
+    on 67B tokens at 8K context while the vision encoder and LLM stay frozen. Stages S1 through S3 train
+    all parameters jointly, vision encoder and LLM together, first on roughly 1T tokens at 8K context, then
+    roughly 1T tokens at 32K context, then 100B tokens at a 262K-token context for ultra-long-context capability.
+    Interleaved-MRoPE interleaves the temporal, height, and width rotary components across the embedding
+    dimension instead of chunking them into separate frequency bands, giving each spatiotemporal axis a
+    uniformly balanced spectrum. Video timing is handled by prefixing each temporal patch with an explicit
+    formatted timestamp text string, such as a marker for 3.0 seconds, trained in both plain-seconds and
+    hours-minutes-seconds formats, replacing the T-RoPE positional encoding used in Qwen2.5-VL.
+  evidence: The paper reports that Qwen3-VL-235B-A22B-Instruct achieves the best reported results among
+    non-thinking or low-thinking-budget models on multiple benchmarks including MMMU, and that the Thinking
+    variant reaches state-of-the-art results on MathVista-mini, MathVision, and MathVerse-mini. On HallusionBench
+    the Thinking version surpasses Gemini 2.5 Pro by 3.0, 1.0, and 6.3 points on its constituent metrics.
+    The model natively supports interleaved contexts up to 256K tokens and the paper reports superior long-video
+    performance, most notably on MLVU, attributed to this context length and the interleaved-MRoPE redesign.
+  limitations: The report contains no dedicated limitations section. It concedes video evaluation comparisons
+    against other models cannot be guaranteed fully fair, since resource and API limits constrained the
+    number of input frames usable during evaluation. It concedes DeepStack's multi-level feature injection
+    and the explicit text timestamp scheme both add modest extra compute and context length overhead relative
+    to the simpler mechanisms they replace.
+  why_it_matters: 'This report explicitly states the authors envision Qwen3-VL as a foundational engine
+    for image-grounded reasoning, agentic decision-making, and multimodal code intelligence, a broader
+    systems role than a pure understanding benchmark leaderboard entry. Separately, this atlas''s own summary
+    for this entry records Qwen3-VL as the current generation of the family that most open generators depend
+    on, extending the role Qwen2.5-VL already plays as text encoder for Qwen-Image and instruction parser
+    for Step1X-Edit; that downstream generation-pipeline role is not discussed anywhere in this technical
+    report itself, which only describes understanding, reasoning, and agentic benchmarks.'
 abstract: 'We introduce Qwen3-VL, the most capable vision-language model in the Qwen series to date, achieving
   superior performance across a broad range of multimodal benchmarks. It natively supports interleaved
   contexts of up to 256K tokens, seamlessly integrating text, images, and video. The model family includes

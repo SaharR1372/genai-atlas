@@ -34,6 +34,52 @@ summary: 'Starts from DINOv2 and SigLIP2 features and does general instruction e
   limited by weak reconstruction, producing details inconsistent with the input image. The paper unfreezes
   the encoder in its second stage to fix exactly that.'
 explanation: null
+explained:
+  before: Representation encoders such as DINOv2 and SigLIP2 make excellent understanding features
+    but were not built to be generative latents. RAE was the first paper to use them directly, freezing
+    the encoder and training only a decoder. That fixed reconstruction quality relative to using the
+    raw features untouched, but this paper argues RAE's high-dimensional, unregularized feature space
+    still lets diffusion models land on off-manifold latents with structurally distorted objects, and
+    the frozen encoder's purely discriminative training still discards high-frequency pixel detail
+    the decoder can never recover.
+  problem: Adapt an understanding-oriented representation encoder's features into a generative latent
+    that is simultaneously well regularized, so diffusion stays on-manifold, and capable of state-of-the-art
+    pixel reconstruction, then build a unified text-to-image and editing model on top of it.
+  idea: Compress DINOv2 or SigLIP2 features into a compact, KL-regularized 96-channel latent with a
+    dedicated semantic encoder-decoder first, then in a second stage unfreeze the representation encoder
+    itself and let a pixel-reconstruction loss push gradients back into it, holding it in place with
+    a semantic-consistency loss against its original, frozen features.
+  method: Stage one, S-VAE, freezes the pretrained DINOv2 or SigLIP2 encoder and trains a semantic
+    encoder and decoder mapping its 768-dimensional features into a 96-channel, 16x16-downsampled,
+    KL-regularized latent, which addresses the off-manifold problem. Stage two, PS-VAE, unfreezes the
+    representation encoder during pixel-decoder training by removing the detach operation that had
+    blocked gradients, so the pixel-reconstruction loss now updates the encoder directly; a semantic-reconstruction
+    loss against the original frozen encoder's features is added alongside the retained KL and pixel
+    losses, so the encoder gains reconstruction detail without losing its semantic structure. This
+    directly confirms the pattern already noted elsewhere in this atlas, that a frozen encoder's weak
+    reconstruction fidelity limits editing quality, and the paper's own fix is to unfreeze it. The unified
+    editing model uses a Transfusion-style shared transformer, in which clean latents of the input image,
+    instruction text embeddings, and noisy target latents are concatenated into one sequence, with a full attention
+    mask over the clean and noisy image latents and a causal mask over the instruction text. Editing
+    happens directly in this 96-channel representation-model latent space. The fetched text describes
+    no mask, attention injection, latent blending, or locality loss protecting regions the instruction
+    did not target; consistency with the input depends entirely on what the model has learned, not
+    on an architectural constraint.
+  evidence: On ImageNet-1K reconstruction at stride 16, PS-VAE reaches rFID 0.203, PSNR 28.79, SSIM
+    0.817, against RAE's rFID 0.619, PSNR 19.20, SSIM 0.436, and MAR-VAE's rFID 0.534, PSNR 26.18, SSIM
+    0.715. On text-to-image, PS-VAE scores GenEval 76.56 and DPG-Bench 83.62 against RAE's 71.27 and
+    81.72. On instruction editing measured by EditingReward on GEdit-Bench, PS-VAE scores 0.222 against
+    RAE's 0.059 and MAR-VAE's 0.056.
+  limitations: The authors concede training is done exclusively on ImageNet-1K and suggest future work
+    could use larger, more diverse data. They train and evaluate only at 256x256 resolution and leave
+    higher resolutions to future work. They also report that under equal loss weighting, SigLIP2 reconstruction
+    saturates earlier than DINOv2's, requiring per-encoder manual tuning of the semantic-to-pixel loss
+    ratio.
+  why_it_matters: It gives a precise, direct confirmation that a frozen representation encoder's weak
+    reconstruction fidelity is a real bottleneck for using these features as a generative and editing
+    latent, and that unfreezing the encoder with a semantic-consistency anchor is a working fix, the
+    same conclusion reached independently by RPiAE.
+  depth: full-text
 abstract: 'Modern Latent Diffusion Models (LDMs) typically operate in low-level Variational Autoencoder
   (VAE) latent spaces that are primarily optimized for pixel-level reconstruction. To unify vision generation
   and understanding, a burgeoning trend is to adopt high-dimensional features from representation encoders

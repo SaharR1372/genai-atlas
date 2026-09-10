@@ -34,6 +34,45 @@ summary: Trains a family of pure self-supervised (no language) vision models fro
   saturates — evidence against the assumption that a generation-ready semantic latent needs language supervision
   at all.
 explanation: null
+explained:
+  depth: full-text
+  before: CLIP-style contrastive language-image pretraining was assumed necessary for the semantic
+    richness that multimodal tasks like VQA need, since language-supervised models clearly
+    outperformed visual self-supervised models such as DINOv2 and MAE on those tasks. But visual SSL
+    had always been trained on much smaller, uncurated datasets than CLIP's web-scale corpora,
+    confounding data scale with supervision type.
+  problem: The paper isolates whether visual SSL underperforms CLIP because it lacks language
+    supervision, or merely because prior comparisons never controlled for training data, by training
+    both paradigms on the identical MetaCLIP web-image corpus.
+  idea: Train a family of pure self-supervised, language-free vision models, called Web-DINO, from
+    1B to 7B parameters on the same web images CLIP uses, and show visual SSL keeps improving with
+    scale on VQA precisely where CLIP-style training saturates, so language supervision is not
+    required to reach CLIP-level semantic quality.
+  method: The supervision is self-distillation in the DINOv2 sense, a joint-embedding
+    teacher-student setup with no text or captions used at all; MAE-style masked reconstruction is
+    tested as a secondary validation objective. Models scale from ViT-1B to ViT-7B, trained purely
+    on the 2 billion images in MetaCLIP data. Evaluation freezes the vision encoder and feeds it
+    through an MLP adapter into a Llama-3 8B language model for the Cambrian-1 VQA suite, alongside
+    classic ImageNet-1k linear probing, ADE20k segmentation and NYU depth. The paper contains no
+    mention anywhere of diffusion models or of Web-SSL features being used as a training target or
+    latent space for image generation; features are evaluated purely as frozen discriminative
+    representations, so this is representation learning only with respect to generative use as far
+    as the fetched text discusses.
+  evidence: Web-DINO ViT-7B reaches 53.9 percent average VQA on Cambrian-1 at 2 billion images seen,
+    against MetaCLIP ViT-7B's 53.0 percent, with MetaCLIP saturating after 3B parameters while
+    Web-DINO keeps improving near log-linearly through 7B. Scaling data for Web-DINO ViT-7B from 1B
+    to 8B samples raises average VQA from 51.0 percent to 55.2 percent, with OCR and chart score
+    rising from 23.6 percent to 35.5 percent. A heavy text-filtered subset, 1.3 percent of the data,
+    pushes Web-DINO ViT-2B to 53.7 percent average VQA and 40.4 percent OCR and chart, beating
+    full-data CLIP ViT-2B's 53.0 percent.
+  limitations: The paper concedes vision-only models do not support zero-shot image classification
+    out of the box the way CLIP does, that the study stays confined to MetaCLIP data rather than
+    larger uncurated corpora, that VQA evaluation is tied to a fixed Llama-3 8B backbone, and that
+    classic vision-benchmark gains are more modest than the VQA gains.
+  why_it_matters: It undercuts the assumption behind generative-latent work such as RAE, which draws
+    its frozen encoders from DINOv2, SigLIP and MAE, that language-aligned supervision is what makes
+    visual features generation-ready. If pure visual self-supervised learning scales past CLIP on
+    semantic tasks, the semantic richness those latents prize need not come from language at all.
 abstract: 'Visual Self-Supervised Learning (SSL) currently underperforms Contrastive Language-Image Pretraining
   (CLIP) in multimodal settings such as Visual Question Answering (VQA). This multimodal gap is often
   attributed to the semantics introduced by language supervision, even though visual SSL and CLIP models

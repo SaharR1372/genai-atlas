@@ -30,6 +30,48 @@ summary: 'Processes images at their native resolution and aspect ratio rather th
   square, and introduces a rotary position encoding decomposed across time, height and width. Directly
   load-bearing for this atlas: its successor is the text encoder inside Qwen-Image.'
 explanation: null
+explained:
+  depth: full-text
+  before: Prior large vision-language models processed images at a fixed predetermined resolution, resizing
+    or padding every input to something like a fixed square before encoding, typically through a static
+    frozen CLIP-style vision encoder. Position encoding for multimodal sequences relied on plain 1D RoPE,
+    designed for sequential text and not for the two spatial dimensions of an image or the added temporal
+    dimension of video.
+  problem: Fixed-resolution preprocessing loses detailed information in high-resolution images and wastes
+    tokens on low-resolution ones, so the model perceives visual detail with less sensitivity to scale
+    than human vision, and a 1D position scheme cannot cleanly represent the joint temporal, height, and
+    width structure of interleaved image, video, and text sequences.
+  idea: Let the vision encoder process each image at its own native resolution and aspect ratio, producing
+    a number of visual tokens proportional to the image's actual size rather than a fixed count, and decompose
+    rotary position embeddings into separate temporal, height, and width components so one scheme covers
+    text, images, and video uniformly.
+  method: The vision encoder is a roughly 675M-parameter ViT initialized from a DFN ViT, with absolute
+    position embeddings removed and replaced by 2D-RoPE inside the encoder to represent patch position.
+    After the ViT, an MLP layer compresses each group of 2 by 2 adjacent patch tokens into a single token
+    before it enters the language model, so fusion is an MLP projector feeding a compressed but still fine-grained
+    stream of visual tokens directly into the LLM's input sequence, in the encoder-projector family rather
+    than cross-attention. The LLM backbone is Qwen2, at 1.5B, 7.6B, or 72B parameters for the 2B, 7B, and
+    72B model variants respectively. Training proceeds in three stages. Stage one trains only the ViT on
+    roughly 600B tokens of image-text data while the LLM stays frozen, stage two unfreezes all parameters,
+    vision encoder and LLM together, across a wider roughly 800B-token data mix, and stage three freezes
+    the ViT again and instruction-tunes the LLM on dialogue, VQA, and agent-style data. M-RoPE assigns text
+    tokens identical position ids across all three axes, equivalent to ordinary 1D RoPE, gives image tokens
+    a constant temporal id with height and width ids that vary per patch position, and gives video frames
+    an incrementing temporal id per frame with height and width following the image pattern, with each
+    new modality's position numbering continuing from one past the maximum id used by the preceding modality.
+  evidence: The 72B model reaches 96.5 on DocVQA against GPT-4o's 92.8 and Claude 3.5 Sonnet's 95.2, 70.5
+    on MathVista against GPT-4o's 63.8, and 877 on OCRBench against a prior state of the art of 852. On
+    MMMU it scores 64.5, below GPT-4o's 69.1. On MathVision it scores 25.9, below GPT-4o's 30.4.
+  limitations: The paper concedes MMMU performance still lags GPT-4o and leaves room for improvement on
+    complex multi-discipline problems. It concedes vision-language navigation performance falls significantly
+    behind specialized VLN models, scoring 51.7% versus a prior state of the art of 79.0% on R2R, attributing
+    this to incomplete and unstructured map information, and states that accurately modeling maps and locations
+    in a 3D environment remains a major challenge. Long-video evaluation was capped at 768 frames per video.
+  why_it_matters: Native dynamic resolution plus M-RoPE became the standard recipe for the Qwen-VL line,
+    and this atlas records that the next generation in this line, Qwen2.5-VL, is the model actually used
+    as the text encoder inside Qwen-Image and as the instruction parser inside Step1X-Edit. That downstream
+    role is not claimed anywhere in this Qwen2-VL paper itself; it applies to the successor model, with
+    Qwen2-VL establishing the architecture that made it possible.
 abstract: We present the Qwen2-VL Series, an advanced upgrade of the previous Qwen-VL models that redefines
   the conventional predetermined-resolution approach in visual processing. Qwen2-VL introduces the Naive
   Dynamic Resolution mechanism, which enables the model to dynamically process images of varying resolutions

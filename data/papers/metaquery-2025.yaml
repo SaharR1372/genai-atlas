@@ -43,6 +43,47 @@ explanation: null
 lines:
 - line-encoder-projector
 - line-unified-models
+explained:
+  depth: full-text
+  before: Prior unified models tried to make a single autoregressive backbone jointly handle text and pixel
+    outputs by fine-tuning a multimodal LLM to also produce image tokens or embeddings, which required careful
+    architecture design, data and loss balancing across modalities, and multi-stage training recipes.
+  problem: Fine-tuning an MLLM to add generation risks degrading the understanding ability it already has,
+    because optimizing one capability can compromise the other when both are trained into the same weights.
+  idea: Insert a fixed set of learnable query tokens between a frozen MLLM and a diffusion image decoder.
+    The queries are fed through the frozen MLLM so its output at those positions carries the model's understanding
+    and reasoning about the prompt, and a small trained connector maps that output into the diffusion decoder's
+    conditioning space, so the MLLM's weights never have to change to gain generation.
+  method: MetaQueries are randomly initialized learnable embeddings matched to the MLLM's hidden dimension,
+    fed into the frozen MLLM under causal masking alongside the prompt. The MLLM's output at the query positions
+    becomes a conditioning sequence, passed through a trainable 24-layer bidirectional-attention transformer
+    connector that projects it into the diffusion decoder's conditioning space in place of the decoder's
+    usual text conditioning. Base experiments use 64 query tokens; the main models scale this to 256, and
+    512 gives a further small gain. MLLM backbones tested range from LLaVA-OneVision-0.5B up to Qwen2.5-VL
+    7B; diffusion decoders are Stable Diffusion v1.5 and Sana-1.6B. Only the queries, the connector and
+    the diffusion decoder are trained, with a standard diffusion denoising loss on paired image-caption
+    data; the MLLM itself is frozen throughout. Pretraining uses 25 million image-caption pairs for 8 epochs,
+    and instruction tuning adds 2.4 million naturally occurring image pairs for 3 epochs, after which the
+    model can be adapted to editing or subject-driven generation with as few as 1,000 fine-tuning steps.
+  evidence: With a Qwen2.5-VL 7B backbone and a Sana decoder, MetaQuery-XL reaches COCO FID 8.69 (with
+    an SD v1.5 decoder), state of the art among SD v1.5-based unified models, ahead of MetaMorph's 11.8
+    and Emu's 11.66, and MJHQ-30K FID 6.02 with Sana, GenEval 0.80 and DPG-Bench 82.05. On the WISE knowledge-and-reasoning
+    generation benchmark MetaQuery-XL scores 0.55 overall against Janus-Pro-7B's 0.35. Understanding is
+    preserved at MME-Perception 1685.2, MMBench 83.5, MMMU 58.6 and MM-Vet 66.6 with the 7B backbone. On
+    DreamBench subject-driven generation, without any per-subject fine-tuning, MetaQuery reaches DINO 0.737
+    and CLIP-I 0.852, ahead of Kosmos-G's 0.694 DINO score.
+  limitations: The authors concede a persistent prompt-alignment gap against Janus-Pro-7B on GenEval and
+    DPG-Bench, which they attribute to differing failure modes between diffusion-based and autoregressive
+    generation rather than to the query-bridge design itself. They also concede that freezing the MLLM costs
+    a small amount of prompt alignment, 0.56 versus 0.58 GenEval compared with full fine-tuning, though
+    visual quality is comparable. They state that closing the remaining gap to leading proprietary systems
+    is likely primarily a data-scaling problem given their 25 million pair training set, rather than an
+    architectural limitation.
+  why_it_matters: MetaQuery shows that a frozen MLLM's reasoning and world knowledge can be transferred
+    to image generation through a lightweight learned interface alone, without ever updating the MLLM's
+    weights, establishing the query-bridge pattern as a way to add generation to any frozen understanding
+    model cheaply while provably preserving its original capabilities, in contrast to Emu2's approach of
+    training the whole multimodal backbone end to end.
 abstract: Unified multimodal models aim to integrate understanding (text output) and generation (pixel
   output), but aligning these different modalities within a single architecture often demands complex
   training recipes and careful data balancing. We introduce MetaQueries, a set of learnable queries that

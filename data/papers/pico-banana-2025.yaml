@@ -31,6 +31,46 @@ summary: 400K edit pairs on real photographs, distilled from a frontier closed e
   Notable both as Apple entering open editing data and as evidence that closed-model distillation is now
   a standard way to build open training sets.
 explanation: null
+explained:
+  depth: full-text
+  before: The strongest instruction editors, such as GPT-4o and Nano-Banana, are closed systems.
+    Openly available training sets for instruction editing were comparatively small, built with
+    domain shift from real photographs, uneven coverage across edit types, and inconsistent quality
+    control, since most relied on proprietary generators or limited human curation.
+  problem: There was no large-scale, openly released, systematically quality-controlled dataset of
+    instruction edits grounded in real photographs, and no open resource supporting multi-turn editing,
+    preference-based alignment, or instruction rewriting research together.
+  idea: Distill edit pairs from a frontier closed editor onto real photographs at scale, organize them
+    under an explicit edit taxonomy, and filter them with an automated multimodal judge, releasing
+    the result openly along with subsets built for multi-turn, preference, and instruction-length
+    research.
+  method: This is a dataset, not an editing method. Source images are real photographs drawn from
+    OpenImages. Nano-Banana, Google's Gemini-2.5-Flash-Image, generates edit pairs across 35 edit
+    types grouped into 8 categories, namely pixel and photometric, object-level semantic, scene composition,
+    stylistic, text and symbol, human-centric, scale, and spatial or layout edits. Each pair is given
+    two instructions, a detailed training-oriented version written by Gemini-2.5-Flash and a short
+    user-style version produced by rewriting it with Qwen2.5-7B. Quality control is automated, with Gemini-2.5-Pro
+    acting as a judge scoring each pair on four weighted criteria, instruction compliance at 40%,
+    seamlessness at 25%, preservation balance at 20% and technical quality at 15%, and pairs are kept
+    above a threshold of roughly 0.7. Beyond the main single-turn set, the release includes a 72K-example
+    multi-turn subset of 2 to 5 sequential edits per image, a 56K-example preference subset pairing
+    successful against failed edits for reward modeling and DPO-style alignment work, and paired
+    long-short instructions across the dataset for instruction rewriting and summarization research.
+  evidence: The release totals roughly 400K examples, split into 258K single-turn edits that passed
+    quality filtering (a 66.8% success rate among generated attempts), 56K preference pairs, and 72K
+    multi-turn sequences. Production cost was approximately $100K. Success rate varies sharply by edit
+    type, from 93.4% for style transfer and 90.7% for film grain to 59.2% for object relocation and
+    57.6% for font changes.
+  limitations: The paper concedes that the underlying generator itself, not just the filtering pipeline,
+    struggles with fine-grained spatial editing, layout extrapolation, and typography. Geometry-heavy
+    edits show perspective inconsistencies and topology breaks, and text edits are brittle on letterform
+    integrity, alignment and contrast. Because every pair is distilled from one closed model's outputs
+    rather than independently verified, the dataset inherits that model's specific failure modes and
+    biases wherever the automated judge does not catch them.
+  why_it_matters: It establishes closed-model distillation onto real photographs, filtered by an
+    automated multimodal judge, as a reproducible way to build large open instruction-editing datasets,
+    and it is notable as Apple's first open release of editing training data. The preference and
+    multi-turn subsets extend what open data can support beyond single-shot supervised fine-tuning.
 abstract: 'Recent advances in multimodal models have demonstrated remarkable text-guided image editing
   capabilities, with systems like GPT-4o and Nano-Banana setting new benchmarks. However, the research
   community''s progress remains constrained by the absence of large-scale, high-quality, and openly accessible

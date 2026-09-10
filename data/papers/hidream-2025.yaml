@@ -33,6 +33,52 @@ summary: A 17B sparse diffusion transformer released in fast, dev, and full vari
   system competitive with FLUX-class models, and one of the few using sparsity rather than dense scaling
   for efficiency.
 explanation: null
+explained:
+  depth: full-text
+  before: FLUX and SD3-class models had scaled diffusion transformers densely, routing every parameter
+    through every token as quality improved, which the authors say makes real-time, cost-effective deployment
+    a persistent challenge.
+  problem: How to reach state-of-the-art text-to-image generation quality while sharply cutting the compute
+    and inference latency that dense scaling had made necessary.
+  idea: Replace the dense feed-forward layers inside a diffusion transformer with a sparse Mixture-of-Experts
+    structure, so only a subset of expert parameters activates for any given token, while keeping a dual-stream
+    stage that processes image and text tokens separately before a single-stream stage lets them interact.
+  method: HiDream-I1 generates in VAE latent space; training images are first encoded into latents by
+    a pretrained VAE encoder before the diffusion transformer ever sees them. The training objective is
+    flow matching, so the network predicts a velocity field conditioned on the noisy latent, the text embedding
+    and the timestep, trained with the mean squared error against the target velocity, the difference between
+    the clean and noise latents, rather than predicting noise or clean data directly. Architecturally, a
+    number of dual-stream blocks first process patchified image latent tokens and text tokens along separate
+    pathways, after which the two token sequences are concatenated and passed through single-stream blocks
+    that let image and text tokens attend jointly. In both stages, every block's standard feed-forward
+    layer is replaced by a sparse MoE layer, where a lightweight router sends each token to a small subset
+    of specialized SwiGLU experts plus one always-active shared expert. Text conditioning combines pooled
+    CLIP-L/14 and CLIP-G/14 embeddings for global conditioning, T5-XXL sequence embeddings, and multi-layer
+    intermediate features from Llama 3.1 8B Instruct, with the T5 and LLM embeddings concatenated as the
+    primary text stream. The model totals 17 billion parameters; the fetched text states only that the
+    router activates a subset of experts per token and does not give an explicit active-parameter count.
+  evidence: On HPS v2.1 averaged across style categories, HiDream-I1 reaches 33.82 against FLUX.1-dev's
+    32.47, SD3's 31.53 and DALL-E 3's 31.44. On GenEval overall it reaches 0.83 against Janus-Pro-7B's
+    0.80, SD3-Medium's 0.74 and FLUX.1-dev's 0.66. On DPG-Bench overall it reaches 85.89 percent against
+    CogView4-6B's 85.13, SD3-Medium's 84.08 and FLUX.1-dev's 83.79. Pretraining proceeded through progressive
+    resolution stages, 600K steps at 256 pixels, then 200K steps at 512 pixels, then 200K steps at 1024
+    pixels, followed by 20K steps of post-training refinement on human-annotated pairs. The three released
+    variants trade sampling steps for speed, Full using 50 or more diffusion steps, Dev a guidance-distilled
+    28 steps, and Fast 14 steps using a GAN-based distillation loss that combines a DMD term with an adversarial
+    term against a frozen teacher's features. The fetched text does not report a classifier-free guidance
+    scale for these benchmark numbers, nor does it give explicit wall-clock inference times, stating only
+    that the model delivers quality within seconds.
+  limitations: The paper does not enumerate limitations in a dedicated section. It does concede that distilling
+    to very low step counts can sacrifice detail and sharpness, and states its GAN-based distillation approach
+    mitigates but does not fully eliminate this loss at the 14-step Fast setting. The fetched text gives
+    no ablation isolating how much of the gain comes from the sparse MoE design versus the dual-stream
+    and single-stream architecture itself.
+  why_it_matters: It is one of the few large open-weight text-to-image systems to use sparsity, rather
+    than dense parameter scaling, as its efficiency lever, and its three-variant release lets deployments
+    trade inference steps for latency directly. The accompanying HiDream-E1 instruction-editing model,
+    fine-tuned on 5 million source-instruction-target triplets and scoring 6.40 on EmuEdit and 7.54 on
+    ReasonEdit, and the HiDream-A1 agent that routes between generation and editing, show the same sparse
+    backbone extending past pure text-to-image generation.
 abstract: 'Recent advancements in image generative foundation models have prioritized quality improvements
   but often at the cost of increased computational complexity and inference latency. To address this critical
   trade-off, we introduce HiDream-I1, a new open-source image generative foundation model with 17B parameters

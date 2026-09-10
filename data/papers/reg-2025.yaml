@@ -39,6 +39,52 @@ summary: 'Sharpens REPA''s idea: rather than aligning hidden states to a frozen 
   latents. A NeurIPS 2025 oral, and evidence that what the generator is asked to predict matters as much
   as what space it predicts in.'
 explanation: null
+explained:
+  depth: full-text
+  before: REPA added an auxiliary loss that aligns a diffusion transformer's intermediate hidden states,
+    at one chosen layer, with the clean-image features of a frozen foundation encoder such as DINOv2. This
+    alignment loss operates only during training and is discarded once training ends.
+  problem: The alignment signal vanishes at inference. Because the semantic guidance never participates
+    in the actual denoising process, REPA can accelerate training but the discriminative structure it captures
+    never shapes what the model actually generates.
+  idea: Rather than aligning to an external representation through an auxiliary loss, entangle a single
+    high-level class token from a frozen foundation model directly into the quantity being denoised. The
+    model then learns to generate the image latent and this semantic token jointly from noise, so semantics
+    persist through inference instead of existing only as a training-time signal.
+  method: REG builds on the standard SiT latent-diffusion setup, so the low-level target is still a VAE
+    latent rather than a pixel space or a replacement encoder space. A frozen DINOv2-B, chosen over CLIP-L
+    and DINOv2-L in an ablation, supplies a single class token from the clean image. Both the VAE latent
+    and the class token are noised together at the same timestep; the latent is patchified and the class
+    token is linearly projected to the same channel width, and the two are concatenated into one sequence
+    fed through an otherwise unmodified SiT backbone. The training loss combines a flow-matching prediction
+    loss on both the latent and the class-token component with an optional REPA-style cosine alignment
+    loss at an intermediate layer. At inference the class token is not provided; it starts from noise and
+    is denoised jointly with the image latent, so the model reconstructs both the pixels and their global
+    semantics at once. Only the SiT backbone, the linear projections and the alignment projection head
+    are trained, while the DINOv2-B encoder stays frozen throughout.
+  evidence: On ImageNet 256x256 without classifier-free guidance, SiT-XL/2 plus REG reaches FID 5.0 after
+    110K iterations, matching quality the plain SiT-XL/2 baseline needs 7M iterations to reach (FID 8.3),
+    a 63x reduction in iterations. REG reaches FID 4.0 at 170K iterations, which SiT-XL/2 plus REPA needs
+    4M iterations to reach (FID 5.9), a 23x reduction. SiT-L/2 plus REG trained for 400K iterations reaches
+    FID 4.6, better than SiT-XL/2 plus REPA trained ten times longer at 4M iterations. With classifier-free
+    guidance, SiT-XL/2 plus REG at 480 epochs reaches FID 1.40, matching SiT-XL/2 plus REPA at 800 epochs
+    (FID 1.42). The added class token costs SiT-XL/2 only 0.30 percent more parameters, 0.38 percent more
+    FLOPs and 0.49 percent more latency per step. In an ablation on SiT-B/2 at 400K iterations, DINOv2-B
+    as the entangled token source reaches FID 15.22, ahead of CLIP-L (21.30) and DINOv2-L (17.36).
+  limitations: The paper's own ablations show sensitivity to the alignment loss weight; a coefficient of
+    0.03 was optimal, and both smaller (0.01 to 0.02) and larger (0.05 to 0.10) values degrade FID. REG
+    still builds on the same VAE latent used by ordinary SiT rather than replacing the encoder, and the
+    entangled signal is a single global class token, so it carries no explicit patch-level spatial structure.
+    The paper does not test entangling more than one semantic token or more than one foundation encoder's
+    signal at once.
+  why_it_matters: REG suggests the gain from foundation-model representations comes from folding semantics
+    into what the generator actually produces, not merely from supervising its hidden states during training.
+    That means the RAE lineage's central move, using frozen encoder features as generative content, can
+    be layered onto an existing VAE-latent diffusion pipeline through a single extra token, not only achieved
+    by replacing the autoencoder outright. Because the entangled signal here is a single global token rather
+    than a patch grid, it leaves open the separate question of whether spatial structure in the aligned
+    representation matters as much as its global semantic content, a question this same research line takes
+    up directly elsewhere.
 abstract: 'REPA and its variants effectively mitigate training challenges in diffusion models by incorporating
   external visual representations from pretrained models, through alignment between the noisy hidden projections
   of denoising networks and foundational clean image representations. We argue that the external alignment,

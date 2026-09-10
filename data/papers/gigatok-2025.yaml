@@ -33,6 +33,41 @@ summary: 'Scales a visual tokenizer to 3B parameters and finds the reconstructio
   reappears at scale: better reconstruction does not monotonically improve downstream autoregressive generation
   unless the latent stays semantically well-behaved.'
 explanation: null
+explained:
+  depth: full-text
+  before: Prior tokenizer work rarely explored scaling tokenizers themselves, and the one attempt that did,
+    ViTok, found that larger tokenizers had unpredictable effects on downstream generation and recommended
+    deprioritizing tokenizer scaling. The general finding in the field was that scaling a tokenizer improves
+    reconstruction fidelity but degrades the downstream autoregressive generator trained on its tokens.
+  problem: No prior method scaled a visual tokenizer's parameter count while simultaneously improving both
+    reconstruction fidelity and the quality of a downstream autoregressive generator trained on its discrete
+    tokens.
+  idea: The reconstruction-generation gap at scale comes from growing complexity in the latent token space
+    as the tokenizer grows. Constraining that complexity with semantic regularization against a frozen
+    pretrained visual encoder keeps the latent space learnable for an autoregressive model even as the
+    tokenizer scales to billions of parameters.
+  method: GigaTok is a discrete vector-quantized tokenizer, not a VAE, built from a CNN encoder at 16x downsampling,
+    transformer layers (a plain ViT for 2D tokens or a Q-Former for 1D tokens), a vector quantizer with
+    a 16,384-entry, 8-dimensional codebook, and a CNN decoder. Semantic regularization aligns the decoder's
+    intermediate features against a frozen DINOv2-B encoder by cosine similarity, weighted at 0.5 in the
+    total loss; DINOv2-B is never updated, only the tokenizer trains. Scaling practice favors 1D over 2D
+    tokenizers, always scales the decoder larger than the encoder, and adds an entropy loss over codebook
+    usage to stabilize training at billion-parameter scale.
+  evidence: The largest configuration, GigaTok-XL-XXL at 2.9B parameters, reaches reconstruction rFID 0.79
+    and LPIPS 0.195 on ImageNet 256x256, and a downstream 1.4B-parameter LlamaGen-XXL autoregressive model
+    trained on its tokens reaches gFID 1.98 without classifier-free guidance; linear probing on the tokenizer's
+    own features reaches 74.0 percent accuracy. A smaller 622M-parameter variant reaches rFID 0.81 and downstream
+    gFID 2.03 with 67.6 percent linear-probe accuracy, and both beat a 72M-parameter LlamaGen baseline tokenizer
+    at rFID 2.19 and downstream gFID 2.34.
+  limitations: The paper confines its experiments to class-conditional generation on ImageNet. It concedes
+    that 1D tokenizers are not directly applicable to multiple resolutions without additional training,
+    that the effects of scaling training data and codebook dimension or size remain unexplored, and that
+    the reconstruction-versus-generation dilemma persists along the axis of training duration even with
+    semantic regularization in place.
+  why_it_matters: It shows the reconstruction-generation dilemma is not specific to small VAE-style tokenizers
+    but reappears at billion-parameter scale for discrete tokenizers too, and that the fix is the same kind
+    of move RAE makes at the encoder level, anchoring the latent to a frozen foundation-model representation,
+    applied here as a regularizer on a trained discrete tokenizer rather than by replacing the encoder outright.
 abstract: In autoregressive (AR) image generation, visual tokenizers compress images into compact discrete
   latent tokens, enabling efficient training of downstream autoregressive models for visual generation
   via next-token prediction. While scaling visual tokenizers improves image reconstruction quality, it

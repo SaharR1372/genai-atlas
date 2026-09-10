@@ -2,6 +2,146 @@
 
 ## Unreleased
 
+### 2026-09-10 — Session 8 (Opus 5) — the standing queue completed
+- **Every paper is now explained** (Q1/Q2). All 154 carry the structured account: before, problem,
+  idea, method, evidence, limitations, why it matters. 152 written from full text; two remain at
+  abstract depth because no HTML render exists, and the validator still flags those two by design.
+- **Four runnable notebooks** (Q4), all executed on an A100 with outputs committed: the latent
+  round-trip, the editing-mechanism comparison, the RAE-against-VAE comparison using the official
+  implementation, and a guidance sweep that is the runnable argument for why `/compare` refuses to
+  publish a leaderboard.
+- **Vendor claims resolved** (Q6) against primary sources, recorded in `docs/refuted-claims.md`.
+  Three refuted outright, one partly, three confirmed and added as system entities.
+- **Seven unsupported claims removed or corrected**, all caught by reading full text rather than
+  trusting summaries. The atlas had been asserting a 62x speedup absent from its paper, describing a
+  MNIST-only result as a methodological advance in image generation, calling a hybrid model
+  autoregressive, understating a model's training resolution, misquoting a benchmark's top score and
+  the model that set it, calling a paper widely reused when it reports no numbers, and repeating an
+  unconfirmable oral acceptance.
+- **One misclassification fixed**: MedEdit was under the borrowed-VAE line but is pixel-space.
+- 296 entities, 252 pages, 28 tests, validation clean.
+
+### 2026-09-10 — Session 10 (Sonnet 5) — WORK_QUEUE Q1/Q2, all 38 unified/VFM/VLM/RAE papers explained
+- **Every paper with first `sections` entry `unified`, `vfm`, `vlm`, or `rae` and no `explained`
+  block now has one**, all 38 at `depth: full-text` (no abstract fallbacks needed). Scope computed
+  by reading each file's actual `sections:` list, first entry only, to avoid collision with the
+  concurrent sessions working the `generation`-first, `editing`-first, and `medical`-first papers.
+  Fanned out across 7 parallel subagents by section/tier: unified landmark+core (transfusion-2024,
+  chameleon-2024, emu35-2025, janus-pro-2025, bagel-2025, emu3-2024, janus-2024, showo2-2025,
+  omnigen2-2025) + strong-followup (unieval-2025); VFM core (dinov3-2025, siglip-2023, ijepa-2023,
+  perception-encoder-2025, registers-2023, radio-2023) + strong-followup/emerging (aimv2-2024,
+  radiov25-2024, webssl-2025, vjepa2-2025, cradiov4-2026); VLM landmark+core+emerging
+  (flamingo-2022, llava-2023, qwen2vl-2024, qwen25vl-2025, internvl3-2025, llava-onevision-2024,
+  qwen3vl-2025); RAE core (reg-2025, blip3o-2025, emu2-2024, metaquery-2025, repa-spatial-2025) +
+  strong-followup/emerging (distilling-rae-2026, drae-2026, gigatok-2025, vfmvae-2025,
+  tokenizer-post-training-2025). Each subagent fetched `arxiv.org/html/<id>v1` (v3 for bagel-2025,
+  since v1/v2 both 404'd) and wrote directly into `data/papers/*.yaml`. `scripts/validate.py`
+  clean, 0 errors, after every file.
+- **Unified-model `method` fields state precisely what is shared vs. separate**, per the task's
+  organizing axis: Chameleon and Emu3 are genuinely one vocabulary/one loss/one backbone with no
+  diffusion component; Transfusion is one backbone with two losses (CE + diffusion MSE) summed;
+  Janus and Janus-Pro explicitly decouple the visual encoder (continuous for understanding, discrete
+  VQ for generation) into one shared autoregressive backbone; Show-o2 fuses SigLIP-distilled and
+  VAE-latent paths into one backbone with two loss heads (CE + flow matching); BAGEL is a genuine
+  mixture-of-transformer-experts (separate FFN params per modality, shared self-attention only);
+  OmniGen2 is the most decoupled — a frozen MLLM glued to a separately trained diffusion transformer
+  via hidden-state conditioning, so understanding cannot degrade by construction. Generation-degrades-
+  understanding was explicitly reported (and quantified) for Transfusion and BAGEL; explicitly denied
+  by Emu3, Janus-Pro, and Chameleon's own framing. UniEval (a benchmark, not a model) supplies direct
+  evidence of the tension: Show-o ranks 1st in generation-only scoring but drops to 7th when graded by
+  its own understanding half, from an 89.2% single-answer bias.
+- **VFM `method` fields state supervision type and generative use, or explicitly say there is
+  none.** None of the 11 VFM papers done this session (DINOv3, SigLIP, I-JEPA, Perception Encoder,
+  Registers, RADIO, AIMv2, RADIOv2.5, Web-SSL, V-JEPA2, C-RADIOv4) discuss feeding their own features
+  to a generative model — that connection is made only by later papers (REPA, RAE, Scale-RAE) citing
+  these as candidate encoders, not by these papers themselves. V-JEPA2 explicitly argues against
+  generative pixel-prediction objectives, beating a Cosmos latent-diffusion-7B baseline on robot
+  planning with a discriminative JEPA-style predictor instead. I-JEPA's existing `summary` field
+  claiming it "was tested as a REPA target and found weaker than DINOv2" is confirmed to be an
+  external (REPA-paper) finding, not something I-JEPA's own paper states — flagged explicitly in its
+  `why_it_matters` field so the entry doesn't misattribute the claim.
+- **VLM `method` fields state the fusion mechanism and frozen/trained LLM status.** Flamingo uses
+  gated cross-attention with both vision encoder and LM fully frozen; LLaVA and every Qwen-VL
+  generation use a linear/MLP projector into the token stream, with the LLM frozen only in early
+  alignment stages then trained; InternVL3 is distinctive in training vision encoder and LLM jointly
+  from the start with nothing frozen; Qwen3-VL adds DeepStack, injecting intermediate ViT-layer
+  features into the first three LLM layers. Qwen2.5-VL and Qwen3-VL's roles as text encoder /
+  instruction parser for generation systems (Qwen-Image, Step1X-Edit) are atlas-level claims from
+  other papers, not claims either VLM paper makes about itself — kept distinct in `why_it_matters`.
+- **RAE `method` fields state encoder/tokenizer and frozen-vs-trained status per paper.** MetaQuery's
+  query-bridge (64-512 learnable queries through a fully frozen MLLM, only queries+connector+decoder
+  trained) and BLIP3-o/Emu2's diffusion-on-CLIP-embedding approach are now precisely distinguished
+  from REG (DINOv2 class token concatenated onto an ordinary VAE latent, not a replacement encoder)
+  and from GigaTok/VFM-VAE (own trained tokenizers, not frozen-foundation-model RAE). repa-spatial-
+  2025's 27-encoder study is confirmed: patch-level spatial structure (|r|>0.85 with FID) predicts
+  REPA gains, global linear-probe accuracy does not (|r|=0.26) — flagged as in tension with BLIP3-o/
+  Emu2's choice of CLIP-family embeddings (weaker on spatial structure) for generation, though no
+  paper addresses this tension directly. distilling-rae-2026 reconfirmed as operating in frozen RAE
+  latent space, adapting the Drifting Models one-step objective (with the auxiliary MAE dropped) to
+  RAE's anisotropic geometry, closer to "distilling a flow-matching teacher via the Drifting
+  objective" than a literal distillation of a separate model class.
+- One recurring YAML authoring trap flagged by subagents but left unfixed in files outside this
+  session's scope (their content, not their fault): a plain unquoted scalar containing a mid-sentence
+  colon-plus-space breaks the YAML parser. Pre-existing instances noted in bagel-2025 (later fixed by
+  this session's own edit), chung-ye-2021, ip-adapter-2023, kontext-2025, ominicontrol-2024,
+  retinal-fm-latent-2026, editscore-2025 — worth a validator lint rule.
+- `WORK_QUEUE.md` Q1/Q2 and `PROJECT_STATE.md` updated to record this batch.
+
+### 2026-09-10 — Session 9 (Sonnet 5) — WORK_QUEUE Q1/Q2, all 40 editing papers explained
+- **Every paper with `editing` in `sections` and no `explained` block now has one**, all at `depth:
+  full-text` (none fell back to abstract). Scope was computed by loading each `sections` list
+  directly, not by grepping for the word "editing" in the file (that over-matches: it would have
+  pulled in var-2024, qwen-image-2025, metaquery-2025, qwen25vl-2025, t2i-adapter-2023,
+  nextstep1-2025, hidream-2025 and agentic-visual-generation-2026, none of which actually carry
+  `editing` in their `sections` field). 40 papers done: bagel-2025, fireflow-2024,
+  biomedjourney-2023, didae-2026, emu35-2025, plug-and-play-2022, ip-adapter-2023, mededit-2024,
+  rf-inversion-2024, seedream4-2025, emu-edit-2023, hidream-o1-2026, radedit-2023, unispace-2026,
+  krisbench-2025, acepp-2025, magicbrush-2023, icebench-2025, omnigen2-2025, kontext-2025,
+  controlnet-2023, refedit-2025, imgedit-2025, ominicontrol-2024, pulid-2024, rpiae-2026,
+  editscore-2025, stable-flow-2024, instantid-2024, masactrl-2023, icedit-2025, kv-edit-2025,
+  instructpix2pix-2022, step1x-edit-2025, pico-banana-2025, prompt-to-prompt-2022,
+  qwen-image-2-2026, rf-solver-2024, psvae-2025, risebench-2025. (biomedjourney-2023,
+  mededit-2024, radedit-2023 were already written in session 8's medical pass and were only
+  re-verified, not rewritten.) Fanned out across 8 parallel subagents in 3 waves (landmark, core,
+  strong-followup/emerging), each fetching `arxiv.org/html/<id>vN` and writing directly into
+  `data/papers/*.yaml`.
+- **Every editing-method paper's `method` field now states two things explicitly**, per the task's
+  organizing axis for the whole editing section: which space the edit happens in (VAE latent /
+  pixel / a representation-model latent / discrete tokens / attention-and-feature-space only with
+  no new latent written), and what mechanism, if any, protects regions the user did not ask to
+  change (mask, attention/KV injection, latent blending, locality loss, or explicitly none — several
+  papers, e.g. InstructPix2Pix, IP-Adapter, ControlNet, HiDream-O1, PS-VAE, Step1X-Edit, have no
+  inference-time protection mechanism at all and rely on learned behavior alone). Benchmark/dataset
+  papers in scope (krisbench-2025, icebench-2025, risebench-2025, magicbrush-2023, pico-banana-2025)
+  were written as dataset/evaluation contributions instead of being forced into that framing.
+- **PS-VAE/RPiAE frozen-encoder claim reconfirmed with exact quotes.** PS-VAE's fetched text states
+  directly: "we unfreeze the representation encoder during pixel decoder training... By removing the
+  detach operation ... we enable gradients to propagate from the pixel decoder back to the encoder,"
+  with a semantic-reconstruction loss keeping it anchored. RPiAE's Stage 1 similarly trains the
+  encoder end-to-end, using a frozen "Pivot Replica Encoder" only as a regularization anchor via an
+  L2 pivot loss, not as the generative encoder itself. Both confirm the prior session's finding that
+  a frozen encoder degrades editing fidelity and both fix it by unfreezing.
+- **Version conflict found in RISEBench.** The atlas's stored `abstract` (matching the paper's
+  original release) reports the best model, GPT-4o-Image, at 28.8% accuracy. The fetched arXiv v2
+  HTML full text instead names the top model "GPT-4o-Native" at 35.9% accuracy, Gemini-2-Flash
+  second at 10.9%. Both versions agree qualitatively (best model well under 50%). Documented inside
+  `explained.evidence` rather than silently resolved; the stored `abstract`/`summary` fields were
+  left untouched per the task's file-preservation rule.
+- **ACE++ (acepp-2025) reports no quantitative benchmark numbers anywhere in the fetched paper**,
+  only qualitative visualizations — worth noting since the existing `summary` field calls it "widely
+  reused," a plausible but paper-unevidenced claim.
+- **Stale claim found in hidream-o1-2026's existing `summary`**: it states the model is "so far
+  trained only at 512x512," but the fetched paper describes three training stages at
+  512-&gt;1024-&gt;2048 resolution with results reported up to 2048x2048. Not corrected (out of this
+  task's scope, which only adds `explained`), flagged here for a future session.
+- Emu-Edit's protection mechanism turned out to be task-dependent rather than uniform: a DINO-derived
+  mask blends edited/original latents for region-based tasks, free-form and global edits have no
+  locality constraint at all, and multi-turn edits use pixel-thresholding (alpha=0.03) instead.
+- `scripts/validate.py` clean (0 errors, 2 pre-existing unrelated warnings: genfirst-2026 and
+  pinaya-2022, both outside this task's scope) after every edit. Only `data/papers/*.yaml` touched.
+  Several other concurrent sessions were editing unrelated `data/papers/*.yaml` files throughout
+  this session (visible via `git status`); none of that was touched, stashed, or reset.
+
 ### 2026-09-10 — Session 8 (Sonnet 5) — WORK_QUEUE Q1/Q2, all 19 medical papers explained
 - **All 19 medical-imaging papers with no `explained` block now have one**, all at `depth:
   full-text`: chung-ye-2021, dar-memorization-2023, frd-2024, roentgen-2022, maisi-2024,

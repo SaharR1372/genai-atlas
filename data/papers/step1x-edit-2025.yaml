@@ -34,6 +34,41 @@ summary: An open instruction-editing system pairing a multimodal LLM that parses
   a DiT that executes it, and the source of GEdit-Bench — the real-world editing benchmark most 2025-26
   editing papers now report.
 explanation: null
+explained:
+  before: Proprietary models such as GPT-4o and Gemini2 Flash showed strong instruction-based editing.
+    Open-source efforts including OmniGen and ACE++ still fell short in generalization, edit accuracy,
+    and image quality, and existing instruction-editing datasets such as AnyEdit and OmniEdit lacked
+    quality and diversity.
+  problem: Close the gap between open and closed-source instruction-based image editing, by building
+    both a training data pipeline at scale and an open architecture capable of using it.
+  idea: Let a multimodal LLM read the instruction together with the reference image and turn that
+    understanding into conditioning for a diffusion transformer that paints the edit, and build the
+    data pipeline needed to train that system at scale.
+  method: Qwen-VL (Qwen2.5-VL) processes the reference image and the instruction. Its output token
+    embeddings, after discarding prefix tokens, pass through a lightweight token-refiner connector
+    and substitute the T5 text embedding normally fed to the downstream DiT, FLUX. The mean of Qwen's
+    output embeddings is separately projected into a global visual guidance vector. The edit happens
+    in VAE latent space, meaning the target image is VAE-encoded, Gaussian noise is added to it, and
+    its tokens are concatenated along the token dimension with the VAE-encoded reference-image tokens
+    into one doubled-length sequence the DiT processes jointly. The fetched text describes no mechanism
+    for protecting unedited regions, no mask, no attention replacement, no preserved KV cache, no latent
+    blending, and no locality loss. Preservation of the untouched parts of the image is left entirely
+    to the MLLM's semantic guidance and the DiT's learned behavior, not to any architectural constraint.
+  evidence: Trained on more than 11 million filtered instruction-image triplets retained from over
+    20 million generated across 11 editing categories, built with Florence-2 annotation, SAM-2 segmentation,
+    and Flux-Fill inpainting among other tools. On the paper's own GEdit-Bench (606 real-world instructions,
+    11 categories, English and Chinese), scored with VIEScore SC/PQ/O by GPT-4.1, Step1X-Edit reaches
+    English O=6.701 against GPT-4o's 7.534 and Gemini2 Flash's 6.315, and beats the open-source baseline
+    OmniGen's O=5.061 by a wide margin. On GEdit-Bench-CN, O=6.861 against GPT-4o's 7.302. A 55-participant
+    user study gives Step1X-Edit user-preference scores of 6.544 and 6.939 on the intersection and full
+    subsets, close to GPT-4o's 6.961 and 7.134.
+  limitations: The paper has no dedicated limitations section and does not discuss the absence of
+    a region-preservation mechanism as a design tradeoff. Its own numbers show it only approaches,
+    not matches, proprietary systems, since GPT-4o leads on every GEdit-Bench axis reported.
+  why_it_matters: It established the working recipe, an MLLM driving a DiT edit executor, and the
+    GEdit-Bench benchmark that a large share of 2025-26 open instruction-editing papers now build on
+    and report against.
+  depth: full-text
 abstract: In recent years, image editing models have witnessed remarkable and rapid development. The recent
   unveiling of cutting-edge multimodal models such as GPT-4o and Gemini2 Flash has introduced highly promising
   image editing capabilities. These models demonstrate an impressive aptitude for fulfilling a vast majority

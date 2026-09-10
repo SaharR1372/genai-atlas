@@ -34,6 +34,37 @@ summary: 'A useful negative result for the hybrid camp: distilling foundation-mo
   and redesigns only the decoder. Independent support for RAE''s central choice, arrived at from the tokenizer
   side.'
 explanation: null
+explained:
+  depth: full-text
+  before: Two separate lines addressed weak VAE latents. One line, exemplified by VA-VAE and REPA-E, distilled
+    or aligned a trained VAE's latent toward vision-foundation-model features while still training the VAE's
+    own encoder from scratch. A separate line, exemplified by RAE, discarded the trained encoder entirely
+    and used a frozen foundation-model encoder directly as the latent, training only a decoder back to pixels.
+  problem: The paper finds that distillation-based alignment of a trained VAE encoder toward a vision foundation
+    model's features inevitably degrades the resulting representation, leaving it more brittle to semantic-preserving
+    transformations than the original foundation-model features it was distilled from.
+  idea: Skip distillation entirely and use a frozen vision foundation model as the tokenizer's encoder directly,
+    exactly preserving its representation, and put the engineering effort into a decoder capable of reconstructing
+    realistic images from the foundation model's coarse, semantically oriented features.
+  method: A frozen SigLIP2-Large encoder supplies the latent and is never updated during training. The trained
+    decoder uses two designed components, Multi-Scale Latent Fusion, which splits the latent into a global
+    style component and spatial components pulled from multiple encoder depths, and Progressive Resolution
+    Reconstruction Blocks, six hierarchical modulated ConvNeXt blocks that upsample from 8x8 to 256x256,
+    with the global style injected at every block while the spatial components guide only the lower-resolution
+    blocks. This is architecturally the same frozen-encoder-plus-trained-decoder recipe RAE uses, arrived
+    at independently from the tokenizer-design side, paired with a stronger, more recent foundation model
+    and a decoder that draws on multiple encoder depths rather than a single output layer.
+  evidence: A 685M-parameter REG-SiT-XL diffusion model trained on VFM-VAE latents reaches gFID 2.22 without
+    classifier-free guidance on ImageNet 256x256 after only 80 epochs, reported as a 10x speedup over prior
+    tokenizers, and gFID 1.62 without guidance after 640 epochs. VFM-VAE itself is trained on a filtered
+    subset of about 1.15 million images at or above 256px, only 25 percent of the training images VA-VAE
+    used, while reaching comparable alignment quality alongside strong reconstruction.
+  limitations: The paper concedes VFM-VAE remains limited to continuous latent models and to moderate resolutions.
+  why_it_matters: It is independent, tokenizer-side confirmation of RAE's central choice, that freezing
+    the foundation-model encoder outperforms distilling its features into a trained encoder, because distillation
+    itself degrades robustness. VFM-VAE reaches this conclusion starting from a latent-diffusion-tokenizer
+    design question rather than the diffusion-transformer-architecture question RAE started from, and the
+    two lines converge on the same frozen-encoder principle.
 abstract: 'The performance of Latent Diffusion Models (LDMs) is critically dependent on the quality of
   their visual tokenizers. While recent works have explored incorporating Vision Foundation Models (VFMs)
   into the tokenizers training via distillation, we empirically find this approach inevitably weakens

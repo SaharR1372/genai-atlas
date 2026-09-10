@@ -29,6 +29,42 @@ summary: Critiques RISEBench as too coarse and not grounded in a formal knowledg
   it with 1,267 instances across 22 tasks and seven reasoning dimensions, adding an explicit knowledge-plausibility
   metric.
 explanation: null
+explained:
+  depth: full-text
+  before: Prior instruction-editing benchmarks such as EditBench, TEdBench, EditEval, and Emu-Edit organized
+    tasks by task type or action, and RISEBench, the closest predecessor, added reasoning-aware evaluation
+    across temporal, causal, spatial, and logical dimensions. The paper's objection is that these reasoning
+    categories "remain coarse and do not provide a formal structure for representing the underlying knowledge
+    required by different tasks."
+  problem: Editing models can produce a visually plausible result, such as sodium dropped into water rendered
+    calmly, while violating the factual, conceptual, or procedural knowledge the edit actually implies,
+    and no existing benchmark isolates this failure mode from ordinary visual or instruction-following
+    quality.
+  idea: Ground editing evaluation in an educational-theory taxonomy of three knowledge types, factual,
+    conceptual, and procedural, decompose these into 7 reasoning dimensions and 22 tasks, and score outputs
+    on an added Knowledge Plausibility axis alongside visual and instruction-following quality.
+  method: 'This is a benchmark and dataset contribution, not an editing method: 1,267 annotated editing
+    instances span 22 tasks under 7 reasoning dimensions (Attribute Perception, Spatial Perception, and
+    Temporal Prediction under Factual knowledge; Social Science and Natural Science under Conceptual;
+    Logical Reasoning and Instruction Decomposition under Procedural). Each knowledge-intensive case carries
+    a manually curated knowledge hint, for example that purple cabbage in acid "should result in a red
+    color change," used to guide a VLM judge. Four scored dimensions are Visual Consistency, Visual Quality,
+    Instruction Following, and the novel Knowledge Plausibility metric, which was calibrated against ratings
+    from 12 human experts, with knowledge-hint-augmented prompts producing closer alignment to expert
+    judgment than simple prompts.'
+  evidence: 'Ten state-of-the-art models were evaluated: closed-source GPT-4o, Gemini 2.0 Flash Experimental,
+    and Doubao, and open-source OmniGen, Emu2, BAGEL, BAGEL-Think, Step1X-Edit, AnyEdit, InstructPix2Pix,
+    and MagicBrush. Overall scores: GPT-4o 80.09, Gemini 2.0 62.41, Doubao 60.70, BAGEL-Think 53.36 (best
+    open-source), MagicBrush 37.15, InstructPix2Pix 22.82 (lowest). By knowledge type, GPT-4o scores 79.80,
+    81.37, and 78.32 on factual, conceptual, and procedural tasks against InstructPix2Pix''s 23.33, 25.59,
+    and 17.28. Every model scores weakest on procedural knowledge, and Knowledge Plausibility scores trail
+    Instruction Following scores across all models tested.'
+  limitations: The paper concedes the benchmark "may still exhibit certain biases," specifically its relatively
+    small scale, potential over-representation of particular knowledge types, and culturally specific
+    assumptions built into task design.
+  why_it_matters: It separates "looks right" from "is consistent with world knowledge" as a distinct axis
+    of editing competence, and shows that even the strongest model tested degrades sharply on procedural,
+    multi-step reasoning, marking a gap instruction-based editing has not closed even at the frontier.
 lines:
 - line-evaluation
 abstract: 'Recent advances in multi-modal generative models have enabled significant progress in instruction-based

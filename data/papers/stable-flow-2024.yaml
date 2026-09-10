@@ -32,6 +32,49 @@ summary: Diffusion transformers lack the UNet's coarse-to-fine hierarchy, so the
   image formation and injects only there. The identification is empirical and has to be redone for each
   architecture.
 explanation: null
+explained:
+  depth: full-text
+  before: On UNet-based diffusion models, training-free editing worked by injecting attention features
+    from a source generation into an edited one, choosing which layers to inject based on the UNet's
+    well-understood coarse-to-fine hierarchy of early, middle and late blocks.
+  problem: Flux and other flow-matching DiTs replace the UNet with a stack of near-identical transformer
+    blocks with no coarse-to-fine structure, so it is unclear which layers to inject into to get a
+    controlled edit rather than noise or a failed edit.
+  idea: DiT-based flow models already produce low output diversity across seeds. A small subset of
+    layers, found automatically, drives most of image formation; injecting attention features only
+    into that subset turns the model's low diversity into a training-free editing mechanism that
+    covers non-rigid edits and object addition through the same procedure.
+  method: The edit happens in attention and feature space only; no new VAE or other latent is written,
+    the source and edited generations are computed in parallel and their image-token attention features
+    are selectively merged at inference time. Vital layers are identified by ablating each layer in
+    turn, using its residual connection to bypass it, and measuring DINOv2 similarity between the full
+    and ablated output; a layer scoring above 0.85 similarity is deemed non-vital and excluded. For
+    Flux.1-dev this selects layers 0, 1, 2, 17, 18, 25, 28, 53, 54 and 56, a set distributed across
+    the network rather than clustered in one region. Editing replaces the image-token attention features
+    of the edited generation with those of the source generation, restricted to this vital-layer set;
+    the whole model stays frozen and training-free. There is no explicit mask, locality loss, or KV-cache
+    preservation. The paper attributes region protection to an emergent attention pattern, in which within
+    the vital layers, tokens the user did not ask to change attend predominantly to image features, while
+    tokens targeted by the instruction attend more strongly to the relevant text tokens, so the injected
+    source features dominate only where nothing was meant to change. Real-image editing needs inversion;
+    the paper uses an inverse Euler ODE solver plus a "latent nudging" step that multiplies the initial
+    latent by 1.15 before inversion to offset it from the training distribution, which the paper reports
+    reduces reconstruction error.
+  evidence: On 3,200 COCO-derived edit samples, Stable Flow reaches CLIP-image similarity 0.92 against
+    0.88 for MagicBrush and 0.76 for Prompt-to-Prompt with null-text inversion, and CLIP-direction score
+    0.14 against 0.11 for MagicBrush and 0.08 or below for the remaining baselines, while CLIP-text
+    adherence at 0.23 sits within the same range as the baselines' 0.21 to 0.24. A user study on Amazon
+    Mechanical Turk with 1,920 responses gives Stable Flow win rates of 60.33% to 82.33% across prompt
+    adherence, image preservation, realism and overall quality.
+  limitations: The paper states three explicit failure modes. It struggles to convert a photorealistic
+    image into a stylized one, such as animation or oil painting, while preserving subject identity.
+    It cannot move an object to a specified spatial position, inheriting the underlying text-to-image
+    model's weak spatial prompt adherence. And it cannot fully replace a background without some leakage
+    from the original.
+  why_it_matters: It shows that in a DiT, edit locality can come purely from choosing where to inject
+    attention, with no mask or auxiliary loss at all, once the right small set of layers is identified.
+    The paper also suggests the vital-layer identification procedure itself could be reused for pruning
+    or distillation, beyond editing.
 abstract: Diffusion models have revolutionized the field of content synthesis and editing. Recent models
   have replaced the traditional UNet architecture with the Diffusion Transformer (DiT), and employed flow-matching
   for improved training and sampling. However, they exhibit limited generation diversity. In this work,

@@ -1,7 +1,89 @@
 # PROJECT_STATE
 
-Last updated: 2026-09-10 (session 8, Sonnet 5) — WORK_QUEUE Q1/Q2: wrote full-text `explained`
-blocks for all 19 medical-imaging papers that had none. See CHANGELOG.md's session 8 entry.
+Last updated: 2026-09-10 (session 10, Sonnet 5) — WORK_QUEUE Q1/Q2: wrote full-text `explained`
+blocks for all 38 papers whose first `sections` entry is `unified`, `vfm`, `vlm`, or `rae` and had
+none. See CHANGELOG.md's session 10 entry.
+
+### Session 10 (2026-09-10, Sonnet 5)
+Worked WORK_QUEUE.md Q1/Q2's unified/VFM/VLM/RAE subset: every paper in `data/papers/*.yaml` whose
+`sections` list's *first* entry is `unified`, `vfm`, `vlm`, or `rae`, with no `explained` key (38
+papers; scope computed by reading each file's actual `sections` list and taking only the first
+entry, per the task's explicit instruction, to avoid collision with concurrent sessions working the
+`generation`-first, `editing`-first, and `medical`-first papers — confirmed no file overlap by
+construction). Fanned out across 7 parallel subagents grouped by section and tier (unified
+landmark+core, unified strong-followup; VFM core, VFM strong-followup/emerging; VLM
+landmark+core+emerging; RAE core, RAE strong-followup/emerging), each fetching `arxiv.org/html/<id>vN`
+and writing directly into `data/papers/*.yaml`. All 38 at `depth: full-text`; none fell back to
+abstract. `scripts/validate.py` clean (0 errors) throughout and after the final pass (296 entities,
+66 relations, only 2 remaining warnings, both outside this session's scope: `genfirst-2026`,
+abstract-depth generation-first, and `pinaya-2022`, medical-first, apparently missed by session 8's
+medical sweep).
+
+**Findings worth carrying forward (full detail in CHANGELOG's session 10 entry):**
+1. Unified-model architectures range from genuinely one-everything (Chameleon, Emu3: one vocabulary,
+   one loss, no diffusion) to a real mixture-of-experts (BAGEL: separate FFN params per modality,
+   shared self-attention only) to fully decoupled (OmniGen2: frozen MLLM glued to a separately
+   trained diffusion transformer, so understanding cannot degrade by construction). Reported
+   generation-degrades-understanding: yes and quantified for Transfusion and BAGEL; explicitly
+   denied by Emu3, Janus-Pro, Chameleon. UniEval's own benchmark shows Show-o ranks 1st in
+   generation-only scoring but 7th when graded by its own understanding half.
+2. None of the 11 VFM papers done this session discuss feeding their own features to a generative
+   model — the generative connection is made only by later papers (REPA, RAE) citing them as
+   candidates, not by these papers themselves. V-JEPA2 explicitly argues against generative
+   pixel-prediction objectives for world modeling. I-JEPA's pre-existing `summary` field's claim
+   that it "was tested as a REPA target" is confirmed to be an external (REPA-paper) finding, now
+   flagged as such rather than attributed to I-JEPA's own paper.
+3. RAE-family method fields now distinguish MetaQuery's query-bridge (frozen MLLM, trained
+   queries+connector+decoder) and BLIP3-o/Emu2's diffusion-on-CLIP-embedding approach from REG
+   (DINOv2 token concatenated onto an ordinary VAE latent, not a replacement encoder) and from
+   GigaTok/VFM-VAE (own trained tokenizers, not frozen-foundation-model RAE). repa-spatial-2025's
+   finding that patch-level spatial structure (not global linear-probe accuracy) predicts REPA gains
+   sits in flagged, unresolved tension with BLIP3-o/Emu2 choosing CLIP-family embeddings (weaker on
+   spatial structure) for generation.
+4. A recurring YAML authoring trap: a plain unquoted scalar with a mid-sentence colon-plus-space
+   breaks the parser. Pre-existing instances (not touched, outside scope) in chung-ye-2021,
+   ip-adapter-2023, kontext-2025, ominicontrol-2024, retinal-fm-latent-2026, editscore-2025 — worth
+   a validator lint rule for a future session.
+
+**Noted, not acted on:** as in prior sessions, other concurrent sessions were simultaneously editing
+`data/papers/*.yaml` files in the `generation`, `editing`, and `medical` first-section subsets (per
+this task's own instructions to avoid collision) plus `WORK_QUEUE.md`/`PROJECT_STATE.md`/
+`CHANGELOG.md` themselves changed between reads — both edits above were re-applied against the
+freshest version read immediately before writing, per the standing note in CLAUDE.md to never rely
+on stale reads of these three files.
+
+---
+
+### Session 9 (2026-09-10, Sonnet 5)
+Worked WORK_QUEUE.md Q1/Q2's editing subset: every paper in `data/papers/*.yaml` where `sections`
+contains `editing` with no `explained` key (40 papers; scope computed by reading each file's actual
+`sections` list, not by grepping for the word "editing", which over-matches by 8 papers). Fanned out
+across 8 parallel subagents in 3 waves (landmark, core, strong-followup/emerging), each fetching
+`arxiv.org/html/<id>vN` and writing directly into `data/papers/*.yaml`. All 40 at `depth: full-text`.
+Every editing-method paper's `method` field states the space the edit happens in and what, if
+anything, protects unedited regions — the atlas's organizing axis for the editing section. Full list
+of papers and cross-paper findings (PS-VAE/RPiAE encoder-unfreezing confirmed with exact quotes,
+RISEBench abstract-vs-fetched-text version conflict, ACE++ has no quantitative results in-paper,
+hidream-o1-2026's stale 512px claim, Emu-Edit's task-dependent protection mechanism) in
+CHANGELOG.md's session 9 entry. `scripts/validate.py` clean (0 errors) throughout. Only
+`data/papers/*.yaml` touched, per the task's own constraint — did not update site/schema code, and
+did not touch git despite heavy concurrent activity from other sessions in the same working tree.
+
+**Findings worth carrying forward:**
+1. Most editing-method papers with a training-free, attention-only mechanism (Prompt-to-Prompt,
+   MasaCtrl, RF-Solver, FireFlow, StableFlow, KV-Edit) have an explicit protection mechanism built
+   into how attention/KV is injected or cached. Most trained end-to-end editing models
+   (InstructPix2Pix, IP-Adapter, ControlNet, HiDream-O1-Image, PS-VAE, Step1X-Edit, ACE++,
+   RefEdit) have **no** inference-time protection mechanism at all — preservation of unedited
+   regions is purely a learned property of the training data/loss, not an architectural guarantee.
+   This split is now recorded paper-by-paper and is ready to drive a matrix or line-level claim.
+2. `mededit-2024`'s miscategorization under `line-medical-transfer-vae` (flagged in session 8; it is
+   actually plain pixel-space DDPM with no VAE) is still unfixed — re-confirmed again this session.
+3. `hidream-o1-2026.yaml`'s `summary` field ("so far trained only at 512x512") is stale/wrong per the
+   fetched full text (multi-stage training up to 2048x2048) — needs a follow-up fix to `summary`
+   itself, out of scope for this session's `explained`-only task.
+
+---
 
 ### Session 8 (2026-09-10, Sonnet 5)
 Worked WORK_QUEUE.md Q1/Q2's medical-imaging subset: every paper in `data/papers/*.yaml` where
@@ -90,6 +172,24 @@ flags several judgment calls (tier assignments, `line-adapter-conditioning`'s `c
 review pass. Nothing was committed to git this session — files are staged in the working tree only.
 
 ## Current phase
+
+**Session 8 (2026-09-10). The standing queue from user review is complete.** All six items in
+`WORK_QUEUE.md` are marked done. Every paper is explained, four notebooks run with committed
+outputs, the vendor claims are resolved against primary sources, and the capability matrix, VFM,
+VLM and medical sections are all built.
+
+**The most valuable habit this project has developed:** reading full text rather than trusting
+summaries. That practice caught seven claims the atlas had been asserting without support, including
+one it had repeated across three separate files. Any future session adding content should keep
+`depth: full-text` as the target and treat `depth: abstract` as a visible debt.
+
+**What is genuinely left**, none of it blocking:
+- Two papers at abstract depth (genfirst-2026, pinaya-2022): no HTML render exists and the PDFs
+  exceeded the fetch limit. The validator warns on both by design.
+- Line deep-dive prose: only 3 of 32 lines have written narrative beyond their structured arcs.
+- Stage-2 RAE generation notebook (weights are cached under `DiTs/` in the same collection).
+- Publishing to GitHub Pages, which needs the placeholder site URL replaced and a deploy workflow.
+  That is a public-facing step awaiting the user's go-ahead.
 
 **Session 7 (2026-09-10).** Working a standing queue from user review, tracked in `WORK_QUEUE.md`,
 which is now the file to read for what is done and what is next. Completed this session: the

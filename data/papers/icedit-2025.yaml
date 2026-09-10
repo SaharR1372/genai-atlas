@@ -36,6 +36,46 @@ summary: 'Shows in-context conditioning can replace heavy editing fine-tunes: st
   editing with roughly 0.1% of the training data and 1% of the trainable parameters prior trained editors
   required.'
 explanation: null
+explained:
+  depth: full-text
+  before: Instruction editing split into two camps. Fine-tuned editors reached good instruction
+    compliance but needed 450K to 10M training pairs and heavy compute. Training-free approaches,
+    built on inversion and attention manipulation, avoided that cost but struggled to interpret
+    complex instructions, giving weaker precision.
+  problem: Close the precision-efficiency tradeoff, reaching fine-tuned-level instruction compliance
+    without fine-tuned-level training data or trainable parameters.
+  idea: A large pretrained DiT already has the contextual ability to relate two images placed side
+    by side. Pose editing as in-context generation, an original image on the left and a generated
+    edit on the right of one diptych, and only a small adapter needs to be trained to make this
+    reliable.
+  method: The edit happens in VAE latent space, inside a pretrained Flux inpainting DiT, via sequence
+    concatenation rather than a new architecture. The source image occupies the left half of a diptych
+    canvas, the right half is masked, and a template prompt such as "a side-by-side image of the same
+    {subject}, the left depicts the original {description}, while the right mirrors the left but
+    applies {edit instruction}" conditions generation of the right half in the same latent sequence.
+    The Flux backbone is frozen; the only trained components are LoRA-MoE adapters inserted into the
+    multi-modal attention blocks, a sparse mixture of LoRA experts selected per input by a trained
+    routing classifier, totalling about 1% of the 12B backbone's parameters and trained on roughly
+    0.05M edit examples. The protection mechanism is the inpainting mask, since the left half is never
+    denoised, so the reference stays intact by construction, and the right half is generated conditioned
+    on attending back to that intact reference. There is no separate locality loss. Early Filter
+    Inference-Time Scaling adds a selection step, where several candidate initial noise seeds are each run
+    for a small number of denoising steps, Qwen-VL-72B scores the partial outputs for instruction
+    alignment by pairwise comparison, and only the winning seed is carried through full denoising.
+  evidence: On the MagicBrush benchmark ICEdit reaches L1 distance 0.060 against UltraEdit's 0.066,
+    CLIP-I 0.928 against MagicBrush's own 0.908, and DINO 0.853 against UltraEdit's 0.852. On the
+    Emu Edit benchmark it reaches CLIP-I 0.907 against EmuEdit's 0.877 and DINO 0.866 against 0.844,
+    though its GPT-4o instruction-following score of 0.68 trails EmuEdit's 0.72. With inference-time
+    scaling applied, VIEScore reaches 78.2 overall against SeedEdit's 75.7. The paper's headline claim
+    is 0.1% of the training data and 1% of the trainable parameters used by prior fine-tuned editors.
+  limitations: The paper concedes persistent failure cases remain even with the in-context paradigm.
+    A single LoRA adapter proved insufficient across the range of edit types, which motivated the
+    move to LoRA-MoE, and the authors note the approach still depends on a curated dataset, of order
+    50K examples, to reach its reported quality.
+  why_it_matters: It shows precise instruction editing does not require massive paired datasets or
+    architectural changes if the base model's own in-context ability is exploited, shifting the design
+    question from how much data to collect toward how to prompt and lightly adapt a strong pretrained
+    generator.
 abstract: 'Instruction-based image editing enables precise modifications via natural language prompts,
   but existing methods face a precision-efficiency tradeoff: fine-tuning demands massive datasets (>10M)
   and computational resources, while training-free approaches suffer from weak instruction comprehension.

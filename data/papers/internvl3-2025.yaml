@@ -29,6 +29,51 @@ status:
 summary: Breaks with the usual recipe of adapting a finished text language model, and instead pretrains
   on multimodal and text data jointly from the start, with variable visual position encoding.
 explanation: null
+explained:
+  depth: full-text
+  before: The conventional recipe, used by earlier InternVL 1.5 and 2.0 releases as well as LLaVA-style
+    models generally, finishes text-only language pretraining first and only afterward retrofits vision
+    capability onto the frozen or lightly-tuned result. Bridging the resulting modality gap typically needs
+    auxiliary domain-specific data and intricate parameter-freezing or multi-stage fine-tuning schedules.
+  problem: Post-hoc adaptation cannot simultaneously optimize linguistic and multimodal competence without
+    either compromising one of them or requiring elaborate multi-stage procedures with selective parameter
+    freezing, which the paper frames as a resource-intensive and inefficient training paradigm.
+  idea: Instead of training a text-only language model first and adapting it afterward, expose the model
+    jointly to text-only corpora and diverse multimodal data from the very first pretraining stage, so
+    linguistic and multimodal competence are acquired together rather than sequentially.
+  method: The vision side uses InternViT, in a 300M or 6B variant, with a pixel unshuffle operation that
+    reduces the visual token count to one quarter, so a 448 by 448 tile is represented by 256 tokens. A
+    randomly initialized two-layer MLP projector then maps these compressed visual features into the language
+    model's input space, placing InternVL3 in the encoder-projector fusion family rather than cross-attention.
+    The LLM backbone is drawn from the Qwen2.5 series across sizes from 0.5B to 72B, or InternLM3-8B, initialized
+    from their base, non-instruction-tuned checkpoints. Unlike the staged freezing used elsewhere in this
+    line, native multimodal pretraining updates all parameters jointly, vision encoder and language model
+    together, with nothing kept frozen during this stage. Variable Visual Position Encoding increments
+    position ids for text tokens by 1 as usual but increments visual tokens by a smaller factor delta,
+    randomly sampled per image during training from a set including 1, 1/2, 1/4, down to 1/256, which lets
+    the model handle much longer multimodal contexts while preserving positional distinctions inside each
+    image. Post-training applies supervised fine-tuning on data expanded from 16.3M to 21.7M samples plus
+    mixed preference optimization, a combined objective summing a DPO-style preference loss, a BCO-style
+    quality loss, and a language modeling generation loss. Test-time scaling uses best-of-N sampling scored
+    by a separate VisualPRM-8B critic model that averages a quality score across each reasoning step.
+  evidence: InternVL3-78B reaches 72.2 on MMMU, a new state of the art among open-source MLLMs at the time,
+    ahead of InternVL3-38B's 70.1 and InternVL3-14B's 67.1. On MathVista it reaches 79.0 against Claude
+    3.5 Sonnet's 66.8 and GPT-4o's 60.0. On ChartQA it reaches 89.7, close to Claude 3.5 Sonnet's 90.8 and
+    ahead of GPT-4o's 85.7. OCRBench reaches 906, the highest reported among open-source models in the paper's
+    comparison. Test-time scaling with VisualPRM best-of-8 lifts InternVL3-1B's MMMU score from 43.4 to
+    55.4.
+  limitations: The paper concedes visual grounding performance plateaus at larger scales, with InternVL3-78B's
+    RefCOCO average of 91.4 actually below InternVL2.5-78B's 92.3, which it attributes to the training
+    data expansion not including additional grounding-specific data. It concedes minor declines on some
+    hallucination benchmarks such as MMHal despite overall progress, and states that achieving more consistent
+    improvement across benchmarks remains an open direction. It concedes InternVL3-78B still underperforms
+    Gemini 1.5 Pro on some VSI-Bench spatial reasoning sub-tasks, 48.4 against 45.4 only on select tasks,
+    and that Gemini 2.5 Pro retains an edge on select HallusionBench tasks.
+  why_it_matters: Native multimodal pretraining is a direct architectural counter-proposal to the encoder-projector-onto-frozen-LLM
+    recipe that LLaVA and the Qwen-VL line use, arguing joint training from the start avoids the alignment
+    cost of retrofitting vision onto an already-finished language model. This paper contains no statement,
+    and this atlas records no other evidence, that InternVL3 is used as a text encoder or instruction parser
+    inside an image generation pipeline, unlike Qwen2.5-VL elsewhere in this atlas.
 abstract: We introduce InternVL3, a significant advancement in the InternVL series featuring a native
   multimodal pre-training paradigm. Rather than adapting a text-only large language model (LLM) into a
   multimodal large language model (MLLM) that supports visual inputs, InternVL3 jointly acquires multimodal

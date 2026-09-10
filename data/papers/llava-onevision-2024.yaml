@@ -30,6 +30,46 @@ status:
 summary: Unifies single-image, multi-image and video handling under one projector with resolution-adaptive
   tiling, showing the encoder-plus-projector pattern generalizes without architectural change.
 explanation: null
+explained:
+  depth: full-text
+  before: The LLaVA-NeXT series and related work pushed single-image performance hard, with only a few
+    papers beginning to explore multi-image scenarios, and separate video LMMs that understood video well
+    typically did so at the cost of single-image quality. It was rare to find one open model reporting
+    strong results across single-image, multi-image, and video scenarios at once.
+  problem: No single open model demonstrated excellent performance simultaneously across single-image,
+    multi-image, and video understanding, and cross-scenario task transfer between these regimes had not
+    been shown.
+  idea: Represent images and video frames under one shared adaptive-resolution tiling scheme so a single
+    architecture and a single projector handle all three input scenarios, on the premise that a stronger
+    image model transfers better to multi-image and video tasks than a model trained on video data alone.
+  method: A SigLIP vision encoder produces per-image features, which a 2-layer MLP projector maps into
+    the language model's word embedding space, an MLP-projector fusion feeding visual tokens directly into
+    the LLM's token stream. The LLM backbone is Qwen2, offered at 0.5B, 7B, and 72B sizes. In the stage-1
+    alignment phase only the projector is trained while the vision encoder and LLM are both frozen. In
+    the later knowledge and instruction-tuning stages the full model is trained, vision encoder included,
+    though the vision encoder uses a learning rate 5 times smaller than the LLM's. AnyRes tiling divides
+    an image into a by b crops matching its aspect ratio; for single images a large maximum spatial configuration
+    is used to preserve resolution, for multi-image inputs only the base resolution is used per image with
+    no extra cropping to control total token count, and for video each frame is resized to the base resolution
+    with bilinear interpolation reducing per-frame tokens so more frames can be included within budget.
+  evidence: Training data comprises a 558K-image stage-1 alignment set, a 4M-sample stage-1.5 set for higher-quality
+    knowledge including 3.5M recaptioned images and 1.1M document/OCR samples, a 3.2M-sample single-image
+    instruction stage, and a final 1.6M-sample OneVision stage mixing 560K multi-image, 350K video, and
+    800K single-image samples. On single-image benchmarks the 72B model reaches 91.3% on DocVQA test and
+    67.5% on MathVista, both ahead of GPT-4V's 88.4% and 49.9% respectively. On the multi-image benchmark
+    Mantis it reaches 77.6% against GPT-4V's 62.7%. On the video benchmark MLVU it reaches 68.0% against
+    GPT-4V's 49.2%. The paper attributes gains on multi-image and video benchmarks absent from the single-image
+    training data to transfer from the strong single-image-trained base, presented as evidence for the
+    one-vision transfer claim.
+  limitations: The paper concedes a relatively larger gap remains against GPT-4V and GPT-4o specifically
+    on complex visual chat scenarios, and states this is left as future work requiring stronger LLMs, larger
+    training data, and better preference learning. It also notes LLaVA-OneVision's perception capability
+    appears to depend mainly on its vision module rather than on scaling the language model.
+  why_it_matters: It shows the same encoder-plus-projector recipe LLaVA introduced generalizes across single-image,
+    multi-image, and video without architectural change, needing only a shared tiling scheme and mixed
+    training data, and that transfer from a strong image model can substitute for video-specific training.
+    The paper makes no claim of use as a text encoder or component inside an image generation pipeline,
+    and this atlas records no such downstream role for it elsewhere.
 abstract: 'We present LLaVA-OneVision, a family of open large multimodal models (LMMs) developed by consolidating
   our insights into data, models, and visual representations in the LLaVA-NeXT blog series. Our experimental
   results demonstrate that LLaVA-OneVision is the first single model that can simultaneously push the

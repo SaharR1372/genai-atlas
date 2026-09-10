@@ -29,6 +29,43 @@ summary: Attacks per-step numerical truncation error with an exact rectified-flo
   Taylor expansion in place of naive Euler steps. Its editing variant also shares self-attention features
   between the inversion and editing passes.
 explanation: null
+explained:
+  before: Rectified-flow diffusion transformers such as FLUX and OpenSora generate well but invert
+    poorly. Vanilla first-order Euler discretization of the rectified-flow ODE accumulates truncation
+    error at every step, so reconstructions drift from the source, and any editing built on that inversion
+    inherits the drift. Prior fixes such as RF-Inversion used optimization-based corrections that only
+    handled simple edits.
+  problem: Get accurate, training-free inversion for rectified-flow models, so DiT-based image and
+    video editing can be built on top of it without retraining the base model.
+  idea: Derive the exact solution of the rectified-flow ODE by variation of constants and approximate
+    its nonlinear term with a high-order Taylor expansion instead of a first-order Euler step, then
+    reuse the self-attention features recorded during inversion to anchor source structure during editing.
+  method: RF-Edit operates entirely in attention-and-feature space; it writes no new latent. During
+    the final N inversion timesteps, self-attention Value features from the last M transformer blocks
+    are cached; during the corresponding early denoising timesteps, those cached Value matrices replace
+    the freshly computed ones, so attention becomes a function of the current queries and keys but
+    the inverted image's stored values. This value-injection is the paper's protection mechanism, and
+    it acts as a structural anchor that preserves the source image's or video's unedited content while
+    the query and key computation still lets the instruction steer the targeted region. There is no
+    mask, no latent blending, and no explicit locality loss; protection is purely an attention-level
+    substitution, tunable by how many steps and blocks share features.
+  evidence: On image editing, RF-Edit reaches CLIP Score 33.66 against Prompt-to-Prompt's 30.70, DiffEdit's
+    32.68, and RF-Inversion's 33.02; its LPIPS of 0.149 is not the best in the comparison, Plug-and-Play
+    scores 0.080 but the paper reports it fails on complex edits. On reconstruction, RF-Solver cuts
+    image MSE to 0.0094 from the rectified-flow baseline's 0.0268 and video LPIPS to 0.3299 from 0.4159.
+    On video editing it reaches subject consistency 0.9501 against TokenFlow's 0.9439 and motion smoothness
+    0.9712 against COVE's 0.9697.
+  limitations: The authors report that pushing the Taylor expansion beyond second order gives no further
+    gain, because the extra function evaluations it costs reduce the number of timesteps available
+    under a fixed inference budget. They note the number of feature-sharing steps needs case-by-case
+    tuning, with their own ablation showing the optimal count differs across examples. The paper does
+    not discuss the roughly doubled per-timestep forward-pass cost the high-order correction adds relative
+    to a plain Euler step.
+  why_it_matters: It showed a numerically exact ODE solver, not a learned component, was the missing
+    piece for rectified-flow inversion, and it established attention-feature sharing between inversion
+    and denoising as a training-free way to protect source structure during editing, without ever writing
+    a new latent.
+  depth: full-text
 abstract: Rectified-flow-based diffusion transformers like FLUX and OpenSora have demonstrated outstanding
   performance in the field of image and video generation. Despite their robust generative capabilities,
   these models often struggle with inversion inaccuracies, which could further limit their effectiveness

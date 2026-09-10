@@ -30,6 +30,50 @@ summary: Adds windowed attention to the native-resolution vision transformer and
   for video. This is the model Qwen-Image uses to encode prompts and Step1X-Edit uses to parse editing
   instructions, so it sits underneath a large share of current open generation and editing work.
 explanation: null
+explained:
+  depth: full-text
+  before: Qwen2-VL and other native-resolution vision-language models processed images at their original
+    size rather than a fixed square, but a plain native-resolution ViT has quadratic attention cost in
+    the number of patches, video temporal understanding was tied to raw frame counts rather than real elapsed
+    time, and document or chart parsing generally required separate task-specific models rather than one
+    unified vision-language model.
+  problem: The paper targets computational inefficiency in native-resolution visual encoding at scale,
+    frame-rate-dependent rather than time-aligned video understanding, fragmented document and structured-data
+    parsing that needs multiple specialized models, and imprecise object grounding needed for agents that
+    operate computers and mobile devices.
+  idea: Make the vision transformer itself efficient at native resolution by restricting most of its layers
+    to windowed attention, align video understanding to absolute elapsed time rather than frame index, and
+    train the model to emit structured outputs, bounding boxes, points, and HTML-like markup, so one model
+    covers document parsing and precise object grounding as well as open-ended visual question answering.
+  method: The vision encoder is a 32-layer ViT trained from scratch, using 2D RoPE for spatial position
+    and RMSNorm with SwiGLU activations, where only four of the 32 layers use full self-attention and the
+    rest use windowed attention over 112 by 112 pixel windows, which brings attention cost from quadratic
+    toward linear in the number of patches. A lightweight two-layer MLP merger groups four adjacent patch
+    features, concatenates them, and projects the result into the LLM's embedding dimension, so fusion
+    is an MLP projector feeding compressed visual tokens directly into the language model's token stream,
+    in the encoder-projector family. The LLM backbone is Qwen2.5, at 3B, 7B, and 72B sizes. Training has
+    three pretraining stages followed by post-training. Stage one trains only the ViT on 1.5T tokens while
+    the LLM stays frozen; stage two unfreezes both ViT and LLM together across 2T tokens at an 8192 sequence
+    length; stage three continues training both at a 32768 sequence length on 0.6T tokens for long-context
+    capability. Post-training applies supervised fine-tuning and DPO with the ViT frozen and the LLM trained.
+    Absolute time encoding is implemented through M-RoPE so temporal position corresponds to real elapsed
+    time rather than frame count, making the model frame-rate invariant.
+  evidence: The 72B model reaches 96.4 on DocVQA against GPT-4o's 91.1 and Claude 3.5 Sonnet's 95.2, 74.8
+    on MathVista against GPT-4o's 63.8, and 88.4 on MMBench-EN-v1.1 against GPT-4o's 83.1. On OCRBench_v2
+    it scores 61.5 English and 63.7 Chinese against GPT-4o's 46.5 and 32.2. On ScreenSpot agent UI grounding
+    it reaches 87.1 against GPT-4o's 18.1. On the long-video benchmark LVBench it reaches 47.3 against GPT-4o's
+    30.8.
+  limitations: The paper concedes that achieving optimal modality alignment for chain-of-thought reasoning
+    remains an ongoing challenge, stating explicitly that visual and textual modalities are not yet adequately
+    integrated at intermediate reasoning steps. Video analysis is capped at 768 frames with a 24,576 token
+    ceiling. On the online agent benchmark OSWorld the model scores 8.83 against GPT-4o's 5.03, still a
+    low absolute score for autonomous computer operation.
+  why_it_matters: 'This atlas records, outside of what this paper itself states, that Qwen2.5-VL specifically
+    is the model Qwen-Image uses to encode text prompts and that Step1X-Edit uses to parse editing instructions,
+    making it a load-bearing component underneath a large share of current open image generation and editing
+    work. That downstream generation role is not mentioned or anticipated anywhere in this technical report,
+    which presents the model purely as a vision-language understanding and agent system; the connection
+    is documented elsewhere in this atlas, not claimed by the paper.'
 abstract: We introduce Qwen2.5-VL, the latest flagship model of Qwen vision-language series, which demonstrates
   significant advancements in both foundational capabilities and innovative functionalities. Qwen2.5-VL
   achieves a major leap forward in understanding and interacting with the world through enhanced visual

@@ -30,8 +30,44 @@ status:
   verified_on: '2026-09-10'
   verified_by: opus
 summary: Unifies creation and editing under a long-context conditioning unit, implemented as a LoRA on
-  FLUX.1 — a widely reused editing backbone precisely because it is cheap to adapt.
+  FLUX.1 and therefore cheap to adapt. Worth noting that the paper itself reports no quantitative benchmark
+  results, so its standing rests on adoption rather than on published numbers.
 explanation: null
+explained:
+  depth: full-text
+  before: The original ACE model's Long-context Condition Unit concatenated the conditioning image and
+    mask with the noise sequence along the token dimension. The paper says this "disrupts the established
+    context perception framework honed during text-to-image generation training" and lengthens the attention
+    sequence, raising adaptation cost. FLUX.1-Fill-dev used channel-wise concatenation but only for its
+    own inpainting task, not generalized to other editing or generation tasks.
+  problem: Adapt a powerful pretrained text-to-image model, FLUX.1-dev, to a broad set of editing and
+    generation tasks under one conditioning scheme, without the extra attention cost and disrupted pretraining
+    prior that sequence-dimension conditioning causes.
+  idea: Concatenate the input image, mask, and noisy latent along the channel dimension rather than the
+    sequence dimension, generalizing FLUX.1-Fill-dev's inpainting-style conditioning into a Long-context
+    Condition Unit usable for arbitrary editing and reference-generation tasks, trained in two stages.
+  method: 'Editing happens in FLUX''s VAE latent space: the noisy latent, reference image, and mask are
+    stacked as extra channels feeding the diffusion transformer, written as [input image; mask; noisy
+    latent] per condition unit, with multiple units concatenated sequentially for multi-reference tasks.
+    There is no explicit mask-based latent blending or post-hoc compositing step described; protection
+    of un-edited regions is implicit, learned end-to-end through the channel-stacked mask conditioning
+    and the training loss (a target-prediction loss plus a reference-reconstruction loss that is zero
+    for 0-reference tasks) rather than any inference-time attention injection or blending. Training runs
+    in two stages: stage one pretrains on 0-reference tasks (no reference image, e.g. inpainting, controllable
+    generation) initialized from FLUX.1-dev or FLUX.1-Fill-dev; stage two finetunes on the full ACE task
+    set including reference-conditioned tasks. The model is released as both a full finetune and lightweight
+    LoRA variants for portrait consistency, subject consistency, local editing, and repainting.'
+  evidence: The paper reports no quantitative benchmark numbers. Its results section presents only qualitative
+    visualizations across five task categories, subject-driven generation, portrait consistency, local
+    editing, flexible instructions, and local reference editing, and asserts superiority in image quality
+    and prompt-following without a metric to support the claim.
+  limitations: The paper concedes no CLIP score, FID, human evaluation, or comparison to ACE, FLUX.1-Fill-dev,
+    or any other baseline is reported; the claimed reduction in adaptation cost from channel-dimension
+    conditioning is asserted but never measured, and no dedicated limitations section is given.
+  why_it_matters: Channel-dimension conditioning is a cheap way to reuse a pretrained model's own attention
+    prior instead of disturbing it with extra sequence tokens, which plausibly explains why ACE++, released
+    as a LoRA on FLUX, became a widely reused editing backbone even though the paper itself offers no
+    quantitative evidence for its claims.
 abstract: 'We report ACE++, an instruction-based diffusion framework that tackles various image generation
   and editing tasks. Inspired by the input format for the inpainting task proposed by FLUX.1-Fill-dev,
   we improve the Long-context Condition Unit (LCU) introduced in ACE and extend this input paradigm to

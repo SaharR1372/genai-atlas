@@ -41,6 +41,44 @@ explanation: null
 lines:
 - line-representation-latent
 - line-unified-models
+explained:
+  depth: full-text
+  before: Prior multimodal systems such as CLIP, Flamingo, the Kosmos series, BLIP and LLaVA, plus the
+    smaller 14B Emu1 predecessor, used task-specific architectures or discrete visual tokens, and their
+    few-shot in-context learning across interleaved text-and-image tasks lagged far behind what large language
+    models achieve with text alone.
+  problem: Multimodal systems had largely failed to imitate the human ability to solve a task from only
+    a handful of demonstrations or a simple instruction, the in-context learning behavior that scaling had
+    already unlocked for text-only language models.
+  idea: Unify text and image prediction under one autoregressive objective that predicts the next multimodal
+    element, either a visual embedding or a text token, over interleaved sequences, and scale the whole
+    system to language-model size to see whether in-context learning emerges the same way it does for text.
+  method: A frozen-during-stage-2 EVA-02-CLIP-E-plus vision encoder turns each image into 64 fixed-dimension
+    continuous visual embeddings, via mean pooling over 8 by 8 patches followed by a linear projection,
+    and these embeddings are interleaved with text tokens as input to a LLaMA-33B autoregressive backbone,
+    for a total of 37 billion parameters across encoder, backbone and decoder. Stage one trains with a captioning
+    loss on text tokens only; stage two adds an image regression loss that predicts continuous visual embeddings
+    directly, with no vector-quantization step, alongside the text classification loss. A separately and
+    fully trained SDXL-base model serves as the visual decoder, converting predicted embeddings back into
+    1024 by 1024 pixel images, trained with classifier-free guidance using 10 percent conditioning dropout.
+    Instruction-tuned variants follow the base model, Emu2-Chat for conversational question answering and
+    Emu2-Gen for controllable generation from mixed text, location and image conditions.
+  evidence: In few-shot in-context evaluation, Emu2 reaches 67.8 percent (8-shot) and 68.8 percent (16-shot)
+    on VQAv2 against Flamingo-80B's 65.6 and 66.8, and 49.3 and 50.3 percent on TextVQA against Flamingo-80B's
+    37.3 and 37.6. Instruction-tuned Emu2-Chat reaches 84.9 percent VQAv2, 65.1 percent GQA, 66.6 percent
+    TextVQA and an MM-Vet score of 48.5. For generation, on 30,000 MS-COCO samples Emu2 reaches CLIP-I 0.686,
+    ahead of SDXL's 0.674 and SEED's 0.682, though CLIP-T trails DALL-E 3, 0.297 versus 0.320. On DreamBench
+    subject-driven generation Emu2 reaches a DINO score of 0.766 and CLIP-I of 0.850, ahead of Kosmos-G's
+    0.694 DINO score.
+  limitations: The authors concede in-context learning can still fail on complex scenes, giving counting
+    objects in a crowded image as an example, and they concede a remaining gap between Emu2-Chat's question-answering
+    ability and closed multimodal systems, citing GPT-4V's MM-Vet score of 67.7 against Emu2-Chat's 48.5.
+  why_it_matters: Emu2 is an early, MLLM-scale demonstration that predicting continuous semantic visual
+    embeddings autoregressively, then handing them to a separately trained diffusion model to decode into
+    pixels, produces strong in-context learning at 37B parameters. It is a direct ancestor of the frozen-backbone,
+    diffusion-decoder pattern that later work such as MetaQuery and BLIP3-o refines by freezing the multimodal
+    backbone entirely and adding only a lightweight bridge, rather than training the whole multimodal model
+    end to end as Emu2 does.
 abstract: The human ability to easily solve multimodal tasks in context (i.e., with only a few demonstrations
   or simple instructions), is what current multimodal systems have largely struggled to imitate. In this
   work, we demonstrate that the task-agnostic in-context learning capabilities of large multimodal models

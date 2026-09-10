@@ -32,6 +32,43 @@ summary: Discretizes the continuous semantic latent that representation autoenco
   and scales to a 131,072-entry codebook. The bridge between the representation-latent line and discrete-token
   generation.
 explanation: null
+explained:
+  depth: full-text
+  before: RAE established that a frozen vision-foundation-model encoder paired with a trained decoder yields
+    a continuous semantic latent that is strong for both reconstruction and flow-matching generation. Discretizing
+    that continuous space with ordinary vector quantization, as a prior VQRAE attempt did, hit codebook
+    collapse and stopped improving once the vocabulary grew past roughly 16,384 codes.
+  problem: Standard Euclidean-distance codebook assignment is mismatched with the geometry of pretrained
+    representation features, where semantic content lives mainly in feature orientation rather than magnitude,
+    so quantization saturates and cannot scale to large vocabularies while staying semantically coherent.
+  idea: Discretize RAE latents with Hyper-Spherical Quantization, which assigns each token to the codebook
+    entry with the highest cosine similarity to it rather than the smallest Euclidean distance, decoupling
+    semantic routing from feature magnitude so the codebook can grow without collapsing.
+  method: A frozen SigLIP2 ViT-So400M encoder supplies the continuous representation, exactly as in plain
+    RAE. Hyper-Spherical Quantization then routes each token to the codebook entry maximizing angular similarity
+    between token and code directions, while a separate Euclidean commitment loss preserves magnitude information
+    needed for reconstruction; the nearest-neighbor search is spherical, but the retrieved code vector itself
+    is unnormalized. A trained decoder, guided in part by a self-distillation teacher, reconstructs images
+    from the resulting discrete codes. Downstream generation is a discrete diffusion model trained with
+    a time-weighted masked cross-entropy loss over the token sequence.
+  evidence: On ImageNet-1K reconstruction, dRAE reaches rFID 0.69 with a 16,384-entry codebook and rFID
+    0.42 with a 131,072-entry codebook, improving as vocabulary grows, with over 90 percent codebook utilization
+    and roughly 12,000 codes active per forward pass against roughly 6,000 for standard VQ at comparable
+    size. Class-conditional generation at a 65,536-entry codebook reaches gFID 4.45 with Inception Score
+    287.3. Paired with a 7B multimodal LLM on the same SigLIP2 encoder at 512 resolution, dRAE reaches MMBench
+    81.5, TextVQA 67.7, GQA 62.4, and SEED 72.7, and text-to-image generation trained on 12M pairs reaches
+    GenEval 0.63 and DPG-Bench 80.58.
+  limitations: The paper concedes reconstructing high-dimensional patch embeddings is harder than reconstructing
+    raw pixel values, attributing this to intrinsic noise in the encoder's own representations and the absence
+    of perceptual supervision at that stage. It also reports that imposing a strict unit-sphere prior on
+    the inputs themselves, rather than restricting spherical geometry to code assignment alone, degrades
+    reconstruction, dropping PSNR from 22.5 to 20.6.
+  why_it_matters: The d in dRAE stands for discrete. What it changes relative to plain RAE is specifically
+    a discretization stage built around a hyper-spherical codebook designed for anisotropic feature geometry,
+    not a new decoder architecture or training curriculum in the sense of reordered training stages, though
+    the decoder is retrained around the new discrete codes. This gives the representation-latent line a
+    genuine bridge to language-model-style next-token generation and multimodal LLM training, which continuous
+    RAE latents cannot directly support.
 abstract: 'In this work, we aim to discretize the high-dimensional visual representations to bridge the
   gap with language models - a non-trivial challenge, as existing quantization methods suffer from codebook
   collapse, failing to scale while preserving semantic coherence. We identify the root cause as metric

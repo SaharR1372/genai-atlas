@@ -31,6 +31,48 @@ status:
 summary: Evaluates creation and editing jointly, matching the architectural shift toward single models
   that do both.
 explanation: null
+explained:
+  depth: full-text
+  before: Earlier benchmarks evaluated creation and editing separately. Editing-specific sets such as
+    InstructPix2Pix and MagicBrush covered as few as 1 task each in the paper's own comparison table (Emu
+    Edit reached 7, UltraEdit 9), relied on FID, IS, and CLIP similarity metrics the paper calls "inadequate
+    for comprehensive evaluation and often misalign with human preferences," and were biased in their
+    image sources, InstructPix2Pix used only synthesized images and MagicBrush used only real ones.
+  problem: No benchmark jointly and comprehensively evaluates unified models that both create and edit
+    images, across enough tasks and evaluation dimensions to reflect real capability, while avoiding single-metric
+    and data-distribution bias.
+  idea: Decompose image generation into four categories by the presence or absence of a source and a reference
+    image (no-reference/reference Creating and Editing), split these into 31 fine-grained tasks, and score
+    outputs along 6 dimensions with 11 metrics, including a new VLM-judge metric for instruction success,
+    over a hybrid real-and-synthetic dataset.
+  method: 'This is a benchmark and metric contribution, not an editing method: 31 tasks across the 4 categories
+    (1 no-reference creating, 3 reference creating, 22 no-reference editing split into global, local,
+    and controllable-generation subtasks, 4 reference editing) span 6,538 evaluation instances at 50 to
+    500 cases per task. The 6 scored dimensions are aesthetic quality (a SigLip-based predictor), imaging
+    quality (MUSIQ), prompt following (CLIP-cap plus the new VLLM-QA), source consistency (CLIP-src, L1-src),
+    reference consistency (Face-ref via InsightFace, DINO-ref, Style-ref via a CSD model), and controllability
+    (task-specific: L1 distance for pose, edge, and depth guidance; colorfulness for colorization; SSIM
+    for deblurring). VLLM-QA feeds Qwen2-VL-72B the instruction, source image, reference images, and generated
+    image, and returns a binary success judgment per case, averaged per task; the combined prompt-following
+    score is (CLIP similarity divided by 0.5, plus VLLM-QA) divided by 2. Data mixes real sources, MS-COCO,
+    LAION-5B, DreamBooth, VITON-HD, with synthetic images to reduce distribution bias.'
+  evidence: Ten models were evaluated, OmniGen, ACE, FLUX, OmniControl, InstructPix2Pix, MagicBrush, UltraEdit,
+    FLUX-Control, IP-Adapter, and ACE++, and no single model dominates. On text-to-image, ACE scores 0.548
+    to 0.611 on aesthetic quality against OmniGen and FLUX's 0.726 to 0.735 on imaging quality. ACE trades
+    high style-reference fidelity (0.849 style-ref) for low prompt-following (0.232), while OmniGen shows
+    the reverse pattern (0.359 style-ref, 0.431 prompt-following). On global editing, OmniGen's source
+    consistency (L1-src 0.544) trails ACE's 0.899, which the paper attributes to inadequate training for
+    pixel-aligned editing. On face editing, ACE scores 0.796 on VLLM-QA against only 0.268 on CLIP-based
+    prompt-following, illustrating VLLM-QA catching instruction failures CLIP similarity misses.
+  limitations: The paper does not report a human-correlation study or inter-rater agreement validating
+    VLLM-QA against human judgment; it notes the imaging-quality metric "tends to favor high-resolution
+    images" due to its resizing methodology, and attributes InstructPix2Pix's and MagicBrush's weak scores
+    to "limited and low-quality training data" rather than analyzing metric ceiling effects or VLLM hallucination
+    risk.
+  why_it_matters: It matches evaluation to the architectural shift toward single models that both create
+    and edit, and its VLLM-QA metric targets a real blind spot, CLIP similarity can stay high while the
+    instructed edit was not actually performed, though the metric's own reliability against human judgment
+    is asserted rather than demonstrated in the paper.
 lines:
 - line-evaluation
 abstract: 'Image generation has witnessed significant advancements in the past few years. However, evaluating

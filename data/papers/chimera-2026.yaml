@@ -28,6 +28,80 @@ status:
 summary: A hybrid linear-attention and latent-attention diffusion transformer, with a scaling law fitted
   specifically for visual diffusion backbones rather than borrowed from language modelling.
 explanation: null
+explained:
+  depth: full-text
+  before: Visual diffusion transformers relied on full self-attention, whose pairwise cost scales quadratically
+    with sequence length, which becomes prohibitive as resolution, video length and multimodal context
+    grow. Language models had already moved past this with sparse attention, compressed key-value representations,
+    linear or recurrent sequence operators, and sparsely activated MoE capacity, but these solutions were
+    not shown to transfer directly to visual diffusion, which must preserve spatiotemporal locality and
+    support bidirectional interaction across modalities. Scaling recipes for such backbones were also borrowed
+    from language modeling rather than fit on visual diffusion itself.
+  problem: Whether a hybrid attention design can replace full attention in a visual diffusion transformer
+    without losing quality, and whether a heterogeneous architecture mixing different attention types,
+    convolutions and MoE can be scaled up with a principled compute-optimal recipe rather than ad hoc tuning.
+  idea: Combine three complementary operators so each covers what the others miss, a cheap linear-cost
+    recurrent attention for long-context state tracking, a small amount of full compressed-key-value attention
+    for direct global interaction, and short local convolutions for spatiotemporal locality, then govern
+    how this heterogeneous mixture scales with a module-wise hyperparameter-transfer scheme and Chinchilla-style
+    laws fit directly on visual diffusion loss rather than borrowed from language-model recipes.
+  method: Chimera operates in VAE latent space. A frozen VAE with temporal, height and width compression
+    factors of 4, 8 and 8 encodes images and video, and a patchification layer turns the latents into visual
+    tokens z1. Training uses a rectified-flow objective that predicts velocity, regressing the model output
+    against v_tau, the derivative dz_tau over dtau, equal to z1 minus z0, with the loss applied only at
+    visual-token positions and not at text-token positions. Text, image and video tokens are processed
+    as one raster-ordered stream with no positional embeddings; position is instead carried by the scan
+    order itself, by modality-aware convolutions, and by the forget gate inside the linear-attention operator.
+    Blocks interleave Kimi Delta Attention (KDA) and Multi-head Latent Attention (MLA) at a 3-to-1 ratio.
+    KDA is a linear-complexity recurrent operator with a channel-wise decay gate that gives long-context
+    state tracking without quadratic cost, while MLA supplies full bidirectional attention over compressed
+    key and value projections for direct global interaction, standing in for the periodic global mixing
+    pure linear attention lacks. Before each KDA update, a modality-aware short convolution runs separately
+    per modality, a causal one-dimensional depthwise convolution over text tokens and a depthwise three-dimensional
+    convolution over visual tokens reshaped to their spatiotemporal grid, giving local context; a fused
+    Triton implementation of this gives a 2.2 to 2.3 times forward speedup. Sparse MoE layers use 56 routed
+    experts with 8 activated per token, an eighth of total expert capacity, each expert a small SwiGLU
+    FFN sized to a fraction of the dense FFN width, balanced with an auxiliary-loss-free bias adjustment
+    that keeps load imbalance near a fixed target through training. Residual state is expanded into 4 streams
+    with identity hyper-connections rather than a single residual stream. HeteroP tunes base hyperparameters
+    once on a small proxy model, width 512, depth 4, about 22M activated parameters, then transfers them
+    to larger configurations using a per-module width ratio, each parameter group's fan-in divided by the
+    proxy's fan-in for that group, and a single global depth ratio, block count over the proxy's block
+    count. Hidden-weight initialization variance and learning rate scale with the inverse of the width
+    ratio, weight decay scales with the width ratio itself, attention and FFN residual outputs are scaled
+    by the inverse depth ratio before the hyper-connection write, and input adapters, norms and biases
+    keep the base rates unscaled. The largest trained model uses width 2048 and depth 32, a width ratio
+    of 4 and a depth ratio of 8 relative to the proxy. A Chinchilla-style parametric loss in activated
+    parameter count N and cumulative visual latent positions D, with compute approximated as 6ND, is fit
+    and extended to a third axis, the image-to-video data ratio, to find compute-optimal training mixes.
+  evidence: Under matched training compute and measured by pretraining diffusion loss rather than a downstream
+    FID or GenEval comparison, the dense Chimera backbone reaches the same loss as a matched full-attention
+    Wan-2.1 2B baseline using 1.7 times less compute, and the complete system with MoE reaches it using
+    7.3 times less compute. The full trained model, 11B parameters with 2B activated, needed roughly 600
+    H100-days of training against Z-Image-Turbo's roughly 12.4K H100-days, about 20 times less. Trained
+    only on 5-second video clips, it extrapolates zero-shot to 30-second video, a 6 times horizon extension,
+    with only 6.5% FID degradation over the final five seconds, which the paper reports as far below the
+    roughly 50% degradation of prior length-extrapolation methods. The fitted scaling laws show image pretraining
+    divides compute nearly evenly between activated model size and token count, with the compute-optimal
+    model size scaling as compute to the power of roughly 0.48 to 0.52, while video pretraining modestly
+    favors growing model size over data, scaling as compute to the power of roughly 0.53 to 0.56. At the
+    systems level the hybrid attention design supports more than 1.68 times longer sequences on a single
+    80GB GPU and runs 2.14 times faster at 255k tokens than a matched MHA and MLA baseline. The paper reports
+    Chimera as competitive with FLUX.1-dev and Z-Image-Turbo on GenEval and DPG-Bench, though exact scores
+    were not available in the fetched text.
+  limitations: The authors do not include a dedicated limitations section, but concede several open questions.
+    The MoE configuration, 56 experts with 8 activated, and the MLA key-value compression ratio are held
+    fixed across every scale studied, and the authors explicitly leave open whether the optimal compression
+    ratio is itself scale-dependent. The main results are measured by pretraining diffusion loss rather
+    than downstream generation quality, which the authors acknowledge is better treated as a post-training
+    metric, and they describe adapting the pretrained backbone for downstream generation quality as future
+    work.
+  why_it_matters: It argues visual diffusion backbones need their own scaling recipe rather than an imported
+    language-model one, since the efficient long-context solutions language models adopted do not transfer
+    directly to a domain that must preserve spatiotemporal locality and bidirectional cross-modal interaction.
+    Fitting Chinchilla-style laws directly on visual diffusion loss, across model size, token count and
+    image-video data ratio, gives a principled way to scale a hybrid heterogeneous architecture instead
+    of tuning it by hand.
 abstract: Visual generation increasingly requires high-resolution images, long videos, and multimodal
   context, making the quadratic cost of full attention prohibitive. We introduce Chimera, a hybrid visual
   diffusion backbone with a principled scaling recipe. Chimera processes text, image, and video tokens

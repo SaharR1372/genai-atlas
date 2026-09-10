@@ -30,6 +30,53 @@ summary: 'Carries the joint-embedding predictive idea to video and shows the res
   action-conditioned prediction and robot planning. Included as a pointer: video is out of this atlas''s
   scope, but the representation family is the same one generative image models draw on.'
 explanation: null
+explained:
+  depth: full-text
+  before: Predictive world models had mostly been trained from real-world interaction data such as
+    state-action sequences, which is scarce and constrains scale, or from video generation models
+    optimized for visual fidelity rather than for planning ability. The original V-JEPA used a
+    smaller 300M-parameter encoder on 2 million videos and stayed in the understanding regime
+    without an action-conditioned planning component.
+  problem: The paper targets understanding, prediction and planning learned largely by observation,
+    combining internet-scale video with only a small amount of robot interaction data and no
+    explicit rewards or task-specific training.
+  idea: Pretrain a joint-embedding predictive architecture that predicts a masked video's learned
+    representation rather than its pixels, then post-train a lightweight action-conditioned
+    predictor on a small amount of robot video, so the same latent world model supports both
+    understanding benchmarks and zero-shot planning.
+  method: The supervision is self-distillation in representation space, JEPA-style masked latent
+    prediction rather than pixel reconstruction. An EMA teacher encoder reads an unmasked view, an
+    online encoder reads a masked view, and a predictor is trained with an L1 loss to match the
+    stop-gradiented teacher representation. The encoder scales from ViT-L at 300M to ViT-g at 1B
+    parameters, trained on over 1 million hours of internet video plus images from a 22M-clip
+    VideoMix22M dataset, with progressive resolution up to 64 frames at 384px. After pretraining the
+    encoder is frozen, and a roughly 300M-parameter action-conditioned autoregressive predictor,
+    V-JEPA 2-AC, is trained on only 62 hours of unlabeled Droid robot video to predict future latent
+    states conditioned on actions, enabling zero-shot planning. The paper explicitly compares this
+    against a video generation baseline built on Cosmos, a latent-diffusion 7B model with a
+    continuous tokenizer, fine-tuned the same way on Droid data, and argues JEPA is preferable
+    because it predicts only the predictable structure of a scene while generative objectives spend
+    capacity modeling unpredictable pixel detail. So the encoder itself is the world model here,
+    generation is discussed only as a rejected alternative baseline, and the paper does not propose
+    its own features as input to a downstream generative image model.
+  evidence: V-JEPA 2 reaches 77.3 percent top-1 accuracy on Something-Something v2 with the ViT-g384
+    model on 64-frame clips at 384px, against InternVideo2's 67.7 percent and VideoPrism's 68.5
+    percent. It reaches 39.7 recall-at-5 on Epic-Kitchens-100 action anticipation against the prior
+    best PlausiVL's 27.6 percent at 8B parameters, a 44 percent relative improvement. After LLM
+    alignment at 8B scale it reaches 84.0 on PerceptionTest and 76.9 on TempCompass. V-JEPA 2-AC
+    achieves 65 percent average grasp success and 72.5 percent average pick-and-place success on
+    real Franka arms in two labs with zero robot-specific data collection, planning in 16 seconds
+    per action against the Cosmos baseline's 4 minutes and lower success rates of 0 to 60 percent.
+  limitations: The paper concedes the model must implicitly infer the action coordinate axis from
+    monocular RGB input alone, which causes errors, that autoregressive rollout error accumulates so
+    long-horizon planning reliability drops, and that the current formulation assumes visual goals
+    are available even though language-specified goals may be more natural for in-the-wild robot
+    deployment.
+  why_it_matters: Video and robotics sit outside this atlas's scope, so this entry is a pointer
+    node, but it belongs to the same self-distillation representation family that image-side
+    generative-latent work draws on, and it is the clearest existing empirical argument against
+    generative pretraining, showing an encoder trained to predict only predictable latent structure
+    can beat one trained to reconstruct or generate pixels when the downstream task is planning.
 abstract: A major challenge for modern AI is to learn to understand the world and learn to act largely
   by observation. This paper explores a self-supervised approach that combines internet-scale video data
   with a small amount of interaction data (robot trajectories), to develop models capable of understanding,

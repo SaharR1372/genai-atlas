@@ -33,6 +33,44 @@ summary: 'Argues tokenizers are trained on the wrong distribution: they see real
   decode *generated* latents. Post-training the tokenizer on the generative distribution closes that train/test
   gap and improves final sample quality.'
 explanation: null
+explained:
+  depth: full-text
+  before: Discrete and continuous tokenizers alike were trained purely as autoencoders, optimized to reconstruct
+    real images from ground-truth tokens and evaluated with reconstruction FID, on the assumption that better
+    reconstruction fidelity would transfer to better downstream generation quality.
+  problem: At inference a generative model's decoder must reconstruct from latents the generator itself
+    produced, which carry sampling errors and out-of-distribution token patterns never seen during tokenizer
+    training on ground-truth tokens, and reconstruction FID does not measure robustness to this mismatch
+    and correlates only weakly with actual generation quality.
+  idea: Close the train-test gap in two stages. During main training, perturb a fraction of tokens toward
+    their nearest codebook neighbors to simulate the noise a generator will later introduce, producing a
+    more robust latent space, and during post-training, once the generator already exists, fine-tune only
+    the decoder on a mix of real reconstructed latents and the generator's own sampled latents so it adapts
+    to what it will actually see at inference.
+  method: Main training adds a latent perturbation strategy in which a fraction beta of images in a batch,
+    beta equal to 0.1, have a fraction alpha of their tokens replaced by a random one of their top-delta
+    nearest codebook neighbors, with delta annealed from 100 to 50 over training. Post-training then freezes
+    the encoder and quantizer and fine-tunes only the decoder, using a preservation ratio sigma that interpolates
+    between tokens taken from real reconstructed latents at sigma equal to 1 and tokens taken from the trained
+    generator's own sampled output at sigma equal to 0; for diffusion-based generators sigma is set from
+    the noise level as sigma equal to 1 minus t over T. The paper also introduces pFID, the FID between
+    images reconstructed from perturbed latents and real images, as a tokenizer-only metric that tracks
+    downstream generation quality where reconstruction FID does not.
+  evidence: With a roughly 400M-parameter RAR autoregressive generator on ImageNet 256x256, main training
+    alone reaches gFID 1.60, and adding post-training improves this to gFID 1.36, both compared against
+    a LlamaGen-L baseline at gFID 3.80. The approach is validated on discrete tokenizers, including LlamaGen
+    and GigaTok, paired with autoregressive generators, and on the continuous tokenizer MAETok paired with
+    a diffusion-based generator.
+  limitations: The paper concedes pFID shows some outliers and a weaker correlation with generation quality
+    in larger settings such as LlamaGen-L, that the benefit of post-training depends on how robust the tokenizer
+    already is from main training, and that the preservation ratio sigma needs per-tokenizer tuning since
+    other tokenizers show noticeable performance variation under it.
+  why_it_matters: It operates on the boundary between tokenizer training and generator training, arguing
+    that a tokenizer's evaluation and final tuning should not stop at reconstruction fidelity but must account
+    for the distribution the generator actually produces at sampling time. Because the technique is validated
+    on both discrete VQ-style tokenizers and a continuous tokenizer, it applies in principle to frozen-encoder
+    RAE-style tokenizers as well as trained VQ tokenizers, though the paper's own experiments do not test
+    a frozen-foundation-model encoder directly.
 abstract: Recent image generative models typically capture the image distribution in a pre-constructed
   latent space, relying on a frozen image tokenizer. However, there exists a significant discrepancy between
   the reconstruction and generation distribution, where current tokenizers only prioritize the reconstruction

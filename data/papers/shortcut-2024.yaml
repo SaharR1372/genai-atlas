@@ -33,6 +33,50 @@ status:
 summary: Conditions the network on the step size it is about to take, so a single model can jump accurately
   at any budget from many steps down to one, without a separate distillation stage or a second model.
 explanation: null
+explained:
+  before: Diffusion and flow-matching models needed dozens to hundreds of network passes to sample, because
+    a standard flow-matching or diffusion objective only teaches the network the instantaneous velocity
+    at a point, which is a poor guide for a single large step. Existing speedups fixed this by distillation,
+    needing multiple training phases and often a second network, or by consistency models, which need heavy
+    bootstrapping and a fragile learning-rate schedule through training.
+  problem: Train one network in one training run, with no separate distillation phase and no second network,
+    that can generate good samples across a wide range of step budgets, from many steps down to a single
+    step.
+  idea: Condition the network not only on the current noise level but also on the step size it is about
+    to take, and teach it self-consistency, that one large shortcut step must equal two consecutive shortcut
+    steps of half that size, so the model learns to account for the curvature it will encounter over a
+    jump rather than only its instantaneous direction.
+  method: The model trains in the latent space of the sd-vae-ft-mse autoencoder, not pixels, mapping 256x256x3
+    images to 32x32x4 latents at 8x downsampling. The network s_theta(x_t, t, d) is a DiT-B backbone, 768
+    hidden size, 12 layers, 12 attention heads, that outputs a shortcut, a direction scaled so that x'_{t+d}
+    = x_t + s(x_t, t, d) times d, which stands for the average velocity over a step of size d rather than
+    the instantaneous velocity flow matching normally regresses. The loss combines two terms. A flow-matching
+    term trains s_theta(x_t, t, 0) against the instantaneous target x_1 minus x_0 at the smallest step size.
+    A self-consistency term trains the shortcut at a doubled step size 2d against a bootstrapped target
+    formed by averaging two applications of the network's own current prediction at step size d, s_theta(x_t,
+    t, d)/2 plus s_theta(x'_{t+d}, t, d)/2. Each batch mixes roughly 75 percent flow-matching targets and
+    25 percent self-consistency targets. The step schedule uses 128 total denoising steps built by binary
+    recursion, giving 8 possible shortcut lengths from 1/128 up to 1. Classifier-free guidance is applied
+    only when evaluating the shortcut model at the smallest step size and is forgone at larger step sizes.
+  evidence: 'On CelebA-HQ-256, unconditional, DiT-B trained for 400,000 steps at batch size 64, shortcut
+    models reach FID 20.5 at 1 step, 13.8 at 4 steps, and 6.9 at 128 steps; an end-to-end consistency-training
+    baseline reaches only 33.2 FID at 1 step under the same setup. On ImageNet-256, class-conditional, DiT-B
+    trained for 800,000 steps at batch size 256, shortcut models reach FID 40.3 at 1 step, 28.3 at 4 steps,
+    and 15.5 at 128 steps; scaling the backbone to DiT-XL brings this to 10.6 at 1 step, 7.8 at 4 steps,
+    and 3.8 at 128 steps. Guidance is applied only at the 1-step setting per the schedule above, and the
+    paper states shortcut models consistently beat consistency models and reflow across this full range
+    of step budgets.'
+  limitations: The authors concede that a gap remains between many-step and one-step generation quality
+    throughout their results. They also note the noise-to-data mapping the model learns is entirely an
+    expectation over the training dataset, unlike GANs or VAEs where that mapping can be directly adjusted,
+    which limits how the model's behavior can be steered at inference. They further concede that classifier-free
+    guidance becomes error-prone at larger step sizes because the linear approximation guidance relies on
+    stops being appropriate.
+  why_it_matters: Conditioning the network on the step size, and bootstrapping a self-consistency target
+    from the network's own predictions, gives a single model a controllable quality-versus-speed dial at
+    inference time without any separate distillation stage, a pattern that later few-step and one-step
+    objectives such as average-velocity methods build directly on.
+  depth: full-text
 abstract: Diffusion models and flow-matching models have enabled generating diverse and realistic images
   by learning to transfer noise to data. However, sampling from these models involves iterative denoising
   over many neural network passes, making generation slow and expensive. Previous approaches for speeding

@@ -27,11 +27,45 @@ status:
   verified_on: '2026-09-10'
   verified_by: opus
 summary: 'The first benchmark for edits that require reasoning rather than recognition, across temporal,
-  causal, spatial and logical cases. Its headline result is how far the field has to go: the best model
-  tested scored under 30 percent.'
+  causal, spatial and logical cases. Its headline result is how far the field has to go: the strongest
+  model tested reached only 35.9 percent.'
 explanation: null
 lines:
 - line-evaluation
+explained:
+  before: Existing image-editing benchmarks tested edits that a model could execute from recognition alone,
+    following an explicit instruction such as changing a color or removing an object. None tested whether
+    a model could reason about temporal, causal, spatial, or logical consequences before producing the
+    edit.
+  problem: There was no benchmark for measuring whether visual editing models can reason about the consequences
+    of an instruction, rather than simply recognize what to change.
+  idea: Build a benchmark around four reasoning categories, temporal, causal, spatial, and logical, and
+    score each output on three axes together, whether the instruction's implicit reasoning was followed,
+    whether the untouched parts of the image stayed consistent, and whether the result looked physically
+    plausible.
+  method: Not an editing method; RISEBench is a curated evaluation set. Temporal Reasoning tests natural
+    evolution such as decay or aging; Causal Reasoning tests the effect of an external force such as a
+    bitten apple or a cracked egg; Spatial Reasoning tests geometric and 3D understanding such as object
+    arrangement, assembly, or viewpoint; Logical Reasoning tests rule-based visual puzzles such as Sudoku
+    or mazes. Each output is judged against three criteria, Instruction Reasoning, Appearance Consistency,
+    and Visual Plausibility, by both human raters and an LMM-as-judge using GPT-4o.
+  evidence: 'Nine editing models were evaluated in total. Note a version discrepancy found while fetching
+    sources: the abstract stored in this entry (matching the paper''s original release) states the best
+    model, named there as GPT-4o-Image, reaches 28.8% accuracy. The arXiv v2 HTML full text fetched in
+    this session instead names the top model GPT-4o-Native and states, quoting directly, "GPT-4o-Native
+    achieves the highest performance with an accuracy of only 35.9%, followed by Gemini-2-Flash with the
+    second-highest accuracy (10.9%)," where accuracy means achieving the maximum score on all three evaluation
+    criteria simultaneously for a given test case. The weakest models trail far behind in both readings,
+    with FLUX.1-Canny scoring 0.0% and EMU2 scoring 1.5% in the v2 text. Both versions agree on the qualitative
+    headline: even the strongest model tested passes well under half of the reasoning-editing cases.'
+  limitations: The authors describe the benchmark as "an exploratory study" still in its early stages.
+    They note that Visual Plausibility carries only a small weight in the overall score even though it
+    has the highest measurement error against human judgment, an acknowledged weakness in how well the
+    automated score reflects physical-law violations.
+  why_it_matters: It reframed the bar for editing models from instruction-following to instruction-reasoning,
+    and its headline result, the best model tested passing well under half the cases, is the number the
+    field cites for how far reasoning-aware editing still has to go.
+  depth: full-text
 abstract: 'Large Multi-modality Models (LMMs) have made significant progress in visual understanding and
   generation, but they still face challenges in General Visual Editing, particularly in following complex
   instructions, preserving appearance consistency, and supporting flexible input formats. To study this

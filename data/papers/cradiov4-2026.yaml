@@ -30,6 +30,45 @@ summary: 'The current agglomerative frontier, and a useful signal about consensu
   DINOv3, SigLIP 2 and SAM 3, which is the field converging on the same three encoders that the generative-latent
   work also reaches for.'
 explanation: null
+explained:
+  depth: full-text
+  before: AM-RADIO and RADIOv2.5 established agglomerative distillation with recipe fixes for
+    resolution mode switching, teacher imbalance and excess token count, but the student still
+    absorbed fixed-pattern teacher artifacts such as SigLIP2 border holes, SAM ViTDet window
+    artifacts and DINOv3 noise patches, and summary-token matching stayed imbalanced across teachers
+    with different angular dispersions.
+  problem: The report distills a newer, stronger teacher set while removing the remaining position-
+    and teacher-specific artifacts, and improves any-resolution support and high-resolution
+    inference efficiency.
+  idea: Keep the RADIO agglomerative recipe but upgrade the teachers to the current best-in-class
+    encoders and add shift-equivariant losses plus perturbation-based regularization, so the student
+    stops memorizing each teacher's fixed-pattern noise and generalizes better across resolutions.
+  method: The supervision is multi-teacher agglomerative distillation. Frozen SigLIP2-g-384,
+    DINOv3-7B and SAM3 teachers distill into two student sizes, C-RADIOv4-SO400M at 412M parameters
+    and C-RADIOv4-H at 631M parameters. Training uses stochastic low- and high-resolution partitions
+    spanning 128px to 1152px, a shift-equivariant loss that randomly and independently shifts the
+    crop seen by the student and by each teacher to strip out position-specific noise, a
+    shift-equivariant MESA EMA regularizer, DAMP multiplicative weight perturbation for robustness,
+    and a balanced summary loss that normalizes angular distance by each teacher's own cone radius.
+    FeatSharp upsampling and mosaic augmentation adapt SigLIP2 and SAM3's native resolutions to the
+    shared schedule, and a ViTDet windowed-attention mode is offered for efficient high-resolution
+    inference. The frozen resulting student is evaluated purely as a discriminative encoder for
+    segmentation, correspondence, classification, and as a drop-in replacement for SAM3's own vision
+    tower in instance segmentation. The report contains no mention of diffusion models or of C-RADIO
+    features feeding a generative image model anywhere in the text, so like its predecessor this is
+    representation learning only as far as the paper's own framing goes.
+  evidence: C-RADIOv4-H reaches 83.09 percent ImageNet-1k zero-shot accuracy against RADIOv2.5-H's
+    82.51 percent. ADE20k mIoU is 55.20 for C-RADIOv4-H against RADIOv2.5-H's 51.58 and against the
+    DINOv3-7B teacher's own 55.9. NAVI correspondence rises to 63.44 from RADIOv2.5-H's 60.89, and
+    SPair to 60.57 from 56.24. As a substitute for SAM3's own vision tower in instance segmentation,
+    C-RADIOv4-H reaches 44.7 percent cgF1 against SAM3's own 54.1 percent.
+  limitations: The paper concedes an uneven ability to replace SAM3's vision encoder, with larger
+    performance gaps on out-of-domain data such as sports equipment and Wikipedia-common imagery
+    compared to natural images, and states that closing this gap is an open research direction.
+  why_it_matters: The teacher set converging on DINOv3, SigLIP2 and SAM3 is itself a signal of
+    field-wide consensus on which encoders carry the most useful structure, the same three families,
+    self-distillation, language-aligned contrastive pretraining and promptable segmentation, that
+    generative-latent work such as RAE also draws its frozen encoders from.
 abstract: 'By leveraging multi-teacher distillation, agglomerative vision backbones provide a unified
   student model that retains and improves the distinct capabilities of multiple teachers. In this tech
   report, we describe the most recent release of the C-RADIO family of models, C-RADIOv4, which builds

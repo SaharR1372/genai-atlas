@@ -31,9 +31,10 @@ status:
   verified: true
   verified_on: '2026-09-10'
   verified_by: opus
-summary: An 80B mixture-of-experts model that unifies understanding and generation autoregressively, with
-  native chain-of-thought before image output. The largest open-sourced unified image foundation model
-  at time of release.
+summary: An 80B mixture-of-experts model that unifies understanding and generation in one backbone, with
+  autoregressive text generation and a diffusion head operating on continuous VAE latents for images,
+  closer to Transfusion's hybrid than to pure autoregressive image generation. Includes native chain-of-thought
+  before image output, and was the largest open-sourced unified image foundation model at release.
 explanation: null
 explained:
   depth: full-text
@@ -41,49 +42,48 @@ explained:
     for understanding and separate VAE features for generation. Most systems matching state-of-the-art
     image quality, such as Seedream 4.0, Nano Banana, GPT-Image and Qwen-Image, were closed source, which
     limited transparency and reproducibility for the research community.
-  problem: The paper sets out to build an open-source model whose generation quality is comparable to or
-    better than these leading closed-source systems, while unifying understanding and generation and
+  problem: The paper sets out to build an open-source model whose generation quality is comparable to
+    or better than these leading closed-source systems, while unifying understanding and generation and
     giving the model an explicit reasoning step before it generates.
-  idea: Build one large autoregressive multimodal backbone that models text with standard next-token
-    prediction and interleaves image generation into the same sequence with a diffusion-based prediction
-    head on continuous VAE features, following the hybrid recipe used by Transfusion and JanusFlow. Train
-    the model to produce an intermediate chain-of-thought text span before producing the image so planning
+  idea: Build one large autoregressive multimodal backbone that models text with standard next-token prediction
+    and interleaves image generation into the same sequence with a diffusion-based prediction head on
+    continuous VAE features, following the hybrid recipe used by Transfusion and JanusFlow. Train the
+    model to produce an intermediate chain-of-thought text span before producing the image so planning
     happens natively rather than through an external prompt rewriter.
   method: HunyuanImage 3.0 is built on the Hunyuan-A13B Mixture-of-Experts backbone, over 80 billion total
     parameters with 13 billion activated per token, using 64 experts with 8 active per token. Images are
-    represented in the continuous latent space of an internal VAE, 32 channels with a 16x spatial
-    downsampling factor, and the fetched text reports no discrete VQ tokens anywhere in the pipeline. Text
-    tokens are predicted with standard autoregressive next-token cross-entropy. Image tokens are produced
-    by a diffusion-based prediction framework attached to the same autoregressive backbone, operating on
-    the VAE's continuous latent features, in the manner the paper states follows Transfusion and JanusFlow;
-    the fetched text does not specify whether the diffusion loss regresses noise, velocity, or the clean
-    latent, nor whether the VAE itself is frozen or jointly trained. Training proceeds through four
-    progressive stages, moving from a frozen vision encoder with a trainable transformer backbone, to a
-    frozen backbone with a trainable vision encoder, to joint training of both, to full joint training at
-    higher resolution up to 1024 pixel VAE resolution with chain-of-thought data included. Post-training
-    layers reward-based and preference-based refinement on top of the base objective, SFT on curated
-    high-quality images, DPO on preference pairs targeting structural defects, MixGRPO, an online RL
-    framework using hybrid ODE-SDE sampling to optimize aesthetics, SRPO, a gradient-guided online RL step
-    that injects noise priors for single-step denoising refinement, and ReDA, a reward-distribution-alignment
-    step that minimizes divergence from a high-reward distribution.
+    represented in the continuous latent space of an internal VAE, 32 channels with a 16x spatial downsampling
+    factor, and the fetched text reports no discrete VQ tokens anywhere in the pipeline. Text tokens are
+    predicted with standard autoregressive next-token cross-entropy. Image tokens are produced by a diffusion-based
+    prediction framework attached to the same autoregressive backbone, operating on the VAE's continuous
+    latent features, in the manner the paper states follows Transfusion and JanusFlow; the fetched text
+    does not specify whether the diffusion loss regresses noise, velocity, or the clean latent, nor whether
+    the VAE itself is frozen or jointly trained. Training proceeds through four progressive stages, moving
+    from a frozen vision encoder with a trainable transformer backbone, to a frozen backbone with a trainable
+    vision encoder, to joint training of both, to full joint training at higher resolution up to 1024
+    pixel VAE resolution with chain-of-thought data included. Post-training layers reward-based and preference-based
+    refinement on top of the base objective, SFT on curated high-quality images, DPO on preference pairs
+    targeting structural defects, MixGRPO, an online RL framework using hybrid ODE-SDE sampling to optimize
+    aesthetics, SRPO, a gradient-guided online RL step that injects noise priors for single-step denoising
+    refinement, and ReDA, a reward-distribution-alignment step that minimizes divergence from a high-reward
+    distribution.
   evidence: Training used close to 5 billion images retained from an initial pool of over 10 billion after
     filtering, a retention rate under 45%. On the paper's own SSAE semantic-alignment benchmark the model
     performs on par with leading models across all measured fine-grained categories. In blind human GSB
     evaluation on 1,000 prompts judged by over 100 professional evaluators in a single run, HunyuanImage
     3.0 wins by a 14.10% relative margin over its own predecessor HunyuanImage 2.1, and by smaller margins
-    over external systems, 1.17% over Seedream 4.0, 2.64% over Nano Banana, and 5.00% over GPT-Image. No
-    FID or other likelihood-style generation metric is reported in the fetched text, and no training compute
-    or token budget is disclosed.
+    over external systems, 1.17% over Seedream 4.0, 2.64% over Nano Banana, and 5.00% over GPT-Image.
+    No FID or other likelihood-style generation metric is reported in the fetched text, and no training
+    compute or token budget is disclosed.
   limitations: The authors concede that only the text-to-image capability is released at this point, and
     describe image-to-image editing training as ongoing with release promised in the near future. The
     fetched text gives no explicit failure-mode or ablation discussion, and omits the exact diffusion
     training objective and the VAE's training status, which limits how precisely its generative mechanism
     can be compared to other hybrid autoregressive-diffusion models.
   why_it_matters: At over 80 billion total parameters with weights released, this is presented as the
-    largest open-source image generative model at the time of release. It demonstrates that a
-    Transfusion/JanusFlow-style hybrid, autoregressive text combined with diffusion image tokens in one
-    backbone, scales to match closed frontier systems on human preference while also supporting native
-    chain-of-thought before generation.
+    largest open-source image generative model at the time of release. It demonstrates that a Transfusion/JanusFlow-style
+    hybrid, autoregressive text combined with diffusion image tokens in one backbone, scales to match
+    closed frontier systems on human preference while also supporting native chain-of-thought before generation.
 abstract: We present HunyuanImage 3.0, a native multimodal model that unifies multimodal understanding
   and generation within an autoregressive framework, with its image generation module publicly available.
   The achievement of HunyuanImage 3.0 relies on several key components, including meticulous data curation,

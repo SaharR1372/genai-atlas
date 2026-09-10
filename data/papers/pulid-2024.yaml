@@ -36,6 +36,49 @@ summary: Tuning-free ID customization that pairs a standard diffusion branch wit
   T2I' branch, adding a contrastive alignment loss and an accurate-ID loss so identity injection disturbs
   the base model's existing behavior (background, lighting, composition, style) as little as possible.
 explanation: null
+explained:
+  depth: full-text
+  before: Tuning-based personalization such as Textual Inversion and DreamBooth reached good identity
+    fidelity but required tens of minutes of per-identity fine-tuning. Tuning-free methods such as IP-Adapter,
+    InstantID, and PhotoMaker removed that cost but traded it for a different problem, pushing identity
+    fidelity higher visibly degraded the base model's own style, background, lighting, and composition,
+    and their ID losses were computed on a single-step, noisy x0 prediction unsuited to a face-recognition
+    model trained on realistic photos.
+  problem: Reach high identity fidelity in a tuning-free method while leaving everything not tied to identity,
+    background, lighting, composition, and style, as close as possible to what the base model would generate
+    without identity conditioning, without per-identity fine-tuning or curated identity-grouped datasets.
+  idea: Train a parallel four-step Lightning text-to-image branch alongside the normal diffusion training
+    branch, and use it purely at training time to compute a contrastive alignment loss that penalizes
+    any change identity conditioning makes to attention behavior relative to the same prompt without identity,
+    plus an accurate identity loss computed from that branch's realistic output rather than a single noisy
+    denoising step.
+  method: PuLID is personalized generation, producing a new image conditioned on a given identity, not
+    in-place editing of an existing photo's pixels. Identity is injected through parallel cross-attention
+    layers in the style of IP-Adapter, an ID encoder combines ArcFace face-recognition features with CLIP
+    image features into 55 global and 55 local tokens the diffusion UNet cross-attends to; this is attention-space
+    conditioning, not a new VAE latent and not a discrete token space. There is no inference-time protection
+    mechanism at all, no mask, no attention injection, no locality loss applied during generation; consistency
+    with the base model's non-identity behavior comes entirely from two training-time losses computed
+    on a paired Lightning-branch rollout. The contrastive alignment loss matches cross-attention response
+    maps, and query features directly for layout, between an identity-conditioned path and a prompt-only
+    path sharing the same starting noise and prompt. The accurate ID loss maximizes ArcFace cosine similarity
+    between the target identity embedding and the face extracted from the Lightning branch's 4-step x0.
+    Training proceeds in three stages, diffusion loss alone, then plus ID loss, then plus alignment loss.
+  evidence: 'On identity fidelity (cosine similarity via a CurricularFace backbone), PuLID''s max-fidelity
+    variant reaches 0.761 on SDXL-Lightning and 0.773 on SDXL-base (DivID-120 set), ahead of InstantID''s
+    0.725 and 0.755 and IP-Adapter''s 0.619 and 0.597. PuLID''s final variant, which includes the alignment
+    loss, scores 0.733 and 0.734, trading about 0.03 similarity for better background and style preservation.
+    The accurate ID loss improves face similarity by +0.200 on DivID-120 and +0.194 on Unsplash-50 over
+    a no-ID-loss baseline (0.561 and 0.514), versus only +0.091 and +0.087 from a naive single-step ID
+    loss.'
+  limitations: The paper concedes PuLID is "slightly inferior to InstantID" on SDXL-base DivID-120 (0.734
+    vs 0.755), that its contrastive-alignment prompt list is simple and could likely be improved, and reports
+    no quantitative editability score such as CLIP-T and no human study, relying on qualitative comparison
+    only; training uses 1.5M images on 8 A100 GPUs with no efficiency discussion, and results are shown
+    for portraits only.
+  why_it_matters: It moves identity preservation out of inference-time engineering, no mask, no injected
+    attention, entirely into training-time regularization against a fast-sampling branch, showing "do
+    not disturb the base model" can be enforced as a loss function rather than a test-time constraint.
 abstract: We propose Pure and Lightning ID customization (PuLID), a novel tuning-free ID customization
   method for text-to-image generation. By incorporating a Lightning T2I branch with a standard diffusion
   one, PuLID introduces both contrastive alignment loss and accurate ID loss, minimizing disruption to

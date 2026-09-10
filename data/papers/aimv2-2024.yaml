@@ -30,6 +30,46 @@ summary: Pretrains a vision encoder by autoregressively predicting both image pa
   a third option beside contrastive alignment and masked reconstruction, and reports clean scaling with
   strong frozen-backbone recognition.
 explanation: null
+explained:
+  depth: full-text
+  before: Vision encoders were pretrained one of three ways. Contrastive methods like CLIP and
+    SigLIP gave strong alignment but needed large batches and heavy dataset curation. Masked
+    reconstruction methods like MAE and BEiT needed less augmentation but sacrificed downstream
+    performance. A vision-only autoregressive line called AIM offered a simple generative pretext
+    task but lagged both because it had no language grounding and needed very large capacity to
+    compete.
+  problem: No single objective combined the scalability and simplicity of generative pretraining
+    with the frozen-trunk recognition and multimodal quality that contrastive pretraining delivered.
+  idea: Pretrain a vision encoder by having it feed a causal multimodal decoder that
+    autoregressively generates both raw image patches and the paired caption's tokens, so the
+    encoder must build features rich enough to support pixel-level and language generation at once.
+  method: The supervision is multimodal autoregressive generation. A ViT encoder with prefix
+    attention, scaled from 300M to 3B parameters, feeds a unified causal decoder with separate heads
+    for images and text; the decoder regresses raw patches with an L2 loss and predicts caption
+    tokens with cross-entropy, combined as caption loss plus 0.4 times pixel loss. Encoder and
+    decoder train jointly on 12 billion image-text pairs from DFN-2B, COYO and a proprietary HQITP
+    mix at up to 448px, but only the encoder trunk is kept and frozen for every downstream
+    evaluation. The paper explicitly separates itself from concurrent multimodal-generation work
+    that uses diffusion decoders, stating those optimize generation quality rather than
+    representation quality, and it never proposes AIMv2 features as an input to a diffusion or other
+    generative image model. The pixel-decoding head exists only as a pretraining pretext task and is
+    discarded afterward, so this is representation learning whose generative-sounding objective is
+    not connected to any downstream generative use in the paper's own framing.
+  evidence: AIMv2-3B reaches 89.5 percent ImageNet-1k top-1 accuracy with a frozen trunk at 448px
+    resolution, and 88.5 percent at 224px; AIMv2-L reaches 86.6 percent at 224px. Using a
+    Llama-3-based LLaVA-style instruction-tuned setup, AIMv2-3B scores 80.9 percent VQAv2 and 58.2
+    percent TextVQA against OpenAI CLIP ViT-L's 76.9 percent and 47.5 percent, and 100.3 versus 94.9
+    CIDEr on COCO captioning, despite training on roughly 12 billion pairs against CLIP's roughly 40
+    billion.
+  limitations: The paper concedes AIMv2 still trails SigLIP in pure zero-shot ImageNet
+    classification, 77.0 percent against 80.4 percent, since decoupling zero-shot recognition from
+    representation quality is not what the autoregressive objective optimizes for. It also concedes
+    DINOv2 remains stronger on iNaturalist and fMoW, and that competitive performance still requires
+    high model capacity.
+  why_it_matters: It demonstrates a third pretraining family, generative multimodal autoregression,
+    that matches or beats contrastive pretraining on frozen-trunk recognition and downstream VQA and
+    captioning while using substantially less paired data and none of the batch-size or filtering
+    tricks contrastive training needs.
 abstract: We introduce a novel method for pre-training of large-scale vision encoders. Building on recent
   advancements in autoregressive pre-training of vision models, we extend this framework to a multimodal
   setting, i.e., images and text. In this paper, we present AIMV2, a family of generalist vision encoders

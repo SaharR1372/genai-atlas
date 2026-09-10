@@ -35,8 +35,8 @@ summary: Maps raw image pixels, text tokens and task-specific condition tokens i
   text encoder entirely. Editing and generation are literally the same forward pass, differing only in
   what occupies the condition-token slot. This makes it a genuinely different design point from BAGEL,
   Show-o2 or OmniGen2, which unify at the sequence level but still route generation through a distinct
-  decoder or head. Scaled in the paper beyond 200B parameters, released at 8B, and so far trained only
-  at 512x512.
+  decoder or head. Scaled in the paper beyond 200B parameters and released at 8B, with multi-stage training
+  from 512 through 1024 to 2048 pixels.
 explanation: null
 explained:
   depth: full-text
@@ -54,17 +54,17 @@ explained:
     space and process all of them with the same decoder-only transformer blocks, so that generation and
     editing become the same forward pass, differing only in which tokens occupy the condition slot.
   method: There is no VAE anywhere in the pipeline. Images are patchified by a learnable patch-embedding
-    layer directly into pixel tokens, so the diffusion process itself runs in pixel space rather than any
-    learned latent. Text tokens come from the backbone's own vocabulary, inherited from Qwen3-VL-8B-Instruct
+    layer directly into pixel tokens, so the diffusion process itself runs in pixel space rather than
+    any learned latent. Text tokens come from the backbone's own vocabulary, inherited from Qwen3-VL-8B-Instruct
     for the 8B model, and condition images are projected into the shared space with a SigLIP-2 visual
     encoder. The Unified Transformer is a decoder-only stack with RMSNorm, SwiGLU and RoPE, using a hybrid
     attention pattern in which condition and text tokens are causally masked and can attend only to preceding
     tokens, while generation tokens use full attention and can attend to everything, including the condition
     tokens. Training combines a flow-matching loss on the predicted pixels with LPIPS and a perceptual
     DINO loss, across progressively higher-resolution stages, before RLHF with GRPO on a composite reward
-    for OCR accuracy, aesthetics, instruction following, and reasoning quality. Critically, the paper describes
-    no explicit mask, attention-injection, or copy mechanism that protects regions the instruction did
-    not target. Region preservation during editing is attributed to the joint optimization of language
+    for OCR accuracy, aesthetics, instruction following, and reasoning quality. Critically, the paper
+    describes no explicit mask, attention-injection, or copy mechanism that protects regions the instruction
+    did not target. Region preservation during editing is attributed to the joint optimization of language
     modeling and multimodal understanding during pretraining and to the model's own full attention over
     condition tokens, which is a claim about a learned property of the architecture, not an enforced constraint.
   evidence: On GenEval the 8B model reaches 0.90 overall against 27B Qwen-Image's 0.87, and the 200B-plus

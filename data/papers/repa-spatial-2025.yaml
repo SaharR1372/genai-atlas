@@ -30,6 +30,52 @@ summary: Runs representation alignment against 27 different encoders and finds t
   gain is patch-level spatial structure, not the global linear-probe accuracy the field had been using
   as a proxy. The most direct answer available to the question of which encoder to align to, and why.
 explanation: null
+explained:
+  depth: full-text
+  before: Since REPA introduced representation alignment, the standard practice for choosing which pretrained
+    vision encoder to align diffusion features to has been to prefer encoders with higher ImageNet-1K linear-probe
+    accuracy, treating strong global semantic classification performance as the relevant property of a
+    good alignment target.
+  problem: Whether that global classification accuracy is actually what predicts a representation-alignment
+    gain in generation, or whether some other property of the encoder matters instead, had not been directly
+    tested against alternatives.
+  idea: Across a large sweep of encoders, patch-level spatial structure, how consistently nearby patches
+    relate to each other compared with distant ones, predicts REPA's generation gain far better than global
+    linear-probe accuracy does. Encoders can have high ImageNet accuracy and weak spatial structure, or
+    the reverse, and generation quality tracks the spatial property, not the classification one.
+  method: The study evaluates 27 vision encoders, including DINOv2, DINOv3, the WebSSL family at 1B, 2B
+    and 3B scale, PE-Core and PE-Spatial variants at B, L and G scale, SpatialPE, CLIP-ViT-L, MoCov3-B,
+    C-RADIO variants, SAM2-S, and classical SIFT and HOG features, trained with REPA at three SiT scales
+    (B/2, L/2, XL/2) on ImageNet at 256x256 resolution. Spatial structure is quantified with four metrics
+    computed from patch tokens, local-versus-distant patch similarity, the decay slope of patch similarity
+    with spatial distance, same-region-versus-cross-region similarity using SAM2 segmentation masks, and
+    root-mean-square spatial contrast. Each metric's Pearson correlation with FID at 100K training steps
+    is compared against linear-probe accuracy's correlation with the same FID. The paper then proposes
+    iREPA, which replaces REPA's MLP projection layer with a lightweight convolution layer and adds a spatial
+    normalization layer that removes the mean and rescales variance across the spatial dimension, implemented
+    in under four lines of code.
+  evidence: Linear-probe accuracy correlates weakly with FID across the 27 encoders (Pearson absolute r
+    of 0.26), while all four spatial-structure metrics correlate strongly (Pearson absolute r above 0.85).
+    PE-Core-G reaches 82.8 percent ImageNet accuracy but only FID 32.3, worse than PE-Spatial-B's FID 21.0
+    at just 53.1 percent accuracy. On SiT-XL/2 at 100K steps, iREPA improves REPA's FID from 19.06 to 16.96
+    with DINOv2-B, from 21.47 to 16.26 with DINOv3-B, from 26.10 to 16.66 with WebSSL-1B, and from 32.35
+    to 18.19 with PE-Core-G. The gain holds across model scale with DINOv2 (SiT-B 49.50 to 43.37, SiT-L
+    24.10 to 20.28, SiT-XL 19.06 to 16.96) and generalizes to REPA-E (DINOv2-B 12.9 to 12.1 at 400K steps;
+    PE-G 25.9 to 16.4), to MeanFlow with classifier-free guidance (WebSSL-1B FID 16.59 to 13.89, DINOv3-B
+    FID 15.56 to 11.05), and to pixel-space diffusion trained with JiT. An ablation isolates the two changes
+    on SiT-XL/2 at 100K steps starting from 19.06 FID, the convolution projection alone reaches 17.66,
+    spatial normalization alone reaches 18.52, and the two combined reach 16.96.
+  limitations: The authors concede the four spatial metrics are empirically consistent with each other
+    but are not backed by a theoretical account of why spatial structure specifically benefits diffusion
+    training. All experiments are run at 256x256 resolution. The 27-encoder set is skewed toward recent
+    model families, and the classical SIFT and HOG features are included as a low floor and described as
+    not competitive. The spatial-normalization hyperparameter range is not thoroughly explored.
+  why_it_matters: This reframes the "which frozen encoder to align to" question the RAE line depends on.
+    Global semantic strength, the property encoders such as SigLIP2 or DINOv2 are usually selected for,
+    is not what a generative model needs from an aligned representation; patch-level spatial coherence
+    is. That separates classification quality from generative usefulness as properties of a representation,
+    with direct implications for which encoders any RAE-style or REPA-style pipeline should prefer as its
+    alignment or conditioning target.
 abstract: 'Representation alignment (REPA) guides generative training by distilling representations from
   a strong, pretrained vision encoder to intermediate diffusion features. We investigate a fundamental
   question: what aspect of the target representation matters for generation, its \textit{global} \revision{semantic}

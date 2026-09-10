@@ -13,6 +13,14 @@ const NOTEBOOKS = [
     runtime: "about a minute",
   },
   {
+    slug: "guidance",
+    title: "Guidance moves the number more than the architecture does",
+    question: "Why this atlas refuses to publish a leaderboard, demonstrated rather than asserted.",
+    body: "Holds one model, one prompt and one seed completely fixed and varies only the sampler's guidance scale. Prompt adherence measured by CLIP swings by 0.125 across the range and peaks in the middle, on weights that never changed. If a knob set at sampling time moves the output this far, a benchmark number quoted without it is not saying what you think.",
+    uses: ["SD 1.5", "classifier-free guidance", "CLIP"],
+    runtime: "a couple of minutes",
+  },
+  {
     slug: "rae",
     title: "Representation autoencoders, run against the VAE they replace",
     question: "The line this atlas is built around claims you can throw away the VAE. Does it hold up?",

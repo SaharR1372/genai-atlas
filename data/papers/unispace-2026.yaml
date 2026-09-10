@@ -31,6 +31,55 @@ summary: An 8B mixture-of-experts unified understanding, generation and editing 
   frozen vision-transformer feature space rather than a VAE pathway. Flagged as needing an independent
   verification pass before any claim in this atlas leans on it.
 explanation: null
+explained:
+  depth: full-text
+  before: Semantic vision encoders such as SigLIP and DINOv2 give strong understanding but their final
+    tokens discard fine-grained detail and reconstruct pixels poorly, so generation and editing systems
+    kept a separate VAE pathway alongside the semantic encoder, meaning a reference image had to be
+    encoded twice, once for semantics and once for reconstruction.
+  problem: Whether understanding, generation and editing can be modeled in a single visual representation
+    built from a pretrained semantic ViT, without a separate VAE pathway.
+  idea: The frozen transformer blocks of a semantic ViT are not intrinsically unable to preserve detail;
+    the original patch embedding is what drives the representation toward abstraction. Adding a second,
+    reconstruction-aware patch embedding that feeds the same frozen blocks recovers fine detail while
+    the original semantic pathway is left untouched.
+  method: The representation is a frozen representation-model latent, a ViT feature space such as
+    DINOv2, SigLIP2 or Qwen-ViT, not a VAE latent and not pixel space. The original semantic patch
+    embedding and all transformer blocks stay frozen; a new reconstruction-aware patch embedding, a
+    projection to a 128-channel compact space, and a ViT-XL decoder trained with GAN losses are the
+    only trained components. The same frozen backbone produces semantic tokens and reconstruction
+    tokens from the two patch embeddings, which are projected and concatenated by channel into a
+    single unified token that keeps the two signals explicitly separated rather than entangled, trained
+    with a balanced flow-matching loss weighting reconstruction-critical information at 75% and the
+    semantic pathway at 25%, normalized by dimension. Scaled to UniSpace, an 8B Mixture-of-Transformer-Experts
+    model, conditioning images route to an understanding expert pathway and noised targets to a
+    generation expert pathway, sharing self-attention, both using the same frozen patch-reparameterized
+    ViT as the only visual tokenizer, with no separate VAE anywhere in the system. For editing, the
+    reference image is encoded into the unified space and given to the model together with the
+    instruction, while the noised target is predicted and denoised in that same space and decoded by
+    the same decoder. There is no explicit mask, attention injection or locality loss protecting
+    unedited regions; preservation is learned implicitly from training on editing data and from the
+    model attending back to the reference encoding, not enforced by any architectural mechanism.
+  evidence: On ImageNet 256x256 reconstruction, the DINOv2 variant reaches rFID 0.14, PSNR 30.84dB and
+    SSIM 0.90, a 75.4% rFID reduction against a plain RAE baseline's 0.57. Understanding scores are
+    preserved rather than degraded, 64.37 average for the SigLIP2 variant against a 63.39 baseline and
+    68.94 for the Qwen-ViT variant against 68.29. Generation on ImageNet with a DiT on the DINOv2
+    variant reaches gFID 2.10 without classifier-free guidance and 1.87 with guidance scale 1.2. On
+    editing, the 8B UniSpace model scores 4.28 overall on the ImgEdit benchmark against 3.90 for
+    SenseNova-U1 and 3.20 for BAGEL, approaching the 32B Emu3.5 model's 4.41, and on GEdit it reaches
+    7.41 English, 7.38 Chinese, 7.39 bilingual average. On text-to-image generation it reaches GenEval
+    0.84 overall, OneIG-Bench 0.561 English and 0.533 Chinese, and DPG-Bench 86.49 overall.
+  limitations: The paper concedes system-level understanding still lags dedicated vision-language
+    models. Because the same encoder is shared for understanding and generation, the authors state it
+    "cannot be freely updated during training on understanding data without potentially compromising
+    its generative capabilities," an architectural constraint the paper leaves for future work to
+    resolve by jointly optimizing the unified representation and the multimodal backbone.
+  why_it_matters: It argues that unifying understanding, generation and editing does not require
+    training a new vision backbone from scratch; changing only the input parameterization can recover
+    reconstruction fidelity from an already-frozen semantic encoder, replacing the ViT-plus-VAE
+    convention with one shared visual interface. As a very recent preprint (2026-08) with no independent
+    replication seen yet, its numbers should be treated as a single-source claim pending outside
+    verification, consistent with this entry's existing flag.
 abstract: Semantic vision encoders have become a central visual interface for multimodal understanding
   and semantic conditioning in image generation. However, their final tokens discard fine-grained visual
   details, leading to poor pixel reconstruction and limiting their use in reconstruction-sensitive tasks

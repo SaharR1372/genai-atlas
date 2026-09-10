@@ -29,6 +29,49 @@ status:
 summary: 'Isolates a specific unsolved failure: when a scene has several similar objects, instruction
   editors cannot reliably pick the one the referring expression names.'
 explanation: null
+explained:
+  depth: full-text
+  before: Instruction editors such as InstructPix2Pix, UltraEdit and OmniEdit performed well when a
+    scene had one prominent editable object, but training data and benchmarks for instruction editing
+    contained essentially no referring-expression cases, so nothing measured or trained for scenes
+    with several similar entities.
+  problem: When a scene contains multiple similar objects, instruction editors have no reliable way
+    to identify which one a referring expression such as "the cat on the left" names, and no benchmark
+    rigorously isolated this failure from ordinary single-object editing.
+  idea: Build a benchmark grounded in RefCOCO that separates easy, single-object edits from hard,
+    multi-entity edits, and show that a comparatively small amount of training data built specifically
+    around referring expressions closes most of the gap that massive generic editing datasets leave
+    open.
+  method: This paper contributes both a benchmark and a fine-tuned editing model, not a new architecture.
+    RefEdit-Bench draws 100 easy and 100 hard images from RefCOCO, each carrying a human-written
+    instruction spanning five edit types, namely color change, object replacement, object addition,
+    object removal and texture modification. Training data for RefEdit is built by a synthetic pipeline.
+    GPT-4o generates image prompts, editing instructions, referring expressions and expanded descriptions;
+    Flux renders the corresponding 1024x1024 source images; Grounded Segment Anything converts each
+    referring expression into an object mask; FlowChef performs inversion-free, mask-guided edits and
+    Inpaint Anything handles removals, yielding over 20,000 paired examples with multiple similar
+    entities per image. RefEdit itself fine-tunes existing UNet-based diffusion editors, Stable
+    Diffusion v1.5 and v3, using the InstructPix2Pix training recipe with MagicBrush's configuration,
+    so edits happen in VAE latent space through a standard denoising UNet rather than any new
+    mechanism. The masks and inversion-free editing used by Grounded SAM and FlowChef only build the
+    training pairs; the deployed RefEdit model has no mask, attention injection or locality loss at
+    inference, it must localize edits to the referred object purely from having been trained on
+    mask-guided synthetic data.
+  evidence: On the hard split of RefEdit-Bench, measured with a modified VIEScore for semantic
+    consistency, RefEdit reaches 4.51 against 2.93 for UltraEdit, despite UltraEdit training on far
+    more data. On PIE-Bench, RefEdit-SD3 reaches an overall score of 5.70 against 5.12 for OmniEdit,
+    which trained on 1.2M pairs, while RefEdit trained on only 20,000 triplets. A human A/B evaluation
+    over 400 image pairs shows RefEdit-SD3 winning consistently against the compared baselines.
+  limitations: The paper concedes every method tested, RefEdit included, shows a significant score
+    drop on RefEdit-Bench relative to PIE-Bench, meaning the hard, multi-entity split remains genuinely
+    difficult rather than solved. It also observes that larger baseline models such as CosXLEdit and
+    UltraEdit underperform smaller ones on the hard split, which the authors attribute to overfitting
+    on training data that lacks complex multi-object examples, offered as a hypothesis rather than a
+    confirmed cause.
+  why_it_matters: It isolates referring-expression localization as a distinct, previously unmeasured
+    failure mode in instruction editing, and it shows that a small, targeted synthetic dataset can
+    outperform baselines trained on datasets one to two orders of magnitude larger, arguing for
+    data specificity over raw scale for this class of failure.
 abstract: Despite recent advances in inversion and instruction-based image editing, existing approaches
   primarily excel at editing single, prominent objects but significantly struggle when applied to complex
   scenes containing multiple entities. To quantify this gap, we first introduce RefEdit-Bench, a rigorous

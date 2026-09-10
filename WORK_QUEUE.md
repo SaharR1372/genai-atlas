@@ -8,7 +8,7 @@ Status key: `TODO` · `IN PROGRESS` · `DONE` · `BLOCKED`
 ---
 
 ## Q1 + Q2 — Written explanations for every paper
-**Status: IN PROGRESS**
+**Status: DONE** (session 8)
 
 The stored abstract is a floor, not the goal. Every paper should have the structured `explained`
 block that LLaDA-Image has: before / problem / idea / method / evidence / limitations /
@@ -31,9 +31,41 @@ why-it-matters, with `depth` recording abstract vs full-text.
       PubMed). All full-text depth. Found `mededit-2024` miscategorized under
       `line-medical-transfer-vae` (it is pixel-space, no VAE at all) — flagged, not fixed, since
       the task scope was `data/papers/*.yaml` only. See CHANGELOG's session 8 entry.
-- [ ] Remaining landmark + core papers (validator warns on each; run `scripts/validate.py` for the
-      current count)
-- [ ] Strong-followup and emerging papers
+- [x] All 40 papers with `editing` in `sections` and no `explained` block — session 9: bagel-2025,
+      fireflow-2024, biomedjourney-2023 (re-verified, already done in session 8), didae-2026,
+      emu35-2025, plug-and-play-2022, ip-adapter-2023, mededit-2024 (re-verified, already done in
+      session 8), rf-inversion-2024, seedream4-2025, emu-edit-2023, hidream-o1-2026, radedit-2023
+      (re-verified, already done in session 8), unispace-2026, krisbench-2025, acepp-2025,
+      magicbrush-2023, icebench-2025, omnigen2-2025, kontext-2025, controlnet-2023, refedit-2025,
+      imgedit-2025, ominicontrol-2024, pulid-2024, rpiae-2026, editscore-2025, stable-flow-2024,
+      instantid-2024, masactrl-2023, icedit-2025, kv-edit-2025, instructpix2pix-2022,
+      step1x-edit-2025, pico-banana-2025, prompt-to-prompt-2022, qwen-image-2-2026, rf-solver-2024,
+      psvae-2025, risebench-2025. All 40 at `depth: full-text` (none needed to fall back to
+      abstract). Every editing-method paper's `method` field states the space the edit happens in
+      (VAE latent / pixel / representation latent / discrete tokens / attention-and-feature-only)
+      and what, if anything, protects unedited regions. See CHANGELOG's session 9 entry for the
+      cross-paper findings (PS-VAE/RPiAE encoder-unfreezing confirmed, RISEBench version conflict,
+      ACE++ has no quantitative benchmark, HiDream-O1's stale 512px claim, Emu-Edit's mixed
+      mask/no-mask protection).
+- [x] All 38 papers whose first `sections` entry is `unified`, `vfm`, `vlm`, or `rae`, and no
+      `explained` block — session 10: transfusion-2024, chameleon-2024, emu35-2025, janus-pro-2025,
+      bagel-2025, emu3-2024, janus-2024, showo2-2025, omnigen2-2025, unieval-2025 (unified);
+      dinov3-2025, siglip-2023, ijepa-2023, perception-encoder-2025, registers-2023, radio-2023,
+      aimv2-2024, radiov25-2024, webssl-2025, vjepa2-2025, cradiov4-2026 (vfm); flamingo-2022,
+      llava-2023, qwen2vl-2024, qwen25vl-2025, internvl3-2025, llava-onevision-2024, qwen3vl-2025
+      (vlm); reg-2025, blip3o-2025, emu2-2024, metaquery-2025, repa-spatial-2025,
+      distilling-rae-2026, drae-2026, gigatok-2025, vfmvae-2025, tokenizer-post-training-2025
+      (rae). All 38 at `depth: full-text`. Scope computed strictly from each file's own `sections:`
+      first entry (not a grep for the section name) to avoid collision with the concurrent
+      generation/editing/medical sessions. See CHANGELOG's session 10 entry for what's-actually-
+      unified per paper, VFM generative-use findings, VLM fusion mechanisms, RAE frozen/trained
+      encoder status, and a flagged YAML-authoring gotcha (mid-sentence colon-space breaks the
+      parser in several files outside this session's scope).
+- [ ] Remaining landmark + core papers outside the editing/medical/unified/vfm/vlm/rae subsets
+      (validator warns on each; run `scripts/validate.py` for the current count — as of session 10
+      only `genfirst-2026` (abstract-depth) and `pinaya-2022` remain among landmark/core warnings,
+      both first-section `generation`/`medical` respectively and outside every session's scope so far)
+- [ ] Strong-followup and emerging papers outside the editing/medical/unified/vfm/vlm/rae subsets
 
 **Method that works:** fetch `arxiv.org/html/<id>v1` and extract intro + method + limitations. The
 abs page alone is too thin — it usually yields "the abstract does not state a problem". Batch through
@@ -58,7 +90,7 @@ in?* That is currently spread across lines and sections, and HiDream-O1-Image is
 ---
 
 ## Q4 — Runnable notebooks with real outputs
-**Status: IN PROGRESS** (2 of ~5 built, session 7)
+**Status: DONE** (4 built, session 8)
 
 For well-known methods and anything claiming to be great, a notebook that runs inference with 1-2
 samples, so a reader sees how each method behaves without cloning six repos. Not new research — just
@@ -84,11 +116,16 @@ diffusers 0.36.0, CUDA available).
 - [x] `editing.ipynb` — SDEdit vs latent masked blending vs IP-Adapter on one image, with
       difference maps showing the strength of each preservation guarantee. Executed, 4 figures.
 - [x] `/notebooks` site section with framing, credits and run instructions
-- [ ] RAE / Scale-RAE inference notebook — **the one the atlas most needs**. Weights are cached
-      (`nyu-visionx--Scale-RAE-Qwen1.5B_DiT2.4B`, `nyu-visionx--siglip2_decoder`) but the pipeline
-      is custom, not diffusers, so it needs the Scale-RAE repo code cloned first:
-      https://github.com/ZitengWangNYU/Scale-RAE
-- [ ] An inversion notebook (RF-Inversion or similar) and a training-free attention method
+- [x] `rae.ipynb` — the official RAE implementation cloned to `external/RAE`, three released
+      decoders (DINOv2, SigLIP2, MAE) run against SD's VAE on one image. **Gotcha worth keeping:**
+      RAE's encoder normalizes with an image-processor mean and std, so it expects [0,1] input, not
+      diffusers' [-1,1]. The wrong convention costs about 8 dB and looks like a broken model.
+      Result: three metrics, three different winners.
+- [x] `guidance.ipynb` — one frozen model, one prompt, one seed, guidance scale swept. CLIP-measured
+      prompt adherence spans 0.125 and peaks in the middle. This is the runnable argument for why
+      `/compare` refuses to publish a leaderboard.
+- [ ] Optional future: stage-2 RAE generation (weights are in the same collection under `DiTs/`),
+      an inversion method, a training-free attention method.
 
 **Gotchas hit, do not rediscover:**
 - SDXL base has only `unet` cached; use `madebyollin/sdxl-vae-fp16-fix` for the SDXL VAE.
@@ -123,10 +160,20 @@ Both render empty. The user considers these foundational to any vision task and 
 ---
 
 ## Q6 — Unverified items still excluded
-**Status: TODO** (carried from session 4)
+**Status: DONE** (session 8)
 
-Only secondary sources found; must be checked against vendor primary sources before entering:
-Qwen-Image-3.0, FLUX 3 open weights, GPT-Image 2.5, Nano Banana 2 Lite, MAI-Image-2.6, SD4.
+All checked against vendor primary sources. Results in `docs/refuted-claims.md`.
+
+- **Refuted**: Qwen-Image-3.0 does not exist. Microsoft's current model is MAI-Image-2.5, not 2.6.
+  Stability's most recent image model is still SD 3.5, not SD4.
+- **Partly refuted**: FLUX 3 was announced 2026-07-23, but only its video model is in early access,
+  the vendor's own docs still direct image work to FLUX.2, and no FLUX 3 repo exists in their
+  Hugging Face org. Recorded on the FLUX system entity as announced rather than released.
+- **Confirmed and added** as `system` entities: GPT-Image 2.5 (two model ids, API only),
+  Gemini's image-lite model (id confirmed, release date not), Krea 2 (open weights under a gated
+  community licence).
+- **Reclassified**: Kroma v0.2 is a community fine-tune of Krea 2 by an independent user, not a
+  vendor base model, so it does not get a peer entry.
 
 ---
 

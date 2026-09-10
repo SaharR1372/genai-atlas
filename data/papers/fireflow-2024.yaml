@@ -30,6 +30,40 @@ summary: Targets the compute cost of precise inversion, claiming second-order so
   three flow-inversion papers landed within three months of each other and none treated the problem as
   settled.
 explanation: null
+explained:
+  depth: full-text
+  before: Prior ReFlow inversion methods pushed accuracy up at real cost. RF-Solver used a Taylor-expansion
+    solver needing up to 30 steps and RF-Inversion used dynamic optimal control needing 28 steps; the
+    paper frames existing approaches as either prioritizing per-step efficiency at the expense of accuracy
+    or paying extra cost for precision, with fast, accurate inversion for ReFlow models left unsolved.
+  problem: Reach second-order ODE-solver accuracy for rectified-flow inversion and editing at the computational
+    cost of a first-order Euler solver, so that both inversion and editing converge in as few as 8 steps.
+  idea: Reuse the midpoint velocity computed at the previous timestep instead of recomputing it at the
+    current step's midpoint. This substitution is proven to keep second-order, O(delta-t squared), global
+    truncation error while needing only one network evaluation per step, the cost of first-order Euler.
+  method: Editing happens in FLUX's own VAE latent space, following the standard forward-inversion-then-reverse-denoising
+    ODE trajectory of the rectified-flow model itself; no separate representation-model latent or discrete
+    token space is introduced. The protection mechanism for un-edited regions is self-attention Value-feature
+    injection, not a mask or a locality loss. Value features are cached at each step during inversion,
+    and at the first denoising step only, these stored inversion-time Values replace the Values computed
+    along the editing trajectory, applied uniformly across all self-attention layers rather than a hand-picked
+    subset of timesteps or blocks as in RF-Solver.
+  evidence: 'On reconstruction at 30 NFE (PIE-Bench-style setup, Table 3), FireFlow reaches LPIPS 0.1579,
+    SSIM 0.8160, PSNR 23.87 against RF-Solver''s 0.2926, 0.7078, 20.05 at double the function evaluations
+    (62 vs 120 NFE). On PIE-Bench editing at 8 steps (18 NFE), FireFlow gets Structure Distance 0.0271
+    and whole-image CLIP similarity 23.03 against RF-Solver''s 0.0311 and 23.28 at 15 steps (60 NFE).
+    Wall-clock speedup over vanilla ReFlow inversion is 3.09x at 512x512 (7.70s vs 23.76s) and 2.94x at
+    1024x1024 (24.52s vs 72.10s). Text-to-image FID at 10 steps is 25.16 against RF-Solver''s 25.93, with
+    CLIP score 31.42 against 31.35.'
+  limitations: The paper concedes the single-Value-replacement strategy "struggles with editing tasks
+    involving changes to object colors or uncommon scenarios," citing failures such as an unsatisfying
+    cat-color edit, poses where the subject's head is not visible, and rare prompts like "Stormtrooper
+    with blue hair." Adding K-feature replacement alongside V improves these cases but the paper concedes
+    this comes "at the cost of diminished preservation of the original structure and background details."
+  why_it_matters: It shows a purely numerical fix, reusing an already-computed intermediate quantity across
+    steps, can substitute for the extra function evaluations higher-order solvers normally require, delivering
+    both faster and more accurate flow inversion, while making clear that attention-feature injection
+    alone still bottlenecks harder edits like color or rare-object changes.
 abstract: Though Rectified Flows (ReFlows) with distillation offers a promising way for fast sampling,
   its fast inversion transforms images back to structured noise for recovery and following editing remains
   unsolved. This paper introduces FireFlow, a simple yet effective zero-shot approach that inherits the

@@ -31,6 +31,59 @@ summary: Distills a 12B model into a 2.5B one while treating the teacher as a bl
   no shared latent space between them — relevant to the atlas because it makes distillation independent
   of the representation choice.
 explanation: null
+explained:
+  depth: full-text
+  before: On-policy distillation lets a student diffusion or flow-matching model be corrected by a teacher
+    using samples the student itself generated, avoiding the exposure-bias problem of purely offline distillation.
+    Every existing recipe assumes teacher and student share a VAE, so teacher latents are valid regression
+    targets in student coordinates, a matching architecture for internal feature alignment, and a common
+    timestep grid, so that step index i means the same noise level for both models.
+  problem: The paper asks what happens when the strongest available teacher and the student one wants
+    to deploy come from unrelated model families, so none of those shared-coordinate assumptions hold.
+    Standard recipes have no answer here, teacher latents are meaningless in a foreign VAE's coordinate
+    system, pixel-wise regression against a teacher that stochastically re-draws local detail collapses
+    training into blur, and step-index alignment pairs states drawn from incomparable noise regimes.
+  idea: Connect teacher and student at exactly one point that neither architecture nor latent space determines,
+    a frozen, model-agnostic vision representation, specifically a frozen DINOv2-Base, that produces comparable
+    embeddings for images decoded independently by either model. Correspondence between the two trajectories
+    is recovered by matching continuous noise levels rather than step indices, since noise level is the
+    only quantity the two trajectories genuinely share.
+  method: Both teacher and student are latent flow-matching generators, each with its own frozen VAE encoder
+    and decoder and its own noise schedule. The student's velocity field, which maps a latent and a time
+    in [0,1] to a velocity in that same latent space, is trained to predict a velocity in its own VAE latent
+    space, exactly as in ordinary flow matching, both during the warm-start phase and during the main on-policy
+    phase. Training proceeds in two phases. An anchoring phase runs offline for 400 steps over 10 noise
+    levels; the teacher generates a target image, which is re-encoded through the student's own VAE encoder
+    into a pseudo-target latent, and the student is trained with an ordinary flow-matching loss against
+    that re-encoded target. This anchors the student in its own coordinate system before any cross-model
+    comparison begins. The main on-policy phase, run for 800 steps with both teacher and student sampled
+    at 20 Euler steps each, has the student generate a sample at its own noise level; the teacher re-noises
+    that image to a chosen noise level, re-denoises it along its own trajectory, and decodes it. Correspondence
+    between the two trajectories is matched by noise level rather than step index, picking the least-noisy
+    student state that is still at least as noisy as the point where the teacher's refinement began. The
+    student's sample and the teacher's refined output are then compared not in either model's latent space
+    but through the frozen DINOv2-Base CLS token embedding, using a cosine-distance loss equal to one minus
+    the cosine similarity between the two embeddings. Fine-tuning uses LoRA with rank 32 and alpha 64,
+    learning rate 1e-4, batch size 4 per GPU, at 512x512 resolution.
+  evidence: Distilling the 12B FLUX.1-dev teacher into the 2.5B SD3.5-Medium student, at matched 20-step
+    Euler sampling for both models with no guidance-method comparison reported, PickScore rises from the
+    SD3.5-Medium baseline's 0.846 to 0.884, close to FLUX.1-dev's own 0.878. HPSv3 rises from 9.12 to 10.97
+    against the teacher's 11.19, and ImageReward rises to 1.116, exceeding the teacher's own 0.971. An
+    ablation on the bridging loss shows a naive per-pixel latent MSE loss collapses within the first training
+    steps and an LPIPS loss degrades late in training, while the DINOv2-CLS cosine loss stays stable; plain
+    CLS embeddings match or exceed richer DINOv2 variants tried. Direct latent regression against teacher
+    latents, the naive same-space baseline, is reported to fail to train at all. Swapping in a different
+    6B teacher, Z-Image, with nothing else changed improves every metric further, including GenEval by
+    0.80 and DPG-Bench by 0.95, suggesting the recipe is not overfit to the FLUX and SD3.5 pair specifically.
+  limitations: The authors' own discussion of limitations is brief. They frame combining multiple complementary
+    teachers as a natural but unexplored remedy rather than something the paper demonstrates, and note
+    that nothing in the formulation is specific to images beyond the choice of feature extractor, positioning
+    extension to other latent generative modalities as further work rather than a result already shown.
+  why_it_matters: It decouples on-policy distillation from representation choice. Because the bridge is
+    a frozen, off-the-shelf vision embedding rather than a shared latent space, distillation can run from
+    whichever teacher is currently strongest into whatever student architecture is being deployed, without
+    retraining a shared VAE or matching timestep grids. For an atlas organized around representation and
+    objective choices, this is a case where distillation is made independent of both.
 abstract: 'On-policy distillation, in which a teacher corrects samples that the student itself generates,
   presupposes that the two models speak the same language: identical VAE latents, matching architectures,
   and a common timestep grid. We ask what happens when none of this holds, as when the strongest teacher

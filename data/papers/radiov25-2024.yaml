@@ -29,6 +29,44 @@ status:
 summary: Refines the multi-teacher distillation recipe, addressing resolution and mode-switching problems
   that the first agglomerative models suffered.
 explanation: null
+explained:
+  depth: full-text
+  before: AM-RADIO established agglomerative distillation, training one student against several
+    frozen teachers such as CLIP, DINOv2 and SAM at once. It suffered resolution mode switching,
+    where low-resolution inputs produced DINO-like features and high-resolution inputs produced
+    SAM-like features, plus teacher activation imbalance, idiosyncratic teacher artifacts, and too
+    many output tokens for practical VLM use.
+  problem: The paper fixes these four specific failure modes of the agglomerative recipe so one
+    encoder behaves consistently across resolutions and produces a compact, fixed token budget
+    suitable for vision-language model integration.
+  idea: Keep the agglomerative concept but repair the training recipe with multi-resolution
+    schedules, mosaic augmentation for tiled teacher inference, variance-balanced teacher losses,
+    and a token-merging compression stage, so a single student matches every teacher at every
+    resolution using fewer tokens.
+  method: The supervision is multi-teacher agglomerative distillation. A ViT student in B, L, H and
+    g sizes, with content-adaptive position embeddings for resolution flexibility, is trained with
+    per-teacher adapter heads against frozen DFN CLIP or OpenAI CLIP, DINOv2-g-reg, and SAM-H.
+    Training runs in three resolution stages, 256px, 432px, then concurrent 432px and 1024px, over
+    600k iterations on DataComp1B, using MSE loss on dense features and cosine loss on summary
+    tokens, with PHI-S balancing so high-variance teachers like SAM do not dominate optimization. A
+    ToMeSD-style token merging stage compresses tokens for fixed VLM patch budgets. The trained
+    student is frozen and used only as a discriminative encoder for segmentation, depth,
+    classification and VLM vision towers; the paper makes no mention anywhere of diffusion models or
+    of RADIO features feeding a generative image model, so this is representation learning only as
+    far as the text discusses.
+  evidence: RADIO-AMP-L reaches 81.21 percent ImageNet-1k zero-shot accuracy against AM-RADIO-L's
+    78.35 percent. ADE20k semantic segmentation mIoU scales from 48.94 at size B to 54.56 at size g.
+    On VLM benchmarks in a VILA-style integration, TextVQA rises from AM-RADIO-H's 63.6 percent to
+    RADIO-AMP-g's 69.6 percent. A scale-equivariance error metric, lower is better, drops from 0.357
+    fine and 0.476 coarse for AM-RADIO to 0.102 and 0.165 for RADIO-AMP-L.
+  limitations: The paper concedes SAM's contribution to classification benchmarks is negligible
+    though positive, that token merging adds compute overhead, that native high-resolution
+    single-pass inference still trails extensive tiling strategies in some settings, and that
+    intermediate-layer feature choice helps dense prediction but is neutral for VLM tasks.
+  why_it_matters: It shows that resolution robustness and token efficiency in agglomerative
+    distillation are recipe problems solvable without changing the teacher set, which is exactly the
+    base that later work such as C-RADIOv4 builds on by swapping in stronger teachers on largely the
+    same recipe.
 abstract: 'Agglomerative models have recently emerged as a powerful approach to training vision foundation
   models, leveraging multi-teacher distillation from existing models such as CLIP, DINO, and SAM. This
   strategy enables the efficient creation of robust models, combining the strengths of individual teachers
