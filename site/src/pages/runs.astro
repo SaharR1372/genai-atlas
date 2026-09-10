@@ -15,6 +15,8 @@ const PROMPTS = [
         note: "All three words rendered correctly in the hand-painted style asked for." },
       { model: "LLaDA-Image", img: "lladabase_text", verdict: "correct",
         note: "All three words correct, with more atmospheric lighting and incidental signage in the background that is also legible." },
+      { model: "HiDream-O1-Image-Dev", img: "hidream_text", verdict: "partly fails",
+        note: "Renders the requested three words correctly on the main window, then hallucinates garbled text on every other sign in the scene: the awning reads TRKEC IUVN ATLAS and the hanging sign reads CATIGE & PRARTSRNIC ATLAS. A distinct failure from the row below, which garbles the requested text itself." },
       { model: "LLaDA-Image-Turbo", img: "llada_text", verdict: "fails",
         note: "Garbles the middle word to VION and duplicates the phrase. Visible distillation artifacts across the image. Same weights as the row above, distilled to 2-4 steps." },
     ],
@@ -23,12 +25,14 @@ const PROMPTS = [
     key: "compose",
     label: "Counting and spatial relations",
     prompt: "three red cubes stacked on top of a blue sphere, to the left of a green cone, studio lighting",
-    tests: "Whether the model can count and place objects. This is what GenEval measures, and it is where both models here fail.",
+    tests: "Whether the model can count and place objects. This is what GenEval measures, and it is where all three models here fail.",
     results: [
       { model: "Qwen-Image", img: "qwen_compose", verdict: "partly fails",
         note: "Colours correct, both spatial relations correct, but produced two cubes instead of three. The cone is a compound shape rather than a cone, and the sphere is squashed." },
       { model: "LLaDA-Image", img: "lladabase_compose", verdict: "partly fails",
-        note: "Cleanest geometry of the three: a true cone, a true sphere, crisp cubes. But it produced four cubes instead of three, missing the count in the other direction." },
+        note: "Clean geometry: a true cone, a true sphere, crisp cubes. But it produced four cubes instead of three, missing the count in the other direction from Qwen." },
+      { model: "HiDream-O1-Image-Dev", img: "hidream_compose", verdict: "partly fails",
+        note: "Also two cubes instead of three. Geometry is clean and the spatial relation is right. Three models, three attempts, three wrong counts." },
     ],
   },
   {
@@ -39,6 +43,7 @@ const PROMPTS = [
     results: [
       { model: "Qwen-Image", img: "qwen_photo", verdict: "good", note: "Convincing skin detail and lighting." },
       { model: "LLaDA-Image", img: "lladabase_photo", verdict: "good", note: "Convincing, with stronger environmental context and depth of field." },
+      { model: "HiDream-O1-Image-Dev", img: "hidream_photo", verdict: "good", note: "Convincing, rendered at 2048px rather than the requested 1024." },
     ],
   },
 ];
@@ -66,6 +71,11 @@ const VERDICT_COLOR: Record<string, string> = {
       Each model runs at its own recommended settings rather than a forced common configuration.
       That shows what you would actually get, and it means quality differences here cannot be
       attributed to architecture. Step counts and guidance differ between rows.
+    </p>
+    <p style="margin:0; color:var(--text-muted); font-size:0.92rem;">
+      HiDream-O1 additionally ignored the requested 1024px and snapped to 2048, so it is rendering
+      four times the pixels of the other rows. That alone can account for apparent detail
+      differences.
     </p>
     <p style="margin:0; color:var(--text-muted); font-size:0.92rem;">
       The one comparison that is clean is LLaDA against its own distilled variant, because those
@@ -107,10 +117,12 @@ const VERDICT_COLOR: Record<string, string> = {
     <h2 style="font-size:1.1rem; margin:0 0 0.75rem;">What running them actually taught us</h2>
     <ul style="margin:0; padding-left:1.2rem;">
       <li style="margin-bottom:0.6rem;">
-        <strong>Counting is a shared failure, not a model-specific one.</strong> Both systems place
-        objects correctly and colour them correctly, and both miss the count, in opposite directions.
-        LLaDA's own paper concedes a weak counting score; this is the same weakness visible in a
-        model whose paper does not mention it.
+        <strong>Counting fails in all three, and that is now a robust finding rather than an
+        anecdote.</strong> Every model placed the objects correctly and coloured them correctly, and
+        every model got the count wrong: two cubes, four cubes and two cubes against a requested
+        three. These are three different architectures on three different latents, including one with
+        no latent at all. LLaDA's paper concedes a weak counting score; the other two do not mention
+        it, and show it anyway.
       </li>
       <li style="margin-bottom:0.6rem;">
         <strong>Distillation costs more than throughput.</strong> LLaDA's Turbo variant is the same

@@ -229,6 +229,30 @@ def run(data_dir: Path = DATA_DIR, content_dir: Path = CONTENT_DIR, root: Path =
             for lid in entity.get("competes_with", []):
                 check_id_exists(lid, f"{src} line.competes_with -> '{lid}'", {"lines"})
 
+            # A thin line is either genuinely small or a coverage gap, and the difference
+            # matters. Flag it so the question gets asked deliberately rather than waiting
+            # for a reader to notice, which is how the pixel-space gap was found.
+            arc_len = len(entity.get("arc", []))
+            if arc_len <= 2 and entity.get("status") != "superseded":
+                errors_or_note = (
+                    f"{src}: line has only {arc_len} paper(s) in its arc. Confirm this is a "
+                    f"genuinely small line rather than incomplete coverage, and record which in "
+                    f"the line's own text."
+                )
+                warnings.append(errors_or_note)
+
+            # A line whose papers all come from one group is a different kind of blind spot.
+            orgs = []
+            for step in entity.get("arc", []):
+                pid = step.get("paper")
+                if pid in registry:
+                    orgs.extend(registry[pid]["entity"].get("orgs") or [])
+            if arc_len >= 2 and orgs and len(set(orgs)) == 1:
+                warnings.append(
+                    f"{src}: every paper in this line is from {orgs[0]}. Either the idea really is "
+                    f"one group's, or the atlas has only found one group's work on it."
+                )
+
         elif etype == "problems":
             for pid in entity.get("attacked_by", []):
                 check_id_exists(pid, f"{src} problem.attacked_by -> '{pid}'", {"papers"})

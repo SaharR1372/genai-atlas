@@ -98,3 +98,40 @@ def test_real_data_every_line_arc_paper_declares_membership(validate_mod):
     """Regression guard on the real atlas: line arcs and paper.lines must not drift apart."""
     errors, _, _, _ = validate_mod.run()
     assert not [e for e in errors if "does not declare lines" in e]
+
+
+def test_thin_line_is_flagged(validate_mod, sample_data_dir):
+    """A line with one or two papers may be a real gap; the atlas must not stay silent about it."""
+    (sample_data_dir / "lines").mkdir(exist_ok=True)
+    (sample_data_dir / "lines" / "line-thin.yaml").write_text(
+        "id: line-thin\ntype: line\nname: Thin line\none_line: A test.\n"
+        "core_bet: Testing.\nprimary_axis: objective\nstatus: emerging\n"
+        "sections: [generation]\narc:\n  - paper: sd3-2024\n    role: origin\n    note: only one\n"
+    )
+    # the paper must declare the line, or a different error fires first
+    p = sample_data_dir / "papers" / "sd3-2024.yaml"
+    p.write_text(p.read_text() + "lines: [line-thin]\n")
+    _, warnings, _, _ = validate_mod.run(data_dir=sample_data_dir)
+    assert any("only 1 paper" in w for w in warnings)
+
+
+def test_single_org_line_is_flagged(validate_mod, sample_data_dir):
+    """
+    A line whose every paper comes from one group is a blind spot. This is the exact failure a
+    reader caught in the pixel-space line, where both entries were from the same lab.
+    """
+    (sample_data_dir / "lines").mkdir(exist_ok=True)
+    for i, pid in enumerate(["one-lab-a", "one-lab-b"]):
+        (sample_data_dir / "papers" / f"{pid}.yaml").write_text(
+            f"id: {pid}\ntype: paper\ntitle: Paper {i}\ndate: '2026-01'\ntier: core\n"
+            f"sections: [generation]\norgs: [OneLab]\nlines: [line-onelab]\n"
+            "status: {code: none, weights: none, verified: false}\nsummary: test.\n"
+        )
+    (sample_data_dir / "lines" / "line-onelab.yaml").write_text(
+        "id: line-onelab\ntype: line\nname: One lab\none_line: A test.\n"
+        "core_bet: Testing.\nprimary_axis: objective\nstatus: emerging\nsections: [generation]\n"
+        "arc:\n  - paper: one-lab-a\n    role: origin\n    note: a\n"
+        "  - paper: one-lab-b\n    role: improvement\n    note: b\n"
+    )
+    _, warnings, _, _ = validate_mod.run(data_dir=sample_data_dir)
+    assert any("every paper in this line is from OneLab" in w for w in warnings)
