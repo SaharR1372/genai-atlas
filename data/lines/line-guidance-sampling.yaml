@@ -7,17 +7,38 @@ core_bet: Substantial quality is available at sampling time, and the guidance ma
   diffusion is mismatched to flow models.
 primary_axis: inference
 status: ascendant
-since: 2025-09
+since: 2022-07
 sections:
 - generation
 arc:
-- paper: glass-flows-2025
+- paper: cfg-2022
   role: origin
-  note: Simulates a flow inside a flow to get SDE-quality samples at ODE cost, with no retraining.
+  note: Jointly trains conditional and unconditional prediction in one network so sampling can extrapolate
+    between them. Everything else on this page is a refinement of this.
+- paper: guidance-interval-2024
+  role: improvement
+  note: Guidance is harmful early and pointless late; applying it only in a middle interval improves both
+    sample and distribution quality.
+- paper: cfgpp-2024
+  role: improvement
+  note: Diagnoses oversaturation as guidance pushing samples off the data manifold, and reframes the correction
+    as an inverse problem.
+- paper: autoguidance-2024
+  role: improvement
+  note: Separates quality from diversity by guiding with a weaker version of the same model rather than
+    an unconditional one.
+- paper: apg-2024
+  role: improvement
+  note: Splits the guidance update into parallel and orthogonal parts and finds only the orthogonal part
+    carries prompt adherence.
+- paper: glass-flows-2025
+  role: improvement
+  note: Simulates a flow inside a flow to get stochastic-sampler quality at deterministic-sampler cost,
+    with no retraining.
 - paper: rectified-cfg-2025
   role: improvement
-  note: Reformulates classifier-free guidance specifically for rectified-flow models, where the diffusion-era
-    version degrades high-guidance samples.
+  note: Carries the CFG++ correction to rectified-flow models, where the diffusion-era formulation is
+    mismatched to straight-path transport.
 strengths:
 - No training cost, so improvements apply to already-released models
 - Composes with every other line

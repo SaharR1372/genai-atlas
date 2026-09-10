@@ -15,6 +15,7 @@ sections:
 - unified
 - vlm
 lines:
+- line-continuous-tokens
 - line-unified-models
 links:
   code: null
@@ -39,35 +40,38 @@ explained:
     which stayed architecturally simple but lost information at quantization. Chameleon-style discrete-token
     unification was the strongest version of the second option.
   problem: Whether a single transformer can match specialized diffusion models at continuous image generation
-    while retaining full language modeling quality, without quantizing images into discrete tokens at all.
+    while retaining full language modeling quality, without quantizing images into discrete tokens at
+    all.
   idea: Represent text as discrete tokens predicted with a language modeling loss and images as continuous
     latent patches denoised with a diffusion loss, inside one transformer trained end to end on both losses
     at once, rather than forcing the whole model to be discrete or the whole model to be continuous.
-  method: One transformer, one set of weights, no mixture of experts. Text uses causal attention and a next-token
-    cross-entropy loss over a standard discrete vocabulary. Images are encoded by an 86M-parameter VAE into
-    8-channel continuous latents, with no vector quantization, and denoised with a DDPM MSE loss inside patches
-    that attend to each other bidirectionally while still respecting causal order relative to surrounding
-    text and other images. The two losses are summed as the language modeling loss plus lambda times the
-    diffusion loss, with lambda set to 5. Modality-specific encoder and decoder layers, either a simple linear
-    projection or a 0.27B-parameter U-Net down and up block, convert k by k patch windows of the VAE latent
-    into and out of transformer-width vectors. This is the one place the architecture is not fully shared,
-    and it is what lets an extreme 8x8 patch size compress an image to 16 patches without collapsing quality.
+  method: One transformer, one set of weights, no mixture of experts. Text uses causal attention and a
+    next-token cross-entropy loss over a standard discrete vocabulary. Images are encoded by an 86M-parameter
+    VAE into 8-channel continuous latents, with no vector quantization, and denoised with a DDPM MSE loss
+    inside patches that attend to each other bidirectionally while still respecting causal order relative
+    to surrounding text and other images. The two losses are summed as the language modeling loss plus
+    lambda times the diffusion loss, with lambda set to 5. Modality-specific encoder and decoder layers,
+    either a simple linear projection or a 0.27B-parameter U-Net down and up block, convert k by k patch
+    windows of the VAE latent into and out of transformer-width vectors. This is the one place the architecture
+    is not fully shared, and it is what lets an extreme 8x8 patch size compress an image to 16 patches
+    without collapsing quality.
   evidence: At matched pretraining scale, 0.5T tokens and 7B active parameters, Transfusion beats a Chameleon-style
-    discrete-token baseline on every axis tested, C4 perplexity 7.72 versus 8.41, image captioning CIDEr 27.2
-    versus 18.0, and text-to-image FID 16.8 versus 29.6, the last using roughly 34 times fewer FLOPs to match
-    Chameleon's FID. At full scale, 7B parameters and 2T tokens with the U-Net encoder and 2x2 patches, Transfusion
-    reaches GenEval 0.63 and FID 6.78, beating DALL-E 2 at GenEval 0.52 and SDXL at 0.55, though trailing
-    Stable Diffusion 3's 0.68, which the paper attributes to SD3's use of synthetic captions that Transfusion's
-    natural-caption-only setup lacks.
-  limitations: The paper concedes a real text-quality cost from adding image training. At 0.76B scale, Llama-eval
-    accuracy drops from a 53.7% text-only baseline to 51.7% with Transfusion, though this is a smaller drop
-    than Chameleon's fall to 48.9%. It also concedes it did not tune lambda beyond a coarse sweep, did not
-    scale the U-Net encoder and decoder alongside the transformer, used only 8k examples for its image-editing
-    fine-tune experiment, and ran no pixel-space experiments without a VAE beyond a brief mention.
-  why_it_matters: It is the cleanest demonstration that unifying understanding and generation does not require
-    destroying image information through quantization. Summing a discrete language modeling loss and a continuous
-    diffusion loss inside one backbone became a template that later unified models built on, even ones that
-    additionally add expert separation that Transfusion itself does not have.
+    discrete-token baseline on every axis tested, C4 perplexity 7.72 versus 8.41, image captioning CIDEr
+    27.2 versus 18.0, and text-to-image FID 16.8 versus 29.6, the last using roughly 34 times fewer FLOPs
+    to match Chameleon's FID. At full scale, 7B parameters and 2T tokens with the U-Net encoder and 2x2
+    patches, Transfusion reaches GenEval 0.63 and FID 6.78, beating DALL-E 2 at GenEval 0.52 and SDXL
+    at 0.55, though trailing Stable Diffusion 3's 0.68, which the paper attributes to SD3's use of synthetic
+    captions that Transfusion's natural-caption-only setup lacks.
+  limitations: The paper concedes a real text-quality cost from adding image training. At 0.76B scale,
+    Llama-eval accuracy drops from a 53.7% text-only baseline to 51.7% with Transfusion, though this is
+    a smaller drop than Chameleon's fall to 48.9%. It also concedes it did not tune lambda beyond a coarse
+    sweep, did not scale the U-Net encoder and decoder alongside the transformer, used only 8k examples
+    for its image-editing fine-tune experiment, and ran no pixel-space experiments without a VAE beyond
+    a brief mention.
+  why_it_matters: It is the cleanest demonstration that unifying understanding and generation does not
+    require destroying image information through quantization. Summing a discrete language modeling loss
+    and a continuous diffusion loss inside one backbone became a template that later unified models built
+    on, even ones that additionally add expert separation that Transfusion itself does not have.
 abstract: We introduce Transfusion, a recipe for training a multi-modal model over discrete and continuous
   data. Transfusion combines the language modeling loss function (next token prediction) with diffusion
   to train a single transformer over mixed-modality sequences. We pretrain multiple Transfusion models

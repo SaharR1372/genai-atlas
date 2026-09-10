@@ -1,0 +1,45 @@
+id: cfg-2022
+type: paper
+title: Classifier-Free Diffusion Guidance
+short: Classifier-Free Guidance
+arxiv: '2207.12598'
+date: 2022-07
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- Google
+authors:
+- Jonathan Ho
+- Tim Salimans
+tier: landmark
+sections:
+- generation
+lines:
+- line-guidance-sampling
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: Trains one network on both conditional and unconditional objectives by randomly dropping the
+  condition, then at sampling time extrapolates away from the unconditional prediction toward the conditional
+  one. Removes the need for a separate classifier and became the single most consequential inference-time
+  knob in image generation, which is why every benchmark number in this atlas has to be read alongside
+  the guidance setting that produced it.
+explanation: null
+abstract: 'Classifier guidance is a recently introduced method to trade off mode coverage and sample fidelity
+  in conditional diffusion models post training, in the same spirit as low temperature sampling or truncation
+  in other types of generative models. Classifier guidance combines the score estimate of a diffusion
+  model with the gradient of an image classifier and thereby requires training an image classifier separate
+  from the diffusion model. It also raises the question of whether guidance can be performed without a
+  classifier. We show that guidance can be indeed performed by a pure generative model without such a
+  classifier: in what we call classifier-free guidance, we jointly train a conditional and an unconditional
+  diffusion model, and we combine the resulting conditional and unconditional score estimates to attain
+  a trade-off between sample quality and diversity similar to that obtained using classifier guidance.'

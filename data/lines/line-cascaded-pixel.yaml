@@ -1,0 +1,52 @@
+id: line-cascaded-pixel
+type: line
+name: Cascaded and multiscale pixel diffusion
+one_line: 'Keep generation in pixels, but handle resolution progressively: generate small, then refine
+  upward.'
+core_bet: Pixels were never the problem. Resolution was. Manage resolution with a cascade or a shifted
+  schedule and pixel diffusion matches latent diffusion, with no tokenizer needed.
+primary_axis: representation
+status: superseded
+since: 2021-05
+sections:
+- generation
+arc:
+- paper: cdm-2021
+  role: origin
+  note: A chain of pixel-space diffusion models with conditioning augmentation to keep errors from compounding
+    between stages.
+- paper: simple-diffusion-2023
+  role: improvement
+  note: 'Argues the cascade is unnecessary: shift the noise schedule and add capacity at low resolution
+    and one end-to-end model suffices.'
+- paper: hdit-2024
+  role: improvement
+  note: A hierarchical transformer with linear rather than quadratic cost in pixels, making native megapixel
+    pixel training feasible. The architectural bridge to the single-stage line.
+- paper: sid2-2024
+  role: evidence
+  note: FID 1.5 on ImageNet 512 in pixel space, a year before the tokenizer-free papers claimed parity.
+    The strongest single reason to treat 2025 as a rediscovery.
+- paper: edify-image-2024
+  role: scaling
+  note: Laplacian frequency-band pixel diffusion shipped at industrial scale while the open literature
+    treated latents as settled.
+- paper: pixelflow-2025
+  role: improvement
+  note: Carries the multiscale bet to flow matching, ImageNet 256 FID 1.98 with no VAE.
+strengths:
+- Reached latent-diffusion quality in pixels years before the current wave, and was largely ignored
+- Progressive resolution sidesteps the attention cost that constrains single-stage pixel transformers
+- Sustained by well-resourced industrial groups rather than by a single result
+weaknesses:
+- A cascade is more moving parts than a tokenizer, which is what it was meant to avoid
+- Errors compound between stages, needing conditioning augmentation to control
+- Largely UNet-era work, so it did not inherit the transformer scaling story the field now expects
+- 'Superseded by the single-stage transformer line in attention rather than in evidence: no paper here
+  was refuted, and SiD2 still holds one of the best pixel-space numbers'
+open_questions:
+- latent-vs-pixel-space
+competes_with:
+- line-vae-latent
+- line-pixel-space
+explains: null

@@ -1,0 +1,49 @@
+id: crossflow-2026
+type: paper
+title: 'CrossFlow: One-Step Generation Across Latent and Pixel Spaces'
+short: CrossFlow
+arxiv: '2606.19970'
+date: 2026-06
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- Peking University
+- Tencent
+- Fudan University
+authors: []
+tier: emerging
+sections:
+- generation
+lines:
+- line-latent-hybrid
+- line-one-step-objectives
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: A one-step flow from noisy latents to pixel-space images, FID 1.62 at a single function evaluation.
+  A latent-to-pixel bridge rather than tokenizer-free generation, recorded here so the distinction stays
+  visible.
+explanation: null
+abstract: 'Most diffusion and flow-matching generators define the prior, probability path, and prediction
+  target in the same representation space. Latent diffusion improves efficiency by moving this path into
+  an autoencoder latent space, but the final sample is still produced by a separately trained decoder.
+  This separation creates a mismatch: the generator is optimized for latent-space prediction, while final
+  quality depends on how the decoder handles generated latents that may differ from clean encoder outputs.
+  We introduce CrossFlow, a cross-space flow formulation that maps noisy latent inputs directly to pixel-space
+  images. The key technical step is a velocity-free one-step objective: the latent trajectory defines
+  the training path, but the supervised prediction is an image rather than a latent displacement. This
+  lets one model act both as a one-step latent-to-pixel generator and as a decoder replacement for latent
+  diffusion pipelines. On class-conditional ImageNet-1k at $256\times256$, CrossFlow-XL achieves 1.62
+  FID with one function evaluation. Ablations show that the latent encoder and pixel-space perceptual
+  and adversarial losses are important for fidelity. These results indicate that cross-space flow objectives
+  can combine the efficiency of latent representations with direct pixel-space supervision, without requiring
+  a separate decoder at inference.'

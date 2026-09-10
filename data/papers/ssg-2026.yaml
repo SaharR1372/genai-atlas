@@ -1,0 +1,50 @@
+id: ssg-2026
+type: paper
+title: A Frozen Pixel-Space Diffusion Model Can Guide Itself with Its Own Samples
+short: Self-Sample Guidance
+arxiv: '2607.29122'
+date: 2026-07
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- Nanyang Technological University
+authors: []
+tier: strong-followup
+sections:
+- generation
+lines:
+- line-pixel-space
+- line-guidance-sampling
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: Adds a lightweight self-guidance head on a frozen pixel-space backbone, improving JiT from 1.86
+  to 1.67 and PixelREPA from 1.81 to 1.59 for under one percent extra compute. An instance of the atlas's
+  recurring finding that inference-time technique moves these numbers as much as architecture does.
+explanation: null
+abstract: 'Pixel-space diffusion models aim to learn an end-to-end generator directly over raw pixels.
+  This is challenging because a single model must capture both global structure and local texture in the
+  same high-dimensional space. While recent work improves pixel diffusion through alternative prediction
+  targets, training objectives, and architectures, these advances typically require training a new model
+  from scratch. We show there is a cheaper, complementary strategy: \textbf{a frozen, pretrained pixel
+  diffusion model can guide itself}. Our key observation is that intermediate layers of a pretrained pixel
+  diffusion transformer can be decoded into coarse predictions that capture the main low-frequency structure,
+  while the final layers progressively refine local, high-frequency details. We therefore attach a lightweight
+  prediction head to an intermediate layer, keep the backbone frozen, and use the discrepancy between
+  the intermediate and final predictions as a self-guidance direction during sampling. To train this head,
+  we further find that real images are not necessary. Instead, model-generated samples suffice and even
+  outperform real images for training the head, especially in enhancing the high-frequency components
+  that pixel diffusion tends to underfit. Across multiple pixel diffusion models on ImageNet, our \textbf{Synthetic
+  Self-Guidance (SSG)} consistently improves generation while adapter training requires less than 1$\%$
+  of full-model training compute: it reduces FID by over 50$\%$ across the evaluated JiT variants without
+  classifier-free guidance (CFG) and further improves strong baselines with CFG, e.g., JiT-H/16 from 1.86
+  to 1.67 and PixelREPA-H/16 from 1.81 to 1.59. Our code is available at https://github.com/zfu006/SSG.'

@@ -1,0 +1,52 @@
+id: pixel-survey-2026
+type: paper
+title: Pixel-Space Diffusion Transformers
+short: Pixel-space survey
+arxiv: '2607.17585'
+date: 2026-07
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- Peking University
+- Nanjing University
+- Stanford University
+- Cornell University
+- University of Agder
+- University of Oulu
+authors: []
+tier: core
+sections:
+- generation
+lines:
+- line-pixel-space
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: A review covering architecture, noise scheduling and token efficiency across the pixel-space
+  literature, arguing that a shared pixel, text and condition token space is a route to unified generation
+  and understanding. Reports no new results; useful as a map, and as evidence that the area became large
+  enough to need one.
+explanation: null
+abstract: 'Latent diffusion models (LDMs) enable efficient high-resolution image synthesis by denoising
+  in a VAE-compressed latent space. However, fixed visual tokenizers can discard fine textures and structural
+  details, while separate representation and diffusion training creates a mismatch between reconstruction
+  and generation objectives. These limitations have renewed interest in pixel-space diffusion, which models
+  raw pixels directly, removes the VAE bottleneck, and supports end-to-end optimization. This formulation
+  better matches the demands of high-fidelity generation but introduces challenges in high-dimensional
+  modeling, including noise scheduling, loss weighting, token efficiency, and scalable architecture design.
+  Pixel-space modeling also offers a promising basis for unified multimodal systems: raw pixels, text,
+  and task conditions can be represented in a shared token space and jointly processed by a single Transformer,
+  narrowing the gap between visual understanding and generation. This paper reviews Pixel-Space Diffusion
+  Transformers (pDiTs) from the perspectives of model architecture, continuous generative mechanisms,
+  and unified multimodal modeling. We summarize representative methods, identify key technical challenges,
+  and discuss future directions toward high-fidelity, end-to-end vision foundation models that integrate
+  generation and understanding.'

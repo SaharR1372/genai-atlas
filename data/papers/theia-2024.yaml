@@ -1,0 +1,40 @@
+id: theia-2024
+type: paper
+title: 'Theia: Distilling Diverse Vision Foundation Models for Robot Learning'
+short: Theia
+arxiv: '2407.20179'
+date: 2024-07
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- Boston Dynamics AI Institute
+authors: []
+tier: strong-followup
+sections:
+- vfm
+lines:
+- line-agglomerative
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: Applies the same multi-teacher distillation bet in robotics, where a single backbone that inherits
+  several specialists is worth more than any one of them.
+explanation: null
+abstract: Vision-based robot policy learning, which maps visual inputs to actions, necessitates a holistic
+  understanding of diverse visual tasks beyond single-task needs like classification or segmentation.
+  Inspired by this, we introduce Theia, a vision foundation model for robot learning that distills multiple
+  off-the-shelf vision foundation models trained on varied vision tasks. Theia's rich visual representations
+  encode diverse visual knowledge, enhancing downstream robot learning. Extensive experiments demonstrate
+  that Theia outperforms its teacher models and prior robot learning models using less training data and
+  smaller model sizes. Additionally, we quantify the quality of pre-trained visual representations and
+  hypothesize that higher entropy in feature norm distributions leads to improved robot learning performance.
+  Code, models, and demo are available at https://theia.theaiinstitute.com.

@@ -7,15 +7,22 @@ core_bet: Exact likelihoods and invertibility are worth having, and the old scal
   rather than fundamental.
 primary_axis: objective
 status: emerging
-since: 2025-06
+since: 2024-12
 sections:
 - generation
 arc:
-- paper: starflow-2025
+- paper: tarflow-2024
   role: origin
-  note: A transformer autoregressive flow with a deep-shallow design, trained in a pretrained autoencoder's
-    latent space; the first flow-based model to compete at high resolution, with an explicit ablation
-    preferring latent over pixel modeling.
+  note: Transformer autoregressive flow blocks with alternating direction, noise augmentation and flow-specific
+    guidance. The architecture the line is built on.
+- paper: starflow-2025
+  role: scaling
+  note: Scales TarFlow to high resolution in a pretrained autoencoder's latent, with an explicit ablation
+    preferring latent over pixel modelling.
+- paper: starflow2-2026
+  role: improvement
+  note: Fuses the flow stream with a vision-language stream so visual tokens enter the same key-value
+    cache as text.
 strengths:
 - Exact likelihoods, which diffusion and flow matching cannot provide
 - Invertible by construction, which matters for editing and inverse problems
@@ -24,6 +31,8 @@ weaknesses:
 - Far less validated than diffusion at frontier scale
 - Architecturally constrained by invertibility
 - Thin follow-up literature so far
+- Every paper in this line is from one group at Apple. Unlike the other lines here, the atlas found no
+  independent replication, which is itself the clearest evidence of how narrow the revival currently is
 competes_with:
 - line-flow-matching
 explains: null

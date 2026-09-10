@@ -1,0 +1,51 @@
+id: no-vae-2025
+type: paper
+title: 'There is No VAE: End-to-End Pixel-Space Generative Modeling via Self-Supervised Pre-training'
+short: There is No VAE
+arxiv: '2510.12586'
+date: 2025-10
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- AMAP, Alibaba Group
+- NVIDIA
+- Caltech
+authors: []
+tier: core
+sections:
+- generation
+- rae
+lines:
+- line-pixel-space
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: Pretrains an encoder self-supervised and then finetunes the whole thing end to end in pixels,
+  reaching ImageNet 256 FID 1.58 at roughly 30 percent of DiT's training compute, and producing the first
+  working pixel-space consistency model. Notable because it keeps a pretrained encoder while discarding
+  the VAE, so it sits between this line and the representation-latent one.
+explanation: null
+abstract: 'Pixel-space generative models are often more difficult to train and generally underperform
+  compared to their latent-space counterparts, leaving a persistent performance and efficiency gap. In
+  this paper, we introduce a novel two-stage training framework that closes this gap for pixel-space diffusion
+  and consistency models. In the first stage, we pre-train encoders to capture meaningful semantics from
+  clean images while aligning them with points along the same deterministic sampling trajectory, which
+  evolves points from the prior to the data distribution. In the second stage, we integrate the encoder
+  with a randomly initialized decoder and fine-tune the complete model end-to-end for both diffusion and
+  consistency models. Our framework achieves state-of-the-art (SOTA) performance on ImageNet. Specifically,
+  our diffusion model reaches an FID of 1.58 on ImageNet-256 and 2.35 on ImageNet-512 with 75 number of
+  function evaluations (NFE) surpassing prior pixel-space methods and VAE-based counterparts by a large
+  margin in both generation quality and training efficiency. In a direct comparison, our model significantly
+  outperforms DiT while using only around 30\% of its training compute. Furthermore, our consistency model
+  achieves an impressive FID of 8.82 on ImageNet-256, significantly outperforming its latent-space counterparts.
+  This marks the first successful training of a consistency model directly on high-resolution images without
+  relying on pre-trained VAEs or diffusion models. Our codes are available at: \href{https://github.com/AMAP-ML/EPG}{https://github.com/AMAP-ML/EPG}'

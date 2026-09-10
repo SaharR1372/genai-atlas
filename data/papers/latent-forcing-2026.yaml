@@ -1,0 +1,45 @@
+id: latent-forcing-2026
+type: paper
+title: 'Latent Forcing: Reordering the Diffusion Trajectory for Pixel-Space Image Generation'
+short: Latent Forcing
+arxiv: '2602.11401'
+date: 2026-02
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- Stanford University
+- University of Michigan
+authors: []
+tier: core
+sections:
+- generation
+- rae
+lines:
+- line-latent-hybrid
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: 'Processes latents and pixels jointly under separate noise schedules, using the latent as a computational
+  scratchpad rather than as the generative space. The explicit counter-position to the tokenizer-free
+  line: not that latents are the destination, but that they are useful working memory.'
+explanation: null
+abstract: Latent diffusion models excel at generating high-quality images but lose the benefits of end-to-end
+  modeling. They discard information during image encoding, require a separately trained decoder, and
+  model an auxiliary distribution to the raw data. In this paper, we propose Latent Forcing, a simple
+  modification to existing architectures that achieves the efficiency of latent diffusion while operating
+  on raw natural images. Our approach orders the denoising trajectory by jointly processing latents and
+  pixels with separately tuned noise schedules. This allows the latents to act as a scratchpad for intermediate
+  computation before high-frequency pixel features are generated. We find that the order of conditioning
+  signals is critical, and we analyze this to explain differences between REPA distillation in the tokenizer
+  and the diffusion model, conditional versus unconditional generation, and how tokenizer reconstruction
+  quality relates to diffusability. Applied to ImageNet, Latent Forcing achieves a new state-of-the-art
+  for diffusion transformer-based pixel generation at our compute scale.

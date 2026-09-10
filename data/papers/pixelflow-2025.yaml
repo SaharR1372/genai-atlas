@@ -1,0 +1,41 @@
+id: pixelflow-2025
+type: paper
+title: 'PixelFlow: Pixel-Space Generative Models with Flow'
+short: PixelFlow
+arxiv: '2504.07963'
+date: 2025-04
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- University of Hong Kong
+- Adobe
+authors: []
+tier: core
+sections:
+- generation
+lines:
+- line-cascaded-pixel
+- line-flow-matching
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: Cascaded flow matching directly in pixel space, ImageNet 256 FID 1.98 with no VAE. Carries the
+  multiscale bet across to the flow objective, and lands between the two pixel lines.
+explanation: null
+abstract: We present PixelFlow, a family of image generation models that operate directly in the raw pixel
+  space, in contrast to the predominant latent-space models. This approach simplifies the image generation
+  process by eliminating the need for a pre-trained Variational Autoencoder (VAE) and enabling the whole
+  model end-to-end trainable. Through efficient cascade flow modeling, PixelFlow achieves affordable computation
+  cost in pixel space. It achieves an FID of 1.98 on 256$\times$256 ImageNet class-conditional image generation
+  benchmark. The qualitative text-to-image results demonstrate that PixelFlow excels in image quality,
+  artistry, and semantic control. We hope this new paradigm will inspire and open up new opportunities
+  for next-generation visual generation models. Code and models are available at https://github.com/ShoufaChen/PixelFlow.

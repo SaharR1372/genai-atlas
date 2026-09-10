@@ -7,23 +7,35 @@ core_bet: Autoregression is worth keeping but quantization is not; per-token con
   the codebook entirely.
 primary_axis: representation
 status: ascendant
-since: 2024-06
+since: 2023-12
 sections:
 - generation
 - unified
 arc:
+- paper: givt-2023
+  role: precursor
+  note: Drops the codebook with a Gaussian-mixture head rather than a diffusion loss, predating MAR with
+    the same underlying objection to quantisation.
 - paper: mar-2024
   role: origin
-  note: Shows vector quantization is unnecessary for autoregressive image generation by replacing the
-    categorical loss with a small per-token diffusion loss.
+  note: Shows vector quantisation is unnecessary by scoring continuous tokens with a small per-token diffusion
+    loss.
+- paper: transfusion-2024
+  role: improvement
+  note: Runs the same per-token diffusion loss on continuous image tokens inside a transformer that also
+    does next-token text prediction.
+- paper: fluid-2024
+  role: scaling
+  note: Scales the recipe to text-to-image and finds continuous tokens beat discrete ones as models grow,
+    with random generation order.
 - paper: resurrect-mar-2025
   role: evidence
   note: Isolates the tokenizer and bidirectional architecture, not the objective, as what actually limits
     masked autoregressive models.
 - paper: nextstep1-2025
   role: scaling
-  note: A 14B autoregressive model with a 157M flow-matching head reaching state of the art among autoregressive
-    text-to-image systems.
+  note: A 14B model with a flow-matching head reaching state of the art among autoregressive text-to-image
+    systems.
 strengths:
 - No quantization loss, so no reconstruction ceiling from the codebook
 - Keeps autoregression's flexible generation order and language-model compatibility

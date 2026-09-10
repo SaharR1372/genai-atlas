@@ -7,17 +7,26 @@ core_bet: Some generation failures are knowledge failures rather than capability
   is retrieval or agency rather than more parameters.
 primary_axis: conditioning
 status: emerging
-since: 2026-07
+since: 2022-09
 sections:
 - generation
 arc:
-- paper: searchgen-2026
+- paper: re-imagen-2022
   role: origin
-  note: Gives an image generator search access to close world-knowledge gaps, with a 20,000-example dataset
-    and a benchmark.
+  note: Retrieves image-text pairs from an external knowledge base to render entities the model never
+    learned, and benchmarks exactly that failure.
+- paper: idea2img-2023
+  role: origin
+  note: Puts a multimodal model in a loop that drafts, critiques and rewrites its own prompt.
+- paper: genartist-2024
+  role: improvement
+  note: An agent that plans, decomposes into tool calls, and verifies the result.
+- paper: searchgen-2026
+  role: scaling
+  note: Gives the generator live search so it can render subjects its training data never covered.
 - paper: agentic-visual-generation-2026
   role: evidence
-  note: Surveys the emerging space and proposes a taxonomy of agentic control over generative models.
+  note: Surveys the space once it became a wave rather than a handful of papers.
 strengths:
 - 'Attacks a failure mode that scaling does not fix: the model simply not knowing what a thing looks like'
 - Composes with any generator, since it changes what reaches the model rather than the model itself

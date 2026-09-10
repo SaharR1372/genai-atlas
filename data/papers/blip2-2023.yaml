@@ -1,0 +1,48 @@
+id: blip2-2023
+type: paper
+title: 'BLIP-2: Bootstrapping Language-Image Pre-training with Frozen Image Encoders and Large Language
+  Models'
+short: BLIP-2
+arxiv: '2301.12597'
+date: 2023-01
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- Salesforce Research
+authors:
+- Junnan Li
+- Dongxu Li
+- Silvio Savarese
+- Steven Hoi
+tier: landmark
+sections:
+- vlm
+lines:
+- line-cross-attention-vlm
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: Bridges a frozen image encoder to a frozen language model with a lightweight Q-Former whose learnable
+  queries cross-attend to image features. The other major answer to the same question Flamingo asked,
+  and arguably the more widely copied one.
+explanation: null
+abstract: The cost of vision-and-language pre-training has become increasingly prohibitive due to end-to-end
+  training of large-scale models. This paper proposes BLIP-2, a generic and efficient pre-training strategy
+  that bootstraps vision-language pre-training from off-the-shelf frozen pre-trained image encoders and
+  frozen large language models. BLIP-2 bridges the modality gap with a lightweight Querying Transformer,
+  which is pre-trained in two stages. The first stage bootstraps vision-language representation learning
+  from a frozen image encoder. The second stage bootstraps vision-to-language generative learning from
+  a frozen language model. BLIP-2 achieves state-of-the-art performance on various vision-language tasks,
+  despite having significantly fewer trainable parameters than existing methods. For example, our model
+  outperforms Flamingo80B by 8.7% on zero-shot VQAv2 with 54x fewer trainable parameters. We also demonstrate
+  the model's emerging capabilities of zero-shot image-to-text generation that can follow natural language
+  instructions.

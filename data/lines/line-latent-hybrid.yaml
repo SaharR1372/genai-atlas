@@ -36,6 +36,15 @@ arc:
   role: evidence
   note: Trains tokenizers across the whole reconstruction-to-representation spectrum and measures which
     latent properties actually predict generation quality.
+- paper: latent-forcing-2026
+  role: hybrid
+  note: Runs latents and pixels together under separate noise schedules, treating the latent as a computational
+    scratchpad rather than as the space generation happens in. The clearest counter-position to the tokenizer-free
+    line.
+- paper: crossflow-2026
+  role: hybrid
+  note: A one-step flow from noisy latents to pixels, FID 1.62 at one function evaluation. A bridge between
+    the spaces rather than a choice between them.
 strengths:
 - Directly targets the one weakness the representation-latent line cannot argue away
 - 'Empirically strong: several members report both better reconstruction and better generation than pure

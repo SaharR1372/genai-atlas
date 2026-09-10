@@ -1,0 +1,56 @@
+id: fluid-2024
+type: paper
+title: 'Fluid: Scaling Autoregressive Text-to-image Generative Models with Continuous Tokens'
+short: Fluid
+arxiv: '2410.13863'
+date: 2024-10
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- Google DeepMind
+- MIT
+authors:
+- Lijie Fan
+- Tianhong Li
+- Siyang Qin
+- Yuanzhen Li
+- Chen Sun
+- Michael Rubinstein
+- Deqing Sun
+- Kaiming He
+- Yonglong Tian
+tier: landmark
+sections:
+- generation
+lines:
+- line-continuous-tokens
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: Scales the continuous-token autoregressive recipe to text-to-image and finds continuous tokens
+  with random generation order beat discrete tokens as models grow. Shares authors with MAR and is the
+  direct large-scale test of that paper's bet, which makes its absence from this atlas until now the clearest
+  single coverage failure the audit found.
+explanation: null
+abstract: 'Scaling up autoregressive models in vision has not proven as beneficial as in large language
+  models. In this work, we investigate this scaling problem in the context of text-to-image generation,
+  focusing on two critical factors: whether models use discrete or continuous tokens, and whether tokens
+  are generated in a random or fixed raster order using BERT- or GPT-like transformer architectures. Our
+  empirical results show that, while all models scale effectively in terms of validation loss, their evaluation
+  performance -- measured by FID, GenEval score, and visual quality -- follows different trends. Models
+  based on continuous tokens achieve significantly better visual quality than those using discrete tokens.
+  Furthermore, the generation order and attention mechanisms significantly affect the GenEval score: random-order
+  models achieve notably better GenEval scores compared to raster-order models. Inspired by these findings,
+  we train Fluid, a random-order autoregressive model on continuous tokens. Fluid 10.5B model achieves
+  a new state-of-the-art zero-shot FID of 6.16 on MS-COCO 30K, and 0.69 overall score on the GenEval benchmark.
+  We hope our findings and results will encourage future efforts to further bridge the scaling gap between
+  vision and language models.'

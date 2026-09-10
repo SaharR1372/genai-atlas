@@ -13,8 +13,19 @@ sections:
 arc:
 - paper: flamingo-2022
   role: origin
-  note: Gated cross-attention layers between the frozen language model's blocks, with a perceiver resampler
-    fixing the visual token budget and gates initialized near zero so training starts as a no-op.
+  note: Gated cross-attention layers interleaved into a frozen language model, with a perceiver resampler
+    fixing the visual token budget.
+- paper: blip2-2023
+  role: origin
+  note: 'The other answer to the same question: a lightweight Q-Former whose learnable queries cross-attend
+    to frozen image features.'
+- paper: otter-2023
+  role: improvement
+  note: Builds on Flamingo's design with in-context instruction tuning.
+- paper: nvlm-2024
+  role: evidence
+  note: Compares cross-attention against decoder-only head to head, marking roughly where the pattern
+    stopped being the default.
 strengths:
 - Visual tokens do not consume the language model's context window
 - The frozen backbone is mathematically guaranteed intact at initialization

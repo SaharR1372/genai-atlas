@@ -1,0 +1,44 @@
+id: idea2img-2023
+type: paper
+title: 'Idea2Img: Iterative Self-Refinement with GPT-4V(ision) for Automatic Image Design and Generation'
+short: Idea2Img
+arxiv: '2310.08541'
+date: 2023-10
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- Microsoft
+authors: []
+tier: core
+sections:
+- generation
+lines:
+- line-agentic-generation
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: Puts a multimodal model in a loop with an image generator so it drafts, critiques its own output
+  and rewrites the prompt. The origin of the agentic half of this line, as distinct from the retrieval
+  half.
+explanation: null
+abstract: We introduce ``Idea to Image,'' a system that enables multimodal iterative self-refinement with
+  GPT-4V(ision) for automatic image design and generation. Humans can quickly identify the characteristics
+  of different text-to-image (T2I) models via iterative explorations. This enables them to efficiently
+  convert their high-level generation ideas into effective T2I prompts that can produce good images. We
+  investigate if systems based on large multimodal models (LMMs) can develop analogous multimodal self-refinement
+  abilities that enable exploring unknown models or environments via self-refining tries. Idea2Img cyclically
+  generates revised T2I prompts to synthesize draft images, and provides directional feedback for prompt
+  revision, both conditioned on its memory of the probed T2I model's characteristics. The iterative self-refinement
+  brings Idea2Img various advantages over vanilla T2I models. Notably, Idea2Img can process input ideas
+  with interleaved image-text sequences, follow ideas with design instructions, and generate images of
+  better semantic and visual qualities. The user preference study validates the efficacy of multimodal
+  iterative self-refinement on automatic image design and generation.

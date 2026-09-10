@@ -1,0 +1,45 @@
+id: cdm-2021
+type: paper
+title: Cascaded Diffusion Models for High Fidelity Image Generation
+short: CDM
+arxiv: '2106.15282'
+date: 2021-05
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- Google
+authors: []
+tier: landmark
+sections:
+- generation
+lines:
+- line-cascaded-pixel
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: Generates a low-resolution image and super-resolves it with a chain of pixel-space diffusion
+  models, introducing conditioning augmentation to stop errors compounding along the chain. The origin
+  of the position that pixel diffusion works if resolution is handled progressively, four years before
+  the tokenizer-free wave.
+explanation: null
+abstract: We show that cascaded diffusion models are capable of generating high fidelity images on the
+  class-conditional ImageNet generation benchmark, without any assistance from auxiliary image classifiers
+  to boost sample quality. A cascaded diffusion model comprises a pipeline of multiple diffusion models
+  that generate images of increasing resolution, beginning with a standard diffusion model at the lowest
+  resolution, followed by one or more super-resolution diffusion models that successively upsample the
+  image and add higher resolution details. We find that the sample quality of a cascading pipeline relies
+  crucially on conditioning augmentation, our proposed method of data augmentation of the lower resolution
+  conditioning inputs to the super-resolution models. Our experiments show that conditioning augmentation
+  prevents compounding error during sampling in a cascaded model, helping us to train cascading pipelines
+  achieving FID scores of 1.48 at 64x64, 3.52 at 128x128 and 4.88 at 256x256 resolutions, outperforming
+  BigGAN-deep, and classification accuracy scores of 63.02% (top-1) and 84.06% (top-5) at 256x256, outperforming
+  VQ-VAE-2.

@@ -13,8 +13,18 @@ sections:
 arc:
 - paper: transition-matching-2025
   role: origin
-  note: Formulates the unification and reports a fully causal variant matching or beating flow-based methods
-    on text-to-image.
+  note: Recasts generation as discrete-time Markov transitions over a continuous state, unifying flow
+    matching and continuous-token autoregression.
+- paper: tm-demystify-2025
+  role: evidence
+  note: Independent proof that transition matching achieves strictly lower KL divergence than flow matching
+    at finite step counts.
+- paper: tm-design-space-2025
+  role: improvement
+  note: Sweeps the head design across 56 models at 1.7B scale to find which configurations actually work.
+- paper: tm-distill-2026
+  role: improvement
+  note: Shows the formulation travels to other groups and other modalities.
 strengths:
 - Offers a single formalism where the field currently has two separate camps
 - From the group that introduced flow matching, so the theoretical framing is credible

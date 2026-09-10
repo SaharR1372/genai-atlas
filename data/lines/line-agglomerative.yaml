@@ -13,14 +13,20 @@ sections:
 arc:
 - paper: radio-2023
   role: origin
-  note: Distils CLIP, DINOv2 and SAM into one student, on the argument that semantics, dense structure
-    and segmentation are separate strengths.
+  note: Distils CLIP, DINOv2 and SAM into one student backbone.
+- paper: theia-2024
+  role: evidence
+  note: The same bet pursued independently, validated in robotics.
+- paper: unic-2024
+  role: evidence
+  note: The same bet again from another group, with teacher-dropping regularisation. Together these show
+    agglomeration is a general idea, not one company's.
 - paper: radiov25-2024
   role: improvement
   note: Fixes resolution and mode-switching failures in the first recipe.
 - paper: cradiov4-2026
   role: scaling
-  note: Now distils DINOv3, SigLIP 2 and SAM 3 — the same three encoders the generative-latent work independently
+  note: Now distils DINOv3, SigLIP 2 and SAM 3, the same three encoders the generative-latent work independently
     converged on.
 strengths:
 - Sidesteps the self-distillation versus contrastive argument by taking both

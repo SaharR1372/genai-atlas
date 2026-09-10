@@ -1,0 +1,48 @@
+id: tm-distill-2026
+type: paper
+title: Transition Matching Distillation for Fast Video Generation
+short: TM Distillation
+arxiv: '2601.09881'
+date: 2026-01
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- NVIDIA
+- NYU
+authors: []
+tier: emerging
+sections:
+- generation
+lines:
+- line-transition-matching
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: Applies transition matching to distil diffusion trajectories into few-step generation. Included
+  as evidence the formulation travels beyond its originating group, though its own target is video and
+  therefore outside this atlas's scope.
+explanation: null
+abstract: 'Large video diffusion and flow models have achieved remarkable success in high-quality video
+  generation, but their use in real-time interactive applications remains limited due to their inefficient
+  multi-step sampling process. In this work, we present Transition Matching Distillation (TMD), a novel
+  framework for distilling video diffusion models into efficient few-step generators. The central idea
+  of TMD is to match the multi-step denoising trajectory of a diffusion model with a few-step probability
+  transition process, where each transition is modeled as a lightweight conditional flow. To enable efficient
+  distillation, we decompose the original diffusion backbone into two components: (1) a main backbone,
+  comprising the majority of early layers, that extracts semantic representations at each outer transition
+  step; and (2) a flow head, consisting of the last few layers, that leverages these representations to
+  perform multiple inner flow updates. Given a pretrained video flow model, we first introduce a flow
+  head to the model, and adapt it into a conditional flow map. We then apply distribution matching distillation
+  to the student model with flow head rollout in each transition step. Extensive experiments on distilling
+  Wan2.1 1.3B and 14B text-to-video models demonstrate that TMD provides a flexible and strong trade-off
+  between generation speed and visual quality. In particular, TMD outperforms existing distilled models
+  under comparable inference costs in terms of visual fidelity and prompt adherence. Project page: https://research.nvidia.com/labs/genair/tmd'

@@ -1,0 +1,48 @@
+id: pixelrepa-2026
+type: paper
+title: Representation Alignment for Just Image Transformers is not Easier than You Think
+short: PixelREPA
+arxiv: '2603.14366'
+date: 2026-03
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- KAIST AI
+authors: []
+tier: strong-followup
+sections:
+- generation
+- rae
+lines:
+- line-pixel-space
+- line-representation-latent
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: 'Finds that REPA, which reliably accelerates latent diffusion transformers, actively hurts JiT,
+  and fixes it with a masked adapter. Valuable to the atlas as a negative result connecting two lines:
+  representation alignment is not a free win independent of the space being generated in.'
+explanation: null
+abstract: 'Representation Alignment (REPA) has emerged as a simple way to accelerate Diffusion Transformers
+  training in latent space. At the same time, pixel-space diffusion transformers such as Just image Transformers
+  (JiT) have attracted growing attention because they remove a dependency on a pretrained tokenizer, and
+  then avoid the reconstruction bottleneck of latent diffusion. This paper shows that the REPA can fail
+  for JiT. REPA yields worse FID for JiT as training proceeds and collapses diversity on image subsets
+  that are tightly clustered in the representation space of pretrained semantic encoder on ImageNet. We
+  trace the failure to an information asymmetry: denoising occurs in the high dimensional image space,
+  while the semantic target is strongly compressed, making direct regression a shortcut objective. We
+  propose PixelREPA, which transforms the alignment target and constrains alignment with a Masked Transformer
+  Adapter that combines a shallow transformer adapter with partial token masking. PixelREPA improves both
+  training convergence and final quality. PixelREPA reduces FID from 3.66 to 3.17 for JiT-B$/16$ and improves
+  Inception Score (IS) from 275.1 to 284.6 on ImageNet $256 \times 256$, while achieving $> 2\times$ faster
+  convergence. Finally, PixelREPA-H$/16$ achieves FID$=1.81$ and IS$=317.2$. Our code is available at
+  https://github.com/kaist-cvml/PixelREPA.'

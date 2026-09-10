@@ -1,37 +1,93 @@
 id: line-pixel-space
 type: line
-name: Pixel-space generation
-one_line: Drop the tokenizer entirely and generate raw pixels with a plain transformer.
-core_bet: No learned latent is necessary; pixel-space instability was an artifact of the prediction target,
-  not of pixels.
+name: Single-stage pixel transformers
+one_line: Drop the tokenizer entirely and generate raw pixels with one plain transformer, in one stage,
+  with no cascade.
+core_bet: No learned latent is necessary. Large patches plus the right prediction target let one end-to-end
+  model find the manifold a VAE was trained separately to provide.
 primary_axis: representation
-status: emerging
-since: 2025-11
+status: contested
+since: 2025-07
 sections:
 - generation
 - rae
 arc:
+- paper: pixnerd-2025
+  role: origin
+  note: Per-patch neural fields replace the VAE outright, single-scale and single-stage, at ImageNet 256
+    FID 2.15. Four months before JiT and independent of it.
 - paper: jit-2025
   role: origin
-  note: Argues epsilon-prediction, not pixels, caused pixel-space instability; x-prediction on large patches
-    makes a plain ViT competitive with tokenizer-based DiTs at 256 to 1024px, with no VAE, no pretraining,
-    no auxiliary losses.
+  note: Argues epsilon-prediction rather than pixels caused pixel-space instability, and that x-prediction
+    on large patches makes a plain ViT competitive with tokenizer-based DiTs. The paper that made the
+    argument the field actually heard, though not the first to make it.
+- paper: no-vae-2025
+  role: improvement
+  note: Keeps a self-supervised pretrained encoder but discards the VAE, hitting FID 1.58 at about 30
+    percent of DiT's training compute and yielding the first pixel-space consistency model.
+- paper: pixeldit-2026
+  role: improvement
+  note: Separates global semantics from texture refinement across two DiT levels, and carries the recipe
+    to 1024px text-to-image.
+- paper: dip-2026
+  role: improvement
+  note: 'Attacks the efficiency objection directly: a lightweight detailer head claims up to 10x faster
+    inference for 0.3 percent more parameters.'
 - paper: pixel-meanflow-2026
   role: improvement
-  note: Adds one-step generation to the tokenizer-free setting, removing the latent at both training and
-    sampling time.
+  note: Adds one-step generation, removing the latent at sampling time as well as training time.
+- paper: pixelrepa-2026
+  role: evidence
+  note: REPA, which accelerates latent DiTs, hurts JiT. Representation alignment turns out to depend on
+    the space being generated in.
+- paper: registers-pixel-2026
+  role: evidence
+  note: Register tokens help pixel-space transformers more than latent ones, so pixel space is not just
+    latent space with more dimensions.
+- paper: ssg-2026
+  role: improvement
+  note: A self-guidance head on a frozen backbone improves both JiT and PixelREPA for under one percent
+    extra compute, which is a larger gain than several architectural changes here.
+- paper: hyperdit-2026
+  role: improvement
+  note: Semantic anchors, scale-aware position embeddings and foundation-model registers reach FID 1.56,
+    at the cost of depending on its own anchor mechanism to converge at all.
+- paper: mosaik-2026
+  role: improvement
+  note: Content-aware variable patch size cuts 70 percent of FLOPs, addressing the resolution scaling
+    objection rather than working around it.
+- paper: pixel-t2i-empirical-2026
+  role: scaling
+  note: The first systematic text-to-image training recipe, reporting 3.2x to 4.8x faster inference than
+    latent baselines and inverting the original efficiency argument for latents.
+- paper: obsop-2026
+  role: improvement
+  note: FID 1.52, from the same group as HyperDiT rather than an independent replication.
+- paper: pixsgr-2026
+  role: improvement
+  note: FID 1.51 and 1.60 at 256 and 512, the lowest reported, and the least scrutinised.
+- paper: pixel-ar-pra-2026
+  role: evidence
+  note: The same bet under an autoregressive rather than diffusion objective, suggesting the tokenizer's
+    dispensability is not a property of diffusion specifically.
+- paper: pixel-survey-2026
+  role: evidence
+  note: A review of the area, which is itself evidence the line stopped being a handful of papers.
 strengths:
 - Removes an entire component, and with it the tokenizer's failure modes and its reconstruction ceiling
 - No train/test mismatch between real and generated latents
 - The strongest existing challenge to the premise every latent line shares
+- Now reports inference speedups over latent baselines, inverting the argument that created latents
 weaknesses:
-- Compute scales badly with resolution compared with latent methods
-- Very few independent results so far, and mostly from one group
-- No demonstrated path yet to text-to-image at frontier scale
+- Attention cost still scales badly with resolution; several papers here exist only to patch that
+- Every headline number is class-conditional ImageNet; text-to-image evidence is one paper old
+- PixelDiT states plainly that no mature training recipe exists for pixel data and noise distributions
+- The two lowest FIDs are single-version preprints, and two of the strongest results share authors
 open_questions:
 - latent-vs-pixel-space
 competes_with:
 - line-vae-latent
 - line-representation-latent
 - line-latent-hybrid
+- line-cascaded-pixel
 explains: null

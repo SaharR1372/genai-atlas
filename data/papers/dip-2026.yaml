@@ -1,0 +1,45 @@
+id: dip-2026
+type: paper
+title: 'DiP: Taming Diffusion Models in Pixel Space'
+short: DiP
+arxiv: '2511.18822'
+date: 2025-11
+venue:
+  name: CVPR
+  status: conference
+orgs:
+- Nanjing University
+- Tencent Youtu Lab
+- National University of Singapore
+authors: []
+tier: core
+sections:
+- generation
+lines:
+- line-pixel-space
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: A DiT backbone for global structure plus a lightweight patch detailer head for local refinement,
+  aimed squarely at the efficiency gap that justified latents in the first place. ImageNet 256 FID 1.79
+  at 631M parameters, and claims up to 10x faster inference for 0.3 percent more parameters. Class-conditional
+  ImageNet only so far.
+explanation: null
+abstract: 'Diffusion models face a fundamental trade-off between generation quality and computational
+  efficiency. Latent Diffusion Models (LDMs) offer an efficient solution but suffer from potential information
+  loss and non-end-to-end training. In contrast, existing pixel space models bypass VAEs but are computationally
+  prohibitive for high-resolution synthesis. To resolve this dilemma, we propose DiP, an efficient pixel
+  space diffusion framework. DiP decouples generation into a global and a local stage: a Diffusion Transformer
+  (DiT) backbone operates on large patches for efficient global structure construction, while a co-trained
+  lightweight Patch Detailer Head leverages contextual features to restore fine-grained local details.
+  This synergistic design achieves computational efficiency comparable to LDMs without relying on a VAE.
+  DiP is accomplished with up to 10$\times$ faster inference speeds than previous method while increasing
+  the total number of parameters by only 0.3%, and achieves an 1.79 FID score on ImageNet 256$\times$256.'

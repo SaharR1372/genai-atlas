@@ -1,0 +1,47 @@
+id: starflow2-2026
+type: paper
+title: 'STARFlow2: Bridging Language Models and Normalizing Flows for Unified Multimodal Generation'
+short: STARFlow2
+arxiv: '2605.08029'
+date: 2026-05
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- Apple
+authors: []
+tier: strong-followup
+sections:
+- generation
+- unified
+lines:
+- line-normalizing-flows
+- line-unified-models
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: Argues an autoregressive normalizing flow is structurally just an autoregressive transformer,
+  then fuses a vision-language stream with a flow stream through residual connections so flow-generated
+  visual tokens land in the same key-value cache as text with no re-encoding.
+explanation: null
+abstract: Deep generative models have advanced rapidly across text and vision, motivating unified multimodal
+  systems that can understand, reason over, and generate interleaved text-image sequences. Most existing
+  approaches combine autoregressive language modeling with diffusion-based image generators, inheriting
+  a structural mismatch between causal text generation and iterative visual denoising. We observe that
+  autoregressive normalizing flows are autoregressive Transformers--sharing the same causal mask, KV-cache
+  mechanism, and left-to-right structure as LLMs--making them the most natural paradigm for true unified
+  multimodal generation. We present STARFlow2, built on the Pretzel architecture that vertically interleaves
+  a pretrained VLM stream with a TarFlow stream via residual skip connections, both operating under the
+  same causal mask. Combined with a deep-shallow flow design and a unified FAE latent space, STARFlow2
+  enables cache-friendly interleaved generation where both text and visual outputs directly enter the
+  KV-cache without re-encoding. Experiments demonstrate strong performance across image generation and
+  multimodal understanding benchmarks, validating autoregressive flows as a viable foundation for unified
+  multimodal modeling.

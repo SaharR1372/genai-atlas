@@ -2,6 +2,62 @@
 
 ## Unreleased
 
+### 2026-09-10 — Session 11 (Opus 5) — coverage audit: the atlas was wrong about pixel space
+
+Triggered by the user noticing the pixel-space section held only two papers. It did, and that was a
+failure of the atlas, not a fact about the field. Two independent audits were run, one over every
+research line with a thin arc, one over pixel-space specifically. **All seven thin lines turned out
+to be atlas gaps. None was genuinely small.** 42 verified papers added, every one fetched from arXiv
+with its recorded title checked against the fetched title before it entered `data/`.
+
+**The pixel-space finding is a taxonomy correction, not just missing papers.**
+- What the atlas called one line is three separate bets. `line-pixel-space` is now *single-stage
+  pixel transformers* (tokenizer-free, one stage, large patches). A new `line-cascaded-pixel` holds
+  the older *cascaded and multiscale* bet — CDM 2021, simple diffusion 2023, HDiT 2024, SiD2 2024,
+  Edify Image 2024, PixelFlow 2025 — which is a different claim (resolution was the problem, not
+  pixels) with a different origin and a five-year head start. Latent Forcing and CrossFlow went to
+  `line-latent-hybrid` as the explicit counter-position: the latent as computational scratchpad
+  rather than as the generative space.
+- **The line's stated origin was wrong.** PixNerd (2507.23268, July 2025) predates JiT (November
+  2025) by four months and reaches the same conclusion independently. JiT is now recorded as an
+  origin for the argument the field actually heard, not as the first to make it.
+- **SiD2 reached FID 1.5 on ImageNet 512 in pixel space in October 2024**, a year before the
+  tokenizer-free wave claimed parity. The atlas is now able to say the 2025 wave rediscovered
+  something rather than discovered it.
+- The line's own `weaknesses` field claimed pixel-space results were "mostly from one group". That
+  was the atlas's coverage gap asserted as a property of the field. Verified affiliations now show
+  at least a dozen groups: NVIDIA, Google DeepMind, Yandex Research, Alibaba (AMAP and Token Hub),
+  Tencent Youtu, KAIST, NTU Singapore, UESTC, Nanjing University, NUS, Peking University, HKU,
+  Stability AI, Stanford, Caltech, and the ByteDance Seed authors on PixNerd.
+- The `weaknesses` field is rewritten to the objections that actually survive: attention cost still
+  scales badly with resolution, nearly every headline number is class-conditional ImageNet, PixelDiT
+  itself concedes no mature training recipe exists for pixel noise distributions, and the two lowest
+  FIDs are single-version preprints from authors who overlap.
+
+**The most severe gap was elsewhere: `line-guidance-sampling` had no classifier-free guidance.**
+A line whose entire subject is inference-time technique was missing the paper that created the
+technique. Added CFG (Ho & Salimans 2207.12598), autoguidance, guidance interval, CFG++ and APG, so
+the arc now runs from the origin rather than starting mid-history.
+
+**Other lines repaired:** normalizing flows was missing TarFlow, the paper STARFlow scales — the
+line began at the scale-up, not the origin. Continuous tokens was missing Fluid, the direct
+large-scale test of MAR's own bet, and GIVT, which drops the codebook a different way and predates
+MAR. Cross-attention VLM was missing BLIP-2. Agentic generation appeared to begin in 2026 and
+actually begins with Re-Imagen in 2022. Agglomerative distillation looked like one company's idea
+until UNIC (NAVER) and Theia (Boston Dynamics AI Institute) were added.
+
+**Method note.** Affiliations were taken only from author blocks actually read in fetched HTML.
+HyperDiT and Observation Operators are left with empty `orgs` because their affiliation blocks are
+not legible in any fetchable rendering; the atlas prints nothing rather than an inference. Four
+papers had been recorded under short titles that turned out to be truncations of the real ones, all
+corrected against the fetched title.
+
+**Systemic fix carried forward from the previous session.** `scripts/validate.py` now warns when a
+line's arc holds two or fewer papers, or when every paper in a line shares one organization. Both
+warnings fired on the lines this session repaired, which is what makes this a check rather than a
+one-off cleanup. Where the warning is a true fact about the field rather than a gap — the
+normalizing-flows line really is all Apple — the line's own text now says so.
+
 ### 2026-09-10 — Session 8 (Opus 5) — the standing queue completed
 - **Every paper is now explained** (Q1/Q2). All 154 carry the structured account: before, problem,
   idea, method, evidence, limitations, why it matters. 152 written from full text; two remain at

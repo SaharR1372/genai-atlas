@@ -1,0 +1,48 @@
+id: unic-2024
+type: paper
+title: 'UNIC: Universal Classification Models via Multi-teacher Distillation'
+short: UNIC
+arxiv: '2408.05088'
+date: 2024-08
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- NAVER LABS Europe
+authors:
+- Mert Bulent Sariyildiz
+- Philippe Weinzaepfel
+- Thomas Lucas
+- Diane Larlus
+- Yannis Kalantidis
+tier: strong-followup
+sections:
+- vfm
+lines:
+- line-agglomerative
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: Multi-teacher distillation with a ladder of expendable projectors and teacher-dropping regularisation.
+  Independent evidence that agglomerating several foundation models into one backbone is a general idea
+  rather than one company's product line.
+explanation: null
+abstract: 'Pretrained models have become a commodity and offer strong results on a broad range of tasks.
+  In this work, we focus on classification and seek to learn a unique encoder able to take from several
+  complementary pretrained models. We aim at even stronger generalization across a variety of classification
+  tasks. We propose to learn such an encoder via multi-teacher distillation. We first thoroughly analyse
+  standard distillation when driven by multiple strong teachers with complementary strengths. Guided by
+  this analysis, we gradually propose improvements to the basic distillation setup. Among those, we enrich
+  the architecture of the encoder with a ladder of expendable projectors, which increases the impact of
+  intermediate features during distillation, and we introduce teacher dropping, a regularization mechanism
+  that better balances the teachers'' influence. Our final distillation strategy leads to student models
+  of the same capacity as any of the teachers, while retaining or improving upon the performance of the
+  best teacher for each task. Project page and code: https://europe.naverlabs.com/unic'

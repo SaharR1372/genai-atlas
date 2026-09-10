@@ -1,0 +1,50 @@
+id: autoguidance-2024
+type: paper
+title: Guiding a Diffusion Model with a Bad Version of Itself
+short: Autoguidance
+arxiv: '2406.02507'
+date: 2024-06
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- NVIDIA
+authors:
+- Tero Karras
+- Miika Aittala
+- Tuomas Kynkäänniemi
+- Jaakko Lehtinen
+- Timo Aila
+- Samuli Laine
+tier: landmark
+sections:
+- generation
+lines:
+- line-guidance-sampling
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-10'
+  verified_by: opus
+summary: Observes that classifier-free guidance conflates two things, improving image quality and narrowing
+  diversity, and separates them by guiding with a deliberately weaker version of the same model rather
+  than with an unconditional one. Sets record ImageNet FIDs, and is the guidance method several representation-latent
+  results depend on, which is why it matters for reading their numbers.
+explanation: null
+abstract: The primary axes of interest in image-generating diffusion models are image quality, the amount
+  of variation in the results, and how well the results align with a given condition, e.g., a class label
+  or a text prompt. The popular classifier-free guidance approach uses an unconditional model to guide
+  a conditional model, leading to simultaneously better prompt alignment and higher-quality images at
+  the cost of reduced variation. These effects seem inherently entangled, and thus hard to control. We
+  make the surprising observation that it is possible to obtain disentangled control over image quality
+  without compromising the amount of variation by guiding generation using a smaller, less-trained version
+  of the model itself rather than an unconditional model. This leads to significant improvements in ImageNet
+  generation, setting record FIDs of 1.01 for 64x64 and 1.25 for 512x512, using publicly available networks.
+  Furthermore, the method is also applicable to unconditional diffusion models, drastically improving
+  their quality.
