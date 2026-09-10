@@ -29,3 +29,5 @@ summary: Critiques RISEBench as too coarse and not grounded in a formal knowledg
   it with 1,267 instances across 22 tasks and seven reasoning dimensions, adding an explicit knowledge-plausibility
   metric.
 explanation: null
+lines:
+- line-evaluation

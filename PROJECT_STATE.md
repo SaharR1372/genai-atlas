@@ -23,6 +23,25 @@ review pass. Nothing was committed to git this session — files are staged in t
 
 ## Current phase
 
+**Session 6 (2026-09-10).** Two fixes from user review.
+
+*Recent papers were mostly categorized, but not entirely.* Of 20 papers added since May 2026, 17
+landed in existing lines. The 3 that did not revealed two genuinely new directions, now added as
+lines: **evaluation and benchmarks** (`line-evaluation`) and **agentic/search-augmented generation**
+(`line-agentic-generation`). Three-Body Scattering stays deliberately on the watchlist with no line,
+since its own authors position it adjacent to drifting rather than as a break.
+
+*Paper pages had no explanation.* Two changes: (a) `verify_paper.py` now stores the authors'
+abstract verbatim on every paper, so no page is ever empty; (b) a new `explained` object on the
+paper schema captures before / problem / idea / method / evidence / limitations / why-it-matters,
+plus a `depth` field recording whether it was written from the abstract or the full text, which is
+shown to the reader. Five papers are written from full text so far: LLaDA-Image, Drifting Models,
+RAE, JiT and Scale-RAE.
+
+**Coverage is now tracked, not assumed.** `validate.py` warns for every landmark/core paper without
+an `explained` block (currently 87) and every paper without a stored abstract. `/updates` shows
+these counts. This is the main outstanding work.
+
 **Session 5 (2026-09-10).** Two changes from user review: medical imaging is now a separate domain
 (D020) rather than one section among seven, and the landing page was rebuilt (D021) so someone
 arriving from a shared link understands the atlas without clicking through. New `/medical` and

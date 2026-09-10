@@ -28,9 +28,23 @@ status:
   code: none
   weights: none
   verified: true
-  verified_on: '2026-09-09'
+  verified_on: '2026-09-10'
   verified_by: opus
 summary: Optimizes the forward diffusion process directly instead of doing policy gradients through the
   reverse sampler, which makes it compatible with any black-box sampler and requires only clean images.
   An ICLR 2026 oral and a cleaner formulation than Flow-GRPO's ODE-to-SDE conversion.
 explanation: null
+abstract: Online reinforcement learning (RL) has been central to post-training language models, but its
+  extension to diffusion models remains challenging due to intractable likelihoods. Recent works discretize
+  the reverse sampling process to enable GRPO-style training, yet they inherit fundamental drawbacks,
+  including solver restrictions, forward-reverse inconsistency, and complicated integration with classifier-free
+  guidance (CFG). We introduce Diffusion Negative-aware FineTuning (DiffusionNFT), a new online RL paradigm
+  that optimizes diffusion models directly on the forward process via flow matching. DiffusionNFT contrasts
+  positive and negative generations to define an implicit policy improvement direction, naturally incorporating
+  reinforcement signals into the supervised learning objective. This formulation enables training with
+  arbitrary black-box solvers, eliminates the need for likelihood estimation, and requires only clean
+  images rather than sampling trajectories for policy optimization. DiffusionNFT is up to $25\times$ more
+  efficient than FlowGRPO in head-to-head comparisons, while being CFG-free. For instance, DiffusionNFT
+  improves the GenEval score from 0.24 to 0.98 within 1k steps, while FlowGRPO achieves 0.95 with over
+  5k steps and additional CFG employment. By leveraging multiple reward models, DiffusionNFT significantly
+  boosts the performance of SD3.5-Medium in every benchmark tested.

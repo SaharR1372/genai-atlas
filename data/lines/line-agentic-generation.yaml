@@ -1,0 +1,28 @@
+id: line-agentic-generation
+type: line
+name: Agentic and search-augmented generation
+one_line: Give the generator tools, search, or a planning loop, so it can render subjects its training
+  data never covered.
+core_bet: Some generation failures are knowledge failures rather than capability failures, and the fix
+  is retrieval or agency rather than more parameters.
+primary_axis: conditioning
+status: emerging
+since: 2026-07
+sections:
+- generation
+arc:
+- paper: searchgen-2026
+  role: origin
+  note: Gives an image generator search access to close world-knowledge gaps, with a 20,000-example dataset
+    and a benchmark.
+- paper: agentic-visual-generation-2026
+  role: evidence
+  note: Surveys the emerging space and proposes a taxonomy of agentic control over generative models.
+strengths:
+- 'Attacks a failure mode that scaling does not fix: the model simply not knowing what a thing looks like'
+- Composes with any generator, since it changes what reaches the model rather than the model itself
+weaknesses:
+- Two papers old, with no independent replication
+- Adds latency and an external dependency at inference time
+- Unclear how much of the gain is retrieval versus the extra compute of a loop
+explains: null

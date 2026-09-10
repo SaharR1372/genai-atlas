@@ -33,11 +33,19 @@ status:
   code: released
   weights: none
   verified: true
-  verified_on: '2026-09-09'
-  verified_by: sonnet
+  verified_on: '2026-09-10'
+  verified_by: opus
 summary: Replaces the UNet backbone of latent diffusion with a plain Vision Transformer operating on latent
   patches, showing that transformer scaling laws (more FLOPs, lower FID) hold for diffusion just as they
   do for language modeling. The direct ancestor of every DiT/MMDiT system in this atlas.
 explanation: null
 lines:
 - line-vae-latent
+abstract: We explore a new class of diffusion models based on the transformer architecture. We train latent
+  diffusion models of images, replacing the commonly-used U-Net backbone with a transformer that operates
+  on latent patches. We analyze the scalability of our Diffusion Transformers (DiTs) through the lens
+  of forward pass complexity as measured by Gflops. We find that DiTs with higher Gflops -- through increased
+  transformer depth/width or increased number of input tokens -- consistently have lower FID. In addition
+  to possessing good scalability properties, our largest DiT-XL/2 models outperform all prior diffusion
+  models on the class-conditional ImageNet 512x512 and 256x256 benchmarks, achieving a state-of-the-art
+  FID of 2.27 on the latter.

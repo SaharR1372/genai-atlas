@@ -4,86 +4,187 @@
   "title": "Paper",
   "type": "object",
   "additionalProperties": false,
-  "required": ["id", "type", "title", "date", "tier", "sections", "status", "summary"],
+  "required": [
+    "id",
+    "type",
+    "title",
+    "date",
+    "tier",
+    "sections",
+    "status",
+    "summary"
+  ],
   "properties": {
-    "id": { "$ref": "common.schema.json#/$defs/id" },
-    "type": { "const": "paper" },
-    "title": { "type": "string", "minLength": 1 },
-    "short": { "type": "string", "description": "Short/common name, e.g. RAE, FLUX.1 Kontext" },
+    "id": {
+      "$ref": "common.schema.json#/$defs/id"
+    },
+    "type": {
+      "const": "paper"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "short": {
+      "type": "string",
+      "description": "Short/common name, e.g. RAE, FLUX.1 Kontext"
+    },
     "arxiv": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "pattern": "^\\d{4}\\.\\d{4,5}$"
     },
-    "doi": { "type": ["string", "null"] },
-    "date": { "$ref": "common.schema.json#/$defs/isoDate" },
+    "doi": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "date": {
+      "$ref": "common.schema.json#/$defs/isoDate"
+    },
     "venue": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "name": { "type": "string" },
+        "name": {
+          "type": "string"
+        },
         "status": {
           "type": "string",
-          "enum": ["preprint", "workshop", "conference", "journal"]
+          "enum": [
+            "preprint",
+            "workshop",
+            "conference",
+            "journal"
+          ]
         }
       },
-      "required": ["name", "status"]
+      "required": [
+        "name",
+        "status"
+      ]
     },
     "orgs": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "authors": {
       "type": "array",
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
-    "tier": { "$ref": "common.schema.json#/$defs/tier" },
+    "tier": {
+      "$ref": "common.schema.json#/$defs/tier"
+    },
     "sections": {
       "type": "array",
       "minItems": 1,
-      "items": { "$ref": "common.schema.json#/$defs/section" }
+      "items": {
+        "$ref": "common.schema.json#/$defs/section"
+      }
     },
     "axes": {
       "type": "object",
       "additionalProperties": {
         "type": "array",
-        "items": { "$ref": "common.schema.json#/$defs/id" }
+        "items": {
+          "$ref": "common.schema.json#/$defs/id"
+        }
       },
-      "propertyNames": { "$ref": "common.schema.json#/$defs/axisKey" }
+      "propertyNames": {
+        "$ref": "common.schema.json#/$defs/axisKey"
+      }
     },
     "lines": {
       "type": "array",
-      "items": { "$ref": "common.schema.json#/$defs/id" },
+      "items": {
+        "$ref": "common.schema.json#/$defs/id"
+      },
       "description": "Research line ids this paper belongs to. A paper may sit in more than one."
     },
     "problems": {
       "type": "array",
-      "items": { "$ref": "common.schema.json#/$defs/id" }
+      "items": {
+        "$ref": "common.schema.json#/$defs/id"
+      }
     },
     "links": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "code": { "type": ["string", "null"] },
-        "weights": { "type": ["string", "null"] },
-        "project": { "type": ["string", "null"] },
-        "pdf": { "type": ["string", "null"] }
+        "code": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "weights": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "project": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "pdf": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
       }
     },
     "status": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["code", "weights", "verified"],
+      "required": [
+        "code",
+        "weights",
+        "verified"
+      ],
       "properties": {
-        "code": { "$ref": "common.schema.json#/$defs/releaseStatus" },
-        "weights": { "$ref": "common.schema.json#/$defs/releaseStatus" },
-        "verified": { "type": "boolean" },
-        "verified_on": { "type": ["string", "null"] },
-        "verified_by": { "type": ["string", "null"] }
+        "code": {
+          "$ref": "common.schema.json#/$defs/releaseStatus"
+        },
+        "weights": {
+          "$ref": "common.schema.json#/$defs/releaseStatus"
+        },
+        "verified": {
+          "type": "boolean"
+        },
+        "verified_on": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "verified_by": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
       }
     },
-    "summary": { "type": "string", "minLength": 1 },
+    "summary": {
+      "type": "string",
+      "minLength": 1
+    },
     "explanation": {
-      "type": ["string", "null"],
+      "type": [
+        "string",
+        "null"
+      ],
       "description": "Path to MDX file with the full paper-page template"
     },
     "_review": {
@@ -91,12 +192,84 @@
       "description": "Pipeline review metadata. Present only on files under data/monitor/candidates/; stripped when a candidate is promoted into data/papers/.",
       "additionalProperties": true,
       "properties": {
-        "score": { "type": "number" },
-        "reasons": { "type": "array", "items": { "type": "string" } },
-        "source": { "type": "string" },
-        "hf_upvotes": { "type": ["integer", "null"] },
-        "discovered_on": { "type": "string" }
+        "score": {
+          "type": "number"
+        },
+        "reasons": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "source": {
+          "type": "string"
+        },
+        "hf_upvotes": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "discovered_on": {
+          "type": "string"
+        }
       }
+    },
+    "abstract": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "The paper's own abstract, fetched verbatim from arXiv by scripts/verify_paper.py. Never hand-written or paraphrased: this is the authors' words, so a reader always has a primary-source account of the problem and method even before an atlas explanation exists."
+    },
+    "explained": {
+      "type": "object",
+      "description": "The atlas's own account of the paper, structured so every entry answers the same questions. Consolidates the blueprint's paper template; the representation/architecture/objective/conditioning fields of that template live in `axes` instead. Written only from a fetched source (D004).",
+      "additionalProperties": false,
+      "properties": {
+        "before": {
+          "type": "string",
+          "description": "What the state of things was immediately before this paper, and what was unsatisfying about it."
+        },
+        "problem": {
+          "type": "string",
+          "description": "The specific problem this paper takes on."
+        },
+        "idea": {
+          "type": "string",
+          "description": "The core idea in two or three sentences, stated so a reader could repeat it."
+        },
+        "method": {
+          "type": "string",
+          "description": "How it actually works: what is trained, what is frozen, what is concatenated to what."
+        },
+        "evidence": {
+          "type": "string",
+          "description": "What results are offered, and how strong they are."
+        },
+        "limitations": {
+          "type": "string",
+          "description": "What it does not solve, including what the paper itself concedes."
+        },
+        "why_it_matters": {
+          "type": "string",
+          "description": "What changes for the field if this holds."
+        },
+        "depth": {
+          "type": "string",
+          "enum": [
+            "abstract",
+            "full-text"
+          ],
+          "description": "Whether this account was written from the abstract alone or from the full text. Rendered on the page so a reader knows how much to trust the method and ablation detail."
+        }
+      },
+      "required": [
+        "problem",
+        "idea",
+        "why_it_matters",
+        "depth"
+      ]
     }
   }
 }

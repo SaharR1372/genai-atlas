@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+### 2026-09-10 — Session 6 (Opus 5) — real paper explanations
+- **Abstracts stored verbatim.** `verify_paper.py` now writes the authors' own abstract onto every
+  paper (`--refresh` backfills), so no paper page is ever empty of substance.
+- **Structured `explained` block** on the paper schema: before, problem, idea, method, evidence,
+  limitations, why it matters, plus a `depth` field recording whether the account came from the
+  abstract or the full text. The depth is shown on the page so a reader knows how far to trust the
+  method detail. Written from full text for LLaDA-Image, Drifting Models, RAE, JiT and Scale-RAE.
+- **Two new research lines** for recent papers no existing line claimed: evaluation and benchmarks,
+  and agentic/search-augmented generation.
+- **Coverage tracked**: the validator now warns on every landmark/core paper lacking an explanation
+  and every paper lacking a stored abstract, and `/updates` reports the counts.
+
 ### 2026-09-10 — Session 5 (Opus 5) — medical split out, landing page rebuilt
 - **Medical imaging separated into its own domain** (D020): a dedicated `/medical` area organized by
   which space each line generates in and why that space was chosen, plus its own open problems and

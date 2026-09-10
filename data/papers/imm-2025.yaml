@@ -28,9 +28,17 @@ status:
   code: none
   weights: none
   verified: true
-  verified_on: '2026-09-09'
+  verified_on: '2026-09-10'
   verified_by: opus
 summary: A single-stage few-step objective that matches distributions between marginals of a stochastic
   interpolant, giving distribution-level convergence guarantees that consistency models lack, with no
   pretraining or distillation. Reaches 1.99 FID on ImageNet 256 in 8 steps.
 explanation: null
+abstract: Diffusion models and Flow Matching generate high-quality samples but are slow at inference,
+  and distilling them into few-step models often leads to instability and extensive tuning. To resolve
+  these trade-offs, we propose Inductive Moment Matching (IMM), a new class of generative models for one-
+  or few-step sampling with a single-stage training procedure. Unlike distillation, IMM does not require
+  pre-training initialization and optimization of two networks; and unlike Consistency Models, IMM guarantees
+  distribution-level convergence and remains stable under various hyperparameters and standard model architectures.
+  IMM surpasses diffusion models on ImageNet-256x256 with 1.99 FID using only 8 inference steps and achieves
+  state-of-the-art 2-step FID of 1.98 on CIFAR-10 for a model trained from scratch.

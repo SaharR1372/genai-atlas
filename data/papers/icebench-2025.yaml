@@ -26,8 +26,27 @@ status:
   code: none
   weights: none
   verified: true
-  verified_on: '2026-09-09'
+  verified_on: '2026-09-10'
   verified_by: opus
 summary: Evaluates creation and editing jointly, matching the architectural shift toward single models
   that do both.
 explanation: null
+lines:
+- line-evaluation
+abstract: 'Image generation has witnessed significant advancements in the past few years. However, evaluating
+  the performance of image generation models remains a formidable challenge. In this paper, we propose
+  ICE-Bench, a unified and comprehensive benchmark designed to rigorously assess image generation models.
+  Its comprehensiveness could be summarized in the following key features: (1) Coarse-to-Fine Tasks: We
+  systematically deconstruct image generation into four task categories: No-ref/Ref Image Creating/Editing,
+  based on the presence or absence of source images and reference images. And further decompose them into
+  31 fine-grained tasks covering a broad spectrum of image generation requirements, culminating in a comprehensive
+  benchmark. (2) Multi-dimensional Metrics: The evaluation framework assesses image generation capabilities
+  across 6 dimensions: aesthetic quality, imaging quality, prompt following, source consistency, reference
+  consistency, and controllability. 11 metrics are introduced to support the multi-dimensional evaluation.
+  Notably, we introduce VLLM-QA, an innovative metric designed to assess the success of image editing
+  by leveraging large models. (3) Hybrid Data: The data comes from real scenes and virtual generation,
+  which effectively improves data diversity and alleviates the bias problem in model evaluation. Through
+  ICE-Bench, we conduct a thorough analysis of existing generation models, revealing both the challenging
+  nature of our benchmark and the gap between current model capabilities and real-world generation requirements.
+  To foster further advancements in the field, we will open-source ICE-Bench, including its dataset, evaluation
+  code, and models, thereby providing a valuable resource for the research community.'

@@ -30,9 +30,20 @@ status:
   code: none
   weights: none
   verified: true
-  verified_on: '2026-09-09'
+  verified_on: '2026-09-10'
   verified_by: opus
 summary: 'Shows in-context conditioning can replace heavy editing fine-tunes: state-of-the-art instruction
   editing with roughly 0.1% of the training data and 1% of the trainable parameters prior trained editors
   required.'
 explanation: null
+abstract: 'Instruction-based image editing enables precise modifications via natural language prompts,
+  but existing methods face a precision-efficiency tradeoff: fine-tuning demands massive datasets (>10M)
+  and computational resources, while training-free approaches suffer from weak instruction comprehension.
+  We address this by proposing ICEdit, which leverages the inherent comprehension and generation abilities
+  of large-scale Diffusion Transformers (DiTs) through three key innovations: (1) An in-context editing
+  paradigm without architectural modifications; (2) Minimal parameter-efficient fine-tuning for quality
+  improvement; (3) Early Filter Inference-Time Scaling, which uses VLMs to select high-quality noise samples
+  for efficiency. Experiments show that ICEdit achieves state-of-the-art editing performance with only
+  0.1\% of the training data and 1\% trainable parameters compared to previous methods. Our approach establishes
+  a new paradigm for balancing precision and efficiency in instructional image editing. Codes and demos
+  can be found in https://river-zhang.github.io/ICEdit-gh-pages/.'

@@ -25,8 +25,8 @@ status:
   code: none
   weights: none
   verified: true
-  verified_on: '2026-09-09'
-  verified_by: sonnet
+  verified_on: '2026-09-10'
+  verified_by: opus
 summary: Identifies that RAE latents are severely anisotropic on a per-token basis, so the standard isotropic-Gaussian-to-data
   coupling forces curved, hard-to-distill denoising trajectories. Proposes a 'drifting field' distillation
   method built for this anisotropic geometry, reaching FID 1.48 with only 16 epochs of distillation.
@@ -34,3 +34,14 @@ explanation: null
 lines:
 - line-one-step-objectives
 - line-representation-latent
+abstract: Despite the significant training acceleration and promising performance, Representation Autoencoders
+  (RAEs) are mainly criticized for poor distillation effectiveness. In this work, we argue that RAE is
+  competent at high-quality one-step generation. We achieve 1.48 FID with only 16-epoch distillation on
+  ImageNet 256 dataset, surpassing various state-of-the-art methods. To achieve this, we quantitatively
+  study the geometrical behavior of different underlying data spaces. We conclude that conventional distillation
+  methods heavily rely on priors of plain teacher denoising trajectories, while RAE incurs much more complex
+  trajectories with poor properties due to ill anisotropical latent space. We introduce the recently proposed
+  drifting field as the distillation methodology, which makes use of semantically rich RAE latents and
+  provides direct supervision involving no dependency. Bridging our Drift-RAE with previous generative
+  paradigms, we propose several insightful modifications, including the first extrapolation-based guided
+  sampling pipeline for one-step generation with barely no cost. The code will be made publicly available.

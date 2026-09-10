@@ -52,3 +52,30 @@ summary: 'Tests whether the RAE recipe survives the jump from ImageNet to open-v
 explanation: null
 lines:
 - line-representation-latent
+explained:
+  depth: full-text
+  before: Representation autoencoders had been demonstrated on class-conditional ImageNet, a controlled
+    setting with a thousand labels and one domain.
+  problem: Whether the recipe survives open-vocabulary text-to-image, where prompts are freeform and the
+    decoder must handle far more than a thousand categories.
+  idea: 'Scale the frozen-encoder recipe to text-to-image and find out what actually limits it: raw data
+    volume, or what the data contains.'
+  method: 'SigLIP-2 So400M at patch 14 is the frozen encoder, giving 1152-dimensional tokens, chosen because
+    language-supervised features are semantically structured enough to serve both understanding and generation.
+    Text conditioning follows the MetaQuery framework directly: 256 learnable query tokens are prepended
+    to the text prompt, a pretrained language model processes text and queries jointly, and a two-layer
+    MLP connector projects into the diffusion transformer''s hidden space. The decoder is scaled on web,
+    synthetic and text-rendering data.'
+  evidence: The finding worth carrying is about data composition rather than scale. Generic web and synthetic
+    data gave only marginal gains on ImageNet and moderate gains on more diverse images, while text rendering
+    required targeted supervision — without text-specific data the decoder fails to reproduce glyph detail.
+    Separately, under fine-tuning on high-quality data, VAE-based models degrade sharply after 64 epochs
+    while RAE models stay stable through 256 with only mild decline.
+  limitations: The visual-understanding results are explicitly described as preliminary exploration rather
+    than competitive, and the paper notes that reaching that level would need any-resolution inputs, multimodal
+    continual pretraining and much higher quality data. Test-time scaling gains are modest and framed
+    as a first step.
+  why_it_matters: 'It answers the scaling question for the representation-latent line and supplies its
+    most distinctive evidence: stability under long fine-tuning, which is a different kind of claim from
+    a better score and harder to attribute to tuning. It also settles how this line does conditioning,
+    by adopting MetaQuery wholesale rather than designing a mechanism for the semantic latent.'

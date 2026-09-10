@@ -37,3 +37,14 @@ summary: 'The cleanest existing case of editing inside a genuinely frozen repres
   own costs plainly, including over-smoothing from lossy inversion and edited points occasionally leaving
   the decoder''s support.'
 explanation: null
+abstract: Foundation models, despite their robust zero-shot capabilities, remain vulnerable to spurious
+  correlations and 'Clever Hans' strategies. Existing mitigation methods often rely on unavailable group
+  labels or computationally expensive gradient-based adversarial optimization. To address these limitations,
+  we propose Visual Disentangled Diffusion Autoencoders (DiDAE), a novel framework integrating frozen
+  foundation models with disentangled dictionary learning for efficient, gradient-free counterfactual
+  generation directly for the foundation model. DiDAE first edits foundation model embeddings in interpretable
+  disentangled directions of the disentangled dictionary and then decodes them via a diffusion autoencoder.
+  This allows the generation of multiple diverse, disentangled counterfactuals for each factual, much
+  faster than existing baselines, which generate single entangled counterfactuals. When paired with Counterfactual
+  Knowledge Distillation, DiDAE-CFKD achieves state-of-the-art performance in mitigating shortcut learning,
+  improving downstream performance on unbalanced datasets.

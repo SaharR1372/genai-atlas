@@ -121,3 +121,12 @@ Format: id · date · decision · why · consequences. Revise by adding a new en
   at build time via `atlasStats()`, so the landing page can never drift from the data. *Why:* the
   user intends to share this publicly, so a visitor arriving cold has to understand what the atlas is
   and why it is organized this way without clicking through.
+- **D022 · 2026-09-10 · Every paper stores the authors' abstract verbatim, and atlas explanations
+  declare their depth.** `verify_paper.py` writes the fetched abstract to an `abstract` field, and a
+  structured `explained` object carries the atlas's own account with a required `depth` of `abstract`
+  or `full-text`, rendered on the page. *Why:* a reader who opens a paper page must find something
+  substantive, and must be able to tell the difference between a write-up grounded in the full method
+  section and one inferred from an abstract. Storing the abstract also means D004's "no claim without
+  a fetched source" is now enforceable by inspection rather than by trust: the source sits next to the
+  claim. The validator warns on every landmark/core paper missing an explanation, so the gap is
+  visible rather than silent.

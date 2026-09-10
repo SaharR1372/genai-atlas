@@ -32,3 +32,48 @@ summary: A 6B diffusion transformer trained from scratch alongside a frozen visi
   complete open release. The Turbo variant samples in two to four steps via distillation from a 50-step
   base. By community uptake it is the highest-traction image-generation release of the summer.
 explanation: null
+abstract: We introduce LLaDA-Image, a unified framework that pairs a 6B Diffusion Transformer (DiT) trained
+  from scratch with a frozen vision-language understanding module built on the LLaDA2.0-Mini diffusion
+  language model backbone. Instead of relying heavily on paired image-text data from the beginning, we
+  first build a strong visual generative prior through image-only pre-training and mid-training. The generation
+  pipeline comprises 220M samples, 98 of which are real images. For efficient and scalable optimization,
+  we use parameter-free RMSNorm throughout the DiT together with the Muon optimizer. The resulting unified
+  model produces highly photorealistic images while accurately following fine-grained editing instructions.
+  We further distill LLaDA-Image into LLaDA-Image-Turbo, enabling fast inference in 2-4 sampling steps.
+  On Qwen-Image-Bench, LLaDA-Image achieves overall scores of 53.53 and 53.38 on the English and Chinese
+  tracks, respectively, setting a new state-of-the-art among open-source models on both tracks. To support
+  further research on capable and efficient generative models, we release our model weights, training
+  code, and detailed recipes.
+explained:
+  depth: full-text
+  before: Open text-to-image systems coupled visual-prior learning to language alignment from the very
+    start, which meant paired image-caption data was needed during the most compute-intensive stage of
+    training.
+  problem: Captions are expensive and lossy. At the low resolutions used early in training, details a
+    caption mentions may simply disappear once the image is downsampled, so the supervision and the training
+    target disagree.
+  idea: Decouple the two. Learn the visual prior from images alone, using a frozen vision-language model
+    to extract a semantic condition from the very same crop being trained on, and only bring in paired
+    captions later for alignment.
+  method: A 6B single-stream diffusion transformer is trained from scratch and processes image and condition
+    tokens jointly through shared layers. The understanding side is a frozen LLaDA 2.0-Mini diffusion
+    language model with a SigLIP-VQ vision encoder. A Residual Query Adapter of learnable query tokens
+    cross-attends to the full multimodal sequence, and a shallow transformer connector projects the result
+    into the diffusion transformer's condition space. Training runs image-only at 256 pixels, then image-only
+    at 512, then text-to-image alignment with paired data, then joint generation and editing. More than
+    90 percent of the generation pipeline is image-only. For editing, reference images bypass the language
+    model entirely and enter through a separate branch carrying SigLIP-VQ features and the clean VAE latent.
+    TwinFlow distillation then compresses sampling to two to four steps by running distribution-matching
+    distillation inside a single shared backbone, using signed time to switch a block between generator
+    and fake-score roles rather than training a second network.
+  evidence: Overall scores of 53.53 on the English track and 53.38 on the Chinese track of Qwen-Image-Bench,
+    reported as state of the art among open-source models. Weights, code and the full recipe are released,
+    which is unusually complete.
+  limitations: The authors are direct about the weak spots. Counting scores 0.53 on GenEval against 0.73
+    to 0.91 for baselines. Text rendering trails dedicated models. In editing, perceptual quality outruns
+    semantic consistency, 8.043 against 7.182 on the English track. Layout stability degrades as the number
+    of regions and the length of requested text grow, and 2K generation is an extension rather than an
+    evaluated capability.
+  why_it_matters: It is the strongest evidence so far that the expensive part of training a generator
+    does not need captions at all. If a frozen understanding model can supply the semantic condition from
+    the image itself, the caption bottleneck that shapes most open training pipelines becomes optional.

@@ -41,3 +41,28 @@ summary: Argues pixel-space diffusion was never unstable because of pixels — i
 explanation: null
 lines:
 - line-pixel-space
+explained:
+  depth: full-text
+  before: Pixel-space diffusion was widely believed to fail at high resolution, and the field's answer
+    was to compress into a latent first. Attempts to fix pixel space reached for dense convolutions and
+    architectural workarounds.
+  problem: The authors argue that diagnosis was simply wrong. The instability was never about pixels;
+    it was about what the network was asked to predict.
+  idea: Natural images lie on a low-dimensional manifold, but a noised quantity is spread across the full
+    high-dimensional space. Predicting clean data only requires representing the manifold; predicting
+    noise requires representing everything. A limited-capacity network can do the first and fails at the
+    second.
+  method: Just image Transformers is a plain Vision Transformer on raw non-overlapping patches, 16 by
+    16 or 32 by 32 pixels, giving tokens of 768 or 3072 dimensions, with standard blocks and adaLN-Zero
+    conditioning. It predicts the clean patch directly rather than noise or velocity. No tokenizer, no
+    pretraining, no auxiliary losses.
+  evidence: 'The decisive result is the contrast, not the absolute number: at 200 epochs on ImageNet 256,
+    x-prediction reaches FID 4.37 while epsilon- and v-prediction both exceed 96, a catastrophic failure
+    under an otherwise identical setup. Scaling to 600 epochs gives 2.36 at Large, 1.86 at Huge and 1.82
+    at Giant.'
+  limitations: The authors position the work as foundational rather than state of the art. They deliberately
+    forgo gains available from self-supervised pretraining or auxiliary losses, introduce no new architectural
+    components, evaluate only on ImageNet, and do not discuss wall-clock or memory cost in depth.
+  why_it_matters: If a plain transformer on raw pixels is competitive once the prediction target is fixed,
+    then the entire argument about which latent is best was optimizing something that may be optional.
+    This is the sharpest live challenge to the premise every latent-based line shares.

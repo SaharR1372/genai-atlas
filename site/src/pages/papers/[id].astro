@@ -37,6 +37,7 @@ function axisEntries() {
 const axes = axisEntries();
 const paperLines = linesOfPaper(paper.id);
 const paperResults = resultsForPaper(paper.id);
+const ex = d.explained;
 
 // One rendered equation per blueprint's "readable equations" requirement — the shared
 // straight-line interpolation every flow-matching/rectified-flow paper in this atlas trains on.
@@ -62,6 +63,58 @@ const flowEquation = katex.renderToString(
     </h2>
     <p style="margin:0; font-size:1.02rem;">{d.summary}</p>
   </div>
+
+  {ex && (
+    <section style="margin-bottom:2.5rem;">
+      <div style="display:flex; align-items:baseline; gap:0.6rem; margin-bottom:1rem;">
+        <h2 style="font-size:1.35rem; margin:0;">What this paper does</h2>
+        <span class="badge" title={ex.depth === "full-text"
+          ? "Written from the paper's full text"
+          : "Written from the abstract only; method and ablation detail may be incomplete"}>
+          read: {ex.depth === "full-text" ? "full text" : "abstract only"}
+        </span>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:1.25rem;">
+        {[
+          ["Before this", ex.before],
+          ["The problem", ex.problem],
+          ["The idea", ex.idea],
+          ["How it works", ex.method],
+          ["Evidence", ex.evidence],
+          ["Limitations", ex.limitations],
+          ["Why it matters", ex.why_it_matters],
+        ].filter(([, v]) => v).map(([k, v]) => (
+          <div style="display:grid; grid-template-columns:minmax(120px,1fr) 4fr; gap:1.5rem; align-items:start;">
+            <h3 style="font-size:0.82rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin:0.2rem 0 0; text-align:right;">
+              {k}
+            </h3>
+            <p style="margin:0;">{v}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  )}
+
+  {d.abstract && (
+    <details style="margin-bottom:2.5rem;" open={!ex}>
+      <summary style="cursor:pointer; font-size:0.95rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.03em;">
+        Abstract, in the authors' own words
+      </summary>
+      <p class="measure" style="margin:0.85rem 0 0; padding-left:1rem; border-left:2px solid var(--border); color:var(--text);">
+        {d.abstract}
+      </p>
+    </details>
+  )}
+
+  {!ex && !d.abstract && (
+    <div class="card" style="margin-bottom:2.5rem;">
+      <p style="margin:0; color:var(--text-muted);">
+        No atlas explanation has been written for this paper yet, and its abstract has not been
+        fetched. The structured facts below are still accurate; see the arXiv link above for the
+        paper itself.
+      </p>
+    </div>
+  )}
 
   {paperLines.length > 0 && (
     <section style="margin-bottom:2rem;">

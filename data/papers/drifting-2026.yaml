@@ -32,7 +32,7 @@ status:
   code: none
   weights: none
   verified: true
-  verified_on: '2026-09-09'
+  verified_on: '2026-09-10'
   verified_by: opus
 summary: Learns a generator mapping directly, rather than a score or an instantaneous velocity to be integrated
   at sampling time. Training evolves the mapping's pushforward distribution along a drifting field until
@@ -40,3 +40,37 @@ summary: Learns a generator mapping directly, rather than a score or an instanta
   — not a distilled multi-step model — and reports 1.54 one-step FID on ImageNet 256 in latent space,
   1.61 in pixel space.
 explanation: null
+abstract: Generative modeling can be formulated as learning a mapping f such that its pushforward distribution
+  matches the data distribution. The pushforward behavior can be carried out iteratively at inference
+  time, for example in diffusion and flow-based models. In this paper, we propose a new paradigm called
+  Drifting Models, which evolve the pushforward distribution during training and naturally admit one-step
+  inference. We introduce a drifting field that governs the sample movement and achieves equilibrium when
+  the distributions match. This leads to a training objective that allows the neural network optimizer
+  to evolve the distribution. In experiments, our one-step generator achieves state-of-the-art results
+  on ImageNet at 256 x 256 resolution, with an FID of 1.54 in latent space and 1.61 in pixel space. We
+  hope that our work opens up new opportunities for high-quality one-step generation.
+explained:
+  depth: full-text
+  before: Diffusion and flow matching both learn a local quantity — a score or an instantaneous velocity
+    — and then integrate it over many network evaluations at sampling time.
+  problem: That iteration is the cost. Getting to one step has meant distilling a trained multi-step model
+    afterwards, inheriting the teacher's errors and paying for two training runs.
+  idea: Move the iteration from inference into training. Learn the generator mapping directly, and let
+    the training process itself evolve the distribution that mapping induces until it matches the data.
+  method: 'A drifting field V(x) is defined as an expectation over a kernel taking one real sample and
+    one generated sample, decomposing into attraction toward data and repulsion from the model''s own
+    current output. Training is a fixed-point iteration: the generator is nudged along this field, implemented
+    as a loss that regresses the generator toward its own drifted output under a stop-gradient. That stop-gradient
+    is the key difference from flow matching, which regresses toward an externally specified target. Equilibrium
+    is the condition V equals zero, which by anti-symmetry holds when the generated distribution equals
+    the data distribution. Inference applies the generator once.'
+  evidence: 1.54 FID in latent space and 1.61 in pixel space on ImageNet 256, at one function evaluation,
+    trained from scratch rather than distilled.
+  limitations: 'The authors state two clearly. The converse of their equilibrium result does not hold
+    in theory: a near-zero drift does not formally guarantee the distributions match. And empirically
+    they were unable to make the method work on ImageNet without a feature encoder, which they attribute
+    to kernel design being unsuited to raw pixel space.'
+  why_it_matters: 'It is a genuinely different derivation from diffusion, flow matching and the average-velocity
+    family, and it reaches one-step quality without a teacher. The admitted dependence on a feature encoder
+    is also a data point for the representation argument: even a method built to avoid iterative sampling
+    could not escape needing a learned representation to work.'

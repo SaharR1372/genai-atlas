@@ -31,8 +31,8 @@ status:
   code: released
   weights: none
   verified: true
-  verified_on: '2026-09-09'
-  verified_by: sonnet
+  verified_on: '2026-09-10'
+  verified_by: opus
 summary: Pushes autoencoder spatial compression up to 128x (vs. the standard 8x) without losing reconstruction
   quality, via residual autoencoding and a staged high-resolution adaptation schedule — up to 19x faster
   inference than SD-VAE-f8 at matched or better FID. The dimension/compression trade-off RAE's high-dimensional
@@ -40,3 +40,16 @@ summary: Pushes autoencoder spatial compression up to 128x (vs. the standard 8x)
 explanation: null
 lines:
 - line-vae-latent
+abstract: 'We present Deep Compression Autoencoder (DC-AE), a new family of autoencoder models for accelerating
+  high-resolution diffusion models. Existing autoencoder models have demonstrated impressive results at
+  a moderate spatial compression ratio (e.g., 8x), but fail to maintain satisfactory reconstruction accuracy
+  for high spatial compression ratios (e.g., 64x). We address this challenge by introducing two key techniques:
+  (1) Residual Autoencoding, where we design our models to learn residuals based on the space-to-channel
+  transformed features to alleviate the optimization difficulty of high spatial-compression autoencoders;
+  (2) Decoupled High-Resolution Adaptation, an efficient decoupled three-phases training strategy for
+  mitigating the generalization penalty of high spatial-compression autoencoders. With these designs,
+  we improve the autoencoder''s spatial compression ratio up to 128 while maintaining the reconstruction
+  quality. Applying our DC-AE to latent diffusion models, we achieve significant speedup without accuracy
+  drop. For example, on ImageNet 512x512, our DC-AE provides 19.1x inference speedup and 17.9x training
+  speedup on H100 GPU for UViT-H while achieving a better FID, compared with the widely used SD-VAE-f8
+  autoencoder. Our code is available at https://github.com/mit-han-lab/efficientvit.'

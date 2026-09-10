@@ -27,3 +27,5 @@ status:
 summary: Gives an image generator search access so it can render subjects its training data never covered,
   closing world-knowledge gaps rather than capability gaps. Releases a 20,000-example dataset and a benchmark.
 explanation: null
+lines:
+- line-agentic-generation

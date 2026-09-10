@@ -124,6 +124,10 @@ def verify_one(paper_id: str, by: str, dry_run: bool) -> bool:
         print("  (dry-run: not writing)")
         return True
 
+    # Store the authors' own abstract so every paper page has a primary-source account of
+    # the problem and method, even before an atlas explanation is written for it.
+    doc["abstract"] = fetched["summary"]
+
     doc.setdefault("status", {})
     doc["status"]["verified"] = True
     doc["status"]["verified_on"] = date.today().isoformat()
@@ -139,6 +143,8 @@ def main() -> int:
     parser.add_argument("--all-unverified", action="store_true")
     parser.add_argument("--by", default="sonnet", help="who verified this (human|fable|sonnet|haiku)")
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--refresh", action="store_true",
+                        help="re-fetch papers that are already verified (e.g. to backfill abstracts)")
     args = parser.parse_args()
 
     if not args.paper_id and not args.all_unverified:
@@ -149,7 +155,12 @@ def main() -> int:
         ids = []
         for f in sorted(PAPERS_DIR.glob("*.yaml")):
             doc = yaml.safe_load(f.read_text())
-            if doc.get("arxiv") and not doc.get("status", {}).get("verified"):
+            if not doc.get("arxiv"):
+                continue
+            needs = not doc.get("status", {}).get("verified")
+            if args.refresh:
+                needs = needs or not doc.get("abstract")
+            if needs:
                 ids.append(f.stem)
     else:
         ids = [args.paper_id]

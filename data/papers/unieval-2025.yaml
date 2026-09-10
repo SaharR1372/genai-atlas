@@ -30,3 +30,5 @@ summary: 'The first benchmark that evaluates understanding and generation togeth
   way to detect the failure mode unified models are most prone to: gaining generation ability while quietly
   losing understanding.'
 explanation: null
+lines:
+- line-evaluation

@@ -29,10 +29,19 @@ status:
   code: none
   weights: none
   verified: true
-  verified_on: '2026-09-09'
+  verified_on: '2026-09-10'
   verified_by: opus
 summary: 'Literally composes the two rival representations: it takes DINOv2 patch features and compresses
   them with a VAE into 32 continuous 1-D tokens, an 8x shorter sequence. Reports gFID 1.80 on ImageNet
   256 at 8x fewer FLOPs per forward pass than diffusing on uncompressed foundation features, arguing the
   dense patch grid RAE inherits is largely redundant.'
 explanation: null
+abstract: Recent work has shown that diffusion models can generate high-quality images by operating directly
+  on SSL patch features rather than pixel-space latents. However, the dense patch grids from encoders
+  like DINOv2 contain significant redundancy, making diffusion needlessly expensive. We introduce FlatDINO,
+  a variational autoencoder that compresses this representation into a one-dimensional sequence of just
+  32 continuous tokens -an 8x reduction in sequence length and 48x compression in total dimensionality.
+  On ImageNet 256x256, a DiT-XL trained on FlatDINO latents achieves a gFID of 1.80 with classifier-free
+  guidance while requiring 8x fewer FLOPs per forward pass and up to 4.5x fewer FLOPs per training step
+  compared to diffusion on uncompressed DINOv2 features. These are preliminary results and this work is
+  in progress.

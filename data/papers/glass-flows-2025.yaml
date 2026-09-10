@@ -28,9 +28,21 @@ status:
   code: none
   weights: none
   verified: true
-  verified_on: '2026-09-09'
+  verified_on: '2026-09-10'
   verified_by: opus
 summary: Simulates a flow model inside a flow model to get the sample quality of stochastic SDE sampling
   at the cost of deterministic ODE sampling, with no retraining. An ICLR 2026 oral and a pure inference-time
   win.
 explanation: null
+abstract: 'The performance of flow matching and diffusion models can be greatly improved at inference
+  time using reward alignment algorithms, yet efficiency remains a major limitation. While several algorithms
+  were proposed, we demonstrate that a common bottleneck is the sampling method these algorithms rely
+  on: many algorithms require to sample Markov transitions via SDE sampling, which is significantly less
+  efficient and often less performant than ODE sampling. To remove this bottleneck, we introduce GLASS
+  Flows, a new sampling paradigm that simulates a "flow matching model within a flow matching model" to
+  sample Markov transitions. As we show in this work, this "inner" flow matching model can be retrieved
+  from a pre-trained model without any re-training, combining the efficiency of ODEs with the stochastic
+  evolution of SDEs. On large-scale text-to-image models, we show that GLASS Flows eliminate the trade-off
+  between stochastic evolution and efficiency. Combined with Feynman-Kac Steering, GLASS Flows improve
+  state-of-the-art performance in text-to-image generation, making it a simple, drop-in solution for inference-time
+  scaling of flow and diffusion models.'

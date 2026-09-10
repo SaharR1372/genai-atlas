@@ -1,0 +1,52 @@
+id: line-evaluation
+type: line
+name: Evaluation and benchmarks
+one_line: Measure whether generators actually do what their scores claim, and fix the benchmarks when
+  they stop tracking human judgment.
+core_bet: Progress claims are only as good as the measurement behind them, so benchmark design is a research
+  contribution in its own right rather than infrastructure.
+primary_axis: inference
+status: ascendant
+since: 2025-03
+sections:
+- generation
+- editing
+arc:
+- paper: icebench-2025
+  role: origin
+  note: Evaluates creation and editing jointly, matching the architectural shift toward single models
+    that do both.
+- paper: risebench-2025
+  role: improvement
+  note: First benchmark for edits requiring reasoning rather than recognition; the best model tested scored
+    under 30 percent.
+- paper: imgedit-2025
+  role: improvement
+  note: Pairs a large editing dataset with a benchmark covering instruction adherence and background retention.
+- paper: krisbench-2025
+  role: improvement
+  note: Critiques the reasoning benchmarks as too coarse and grounds its own in an explicit knowledge
+    framework.
+- paper: unieval-2025
+  role: improvement
+  note: Evaluates understanding and generation together, the only way to catch a unified model gaining
+    one while losing the other.
+- paper: geneval2-2025
+  role: challenge
+  note: Measures up to 17.7 percent drift between the field's most-cited compositional benchmark and human
+    judgment as models improved.
+- paper: contextbias-2026
+  role: improvement
+  note: Tests whether stereotyped attributes persist when prompt context changes, across 92 roles and
+    66,000 images.
+strengths:
+- Every claim elsewhere in this atlas depends on these holding up
+- 'Actively self-correcting: the strongest results here are about benchmarks failing, published by the
+  people who use them'
+- Cheap to run relative to training, so it scales with the field
+weaknesses:
+- Benchmarks drift as models improve, and detection lags the drift
+- Model-as-judge evaluation inherits the judge's biases
+- The same checkpoint scores differently across papers, so absolute numbers carry less information than
+  they appear to
+explains: null

@@ -186,6 +186,22 @@ def run(data_dir: Path = DATA_DIR, content_dir: Path = CONTENT_DIR, root: Path =
                 check_id_exists(pid, f"{src} paper.problems -> '{pid}'", {"problems"})
             for lid in entity.get("lines", []):
                 check_id_exists(lid, f"{src} paper.lines -> '{lid}'", {"lines"})
+
+            # Coverage, tracked as warnings so the atlas reports its own gaps rather than
+            # letting a landmark paper sit with nothing but a one-line summary.
+            if entity.get("tier") in ("landmark", "core"):
+                if not entity.get("explained"):
+                    warnings.append(
+                        f"{src}: {entity['tier']} paper has no `explained` block "
+                        f"(a reader gets only the summary)"
+                    )
+                elif entity["explained"].get("depth") == "abstract":
+                    warnings.append(
+                        f"{src}: {entity['tier']} paper explained from the abstract only; "
+                        f"a full-text read would firm up method and ablation detail"
+                    )
+            if entity.get("arxiv") and not entity.get("abstract"):
+                warnings.append(f"{src}: no abstract stored (run verify_paper.py --refresh)")
             for axis_key, concept_ids in entity.get("axes", {}).items():
                 for cid in concept_ids:
                     check_id_exists(cid, f"{src} paper.axes.{axis_key} -> '{cid}'", {"concepts"})
