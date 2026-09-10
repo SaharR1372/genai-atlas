@@ -130,3 +130,12 @@ Format: id · date · decision · why · consequences. Revise by adding a new en
   a fetched source" is now enforceable by inspection rather than by trust: the source sits next to the
   claim. The validator warns on every landmark/core paper missing an explanation, so the gap is
   visible rather than silent.
+- **D023 · 2026-09-10 · Navigation shows only index pages, and topics are distinguished from research
+  lines in the interface.** The header linked "Sections" to `/sections/editing`, one arbitrary child,
+  so a reader clicking a general-sounding label landed on image editing and reasonably concluded the
+  site was broken. Fixed by building a `/sections` index and cutting the header to seven entries that
+  all point at index pages: Topics, Research lines, Models, Compare, Notebooks, Medical, Search.
+  Open problems, timeline, graph, updates and design axes moved to a footer nav. *Why:* ten header
+  entries, one of them a lie about where it goes, is worse than seven honest ones. The topics index
+  also states outright how a topic differs from a research line, because those are the atlas's two
+  browse axes and the distinction is not self-evident from the labels alone.

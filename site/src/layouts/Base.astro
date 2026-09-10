@@ -48,16 +48,13 @@ const { title, description = "A research atlas of modern generative vision, 2023
       <a href="/" style="font-family:var(--font-heading); font-weight:600; font-size:1.15rem; color:var(--text);">
         Generative Vision Atlas
       </a>
-      <nav style="display:flex; gap:1.25rem; align-items:center; font-size:0.92rem;">
+      <nav style="display:flex; gap:1.1rem; align-items:center; font-size:0.92rem; flex-wrap:wrap;">
+        <a href="/sections">Topics</a>
+        <a href="/lines">Research lines</a>
         <a href="/models">Models</a>
-        <a href="/notebooks">Notebooks</a>
-        <a href="/lines">Lines</a>
-        <a href="/sections/editing">Sections</a>
-        <a href="/medical" style="color:var(--section-medical);">Medical</a>
         <a href="/compare">Compare</a>
-        <a href="/problems">Problems</a>
-        <a href="/timeline">Timeline</a>
-        <a href="/graph">Graph</a>
+        <a href="/notebooks">Notebooks</a>
+        <a href="/medical" style="color:var(--section-medical);">Medical</a>
         <a href="/search">Search</a>
         <button id="theme-toggle" aria-label="Toggle dark mode" style="background:none; border:1px solid var(--border-strong); border-radius:6px; padding:0.3em 0.6em; color:var(--text); cursor:pointer; font-family:var(--font-mono); font-size:0.8rem;">
           ◐
@@ -67,9 +64,20 @@ const { title, description = "A research atlas of modern generative vision, 2023
     <main class="container" style="padding-top:2rem; padding-bottom:4rem;">
       <slot />
     </main>
-    <footer class="container" style="padding-top:2rem; padding-bottom:2rem; border-top:1px solid var(--border); color:var(--text-muted); font-size:0.85rem;">
-      Living research atlas · data compiled from <code>data/</code>, see
-      <a href="https://github.com">the repository</a> for sources and update history.
+    <footer class="container" style="padding-top:2rem; padding-bottom:2.5rem; border-top:1px solid var(--border); color:var(--text-muted); font-size:0.85rem;">
+      <nav style="display:flex; gap:1.1rem; flex-wrap:wrap; margin-bottom:0.9rem;">
+        <a href="/problems">Open problems</a>
+        <a href="/timeline">Timeline</a>
+        <a href="/graph">Research graph</a>
+        <a href="/updates">Updates</a>
+        <a href="/axes/representation">Design axes</a>
+      </nav>
+      <p style="margin:0;">
+        A living atlas of modern generative vision. Structured data lives in <code>data/</code>;
+        every paper entry is checked against its source before anything is claimed about it. See
+        <a href="https://github.com/SaharR1372/genai-atlas">the repository</a> for how it is built and
+        kept current.
+      </p>
     </footer>
     <script is:inline>
       (function () {

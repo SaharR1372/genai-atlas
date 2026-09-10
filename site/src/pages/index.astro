@@ -210,7 +210,8 @@ const STATUS_COLOR: Record<string, string> = {
         { href: "/lines/line-representation-latent", t: "New to the latent debate", d: "The line that asks whether the generative space should be a pretrained representation at all." },
         { href: "/compare", t: "You want the numbers", d: "Head to head on ImageNet and text-to-image, with what the numbers can and cannot support." },
         { href: "/timeline", t: "You want the story in order", d: "How the field moved, and how long ideas sat unused before something made them work." },
-        { href: "/graph", t: "You want the shape of it", d: `${stats.relations} typed relations: who builds on, challenges, and competes with whom.` },
+        { href: "/notebooks", t: "You want to run something", d: "Four notebooks with real outputs from an A100: what each latent discards, RAE against the VAE it replaces, how editing methods differ, and why guidance breaks benchmarks." },
+        { href: "/sections", t: "You want to browse by subject", d: "Six topic areas plus medical, each with its papers, its research lines, and its open problems." },
       ].map((x) => (
         <a class="card" href={x.href} style="display:block;">
           <h3 style="font-size:0.98rem; margin:0 0 0.4rem;">{x.t}</h3>

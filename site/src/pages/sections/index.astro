@@ -1,0 +1,80 @@
+---
+import Base from "../../layouts/Base.astro";
+import { allNodes, generalLines, medicalLines, medicalPapers, isMedical } from "../../lib/graph";
+
+const TOPICS = [
+  { section: "generation", name: "Image generation",
+    blurb: "Making an image from a prompt: the objectives, backbones and latent spaces that do it." },
+  { section: "rae", name: "Representation-space generation",
+    blurb: "What the generative latent should be. The question this atlas is built around." },
+  { section: "editing", name: "Image editing",
+    blurb: "Changing an existing image, which adds a constraint generation never faces." },
+  { section: "unified", name: "Unified understanding and generation",
+    blurb: "One model that both reads images and makes them, for varying values of 'one'." },
+  { section: "vfm", name: "Vision foundation models",
+    blurb: "The pretrained encoders that generative models increasingly depend on." },
+  { section: "vlm", name: "Vision-language models",
+    blurb: "Covered where they bear on generation: as text encoders and instruction parsers." },
+];
+
+const papers = allNodes().filter((n) => n.nodeType === "papers");
+const counts = Object.fromEntries(
+  TOPICS.map((t) => [
+    t.section,
+    {
+      papers: papers.filter((p) => (p.sections ?? []).includes(t.section) && !isMedical(p)).length,
+      lines: generalLines().filter((l) => (l.sections ?? []).includes(t.section)).length,
+    },
+  ])
+);
+---
+<Base
+  title="Topics"
+  description="The subject areas this atlas covers, and how they relate to the research lines that cut across them."
+>
+  <h1 style="font-size:1.9rem; margin:0 0 0.6rem;">Topics</h1>
+  <p class="measure" style="color:var(--text-muted); margin:0 0 1.5rem;">
+    Six subject areas, plus medical imaging as a separate domain. Every paper belongs to at least
+    one.
+  </p>
+
+  <div class="card" style="margin-bottom:2.5rem;">
+    <h2 style="font-size:1rem; margin:0 0 0.6rem;">Topics or research lines: which do you want?</h2>
+    <p class="measure" style="margin:0 0 0.5rem;">
+      A <strong>topic</strong> is a subject area, like editing or unified models. Browse by topic
+      when you want to know what exists in a field.
+    </p>
+    <p class="measure" style="margin:0;">
+      A <strong><a href="/lines">research line</a></strong> is a family of work sharing one core
+      design bet, like generating in a frozen foundation model's features. Lines cut across topics,
+      and lines answering the same question compete directly. Browse by line when you want to know
+      why groups disagree.
+    </p>
+  </div>
+
+  <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(290px,1fr)); gap:1.25rem; margin-bottom:2.5rem;">
+    {TOPICS.map((t) => (
+      <a class="card section-border" style={`--section-color: var(--section-${t.section}); display:block;`} href={`/sections/${t.section}`}>
+        <h2 style={`font-size:1.12rem; margin:0 0 0.4rem; color:var(--section-${t.section});`}>{t.name}</h2>
+        <p style="margin:0 0 0.6rem;">{t.blurb}</p>
+        <p style="margin:0; font-size:0.82rem; color:var(--text-muted); font-family:var(--font-mono);">
+          {counts[t.section].papers} papers · {counts[t.section].lines} research lines
+        </p>
+      </a>
+    ))}
+  </div>
+
+  <a class="card" href="/medical" style="display:block; border-left:4px solid var(--section-medical);">
+    <p class="badge" style="margin-bottom:0.5rem; border-color:var(--section-medical); color:var(--section-medical);">
+      Separate domain
+    </p>
+    <h2 style="font-size:1.12rem; margin:0 0 0.4rem; color:var(--section-medical);">Medical imaging</h2>
+    <p style="margin:0 0 0.6rem;">
+      Kept apart from the six topics above, because clinical imaging answers to a different evidence
+      bar and has reached different conclusions about where generation should happen.
+    </p>
+    <p style="margin:0; font-size:0.82rem; color:var(--text-muted); font-family:var(--font-mono);">
+      {medicalPapers().length} papers · {medicalLines().length} research lines
+    </p>
+  </a>
+</Base>
