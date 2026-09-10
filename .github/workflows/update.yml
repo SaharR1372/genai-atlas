@@ -1,0 +1,59 @@
+name: Living update
+
+# Every 3 days, per the blueprint's update cadence. Also runnable on demand.
+on:
+  schedule:
+    - cron: "0 6 */3 * *"
+  workflow_dispatch:
+    inputs:
+      days:
+        description: "How many days back to sweep"
+        required: false
+        default: "4"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install PyYAML jsonschema requests
+
+      - name: Validate the atlas before touching anything
+        run: python scripts/validate.py
+
+      - name: Discover and score new candidates
+        run: python -m pipeline.run --days "${{ github.event.inputs.days || 4 }}"
+
+      - name: Validate again (candidates must satisfy the paper schema)
+        run: python scripts/validate.py
+
+      - name: Open a pull request with the candidate queue
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: living-update/candidates
+          title: "Living update: new candidate papers for review"
+          commit-message: "Living update: candidate papers from the scheduled sweep"
+          body: |
+            Automated discovery sweep. **Nothing here is in the atlas yet.**
+
+            Each file under `data/monitor/candidates/` is a proposal with a relevance
+            score and the reasons it was surfaced. To accept one:
+
+            1. Read it, and check the `_review` block for why it scored.
+            2. Verify it: `python scripts/verify_paper.py <id>` after moving it to
+               `data/papers/` and giving it a proper id, tier, lines, and summary.
+            3. Delete the candidate file.
+
+            Automation never proposes a tier above `emerging` and never writes to
+            `data/papers/` (see DECISIONS.md, D006).
+          delete-branch: true

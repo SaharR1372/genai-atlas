@@ -1,0 +1,48 @@
+id: efficient-fairness-auditing-across-260909486
+type: paper
+title: Efficient Fairness Auditing Across Guidance Scales in Text-to-Image Diffusion Models via Causal
+  Abstraction
+arxiv: '2609.09486'
+date: 2026-09
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Nabila Tasfiha Rahman
+- Rajatsubhra Chakraborty
+- Depeng Xu
+- Lu Zhang
+tier: emerging
+sections:
+- generation
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: Fairness auditing of text-to-image diffusion models often requires generating large numbers of
+  images across sampling configurations, making comprehensive evaluation computationally expensive. We
+  propose a causal-abstraction-based audit instrument for efficiently evaluating fairness under interventions
+  on the classifier-free guidance scale. Given a fixed prompt and a target feature function, we represent
+  the diffusion process as a low-level structural causal model and construct a corresponding high-level
+  model over abstract denoising states. We characterize the projected causal structure, establish identifiability
+  of the fairness-relevant interventional query, and provide sufficient conditio
+explanation: null
+_review:
+  score: 11.0
+  reasons:
+  - 'core topic: text-to-image, diffusion model'
+  - core topic appears in the title
+  - 'matches sections: generation'
+  - affiliated with a major lab or university
+  - title suggests a substantive contribution
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-09-10'

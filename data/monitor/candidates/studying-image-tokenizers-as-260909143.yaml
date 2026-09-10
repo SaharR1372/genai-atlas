@@ -1,0 +1,50 @@
+id: studying-image-tokenizers-as-260909143
+type: paper
+title: Studying Image Tokenizers as Visual Languages in Unified Multimodal Models
+arxiv: '2609.09143'
+date: 2026-09
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Siting Li
+- Zhengyang Wang
+- Simon Shaolei Du
+- Xi Chen
+- Yang Liu
+tier: emerging
+sections:
+- generation
+- rae
+- unified
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: 'Image tokenizers define the ``visual language'''' of unified multimodal models, yet are commonly
+  studied through isolated metrics or generation-/understanding-only evaluations. These evaluations do
+  not fully capture how visual tokens behave when modeled jointly with text. We build a controlled pure-autoregressive
+  testbed and track task-specific validation losses during multimodal continual pretraining across text,
+  image, text-to-image (T2I), and image-to-text (I2T) prediction. We examine how these losses scale and
+  relate to downstream performance, then use them to study multimodal learnability---how well image and
+  text tokens are jointly modeled---and tokenizer design. We find that (1) losses '
+explanation: null
+_review:
+  score: 15.0
+  reasons:
+  - 'core topic: text-to-image, image tokenizer, unified multimodal'
+  - core topic appears in the title
+  - 'matches sections: generation, rae, unified'
+  - affiliated with a major lab or university
+  - title suggests a substantive contribution
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-09-10'

@@ -1,0 +1,43 @@
+id: muonc-operatoraligned-muon-for-260909676
+type: paper
+title: 'Muon-C: Operator-Aligned Muon for Convolutional Kernels'
+arxiv: '2609.09676'
+date: 2026-09
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Jiaxin Qing
+- Lexin Li
+tier: emerging
+sections:
+- generation
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: Muon replaces matrix momentum with an approximately orthogonal polar direction, but its geometry
+  depends on the matrix representation. For convolution, standard unfolding describes a local patch map
+  rather than the convolution operator. We introduce Muon-C, an operator-aligned optimizer that represents
+  kernel momentum as frequency-wise channel-transfer matrices, polarizes these blocks independently, and
+  uses a critical Fourier grid to return updates exactly to the original finite kernel support. We show
+  that the new geometry arises from combining the block partition and Fourier coordinates. The exact-polar
+  direction is a linear minimization oracle under the critically sampled convolution nor
+explanation: null
+_review:
+  score: 6.0
+  reasons:
+  - 'core topic: flow matching'
+  - 'matches sections: generation'
+  - 'mentions atlas work: Flow Matching'
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-09-10'

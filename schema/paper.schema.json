@@ -85,6 +85,18 @@
     "explanation": {
       "type": ["string", "null"],
       "description": "Path to MDX file with the full paper-page template"
+    },
+    "_review": {
+      "type": "object",
+      "description": "Pipeline review metadata. Present only on files under data/monitor/candidates/; stripped when a candidate is promoted into data/papers/.",
+      "additionalProperties": true,
+      "properties": {
+        "score": { "type": "number" },
+        "reasons": { "type": "array", "items": { "type": "string" } },
+        "source": { "type": "string" },
+        "hf_upvotes": { "type": ["integer", "null"] },
+        "discovered_on": { "type": "string" }
+      }
     }
   }
 }
