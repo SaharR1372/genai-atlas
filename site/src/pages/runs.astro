@@ -1,0 +1,134 @@
+---
+import Base from "../layouts/Base.astro";
+
+// Results of running the released weights on this project's own hardware. Kept as an
+// explicit list rather than generated, because each observation is a judgement that
+// needs to be stated and defended, not a number that can be read off.
+const PROMPTS = [
+  {
+    key: "text",
+    label: "Text rendering",
+    prompt: 'a storefront window with a hand-painted sign reading "GENERATIVE VISION ATLAS", morning light, photograph',
+    tests: "Whether the model can render specified text correctly. This is the capability Qwen-Image was built around, and where most earlier open models visibly failed.",
+    results: [
+      { model: "Qwen-Image", img: "qwen_text", verdict: "correct",
+        note: "All three words rendered correctly in the hand-painted style asked for." },
+      { model: "LLaDA-Image", img: "lladabase_text", verdict: "correct",
+        note: "All three words correct, with more atmospheric lighting and incidental signage in the background that is also legible." },
+      { model: "LLaDA-Image-Turbo", img: "llada_text", verdict: "fails",
+        note: "Garbles the middle word to VION and duplicates the phrase. Visible distillation artifacts across the image. Same weights as the row above, distilled to 2-4 steps." },
+    ],
+  },
+  {
+    key: "compose",
+    label: "Counting and spatial relations",
+    prompt: "three red cubes stacked on top of a blue sphere, to the left of a green cone, studio lighting",
+    tests: "Whether the model can count and place objects. This is what GenEval measures, and it is where both models here fail.",
+    results: [
+      { model: "Qwen-Image", img: "qwen_compose", verdict: "partly fails",
+        note: "Colours correct, both spatial relations correct, but produced two cubes instead of three. The cone is a compound shape rather than a cone, and the sphere is squashed." },
+      { model: "LLaDA-Image", img: "lladabase_compose", verdict: "partly fails",
+        note: "Cleanest geometry of the three: a true cone, a true sphere, crisp cubes. But it produced four cubes instead of three, missing the count in the other direction." },
+    ],
+  },
+  {
+    key: "photo",
+    label: "Plain photographic quality",
+    prompt: "a close-up portrait of an elderly fisherman with a weathered face, soft window light, 85mm lens",
+    tests: "A prompt with no trick in it, to see baseline quality when nothing unusual is being asked.",
+    results: [
+      { model: "Qwen-Image", img: "qwen_photo", verdict: "good", note: "Convincing skin detail and lighting." },
+      { model: "LLaDA-Image", img: "lladabase_photo", verdict: "good", note: "Convincing, with stronger environmental context and depth of field." },
+    ],
+  },
+];
+
+const VERDICT_COLOR: Record<string, string> = {
+  correct: "var(--section-vfm)",
+  good: "var(--section-vfm)",
+  "partly fails": "var(--section-unified)",
+  fails: "var(--section-medical)",
+};
+---
+<Base
+  title="Model runs"
+  description="What the open models actually produce, run on this project's own hardware from the released weights, on identical prompts and seeds."
+>
+  <h1 style="font-size:1.9rem; margin:0 0 0.6rem;">What these models actually produce</h1>
+  <p class="measure" style="color:var(--text-muted); margin:0 0 1.5rem;">
+    Released weights, run here on an A100 80GB, same prompts and same seed across models. Three
+    prompts chosen to test different things rather than to flatter anyone.
+  </p>
+
+  <div class="card section-border" style="--section-color: var(--section-unified); margin-bottom:2.5rem;">
+    <h2 style="font-size:1rem; margin:0 0 0.5rem;">How to read this, and how not to</h2>
+    <p style="margin:0 0 0.5rem;">
+      Each model runs at its own recommended settings rather than a forced common configuration.
+      That shows what you would actually get, and it means quality differences here cannot be
+      attributed to architecture. Step counts and guidance differ between rows.
+    </p>
+    <p style="margin:0; color:var(--text-muted); font-size:0.92rem;">
+      The one comparison that is clean is LLaDA against its own distilled variant, because those
+      share weights and differ only in distillation. Everything else is an observation about systems
+      as shipped, not evidence about the ideas underneath them. See
+      {" "}<a href="/compare">why benchmark numbers cannot rank these</a>.
+    </p>
+  </div>
+
+  {PROMPTS.map((p) => (
+    <section style="margin-bottom:3.5rem;">
+      <h2 style="font-size:1.35rem; margin:0 0 0.35rem;">{p.label}</h2>
+      <p style="margin:0 0 0.5rem; color:var(--text-muted); font-size:0.92rem;">{p.tests}</p>
+      <p style="margin:0 0 1.25rem; font-family:var(--font-mono); font-size:0.82rem; color:var(--text-muted); border-left:2px solid var(--border-strong); padding-left:0.75rem;">
+        {p.prompt}
+      </p>
+
+      <div style={`display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:1.25rem;`}>
+        {p.results.map((r) => (
+          <figure style="margin:0;">
+            <img src={`/runs/${r.img}.webp`} alt={`${r.model} on the ${p.label.toLowerCase()} prompt`}
+                 loading="lazy" style="width:100%; border-radius:8px; border:1px solid var(--border); display:block;" />
+            <figcaption style="margin-top:0.6rem;">
+              <div style="display:flex; align-items:baseline; gap:0.5rem; margin-bottom:0.3rem; flex-wrap:wrap;">
+                <strong style="font-size:0.95rem;">{r.model}</strong>
+                <span class="badge" style={`border-color:${VERDICT_COLOR[r.verdict]}; color:${VERDICT_COLOR[r.verdict]};`}>
+                  {r.verdict}
+                </span>
+              </div>
+              <p style="margin:0; font-size:0.88rem; color:var(--text-muted);">{r.note}</p>
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+    </section>
+  ))}
+
+  <section class="card">
+    <h2 style="font-size:1.1rem; margin:0 0 0.75rem;">What running them actually taught us</h2>
+    <ul style="margin:0; padding-left:1.2rem;">
+      <li style="margin-bottom:0.6rem;">
+        <strong>Counting is a shared failure, not a model-specific one.</strong> Both systems place
+        objects correctly and colour them correctly, and both miss the count, in opposite directions.
+        LLaDA's own paper concedes a weak counting score; this is the same weakness visible in a
+        model whose paper does not mention it.
+      </li>
+      <li style="margin-bottom:0.6rem;">
+        <strong>Distillation costs more than throughput.</strong> LLaDA's Turbo variant is the same
+        model compressed to two to four sampling steps, and it is the only run here that fails the
+        text prompt outright. Anyone quoting a distilled model's speed should quote this alongside it.
+      </li>
+      <li style="margin-bottom:0.6rem;">
+        <strong>Text rendering is genuinely solved in open models.</strong> Two years ago this prompt
+        would have produced letter-shaped noise from anything open. Both full models here get it
+        right first time.
+      </li>
+      <li>
+        <strong>Every one of these needs a different environment.</strong> Qwen runs on stock
+        diffusers. LLaDA pins transformers 4.57.6 with diffusers 0.39. HiDream-O1 pins transformers
+        4.57.1 and requires a compiled flash-attention with no fallback path in its code. No two of
+        the three coexist in one environment, which is a real cost of the current open ecosystem and
+        part of why assembling them in one place is worth doing.
+      </li>
+    </ul>
+  </section>
+</Base>
