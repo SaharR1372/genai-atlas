@@ -1,0 +1,25 @@
+id: krea-2
+type: system
+name: Krea 2
+org:
+- Krea
+open: true
+releases:
+- version: Krea 2 Raw
+  date: 2026-06
+  arxiv: null
+  open: true
+  notes: 13B text-to-image foundation model. Open weights under the Krea 2 Community License with an acceptable-use
+    policy, so gated rather than permissively licensed.
+- version: Krea 2 Turbo
+  date: 2026-06
+  arxiv: null
+  open: true
+  notes: The distilled fast variant. By community uptake this was the most downloaded open image model
+    of summer 2026.
+sections:
+- generation
+summary: A from-scratch 13B text-to-image family built by Krea, notable for a style-transfer and style-mixing
+  workflow rather than for a new architecture, and for being the summer's most widely downloaded open
+  image model. A technical report exists but no arXiv paper, so it sits here as a system rather than a
+  paper entry.

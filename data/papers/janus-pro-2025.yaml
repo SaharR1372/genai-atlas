@@ -36,6 +36,43 @@ summary: Decouples the visual encoder used for understanding from the one used f
   a single shared language backbone, then scales data and model size. One of the most reused open unified
   baselines of the period.
 explanation: null
+explained:
+  depth: full-text
+  before: The original Janus model had already shown that decoupling the visual encoder used for understanding
+    from the one used for generation, while sharing a single autoregressive backbone, reduces the conflict
+    between the two tasks compared to routing both through one visual encoder. But Janus itself was capped
+    at 1.5B parameters, trained on comparatively little data, and produced unstable, low-quality text-to-image
+    generation, especially on short prompts.
+  problem: Whether scaling the decoupled-encoder recipe with more training data, a re-balanced training
+    schedule, and a larger 7B backbone closes the remaining gap to specialized generation models and larger
+    single-encoder understanding models.
+  idea: Keep understanding and generation on two separate encoders feeding one shared language-model backbone,
+    and show that most of Janus's remaining shortfall was a data-and-scale problem rather than an architectural
+    one.
+  method: Understanding and generation use two different encoders, not one. A SigLIP-Large-Patch16-384 encoder
+    extracts continuous semantic features for understanding, and a separate VQ tokenizer with a 16,384-entry
+    codebook and downsampling factor 16 produces discrete image token ids for generation. Both feed, through
+    separate adaptors, into a single shared autoregressive transformer backbone at 1.5B or 7B scale, and
+    generation uses a separately initialized prediction head distinct from the model's built-in language-model
+    head. There is one family of loss, autoregressive next-token cross-entropy, applied to text tokens for
+    understanding and to discrete VQ token ids for generation; there is no diffusion loss anywhere. Relative
+    to Janus, training stage two drops ImageNet pretraining data entirely in favor of dense-caption text-to-image
+    data, stage one is extended, and the stage-three data ratio shifts from 7:3:10 to 5:1:4 to reduce over-weighting
+    of text-to-image data. The paper explicitly attributes its gains to decoupling avoiding the understanding-generation
+    conflict, not to any change in that decoupling itself.
+  evidence: Janus-Pro-7B reaches GenEval 0.80, ahead of Janus's 0.61, DALL-E 3's 0.67, SD3-Medium's 0.74
+    and Emu3's 0.54, and DPG-Bench 84.19 against Janus's 79.68. On understanding it reaches MMBench 79.2,
+    up 9.8 points from Janus's 69.4, and MMMU 41.0 against Janus's 30.5. Janus-Pro-1B improves GenEval from
+    Janus's 0.61 to 0.73 at a fraction of the 7B model's parameters.
+  limitations: The paper concedes input resolution is capped at 384x384, which hurts fine-grained tasks
+    such as OCR, that the vision tokenizer's reconstruction loss combined with this low resolution leaves
+    generated images short on fine detail, and that small facial regions in particular come out under-detailed.
+    It states that increasing resolution would likely mitigate these issues but did not do so in this work.
+  why_it_matters: Janus-Pro is one of the most reused open baselines because it isolates one specific unification
+    choice, decoupled encoders on a shared backbone, and shows gains in both directions at once as data and
+    scale increase. That makes it the cleanest argument in the open literature that encoder decoupling, rather
+    than architectural cleverness elsewhere, is what avoids the understanding-generation tradeoff other unified
+    designs report.
 abstract: In this work, we introduce Janus-Pro, an advanced version of the previous work Janus. Specifically,
   Janus-Pro incorporates (1) an optimized training strategy, (2) expanded training data, and (3) scaling
   to larger model size. With these improvements, Janus-Pro achieves significant advancements in both multimodal

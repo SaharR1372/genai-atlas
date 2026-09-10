@@ -33,6 +33,40 @@ summary: The open-source infrastructure most medical generative work is built on
 explanation: null
 lines:
 - line-medical-domain-vae
+explained:
+  depth: full-text
+  before: Medical generative modeling papers each built their own diffusion, autoregressive or GAN pipeline
+    from scratch, with inconsistent evaluation metrics across studies, so methods were hard to compare
+    or reproduce.
+  problem: Researchers lacked a common, tested implementation of generative building blocks that worked
+    consistently across 2D and 3D medical modalities and across architecture families, so every group re-implemented
+    diffusion samplers, autoencoders and evaluation code independently.
+  idea: Extend the MONAI framework with a generative-models module that packages diffusion, VQ-VAE-based
+    autoregressive, and GAN pipelines as interchangeable, modality-agnostic components, and validate them
+    across five representative tasks rather than proposing one new method.
+  method: The library is deliberately architecture-plural rather than a claim about which generation space
+    is best. It provides pixel-space DDPMs, latent diffusion models running on a per-modality AutoencoderKL,
+    and VQ-VAE discrete-token latents feeding a transformer or diffusion prior, with SPADE-based GANs included
+    as adversarial baselines. The stated rationale for using a latent at all is memory, since latent diffusion
+    models "leverage the latent representation learned by trained compression models to train on higher
+    dimensional 2D or 3D data than traditional diffusion models are capable of," and 3D perceptual losses
+    are computed with a 2.5D approximation because of the "computational memory constraints associated
+    with 3D networks." No modality-specific reasoning is given beyond that memory argument, and the paper
+    never evaluates whether a domain-trained latent captures clinically relevant detail better than a borrowed
+    one.
+  evidence: All five demonstration experiments report only distribution metrics, not clinical utility.
+    2D chest X-ray generation on MIMIC-CXR reaches FID 8.83 and MS-SSIM 0.43, 3D brain MRI on UK Biobank
+    reaches FID 0.0051 and MS-SSIM 0.92, and mammography on CSAW-M reaches FID 1.91. Out-of-distribution
+    detection with a diffusion-based reconstruction score reaches AUC 1.0 on all eight Medical Decathlon
+    organs, which is a detection benchmark rather than a diagnostic or treatment task. No reader study
+    or downstream clinical-task evaluation appears anywhere in the paper.
+  limitations: The paper concedes that cascaded high-resolution generation is slow, about 13 minutes per
+    image against 22 seconds for the single-stage approach, and frames the release as a starting point,
+    listing broader model coverage and MRI reconstruction support as future work rather than solved problems.
+  why_it_matters: This is the shared substrate most later medical generative papers in this atlas build
+    on, so its architecture-plural stance, offering pixel, domain-VAE-latent and discrete-token routes
+    side by side without picking a winner, sets the baseline vocabulary and tooling the rest of the medical
+    section works against.
 abstract: Recent advances in generative AI have brought incredible breakthroughs in several areas, including
   medical imaging. These generative models have tremendous potential not only to help safely share medical
   data via synthetic datasets but also to perform an array of diverse applications, such as anomaly detection,

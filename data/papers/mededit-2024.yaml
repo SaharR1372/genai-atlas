@@ -18,7 +18,7 @@ sections:
 - medical
 - editing
 lines:
-- line-medical-transfer-vae
+- line-medical-pixel-space
 links:
   code: null
   weights: null
@@ -34,6 +34,49 @@ summary: 'Induces pathology into healthy brain MRI while preserving the surround
   its evaluation: a board-certified neuroradiologist judged the generated strokes indistinguishable from
   real ones, which is a stronger bar than any distribution metric.'
 explanation: null
+explained:
+  depth: full-text
+  before: Counterfactual biomedical editing had mostly targeted chest X-ray disease progression using
+    paired longitudinal data, and separate brain-imaging work generated healthy scans from pathological
+    ones for lesion localization. Diffusion editing tools like SDEdit and Palette existed for natural
+    images, but the paper states existing methods "either inadequately model indirect pathological effects
+    like brain atrophy or by excessively altering the scan, which disrupts correspondence to the original
+    images."
+  problem: Induce a stroke lesion into a specific region of a brain MRI, allowing plausible indirect effects
+    such as atrophy nearby, without disturbing the rest of the scan's correspondence to the original.
+  idea: Extend RePaint-style diffusion inpainting from class-conditional to mask-conditional generation,
+    and inpaint a deliberately dilated region around the target pathology rather than only the pathology
+    mask itself, so the model has room during denoising to generate secondary tissue changes the true
+    lesion would cause.
+  method: MedEdit operates in pixel space. A standard DDPM U-Net denoises 128x128 T1-weighted brain slices
+    directly, with no VAE, VQGAN, or other latent compression anywhere in the pipeline. The paper gives
+    no explicit justification for pixel space; it is presented as the standard DDPM setup, T equals 1000
+    steps with a linear beta schedule from 1e-4 to 0.02, without discussing the representation choice.
+    This means MedEdit does not use a borrowed Stable Diffusion latent the way its line categorization
+    in this atlas otherwise implies; the mechanism here is pixel-space RePaint-style inpainting with a
+    dilated conditioning mask, not fine-tuned Stable Diffusion with a frozen natural-image VAE. The core
+    technical contribution is the mask dilation, kernel size 25, applied with four resampling iterations
+    per timestep to harmonize the inpainted and known regions.
+  evidence: The paper offers the strongest evidence tier in this batch, a downstream segmentation task
+    and a clinician reader study, alongside distribution metrics. On the Atlas v2.0 stroke dataset, 655
+    T1 scans with 54 held out for test, MedEdit reaches FID 3.07 against Palette's 5.63 and SDEdit's 7.95,
+    a 45% and 61% improvement respectively, and a Dice score of 0.63 from an nnUNet lesion segmenter run
+    on the generated counterfactuals, against Palette's 0.38 and naive RePaint's 0.50. Beyond distribution
+    metrics, a board-certified neuroradiologist rated 80 generated and 20 real scans, blinded, on a 1
+    to 5 scale. MedEdit's realism score of 3.20 matched the real scans' own 3.20 and beat SDEdit's 2.80,
+    and MedEdit scored 3.15 on indirect pathological realism against SDEdit's 3.00, Palette's 2.00, and
+    naive RePaint's 1.85. This is a genuine reader-study result, not just a metric, though it rests on
+    a single rater with no inter-rater reliability reported.
+  limitations: The paper concedes its own computational metrics "fall short in capturing nuanced clinical
+    realities" and that FID specifically "overlooks critical subtleties like the indirect pathological
+    effects accompanying stroke lesions," which is why it added the reader study. It concedes the method
+    was evaluated only in 2D at 128x128 and proposes 3D extension as future work. It concedes the neuroradiologist
+    evaluation used a single rater on a subjective scale without inter-rater reliability. It concedes
+    the method "was not designed specifically for stroke synthesis" and claims generalization to other
+    pathologies without evidence for it.
+  why_it_matters: It shows that a reader study can move a medical generation paper's central claim, indistinguishability
+    from real, onto ground a distribution metric cannot reach, and it shows this is achievable with the
+    plainest possible generation space, plain pixel-space DDPM, no latent compression at all.
 abstract: Denoising diffusion probabilistic models enable high-fidelity image synthesis and editing. In
   biomedicine, these models facilitate counterfactual image editing, producing pairs of images where one
   is edited to simulate hypothetical conditions. For example, they can model the progression of specific

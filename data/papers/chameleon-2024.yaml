@@ -35,6 +35,41 @@ summary: An early-fusion, token-based decoder-only transformer that represents t
   separate conditioning module at all — an earlier image (or text) token is simply an earlier position
   in the same autoregressive stream the model already predicts next-tokens over.
 explanation: null
+explained:
+  depth: full-text
+  before: Multimodal systems combined modality-specific components, separate image encoders bolted onto
+    a text-pretrained language model for understanding, in systems such as Flamingo, LLaVA and IDEFICS,
+    and separate DALL-E-style diffusion decoders attached externally for generation. This late-fusion design
+    limited a model's ability to reason over and generate arbitrary interleaved sequences of text and images.
+  problem: Whether a single early-fusion, token-based transformer trained from scratch on one shared vocabulary
+    can understand and generate arbitrary interleaved text-image documents, with no modality-specific encoder
+    or decoder, and remain numerically stable at scale.
+  idea: Turn images into discrete tokens drawn from a fixed codebook, splice those tokens into the same
+    vocabulary as text BPE tokens, and train one autoregressive transformer with one next-token prediction
+    loss over the fully interleaved sequence from the start of pretraining.
+  method: One transformer, one set of weights, and literally one vocabulary, 65,536 BPE text tokens plus
+    8,192 image tokens from a discrete image tokenizer that encodes a 512x512 image into 1,024 tokens. There
+    is no separate conditioning pathway and no diffusion loss anywhere; an image token earlier in the sequence
+    is simply an earlier position that the same autoregressive objective already predicts over. Training
+    stably at 7B and 34B scale required specific fixes the paper documents in detail, query-key normalization
+    to directly bound attention-norm growth, a 1e-5 z-loss penalizing the softmax partition function, and
+    reordering normalization to post-attention and post-feedforward placement rather than Llama's pre-norm.
+    The paper traces divergence to text and image tokens having such different entropy that shared softmax
+    weights let norms grow unchecked and exceed bf16 range, typically after 20 to 30 percent of training.
+  evidence: Chameleon-34B reaches COCO Karpathy captioning CIDEr 140.8 zero-shot after supervised fine-tuning,
+    ahead of Flamingo-80B's 32-shot 113.8, and beats Llama-2-34B on MMLU, 65.8 versus 62.6, GSM8K maj@8,
+    61.4 versus Llama-2-70B's 56.8, and MATH maj@1, 22.5 versus 6.24. In human evaluation on long-form mixed-modal
+    generation it wins 60.4% of comparisons against a Gemini-Pro-based pipeline and 51.6% against a GPT-4V-based
+    pipeline augmented with DALL-E 3 images.
+  limitations: The paper concedes the image tokenizer's core weakness is reconstructing images containing
+    a large amount of text, which upper-bounds performance on OCR-heavy tasks. It also concedes its human-evaluation
+    prompt set was crowdsourced rather than drawn from real user queries and explicitly excluded OCR and
+    infographic-interpretation prompts, and that despite only 0.095% unsafe outputs on standard prompts,
+    adversarial red-teaming found 1.6% unsafe outputs, indicating safety tuning needs further work.
+  why_it_matters: Chameleon is the reference point for what a literally shared, single-vocabulary, single-loss
+    unified model looks like. Every later paper that adds a separate tokenizer, a separate expert, or an
+    added diffusion loss should be read against Chameleon as a deliberate departure from full sharing, not
+    as a synonym for it.
 abstract: We present Chameleon, a family of early-fusion token-based mixed-modal models capable of understanding
   and generating images and text in any arbitrary sequence. We outline a stable training approach from
   inception, an alignment recipe, and an architectural parameterization tailored for the early-fusion,

@@ -37,6 +37,49 @@ summary: Scales MAR's continuous-token idea to a 14B autoregressive model with a
   reaching state of the art among autoregressive text-to-image systems. An ICLR 2026 oral, and the strongest
   evidence that continuous-token autoregression is a real competitor to diffusion rather than a curiosity.
 explanation: null
+explained:
+  before: Autoregressive image models faced a choice between two unsatisfying options. Vector-quantized
+    tokenizers gave discrete tokens compatible with standard next-token prediction but introduced quantization
+    loss and exposure bias, while continuous-token approaches needed a heavy, computationally expensive
+    diffusion process to model each token, and a persistent performance gap remained against state-of-the-art
+    diffusion text-to-image models.
+  problem: Build an autoregressive model that consumes continuous image tokens directly under a single
+    next-token objective, without paying for a heavy per-token diffusion process and without the quantization
+    loss of discrete tokens.
+  idea: Treat continuous image tokens the same way as discrete text tokens inside one autoregressive factorization
+    p(x) = product of p(x_i given x_less_than_i), and give the model a lightweight flow-matching head instead
+    of vector quantization to turn each predicted continuous vector into a token.
+  method: Generation happens in a continuous VAE latent space, not pixels or discrete tokens. A tokenizer
+    fine-tuned from the Flux VAE produces 16-channel latents at 8x spatial downsampling with channel-wise
+    normalization and stochastic noise perturbation; a space-to-depth transform turns each 16x16 grid of
+    64-channel patches into a 1D sequence of 256 tokens. A 14B decoder-only Transformer backbone, initialized
+    from Qwen2.5-14B, predicts a hidden state at each position; text tokens are scored with standard cross-entropy,
+    while image tokens are handed to a small 157M-parameter, 12-layer MLP flow-matching head with 1536
+    hidden dimensions that regresses the velocity vector mapping a noised patch to its clean target. The
+    total loss is a weighted sum of the text cross-entropy loss and this image flow-matching loss. Pretraining
+    uses 550M image-text pairs, 3.5M editing samples, an 80M-sample video-interleaved dataset, and 400B
+    text-only tokens, run across a 1.23T-token first stage, a 0.61T-token second stage, and a 40B-token
+    annealing phase.
+  evidence: 'On text-to-image benchmarks the paper reports GenEval 0.63 (0.73 with a Self-CoT rewriting
+    step), DPG-Bench 85.28, GenAI-Bench advanced 0.67 (0.74 with Self-CoT), WISE 0.54 (0.67 with Self-CoT,
+    0.79 with prompt rewriting), and OneIG-Bench English 0.417. The editing variant NextStep-1-Edit scores
+    6.58 on GEdit-Bench-EN and 3.71 on ImgEdit-Bench. On ImageNet-1K reconstruction the tokenizer reaches
+    PSNR 30.60, close to Flux.1-dev''s 31.64 and well above discrete tokenizers such as VAR (22.12 PSNR)
+    and TiTok-S-128 (17.52 PSNR). An ablation across 40M, 157M, and 528M flow-matching head sizes found
+    all three gave remarkably similar generation quality, which the authors read as evidence that the AR
+    backbone, not the head, does the core generative modeling and the head is mainly a lightweight sampler.'
+  limitations: The authors concede several open problems. Moving to higher-dimensional latent spaces produces
+    failure modes including local block-shaped artifacts, global noise, and grid-like artifacts. Inference
+    is bottlenecked by strictly serial LLM decoding, measured at 11.31 ms per token for 1024-token sequences
+    on an H100. Because generation is sequential rather than the parallel iterative refinement diffusion
+    allows, higher-resolution training requires substantially more steps to converge. Supervised fine-tuning
+    on small, high-quality datasets is unstable and only reliably improves the model once fine-tuning data
+    reaches roughly a million samples.
+  why_it_matters: NextStep-1 is presented as the strongest evidence to date that continuous-token autoregression,
+    with a cheap flow-matching head standing in for vector quantization, is a real competitor to diffusion
+    for text-to-image generation rather than a research curiosity, at a scale (14B) large enough to be
+    taken as a genuine data point rather than a toy demonstration.
+  depth: full-text
 abstract: Prevailing autoregressive (AR) models for text-to-image generation either rely on heavy, computationally-intensive
   diffusion models to process continuous image tokens, or employ vector quantization (VQ) to obtain discrete
   tokens with quantization loss. In this paper, we push the autoregressive paradigm forward with NextStep-1,

@@ -34,6 +34,43 @@ summary: A diffusion foundation model for pathology built on Stable Diffusion 3'
   with. The foundation model supplies the condition, not the latent — the distinction that STREAM later
   argues is the limiting choice.
 explanation: null
+explained:
+  depth: full-text
+  before: Pathology generative models existed only as small, cancer-type-specific diffusion models trained
+    on limited annotated data, while self-supervised discriminative models still needed nontrivial labeled
+    data downstream and cross-institution data sharing was blocked by regulation.
+  problem: Build a generative model that scales across cancer types and institutions despite two structural
+    gaps in pathology, there are no image-caption pairs to condition on the way natural-image diffusion
+    models do, and no single large dataset any one institution can share directly to train on.
+  idea: Train a diffusion transformer on 30.8 million H&E patches conditioned on self-supervised UNI-2h
+    embeddings instead of text, since pathology has no captions, and reuse Stable Diffusion 3's pretrained
+    VAE unchanged so all training effort goes into the conditional generator.
+  method: Generation happens in Stable Diffusion 3's frozen natural-image VAE latent, an eight-times downsampling
+    that turns a 1024x1024 image into a 128x128x16 latent, with only the DiT trained, in three progressive
+    stages from 256px to 1024px. The paper's stated reason for this specific VAE is empirical reconstruction
+    quality on pathology tiles, not domain match, it reports SD3's VAE reaches PSNR 31.79 against SDXL's
+    26.93 on their data, and picks the better reconstructor among natural-image VAEs rather than training
+    a pathology-specific autoencoder. Conditioning uses cross-attention on frozen UNI-2h embeddings, chosen
+    explicitly because "there is no large-scale image-caption dataset" for pathology to caption-condition
+    on.
+  evidence: Most reported evidence is distribution metrics. At 256px PixCell reaches FID 9.65 against 14.16
+    for LRDM and 12.04 for ZoomLDM; at 1024px on TCGA-BRCA it reaches crop FID 7.92 against 15.51 to 17.87
+    for baselines, generating in 2.5 seconds against 28 to 60 seconds for competitors. One genuine downstream-task
+    result exists, a DINOv2 encoder trained on PixCell-synthesized data reaches 71.6% balanced k-NN accuracy
+    across four classification benchmarks, matching 71.7% from training on an equal amount of real data,
+    a real task-based parity result rather than a distribution-metric comparison. Cell-segmentation augmentation
+    with ControlNet-generated images raises Dice from 0.629 to 0.653 on a cross-domain split. Virtual IHC
+    staining underperforms a CycleGAN baseline on SSIM (0.1892 versus 0.1945) though it improves crop FID
+    (20.87 versus 33.22). No reader study with a pathologist is reported.
+  limitations: The paper concedes that UNI-2h conditioning entangles cell count and layout with the mask
+    signal, so ControlNet-guided generation fails to follow the mask when the two conflict; that synthetic
+    data does not guarantee privacy since generative models are known to leak training samples; and that
+    IHC staining quality is limited by resolution mismatch in the evaluation dataset and by the model never
+    seeing paired IHC data directly.
+  why_it_matters: The foundation-model representation here supplies the condition, not the generative latent,
+    since the latent is still a borrowed natural-image VAE. The k-NN parity result is the first evidence
+    in this atlas that synthetic pathology data can substitute for real data on a downstream task rather
+    than just resembling it visually.
 abstract: 'The digitization of histology slides has revolutionized pathology, providing massive datasets
   for cancer diagnosis and research. Self-supervised and vision-language models have been shown to effectively
   mine large pathology datasets to learn discriminative representations. On the other hand, there are

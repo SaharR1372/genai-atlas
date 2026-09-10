@@ -32,6 +32,52 @@ summary: 'The first benchmark that evaluates understanding and generation togeth
 explanation: null
 lines:
 - line-evaluation
+explained:
+  depth: full-text
+  before: Unified models were evaluated on scattered task-specific benchmarks, separate understanding suites
+    and separate generation suites such as GenEval or DPG-Bench, with no combined score. Visual generation
+    evaluation depended on external judge models the paper reports as having error rates from 9.14 to 25.8
+    percent, plus large labeled image datasets, and standard metrics such as FID, IS, and CLIPScore were
+    judged insufficient to capture instruction-following.
+  problem: Build a single evaluation framework that scores a unified model's understanding and generation
+    together, without extra judge models, extra images, or extra annotations, in a way that can surface
+    the specific failure mode where a model gains generation ability while quietly losing understanding.
+  idea: Have a unified model generate images from a prompt, then use that same model's own understanding
+    component to answer multiple-choice questions about the images it just generated, so the score depends
+    on both halves working together.
+  method: This is a benchmark and metric, not a unified model. UniBench covers 13 level-1 tags and 81 level-2
+    tags across 1,234 prompts, producing 4,231 questions, each with five multiple-choice options rather
+    than the binary options used in prior benchmarks. For a unified model under test, the protocol generates
+    four images per prompt, then asks that model's own understanding capability to answer the VQA-style
+    questions about its own generated images; UniScore aggregates case-level accuracy up through tag-level
+    to one overall number. No external judge model or external labeled image set is required because the
+    model under test supplies both the images and the grading, which is also what makes joint degradation
+    visible, a model with weak understanding cannot reliably grade its own generations even when they are
+    good, and a model with weak generation fails regardless of how well it understands. Pure generation-only
+    models with no understanding component, such as Stable Diffusion, PixArt-alpha, FLUX variants, and
+    DALL-E 2 and 3, are scored on the same benchmark using an external understanding model, Qwen2.5-VL-7B,
+    substituted in for grading so they remain comparable.
+  evidence: UniScore correlates with human judgment at Pearson r equals 0.716 across three annotators, up
+    to 0.777 for one annotator, against CLIPScore's 0.372 and VQAScore's 0.575. Across 10 unified models,
+    VARGPT, TokenFlow, Show-o-Turbo, Show-o, Janus-Pro-1B, Janus-1.3B, VILA-U, UniToken-II, JanusFlow-1.3B,
+    and Janus-Pro-7B, and 10 generation-only models including Stable Diffusion 1.5 through 3.5-Medium, PixArt-alpha,
+    FLUX variants, and DALL-E 2 and 3, Janus-Pro-7B ranks first overall with a UniScore of 0.572 and only
+    7 percent of its self-answers are "N/A" or unknown, showing it understands its own generations well.
+    Show-o ranks first among generation-only scores but drops to seventh once graded by its own understanding,
+    because 89.2 percent of its VQA answers were the letter A, a bias the self-grading protocol specifically
+    exposes. JanusFlow-1.3B shows the best self-understanding of its generated images despite mid-tier generation
+    quality. Unified models show roughly twice the discriminability of task-specific benchmarks by coefficient
+    of variation, 0.194 against 0.099.
+  limitations: The paper's own limitations section was not accessible in the fetched source, so specific
+    conceded limitations cannot be quoted here. The reported findings themselves point to one structural
+    limitation of the design, self-grading can be distorted by a model's own answering biases, illustrated
+    by Show-o's skewed VQA responses, which is part of why the paper falls back to an external judge model
+    for scoring generation-only systems that have no understanding component of their own.
+  why_it_matters: UniEval gives the field quantitative proof that generation quality and a model's understanding
+    of its own generations are not the same thing and do not move together, with Show-o as the clearest
+    case, first in generation but seventh once its own understanding is asked to grade it. It turns the
+    generation-degrades-understanding tradeoff that other unified-model papers discuss qualitatively into
+    a single measurable number, UniScore, that later unified models can be required to report.
 abstract: The emergence of unified multimodal understanding and generation models is rapidly attracting
   attention because of their ability to enhance instruction-following capabilities while minimizing model
   redundancy. However, there is a lack of a unified evaluation framework for these models, which would

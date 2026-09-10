@@ -28,6 +28,57 @@ summary: A physics-inspired objective where each sample is attracted toward one 
   256. The authors position it next to drifting and one-step distillation rather than as a clean break,
   so it sits on the watchlist rather than as a new line.
 explanation: null
+explained:
+  depth: full-text
+  before: Distribution-matching one-step generators, including the recently proposed Drifting Models,
+    derive their training signal from minibatch-wide all-pairs fields, comparing every generated sample
+    against every other sample and every real sample in the batch to estimate an energy-distance gradient,
+    a theoretically grounded approach that scales quadratically with batch size.
+  problem: The paper asks whether a proper distributional energy can instead supply constant-size, per-sample
+    supervision for training a one-step generator directly, without teacher queries, prescribed denoising
+    targets or adversarial discriminators, and without the quadratic cost of all-pairs batch statistics.
+  idea: Reframe the energy-distance gradient as a three-body scattering interaction. Each generated projectile
+    is pulled toward one real reference sample and pushed away from one independently generated sample,
+    so that the expectation of this single attract-repel vector, conditioned on the projectile, equals
+    the 2-Wasserstein gradient-flow velocity of the energy distance between the model and data distributions.
+  method: Three-Body Scattering trains a generator by regression rather than denoising. The generator maps
+    noise directly to a sample in one forward pass, either in pixel space with PixelDiT-XL or in the SD-VAE
+    latent space with DiT-XL/2, and for ImageNet-scale runs the scattering interaction is computed not
+    on raw pixels but on frozen representation features from ResNet-18, SigLIP2-B or MAE-B, with gradients
+    flowing back through those frozen features into the generator while the repelling source sample stays
+    detached. The training objective is a mean-squared-error regression of the generator's output toward
+    a frozen target built from the scattering vector, the normalized direction toward the real reference
+    minus the normalized direction toward the repelled generated sample, which functions as a drift field
+    the generator regresses onto rather than a noise or velocity prediction in the diffusion sense. A second
+    small tracker network is trained alongside the generator to estimate the conditional expectation of
+    this scattering vector online, which the paper shows reduces the variance that comes from which single
+    real and generated samples happen to be drawn, compared with using the instant per-triplet vector directly.
+    Most reported ImageNet runs initialize the generator from a checkpoint already pretrained with diffusion
+    or flow matching rather than training from a random start. Inference is a single forward pass, one
+    function evaluation, with no classifier-free guidance or guidance-scale sweep used anywhere in training
+    or inference.
+  evidence: On ImageNet-256 at one function evaluation, TBSM reaches FID 1.63 with the latent-space DiT-XL/2
+    and FID 2.23 with the pixel-space PixelDiT-XL, both without guidance and both initialized from a pretrained
+    multi-step checkpoint. A smaller pixel-space JiT-B variant reaches FID 2.92. In the paper's own comparison
+    table, Drifting Models with DiT-L/16 reaches FID 1.43 and an FD-loss-refined JiT-H/16 reaches FID 0.75,
+    both also pixel-space one-step methods, so TBSM's results are competitive but do not lead that comparison.
+    On ImageNet-512, the latent DiT-XL/4 variant reaches FID 1.92 and the pixel PixelDiT-XL variant reaches
+    FID 3.84.
+  limitations: The authors concede that their convergence analysis, both the population-flow argument
+    and the finite-generator argument, relies on assumptions such as an exact scattering field, chain-rule
+    regularity, gradient dominance and bounded variance, and that neither argument establishes convergence
+    for a general neural generator trained by stochastic gradient descent. They also concede that vector
+    estimates can be noisy near coincident particles, that training from random initialization at ImageNet
+    scale remains untested, that scattering in representation space only guarantees matching of the projected
+    distribution so full image fidelity depends on how informative the frozen encoder is, and that the
+    paper establishes sample quality at one function evaluation without a compute-matched efficiency comparison
+    against mature diffusion and autoregressive systems. The paper's own results place TBSM behind Drift
+    and FD-loss on the pixel-space ImageNet comparison.
+  why_it_matters: It shows that a theoretically proper distributional energy can be turned into ordinary
+    per-sample regression supervision without quadratic batch cost, adversarial training or a teacher model.
+    The paper's own design map places this method as one point adjacent to Drift-like dynamics, GAN-like
+    critics and diffusion-style objectives rather than a replacement for any of them, consistent with the
+    authors' framing and with the atlas keeping it on the watchlist rather than assigning it a line.
 abstract: 'Modern generative models typically rely on an adversarial critic, a prescribed noise-to-data
   path, or an autoregressive factorization. Instead, we show that a proper distributional energy can induce
   sample-level motion and provide direct regression supervision for a one-step generator. Three-Body Scattering

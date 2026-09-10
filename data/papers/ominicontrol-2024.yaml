@@ -40,6 +40,56 @@ summary: 'Predates FLUX.1 Kontext by about seven months and generalizes the same
   handles both spatially-aligned control (edges, depth) and non-aligned control (subject-driven generation)
   — for about 0.1% additional parameters versus a trained adapter.'
 explanation: null
+explained:
+  depth: full-text
+  before: Conditioning a diffusion model on an image (an edge map, a depth map, a reference subject)
+    was done with UNet-era adapters bolted onto the backbone. ControlNet adds roughly 361M parameters,
+    42% of Stable Diffusion 1.5's 860M; T2I-Adapter adds roughly 77M, 9%; IP-Adapter for FLUX.1 adds
+    roughly 918M, 7.6% of its 12B parameters. Each adapter is built for either spatially-aligned control
+    (edges, depth) or non-aligned control (subject reference) but not both, and none of these UNet-specific
+    designs transfers cleanly to a DiT backbone.
+  problem: Give a DiT a single minimal mechanism that handles both spatially-aligned and non-aligned
+    image conditioning, without a task-specific adapter architecture.
+  idea: Encode the condition image with the DiT's own VAE encoder, concatenate its tokens with the
+    text and noisy-image tokens into one sequence, and let ordinary multi-modal attention do the
+    conditioning work. A position-encoding shift, not a new module, is what tells the model whether
+    the condition is spatially aligned with the target or not.
+  method: 'Space: this operates entirely inside FLUX.1-dev''s own VAE latent space, the 12B-parameter
+    rectified-flow DiT that is the paper''s base model throughout. The condition image is encoded with
+    the same frozen VAE the backbone already uses, producing tokens C_I that live in the identical latent
+    space as the noisy generation tokens X and are concatenated with text tokens C_T into one sequence
+    Z = [X; C_T; C_I], which then passes through ordinary full multi-modal attention (softmax(Q_Z K_Z^T
+    / sqrt(d)) V_Z) so every token type can attend to every other. FLUX.1-dev''s pretrained transformer
+    weights are frozen throughout, and its own rectified-flow velocity-prediction training objective is
+    left completely unchanged; adaptation is done with LoRA at rank 4, roughly 14.5M newly trained parameters,
+    about 0.1% of FLUX.1''s 12B, injected only into the existing attention layers as the conditioning
+    pathway, with the LoRA scale set to 0 on non-condition tokens. For spatially-aligned tasks (canny, depth, deblur, colorization) the condition tokens are
+    given the same RoPE position indices as their corresponding tokens in the target image, enforcing
+    spatial correspondence; for non-aligned tasks (subject-driven generation) the condition tokens
+    are shifted to a disjoint index range with no spatial overlap, which the paper reports converges
+    faster. Protection: there is no mask, attention injection, or locality loss anywhere in the design.
+    The only knob governing how strongly the condition constrains the output is a single global condition-strength
+    factor, applied uniformly through the attention bias; nothing in the mechanism protects specific
+    regions the model was not asked to change, so fidelity to the untouched parts of the composition
+    is an emergent property of the position-encoding correspondence on aligned tasks, not an explicit
+    guarantee.'
+  evidence: 'On COCO 2017 validation at 512x512 against FLUX ControlNet: canny F1-score 0.38 versus
+    0.21, canny CLIP-Score 0.76 versus 0.53, depth MSE 903 versus 2958, colorization MSE 24 versus
+    351, deblurring FID 11.49 versus 30.38. On a DreamBooth-derived subject-driven benchmark against
+    IP-Adapter for FLUX, GPT-4o-judged identity preservation is 50.6% versus 11.8%, modification accuracy
+    75.8% versus 57.7%, material quality 84.3% versus 65.8%, and color fidelity 55.0% versus 30.8%,
+    corroborated by a 375-response user study. All of this comes from roughly 0.1% additional parameters
+    versus IP-Adapter''s 7.6% and ControlNet''s much larger share.'
+  limitations: 'The paper does not carry an explicit limitations section. The mechanism itself exposes
+    some implied constraints read directly from the method: the condition-strength factor is a single
+    global scalar with no spatial granularity, the choice of position-encoding scheme differs by task
+    type and was tuned empirically rather than derived, and all results are on FLUX-family DiTs, so
+    generalization to other transformer backbones is untested in the paper.'
+  why_it_matters: It shows that conditioning does not require a bespoke adapter architecture at all;
+    reusing the backbone's own encoder and attention, plus a position-encoding trick, is enough to match
+    or beat specialized UNet-era adapters across both aligned and non-aligned conditioning tasks with
+    a fraction of their parameter cost. This is the same minimal concatenate-and-attend move that FLUX.1
+    Kontext would popularize for editing roughly seven months later.
 abstract: 'We present OminiControl, a novel approach that rethinks how image conditions are integrated
   into Diffusion Transformer (DiT) architectures. Current image conditioning methods either introduce
   substantial parameter overhead or handle only specific control tasks effectively, limiting their practical

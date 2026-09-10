@@ -38,6 +38,42 @@ summary: 'Introduces a simulation-free objective for continuous normalizing flow
   (optimal transport) path as a simple special case that trains faster and samples in fewer steps than
   diffusion.'
 explanation: null
+explained:
+  depth: full-text
+  before: Continuous normalizing flows were trained by maximum likelihood, which required simulating the flow's ODE
+    during training and did not scale to large models or datasets. Score-based diffusion models offered
+    simulation-free training but only for a restricted family of Gaussian diffusion probability paths, such as
+    variance-preserving or variance-exploding paths, not for probability paths in general.
+  problem: Train continuous normalizing flows in a simulation-free way for a much broader family of probability paths
+    between a noise distribution and the data distribution than the paths diffusion models use, and determine whether
+    some other choice of path trains faster or samples more efficiently than the diffusion paths already in use.
+  idea: Define a simple, per-example conditional probability path with a known vector field, and regress a network
+    directly onto that conditional vector field rather than the intractable marginal one. The paper proves the
+    conditional and marginal objectives have identical gradients, and shows that a straight-line optimal-transport
+    path between noise and data is a valid and efficient special case.
+  method: This trains fully unconditional, class-conditional models directly on ImageNet pixels, with no latent
+    encoding, using a U-Net architecture adapted from Dhariwal and Nichol. The network regresses a velocity vector
+    field, not noise and not clean data, that generates the chosen conditional probability path. For the
+    optimal-transport path the conditional field has a closed form, the displacement from the current point toward the
+    data point scaled by a factor that goes to zero as the path reaches the data, giving straight-line, constant-speed
+    trajectories rather than the curved, backtracking trajectories diffusion paths produce.
+  evidence: No classifier or classifier-free guidance is used anywhere in this paper, since the models are
+    unconditional or class-conditional ImageNet generators, so these numbers are guidance-free by construction. On
+    ImageNet 32 by 32 the optimal-transport variant reaches 3.53 bits per dimension and FID 5.25. On ImageNet 64 by 64
+    it reaches 3.31 bits per dimension and FID 14.00. On ImageNet 128 by 128 it reaches FID 21.52. Training is also
+    more efficient, the ImageNet 64 model needs 157000 iterations against 540000 for the diffusion baseline at matched
+    throughput, and the ImageNet 128 model needs 475000 iterations against 4.36 million. At sampling time the
+    optimal-transport path needs fewer function evaluations to reach a matched error threshold, for example 156
+    against a diffusion score-matching baseline's 232 on CIFAR-10, and 162 against 436 on ImageNet 64.
+  limitations: The authors note explicitly that the conditional path being optimal transport does not imply the
+    resulting marginal vector field is itself an optimal-transport solution. Their theoretical guarantees also depend
+    on regularity assumptions, such as the data density staying bounded away from zero and decaying fast enough at
+    infinity, that are convenient rather than verified properties of real image distributions.
+  why_it_matters: This reframed diffusion training as one special case of a much larger, simulation-free family, and
+    showed that regressing a velocity field along a straight path trains faster and samples in fewer steps than the
+    curved diffusion paths used before it. Predicting a velocity or drift field rather than noise or clean data is now
+    a distinct training-objective choice this atlas tracks, and the straight-path formulation here is the direct
+    ancestor of the rectified-flow objectives used in later production text-to-image systems.
 lines:
 - line-flow-matching
 abstract: We introduce a new paradigm for generative modeling built on Continuous Normalizing Flows (CNFs),

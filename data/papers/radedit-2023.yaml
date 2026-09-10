@@ -34,6 +34,45 @@ summary: Uses masked diffusion editing to synthesize the dataset shifts a deploy
   a vision model can be stress-tested without collecting new clinical data. Editing as an evaluation instrument
   rather than as a content-creation tool.
 explanation: null
+explained:
+  depth: full-text
+  before: Prior counterfactual editing methods for stress-testing either lacked spatial control or over-constrained
+    edits. LANCE, using unconstrained DDIM inversion, removed chest drains along with the pneumothorax
+    it was asked to remove, learning the spurious correlation between the two. DiffEdit, using a single
+    exclusion mask, produced visible boundary artifacts when adding consolidation to the lungs.
+  problem: Biomedical vision models trained on small, biased datasets can show inflated held-out performance
+    from spurious correlations, and there was no way to test a deployed model against realistic distribution
+    shifts without collecting new, expensive labeled clinical data.
+  idea: Fine-tune a text-to-image diffusion model on chest X-rays, then edit real images with two masks
+    at once, one confining the edit and one protecting regions that must stay unchanged, so edits can simulate
+    a shift without inheriting whatever spurious co-occurrence a single mask would carry.
+  method: RadEdit fine-tunes only the U-Net of a latent diffusion model while keeping SDXL's pretrained
+    VAE frozen, with text conditioning from BioViL-T, a domain-specific radiology-report encoder, rather
+    than CLIP. The paper's stated reason for keeping the VAE frozen is that it "can adequately reconstruct
+    chest X-rays" already, so no domain-specific autoencoder was trained. Editing runs DDPM inversion to
+    the latent, then at each denoising step blends conditional and unconditional noise inside an exclusion
+    mask while an inclusion mask reverts protected regions to the inversion trajectory; regions outside
+    both masks are deliberately left free to change for global consistency.
+  evidence: All three demonstrated shifts are validated by downstream classification or segmentation performance
+    on real clinical tasks, not by distribution metrics. For acquisition shift, a COVID-19 classifier trained
+    on a scanner-confounded split reaches 99.1% accuracy on its real test set but only 5.5% on synthetic
+    images that strip the confounding scanner artifact, while a classifier trained on a deconfounded split
+    holds steady at 74.4% real versus 76.0% synthetic. For manifestation shift, a pneumothorax classifier
+    drops from 93.3% to 17.9% accuracy when chest drains are edited in without the pathology, exposing
+    a drain-pathology shortcut, while a more robustly trained classifier drops only from 93.7% to 81.7%.
+    For population shift, lung-segmentation Dice degrades more under edits for a model trained on a mostly-healthy
+    cohort than for one trained on a cohort with more abnormalities. No reader study with a radiologist
+    is reported; edit fidelity itself is scored with BioViL-T similarity, an automated proxy the paper
+    admits may itself be biased.
+  limitations: The paper concedes that failure cases are currently found by manual inspection of datasets
+    and models rather than automatically, that not every pathology can be tested this way since some require
+    adjusting segmentation masks after editing, that additions occasionally introduce unintended changes
+    like cardiomegaly or altered lung size for larger edits, and that its own edit-quality score is not
+    sensitive enough to catch the specific artifacts produced by the LANCE and DiffEdit baselines it compares
+    against.
+  why_it_matters: This is editing used as an evaluation instrument, generating the specific distribution
+    shift a clinical model will face and measuring the resulting drop in real task performance, a stronger
+    form of evidence than the distribution metrics most other generative medical-imaging papers report.
 abstract: 'Biomedical imaging datasets are often small and biased, meaning that real-world performance
   of predictive models can be substantially lower than expected from internal testing. This work proposes
   using generative image editing to simulate dataset shifts and diagnose failure modes of biomedical vision

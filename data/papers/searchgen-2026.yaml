@@ -29,6 +29,52 @@ summary: Gives an image generator search access so it can render subjects its tr
 explanation: null
 lines:
 - line-agentic-generation
+explained:
+  depth: full-text
+  before: Prior visual-generation benchmarks such as GenAI-Bench, T2I-CompBench, DALL-Eval and HEIM tested
+    compositionality and aesthetics within concepts the generator already knew. Prior search-augmented
+    systems such as Re-Imagen, RDM, KNN-Diffusion and IP-Adapter triggered retrieval on every prompt regardless
+    of whether the generator already had adequate knowledge.
+  problem: Generators are trained on fixed corpora while user requests are open-ended and evolving, covering
+    new characters, trending entities and events after the training cutoff. Unconditional retrieval that
+    fires on every prompt actively hurts prompts the generator already handles, through concept corruption
+    where search overrides correct internal knowledge and a copy effect where references become copying
+    templates.
+  idea: Treat knowledge as generator-specific and shifting rather than fixed. Define a boundary between
+    what a given generator can internalize through training and what must stay in external context, and
+    learn that boundary by first teaching the generator to expand what it can internalize, then training
+    a reasoner to search only for what falls outside the strengthened generator's new boundary.
+  method: The paper builds SearchGen-20K, 20,839 prompts across twelve failure categories and twenty-two
+    domains, annotated with 5.2 knowledge gaps per prompt on average, plus SearchGen-Corpus-1M, 145,642
+    archived search sessions with 370,733 cached downloads, for offline reproducible evaluation. A three-stage
+    reasoner, warm-started by finetuning Qwen3-VL-8B on about 10,000 expert trajectories, gates which knowledge
+    gaps are critical enough to trigger at most three search queries, filters retrieved references down
+    to what fills the specific gap, and integrates them into an enriched text prompt. Co-training then
+    alternates two phases, an online iterative Diffusion-DPO phase that trains the image generator, tested
+    on Flux.2-Klein-4B, Flux.2-Klein-9B and Bagel-7B, on preference pairs built from top- and worst-scored
+    search-augmented generations, and a rejection-sampling finetuning phase that retrains the reasoner
+    on only positive-advantage trajectories rolled out against the now-stronger generator. This is generator-agnostic
+    post-training layered on top of existing text-to-image models rather than a new base generative objective,
+    so it makes no claim about the pixel, latent or token space of the underlying generator beyond whatever
+    each tested model already uses.
+  evidence: On SearchGen-Bench, frontier open generators score only 21 to 28 out of 100 on search-intensive
+    prompts against 67 to 75 on prompts that need no outside knowledge, a roughly 40-point collapse invisible
+    to benchmarks like GenAI-Bench, where Flux.2-Klein-9B scores above 4.0 out of 5.0. Naive unconditional
+    search actively hurts, Qwen-Image-2 drops from 70.7 to 60.4 on no-search prompts once search is forced
+    on every prompt. The teach-then-search co-training recipe raises Klein-4B from 26.4 at the warm-started
+    stage to 29.2 after generator DPO and 31.8 after the reasoner RFT stage, close to a Gemini-3-Flash oracle
+    reasoner's 31.2 on the same generator, while also recovering selectivity, no-search-prompt scores rise
+    from 49.9 to 56.9 as the co-trained system learns not to search when it does not need to. Bagel-7B
+    improves similarly, 23.4 to 24.7 to 26.8 across the same three stages.
+  limitations: The authors concede they ran only one co-training cycle and do not know whether further
+    iteration keeps helping, tested only 4 and 7 billion parameter generators so the scaling trajectory
+    is untested, leave open whether richer reward signals would help on the hardest prompt tier, and do
+    not know whether the knowledge boundary could be predicted without full co-training through cheaper
+    probing or uncertainty estimates.
+  why_it_matters: It reframes a class of generation failures as missing world knowledge rather than missing
+    rendering capability, and shows that indiscriminate tool use is actively harmful, so search-augmented
+    generation needs a learned, generator-specific policy for when to search rather than a fixed retrieval
+    trigger.
 abstract: 'Visual generators excel at rendering, but they confidently fabricate what they do not know.
   User requests are unbounded, evolving, and deeply long-tailed: new characters, trending entities, post-cutoff
   events, and more. This world-knowledge bottleneck is structural: generators are trained on fixed corpora,

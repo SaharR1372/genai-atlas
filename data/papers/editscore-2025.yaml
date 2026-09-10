@@ -31,6 +31,47 @@ summary: Scores an edit as the geometric mean of semantic consistency, covering 
   and region preservation, and perceptual quality, validated against a companion benchmark and used to
   train a policy with Flow-GRPO.
 explanation: null
+explained:
+  depth: full-text
+  before: RL had already improved text-to-image generation, through methods such as Flow-GRPO and DanceGRPO,
+    but had barely been applied to image editing because no reliable reward signal for editing existed.
+    Proprietary VLMs such as GPT-5 were too expensive to call at RL scale, and open-source VLMs were not
+    accurate enough, and Qwen2.5-VL-72B reached only 0.563 overall accuracy on the paper's own benchmark and
+    scored worse than chance, 0.376, on consistency judgments.
+  problem: Image-editing RL needs a reward model that scores an edit accurately, is cheap enough to call
+    at RL scale, and is consistent enough not to be gamed by the policy during training, and no such model
+    or public benchmark for it existed.
+  idea: Build a benchmark of expert-annotated edit preferences, then train a family of specialized reward
+    models that score every edit as the geometric mean of a semantic-consistency score, covering instruction
+    following and region preservation together, and a perceptual-quality score, and show that this specialized
+    signal, not raw model scale, is what makes online RL for editing work.
+  method: EditReward-Bench pairs 3,072 preference pairs across four categories (Subject, Appearance, Scene,
+    Advanced) and three axes (Prompt Following, Consistency, Overall Quality), drawn from the outputs of
+    11 editing models and ranked by expert human raters into quality tiers, keeping only pairs with full
+    annotator agreement. EditScore fine-tunes Qwen2.5-VL (7B, 32B, 72B) with LoRA rank 32 on 70,000 GPT-4.1-annotated
+    samples, curated by k-center greedy sampling and filtered to remove unachievable or low-discriminability
+    cases; each model outputs chain-of-thought reasoning plus a scalar score, and the final score is the
+    geometric mean of the semantic-consistency and perceptual-quality scores. A self-ensemble strategy averages
+    several independent stochastic forward passes per input triplet. The resulting reward trains OmniGen2
+    with Flow-GRPO adapted to OmniGen2's SDE formulation, using 20 sampling timesteps, a group size of 12,
+    and a KL penalty of 0.04. This is an evaluation and reward-modeling contribution rather than an editing
+    method, so the space/protection-mechanism axis that organizes the rest of this section does not apply
+    to it directly.
+  evidence: EditScore-72B with a 4-pass ensemble reaches 0.763 overall accuracy on EditReward-Bench, close
+    to GPT-5's 0.755 and above GPT-4.1's 0.705; EditScore-7B single-pass already reaches 0.659 overall,
+    above Qwen2.5-VL-72B's 0.563. Using EditScore-7B as the RL reward, OmniGen2's GEdit-Bench-EN overall
+    score rises from 6.28 to 6.68 and its semantic-control score from 6.72 to 7.20; its ImgEdit-Bench overall
+    score rises from 3.40 to 3.63. Using Qwen2.5-VL-72B as the reward instead causes RL training to collapse.
+  limitations: RL training was run on 32 H100 GPUs, a computational barrier the authors do not otherwise
+    address, and EditReward-Bench covers only 13 tasks and two downstream benchmarks (GEdit-Bench, ImgEdit-Bench),
+    so its coverage of editing scenarios is bounded. The authors' own analysis shows reward variance, not
+    annotator accuracy, drove policy quality. GPT-4.1 labels, despite lower benchmark accuracy than GPT-5's,
+    produced a better policy (6.375 versus 6.292), which they note complicates simple accuracy-based reward
+    selection.
+  why_it_matters: It shows the bottleneck blocking RL for image editing was reward fidelity rather than
+    the RL algorithm itself, and gives the field both a public preference benchmark and an open reward model
+    to build on instead of expensive proprietary VLM calls, the same role FID and CLIP score play for generation
+    but built specifically for the instruction-following-plus-preservation structure of an edit.
 abstract: Instruction-guided image editing has achieved remarkable progress, yet current models still
   face challenges with complex instructions and often require multiple samples to produce a desired result.
   Reinforcement Learning (RL) offers a promising solution, but its adoption in image editing has been

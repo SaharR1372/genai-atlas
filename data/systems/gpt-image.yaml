@@ -1,0 +1,25 @@
+id: gpt-image
+type: system
+name: GPT Image
+org:
+- OpenAI
+open: false
+releases:
+- version: gpt-image-2.5-sunburst
+  date: 2026-09
+  arxiv: null
+  open: false
+  notes: Confirmed in OpenAI's own API changelog dated 2026-09-08 and listed in their model docs as their
+    most capable image generation and editing model. API only.
+- version: gpt-image-2.5-flare
+  date: 2026-09
+  arxiv: null
+  open: false
+  notes: The fast variant, released the same day. Both support new xhigh and max quality settings.
+sections:
+- generation
+- editing
+summary: OpenAI's image generation and editing family, available only through the API. No technical report
+  exists, so the atlas records what the vendor's own documentation states and nothing more. OpenAI describes
+  the underlying approach as autoregressive rather than diffusion, but publishes no architecture details,
+  so it cannot be placed on the representation axis.

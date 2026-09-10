@@ -26,6 +26,46 @@ status:
 summary: Tests whether stereotyped attributes persist when the prompt context changes, across 92 roles
   and more than 66,000 generated images from four current systems, and finds that they do.
 explanation: null
+explained:
+  depth: full-text
+  before: Prior bias audits of text-to-image models evaluated stereotyped role-attribute associations
+    in isolation, using a fixed context-free prompt template such as "a photo of a nurse," without varying
+    the scene or activity around the role.
+  problem: It was unknown whether stereotyped visual associations attached to a profession are a stable
+    property of the role concept, or an artifact of the fixed prompt template that a shift in context
+    could suppress.
+  idea: Instead of asking only whether a role carries stereotyped attributes, ask whether those attributes
+    persist or dissolve once the role is placed into a scene that has nothing to do with its usual context,
+    using matched prompts that hold the role fixed and vary only the surrounding context.
+  method: Four text-to-image systems, FLUX.1, Stable Diffusion XL, Stable Diffusion 3.5 and Qwen-Image,
+    each generated 10 images per prompt across 1,656 prompts covering 92 occupational roles under context-free,
+    context-related and context-unrelated conditions, for 66,240 images total. GPT-5-mini extracted 30
+    attributes across four cohorts, Scene, Camera, Objects and People, using closed and open vocabularies,
+    validated against human annotation with a Cohen's kappa of 0.822. Two metrics summarize the images,
+    a Bias Intensity score measuring how concentrated attribute labels are around a dominant value, and
+    a Context Consistency Score tracking label prevalence and stability across conditions.
+  evidence: Pooled Bias Intensity rose from 0.452 under context-free prompts to 0.499 under context-unrelated
+    prompts, an increase of 0.047 with a cluster-bootstrap 95 percent interval of [0.030, 0.050]. Demographic
+    cues were the most persistent attribute, dancer was rendered female in 98 to 100 percent of images
+    across all four models, flight attendant female in 99 to 100 percent, and mechanic male in 94 to 100
+    percent, each shifting by only a few percentage points between conditions. Tools and garments persisted
+    at lower but still consistent rates, welder with gloves in 29 to 32 percent of images and baker with
+    an apron in 31 to 33 percent. Scene attributes were the most context-sensitive cohort, with a swing
+    of +0.093, ahead of objects at +0.058 and people at +0.042, while camera framing showed the largest
+    swings among individual dimensions despite a near-zero net change. Across all four models, 93.3 percent
+    of role-attribute pairs stayed invariant under semantic prompt reformulation.
+  limitations: The authors concede that Bias Intensity measures distributional concentration rather than
+    social harm directly, noting that a highly concentrated distribution may reflect a genuine visual regularity
+    of the occupation as much as an unwanted stereotype. The 92 roles are drawn from the U.S. Bureau of
+    Labor Statistics taxonomy and are not intended as exhaustive global coverage. The framework varies
+    only location and activity context, not lighting, cultural setting or interpersonal interaction, and
+    attribute extraction depends on GPT-5-mini, which carries its own occupational priors despite the human
+    validation check.
+  why_it_matters: Unrelated context increasing rather than suppressing cross-role attribute concentration
+    shows that models change the scene around a role rather than adapting the role's visual characterization
+    itself, a compositional failure invisible to context-free bias benchmarks. It argues that bias evaluation
+    needs controlled contextual variation, not just isolated-concept audits, to detect this kind of stereotype
+    persistence.
 abstract: 'Text-to-image models learn associations between concepts - in the case of this paper, people''s
   professions, which we refer to as roles - and visual attributes. These associations can underpin many
   observed forms of stereotypical bias. A key open question in this area is whether these associations

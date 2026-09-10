@@ -32,6 +32,51 @@ summary: Scales DINO-style self-supervised training to 7B parameters and adds Gr
   features high-quality over very long training, fixing a known DINOv2 dense-feature degradation issue;
   the encoder SVG generates directly inside.
 explanation: null
+explained:
+  depth: full-text
+  before: DINOv2 showed that a self-distillation recipe could produce frozen features rivaling
+    weakly-supervised models on dense tasks, but pushing that recipe further ran into a known,
+    unsolved failure. Dense patch-level feature quality degraded over long training schedules even
+    as global, class-level performance kept improving, and cosine learning-rate schedules tied to a
+    fixed training horizon made it hard to tune hyperparameters for ever-larger runs.
+  problem: Scale a DINO-style self-distillation recipe to a 7-billion-parameter model trained on
+    over a billion curated images without the dense feature maps collapsing partway through the
+    schedule, since global and local representation quality had been diverging in that regime.
+  idea: The Gram matrix of patch features, i.e. all pairwise dot products between patch tokens, from
+    an earlier, still-healthy checkpoint can serve as a target that keeps anchoring patch-level
+    structure while training continues and global representation keeps improving. Rather than let
+    the student's patch-pair similarities drift freely for the rest of training, periodically pin
+    them back toward those of a frozen earlier "Gram teacher."
+  method: DINOv3 trains a ViT-7B (6.7B parameters, 40 blocks, patch size 16) with self-distillation,
+    a DINO clustering loss plus an iBOT masked-patch-prediction loss plus a Koleo regularizer, using
+    Sinkhorn-Knopp centering, on 1.689 billion curated web images (LVD-1689M) for 1M iterations at a
+    constant learning rate. After 1M iterations a refinement phase adds Gram anchoring, the squared
+    Frobenius distance between the student's patch-pair Gram matrix and that of an earlier Gram
+    teacher checkpoint updated every 10k iterations, using higher-resolution features as the anchor.
+    RoPE with jittering gives resolution robustness, and 4 register tokens are used, following the
+    registers fix (registers-2023 in this atlas). The 7B model is then distilled post-hoc into
+    smaller students from 21M to 0.8B parameters, and separately given text alignment via LiT, where
+    the vision encoder is frozen and only a text encoder is trained contrastively against it. The
+    entire core pretraining is self-supervised on images alone; text alignment is a purely post-hoc,
+    frozen-encoder addition, not part of the representation-learning objective itself. The paper
+    contains no discussion of using DINOv3 features as a training target for diffusion or other
+    generative models, or of the encoder feeding a generative decoder; it evaluates the model
+    exclusively as a frozen feature extractor for discriminative and dense-prediction tasks.
+  evidence: 'On frozen dense linear probes: ADE20k mIoU 55.9 against DINOv2''s 49.5 and SigLIP2''s
+    42.7, Cityscapes mIoU 81.1 against DINOv2''s 75.6, NYUv2 depth RMSE 0.309 against DINOv2''s
+    0.372. ImageNet-1k linear probing reaches 88.2% top-1 for ViT-7B, close to DINOv2-g''s 88.1%.
+    Unsupervised object discovery (CorLoc, Pascal VOC) reaches 61.1% against DINOv2''s 55.3%. With a
+    linear decoder and light fine-tuning, COCO detection reaches 66.1 mAP, ahead of an AM-RADIO-based
+    detector at 64.3.'
+  limitations: The paper does not present a dedicated limitations section. It does concede, in its
+    appendix ablations, that results are sensitive to which checkpoint is used as the Gram teacher,
+    anchoring to the checkpoint at exactly 1M iterations is suboptimal, so the anchor point requires
+    deliberate tuning rather than being a free choice.
+  why_it_matters: Confirms that self-distillation scales past DINOv2 given a targeted fix for one
+    specific failure mode, dense feature collapse, yielding the strongest frozen general-purpose
+    dense features referenced in this atlas's own comparison tables. That makes DINOv3 exactly the
+    kind of frozen encoder RAE-style generative decoders would want to consume, but this paper never
+    tests or even discusses that use; any such connection belongs to later papers, not this one.
 abstract: Self-supervised learning holds the promise of eliminating the need for manual data annotation,
   enabling models to scale effortlessly to massive datasets and larger architectures. By not being tailored
   to specific tasks or domains, this training paradigm has the potential to learn visual representations

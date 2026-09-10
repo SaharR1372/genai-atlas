@@ -36,3 +36,52 @@ summary: 'The strongest downstream evidence in medical generative imaging: pixel
   X-ray, histopathology and dermatology. Notably, the choice of pixel space is never argued — it is inherited
   from the Imagen lineage the authors were using.'
 explanation: null
+explained:
+  depth: full-text
+  before: Medical ML models degrade under distribution shift and underperform on underrepresented subgroups,
+    and prior generative-augmentation work in medicine mostly used GANs of limited diversity and quality,
+    evaluated on single modalities without jointly tackling robustness and fairness together.
+  problem: Data acquisition and expert labeling to fix underrepresentation are often prohibitively expensive
+    or practically impossible because of the rarity of conditions or the scarcity of clinical expertise,
+    so the question is whether a generative model can produce steerable synthetic augmentations that close
+    accuracy and fairness gaps without new data collection.
+  idea: Train a conditional diffusion model on available labeled and unlabeled data, sample from it so that
+    demographic attributes are represented uniformly while the true disease prevalence is preserved, and
+    use those synthetic images to enrich the training set of a downstream diagnostic classifier.
+  method: Generation happens directly in pixel space, with a cascaded DDPM using a UNet backbone and no
+    VAE or other learned latent anywhere in the pipeline. A low-resolution diffusion model (64 by 64) is
+    trained first, and where higher resolution is needed a second upsampling diffusion model is trained
+    with the same label or label-and-attribute conditioning, following the standard cascaded-DDPM literature.
+    The paper never argues for pixel space over a latent alternative. It simply adopts the cascaded DDPM
+    architecture as previously published, with no discussion of memory limits, invertibility, or any other
+    reason to avoid a latent. Three modalities are tested, namely histopathology (CAMELYON17, patch classification),
+    chest radiology (CheXpert in-distribution, ChestX-ray14 out-of-distribution) and dermatology (a US teledermatology
+    dataset in-distribution, Australian and Colombian datasets out-of-distribution).
+  evidence: This is downstream clinical-task evidence, not just distribution metrics, and it includes a
+    genuine reader study. In histopathology, synthetic data plus color augmentation gave a 48.5 percent relative
+    improvement over baseline and 3.2 percent over color augmentation alone in the most skewed low-data
+    setting, while closing the in-distribution fairness gap between hospitals by 20 absolute percentage
+    points. In chest radiology, average AUC improved 5.2 percent out of distribution, with cardiomegaly AUC
+    improving 21.1 percent, the sex fairness gap narrowing 44.6 percent, and the race fairness gap narrowing
+    31.7 percent in distribution. In dermatology, label-and-property conditioning gave 27.3 percent better
+    high-risk sensitivity in distribution and 63.5 percent out of distribution in the more skewed setting,
+    closing the fairness gap by a factor of 7.5 out of distribution. A reader study then checked whether
+    the synthetic images were themselves clinically credible, three dermatologists rating 488 synthetic
+    images reached 56.0 plus or minus 11.9 percent top-1 diagnostic accuracy and 67.7 plus or minus 12.5
+    percent top-3 accuracy, comparable to 101 board-certified dermatologists rating 789 real images at 54.0
+    plus or minus 21.1 percent top-1 and 67.1 plus or minus 22.7 percent top-3. This combination of downstream
+    accuracy and fairness gains across three modalities, corroborated by a reader study, is stronger evidence
+    than the FID- or SSIM-only comparisons common elsewhere in the medical section.
+  limitations: The paper concedes it is not a substitute for genuine data collection and should only complement
+    it. It concedes that a poor or biased generative model could exacerbate rather than fix subgroup disparities,
+    that binary sex and sex-and-gender conflation and the Fitzpatrick skin-type scale carry their own known
+    limitations, and that its conclusions are only as trustworthy as the evaluation datasets used to draw
+    them. It also concedes that only about half of the generated dermatology images were rated diagnosable
+    quality at all, and that memorization and privacy guarantees for rare attributes remain open problems
+    for future work.
+  why_it_matters: This is the strongest downstream clinical evidence in the whole medical section precisely
+    because it combines accuracy gains, fairness gains, three independent modalities and clinician judgment
+    of the synthetic images themselves, all without any learned latent space in the pipeline. It is also
+    a pointed negative result for the pixel-space line's own reasoning, since the paper never argues for
+    pixel space at all, so its strength as evidence for pixel-space generation is really strength as evidence
+    for cascaded diffusion trained the way the Imagen lineage already did, inherited rather than justified.

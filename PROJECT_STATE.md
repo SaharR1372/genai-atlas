@@ -1,7 +1,34 @@
 # PROJECT_STATE
 
-Last updated: 2026-09-10 (session 7, Sonnet 5) — WORK_QUEUE Q1/Q2: wrote full-text `explained` blocks
-for 23 more papers in the representation/latent-design area. See CHANGELOG.md's session 7 entry.
+Last updated: 2026-09-10 (session 8, Sonnet 5) — WORK_QUEUE Q1/Q2: wrote full-text `explained`
+blocks for all 19 medical-imaging papers that had none. See CHANGELOG.md's session 8 entry.
+
+### Session 8 (2026-09-10, Sonnet 5)
+Worked WORK_QUEUE.md Q1/Q2's medical-imaging subset: every paper in `data/papers/*.yaml` where
+`sections` contains `medical` with no `explained` key (18 arXiv papers + 1 DOI-only Nature Medicine
+paper, ktena-2024). Fanned out across 4 parallel subagents, each fetching `arxiv.org/html/<id>vN`
+(PubMed Central full text for ktena-2024, via the PubMed MCP tools) and writing directly into
+`data/papers/*.yaml`. All 19 landed at `depth: full-text`. Every block states the paper's generation
+space (pixel / domain-trained VAE / borrowed natural-image VAE / foundation-model latent /
+normalizing flow) and the paper's own rationale for it, or explicitly says the paper gives none, per
+the task's medical-specific requirement. `scripts/validate.py` clean after every file. Only
+`data/papers/*.yaml` touched.
+
+**Finding worth carrying forward:** `data/papers/mededit-2024.yaml` is tagged
+`lines: [line-medical-transfer-vae]`, but its fetched full text shows a plain pixel-space DDPM
+(RePaint-style inpainting on 128x128 brain MRI slices) with no VAE, VQGAN, or borrowed autoencoder
+of any kind — it never fine-tunes Stable Diffusion. `line-medical-transfer-vae`'s `core_bet`
+("keeping its natural-image VAE frozen") does not describe this paper. The line's arc entry for
+mededit-2024 should move to `line-medical-pixel-space`, or be dropped, in a future session — not
+changed this session since the task was scoped to `data/papers/*.yaml` only.
+
+Two other checks against `data/lines/line-medical-*.yaml` confirmed rather than contradicted
+existing claims: `dar-memorization-2023`'s fetched numbers (59% of coronary CT training volumes,
+33% of sampled MRI candidates confirmed memorized) are the direct source for
+`line-medical-domain-vae`'s memorization-risk weakness; `ktena-2024`'s fetched full text (three-
+modality downstream clinical gains plus a genuine dermatologist reader study, no stated rationale
+for pixel space) confirms `line-medical-pixel-space`'s claim that it carries "the strongest
+downstream evidence in the whole medical section."
 
 ### Session 7 (2026-09-10, Sonnet 5)
 Worked WORK_QUEUE.md Q1/Q2 top to bottom: wrote the `explained` block (before/problem/idea/method/

@@ -36,6 +36,44 @@ summary: Adapts Stable Diffusion to chest X-rays by fine-tuning the U-Net and te
   by up to five points. The frozen natural-image latent is a pragmatic transfer-learning choice; the paper
   does not test whether that VAE discards clinically relevant detail.
 explanation: null
+explained:
+  depth: full-text
+  before: Stable Diffusion had been pretrained on billions of natural image-text pairs from LAION, and
+    prior chest X-ray synthesis was mostly GAN-based, class-conditional, and limited to a handful of pathologies
+    rather than open text conditioning. Early attempts to apply Stable Diffusion directly to chest X-rays
+    performed poorly, with one few-shot study losing 9.7 points of AUROC relative to a real-data baseline.
+  problem: The paper addresses the large distributional shift between natural images and chest radiographs,
+    and between natural language and the narrow, domain-specific vocabulary of radiology reports, which
+    stops a natural-image-pretrained model from generating clinically faithful, text-controllable X-rays.
+  idea: Fine-tune Stable Diffusion's denoising U-Net and CLIP text encoder on chest X-rays and radiology
+    report text from MIMIC-CXR, while keeping Stable Diffusion's VAE frozen, so the model inherits natural-image
+    visual priors but learns radiology-specific content and vocabulary.
+  method: Generation happens in Stable Diffusion's natural-image VAE latent space, borrowed unchanged from
+    the natural-image pretrained model rather than trained on chest X-rays. The paper's only stated reason
+    is a citation to the authors' own earlier work, stating that the VAE component is suitable for CXR
+    generation without modification, so it was kept frozen. No analysis of reconstruction fidelity or loss
+    of fine anatomical detail, such as tubes, lines, or small nodules, is given in this paper, and no ablation
+    compares a retrained VAE against the frozen one. The U-Net and CLIP text encoder were fine-tuned on
+    377,110 MIMIC-CXR images and their radiology report impressions, with learning-rate and step-count
+    sweeps up to 60,000 steps.
+  evidence: The paper reports FID-style distribution metrics, downstream classifier improvement, and a
+    genuine reader study, which puts it ahead of purely distributional evaluation. FID computed with a
+    CXR-specific classifier drops from 47.7 for unmodified Stable Diffusion to 3.6 for the best fine-tuned
+    model. Augmenting real training data with synthetic images improves a downstream classifier's AUROC
+    by about 5 points when trained jointly on 30,000 real and 30,000 synthetic images, and by about 3 points
+    when trained purely on a larger synthetic set, both measured against a real-only baseline. Two radiologists
+    with 7 and 9 years of experience rated 104 real-versus-synthetic image pairs for realism on a negative-2-to-2
+    scale and gave average scores of 1.67 and 1.81, indicating synthetic images were rated close to real,
+    though the paper notes radiologists could still often distinguish them through device-artifact cues.
+  limitations: The paper concedes its synthetic images have a limited grayscale range that precludes realistic
+    windowing and should not be regarded as a replacement for actual chest X-ray studies. It trains on
+    a single institution's data, uses only the shorter impression section of reports rather than full findings,
+    overfits when fine-tuned on datasets of only a few hundred images, and shows catastrophic forgetting
+    of general-domain text-encoder knowledge during medical fine-tuning that the paper does not mitigate.
+  why_it_matters: It shows a natural-image foundation model can be adapted cheaply to a clinical domain
+    and still improve a downstream classifier by a measurable margin, while leaving the frozen natural-image
+    VAE's fitness for clinically relevant detail as an open, unexamined assumption that the rest of this
+    transfer-VAE line inherits.
 abstract: Multimodal models trained on large natural image-text pair datasets have exhibited astounding
   abilities in generating high-quality images. Medical imaging data is fundamentally different to natural
   images, and the language used to succinctly capture relevant details in medical data uses a different,

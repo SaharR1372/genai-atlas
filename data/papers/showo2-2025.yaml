@@ -34,6 +34,51 @@ summary: Refines the single-transformer recipe that runs autoregressive text and
   in one set of weights, and moves to 3D-VAE latents. Evidence the native-unified line is maturing rather
   than stalling.
 explanation: null
+explained:
+  depth: full-text
+  before: The original Show-o generated images as discrete autoregressive tokens inside a single transformer
+    but had no native video support and no visual representation designed to scale across image and video
+    modalities together.
+  problem: How to extend the single-transformer unified recipe to high-quality continuous-latent image
+    and video generation, and to a representation that scales across both modalities, while still keeping
+    one shared backbone for understanding and generation.
+  idea: Fuse a semantic feature path and a low-level VAE-latent path into one visual representation, then
+    feed that single representation into one shared language-model backbone that carries two task-specific
+    heads, an autoregressive language head and a flow-matching head.
+  method: A 3D causal VAE (Wan2.1) compresses images and video 8 times spatially and 4 times temporally
+    into continuous latents, replacing the discrete VQ tokenizer of Show-o v1. Two paths process these latents,
+    SigLIP-distilled semantic layers that extract high-level features from noised and clean latents, and
+    a projector that embeds low-level 2D patch features, and the two are concatenated and fused with RMSNorm
+    and a two-layer MLP into one unified visual representation used for both understanding and generation.
+    That single fused representation, not two separate tokenizers, is what is shared. The backbone itself
+    is one Qwen2.5-1.5B or 7B transformer, one set of weights, not a mixture of experts, carrying two heads
+    on top, a language head trained with next-token cross-entropy and a flow head trained with a flow-matching
+    loss using its own transformer layers with adaLN-Zero time-step modulation. The combined loss is alpha
+    times the next-token loss plus the flow-matching loss, with alpha 0.2 in stage one and 1.0 in stage
+    two. Stage one trains only the projector, fusion module, and flow head on 66 million image-text pairs
+    at 432 by 432 resolution, about 1.5 days on 64 H100 GPUs, while the pre-distilled semantic layers are
+    used but not further tuned. Stage two fine-tunes the full model except the VAE on 9 million understanding
+    and 16 million generation examples, about 15 hours on the same hardware. The 7B model resumes the flow
+    head from the 1.5B run with an added alignment MLP.
+  evidence: On GenEval, Show-o2 scores 0.73 overall at 1.5B and 0.76 at 7B using 66 million generation pairs,
+    against Janus-Pro-7B's 0.80 on 144 million pairs and SD3-Medium's 0.74 as a generation-only 2B baseline.
+    On DPG-Bench, Show-o2 reaches 85.02 at 1.5B and 86.14 at 7B, ahead of Janus-Pro-7B's 84.19 and DALL-E
+    3's 83.50. On understanding, MME(p) is 1450.9 at 1.5B and 1620.5 at 7B, the 7B beating Janus-Pro-7B's
+    1567.1; MMBench(val) is 67.4 and 79.3, matching Janus-Pro-7B's 79.2; MMMU(val) is 37.1 and 48.9, ahead
+    of Mogao-7B's 44.2. On text-to-video, VBench quality score is 81.34, competitive with CogVideoX-5B's
+    81.61 and ahead of Emu3's 80.96.
+  limitations: The paper concedes that a low proportion of text-containing training images leads to poor
+    text rendering in generated images, mitigated by training at higher resolution and adding a TextAtlas
+    subset. It also concedes that generated images lack detail on small objects because of limited resolution.
+    It flags misuse risk from generating convincing synthetic text and images, and notes the training data
+    includes celebrities and copyrighted material. The paper does not report an explicit ablation isolating
+    whether joint training of the language head and flow head degrades either task relative to training
+    each alone; results are presented as state of the art on both fronts without addressing that tradeoff
+    directly.
+  why_it_matters: Show-o2 shows the native-unified recipe extending past discrete image tokens to continuous
+    video latents while keeping one backbone, evidence the line is maturing rather than stalling at Show-o's
+    original discrete-token design. It also illustrates a different sense of "unified" than Janus or Emu3,
+    one shared representation and one shared backbone, but two distinct loss heads rather than one objective.
 abstract: This paper presents improved native unified multimodal models, \emph{i.e.,} Show-o2, that leverage
   autoregressive modeling and flow matching. Built upon a 3D causal variational autoencoder space, unified
   visual representations are constructed through a dual-path of spatial (-temporal) fusion, enabling scalability

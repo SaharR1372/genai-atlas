@@ -33,6 +33,39 @@ summary: 'A multi-centre benchmark for generating CT from MRI or cone-beam CT fo
   clinical dose accuracy, so a method can look good by FID-style measures and still be wrong where it
   matters.'
 explanation: null
+explained:
+  depth: full-text
+  before: Individual synthetic-CT papers each claimed to beat prior work, but used different training
+    data, anatomies and metrics, and nearly all of them scored their methods only with image-similarity
+    measures, leaving the actual clinical target, radiotherapy dose accuracy, unmeasured.
+  problem: No multi-centre, ground-truth benchmark existed to compare synthetic-CT generation methods fairly,
+    and it was unknown whether the image-similarity metrics the field relied on actually predicted the
+    dose accuracy that determines whether a synthetic CT is safe to plan treatment on.
+  idea: Run a public challenge with CT ground truth from 1,080 patients across three Dutch centres, split
+    into MRI-to-CT and CBCT-to-CT tasks, and score every submission on both image-similarity and dose-based
+    metrics computed from real photon and proton treatment plans.
+  method: This is a challenge report rather than a single architecture, so it surveys generation approaches
+    instead of prescribing one. Participating teams used CNN encoder-decoders, GANs, vision transformers,
+    diffusion models and ensembles, in fully 3D, 3D-patch, 2.5D and 2D configurations. The report does
+    not evaluate or argue for any particular generation space, pixel, latent or otherwise, and gives no
+    stated rationale for that choice since it was left to each team; transformer-based submissions scored
+    highest on average (SSIM 0.88 Task 1, 0.90 Task 2), ahead of CNNs (0.85, 0.89) and GANs (0.83, 0.87).
+  evidence: The report is unusual in this atlas for explicitly testing whether distribution metrics predict
+    clinical utility, rather than only reporting them. Top teams reached SSIM above 0.87 (Task 1) and 0.90
+    (Task 2), with gamma pass rates above 98.1% and 99.0% for photon plans and above 97.3% and 97.0% for
+    proton plans across the two tasks. Image-similarity metrics (MAE, PSNR, SSIM) correlate strongly with
+    each other, Spearman absolute correlation between 0.88 and 0.96, while their correlation with the dose-based
+    metrics that matter clinically is low, absolute correlation at most 0.47. The paper states directly
+    that image similarity metrics "should not be solely relied upon to determine the clinical suitability
+    of a model." Under the authors' own proposed clinical thresholds, only one team per task actually met
+    the bar, so even the best submissions by image metrics mostly fell short on the clinical criterion.
+  limitations: The paper concedes the dataset is limited to Dutch centres and only brain and pelvis anatomy,
+    that image pairs were only rigidly registered so residual anatomical mismatch remains, that CBCT's
+    limited field of view made synthesizing the full body contour difficult, and that the validation phase
+    had no dose evaluation, so teams could not optimize toward the metric that turned out to matter most.
+  why_it_matters: For this atlas the central result is negative. Better FID or SSIM does not certify a
+    generative method as clinically usable, and any medical generation line whose evidence stops at distribution
+    metrics has not yet shown it solves the problem that matters.
 abstract: 'Radiation therapy plays a crucial role in cancer treatment, necessitating precise delivery
   of radiation to tumors while sparing healthy tissues over multiple days. Computed tomography (CT) is
   integral for treatment planning, offering electron density data crucial for accurate dose calculations.

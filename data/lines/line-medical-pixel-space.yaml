@@ -22,6 +22,11 @@ arc:
   role: evidence
   note: Pixel-space cascaded diffusion improves diagnostic accuracy and subgroup fairness across three
     modalities — the strongest downstream evidence in the whole medical section.
+- paper: mededit-2024
+  role: evidence
+  note: 'A pixel-space denoising model that induces pathology into healthy brain MRI. Its evaluation is
+    the notable part: a blinded neuroradiologist could not distinguish the generated strokes from real
+    ones.'
 strengths:
 - Required for inverse problems where measurements must stay consistent
 - No tokenizer means no reconstruction ceiling and no train/test latent mismatch

@@ -38,6 +38,49 @@ summary: Maps raw image pixels, text tokens and task-specific condition tokens i
   decoder or head. Scaled in the paper beyond 200B parameters, released at 8B, and so far trained only
   at 512x512.
 explanation: null
+explained:
+  depth: full-text
+  before: Standard latent diffusion transformers relied on a separate pretrained VAE and a disjoint text
+    encoder such as CLIP or T5, which the paper argues introduces an information bottleneck and loses
+    high-frequency detail during latent compression. Pixel-space diffusion transformers removed the VAE
+    but still paired the denoiser with an off-the-shelf, separately trained text encoder, leaving text
+    and image never jointly optimized. Other unified models such as BAGEL, Show-o and OmniGen2 unify multiple
+    tasks in one model but still route generation through a distinct decoder or head rather than the same
+    token space used for understanding.
+  problem: How to build one foundation model that handles text-to-image generation, instruction-based
+    editing, and subject-driven personalization at high resolution, without the semantic misalignment
+    that a separately trained VAE and text encoder introduce.
+  idea: Map raw image pixels, text tokens, and task-specific condition tokens into a single shared token
+    space and process all of them with the same decoder-only transformer blocks, so that generation and
+    editing become the same forward pass, differing only in which tokens occupy the condition slot.
+  method: There is no VAE anywhere in the pipeline. Images are patchified by a learnable patch-embedding
+    layer directly into pixel tokens, so the diffusion process itself runs in pixel space rather than any
+    learned latent. Text tokens come from the backbone's own vocabulary, inherited from Qwen3-VL-8B-Instruct
+    for the 8B model, and condition images are projected into the shared space with a SigLIP-2 visual
+    encoder. The Unified Transformer is a decoder-only stack with RMSNorm, SwiGLU and RoPE, using a hybrid
+    attention pattern in which condition and text tokens are causally masked and can attend only to preceding
+    tokens, while generation tokens use full attention and can attend to everything, including the condition
+    tokens. Training combines a flow-matching loss on the predicted pixels with LPIPS and a perceptual
+    DINO loss, across progressively higher-resolution stages, before RLHF with GRPO on a composite reward
+    for OCR accuracy, aesthetics, instruction following, and reasoning quality. Critically, the paper describes
+    no explicit mask, attention-injection, or copy mechanism that protects regions the instruction did
+    not target. Region preservation during editing is attributed to the joint optimization of language
+    modeling and multimodal understanding during pretraining and to the model's own full attention over
+    condition tokens, which is a claim about a learned property of the architecture, not an enforced constraint.
+  evidence: On GenEval the 8B model reaches 0.90 overall against 27B Qwen-Image's 0.87, and the 200B-plus
+    Pro version reaches 0.92. On DPG, 8B reaches 89.83 against Qwen-Image's 88.32, and Pro reaches 90.30.
+    On the ImgEdit editing benchmark, 8B scores 4.14 overall and Pro scores 4.51, against Qwen-Image-Edit
+    27B's 4.27. On the UniSubject personalization benchmark with four to eight subjects, 8B reaches an
+    overall quality score of 7.47 against Qwen-Image-Edit's 5.34.
+  limitations: The paper gives almost no explicit discussion of failure modes or open problems. It notes
+    the full model needs around 50 denoising steps and offers a 28-step distilled variant for faster inference,
+    but it does not discuss the compute or memory cost of running full self-attention over pixel-level
+    tokens, and it does not address how the approach scales beyond the resolutions it reports training
+    at.
+  why_it_matters: If preservation of unedited content can emerge purely from joint pixel-text-condition
+    attention with no explicit locality mechanism at all, that is evidence unified pixel-space attention
+    can substitute for the masking and latent-blending machinery every VAE-based editor still relies on,
+    though the paper offers no ablation isolating that claim from the effect of joint pretraining itself.
 abstract: The evolution of visual generative models has long been constrained by fragmented architectures
   relying on disjoint text encoders and external VAEs. In this report, we present HiDream-O1-Image, a
   natively unified generative foundation model via pixel-space Diffusion Transformer, that pioneers a

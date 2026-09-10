@@ -39,6 +39,53 @@ summary: Revives normalizing flows as a serious high-resolution generator using 
   an explicit ablation finding latent-space modeling beats pixel-level for this family, and for giving
   exact likelihoods that diffusion and flow matching do not.
 explanation: null
+explained:
+  depth: full-text
+  before: Diffusion dominated high-resolution image generation but needs iterative denoising at both
+    training and inference. Discrete autoregressive models avoid iteration but lose fidelity to quantization.
+    Normalizing flows received little attention in the recent wave of generative modeling despite being
+    a principled likelihood-based approach, and TARFlow had shown transformer autoregressive flows were
+    promising without demonstrating they could scale to high resolution.
+  problem: Whether autoregressive normalizing flows can scale to high-resolution class-conditional and
+    text-to-image generation, competitive with diffusion and autoregressive baselines, while keeping exact
+    maximum-likelihood training.
+  idea: Stack transformer autoregressive flow blocks in a deep-shallow allocation, one deep block carrying
+    most of the model's capacity and a few lightweight shallow blocks doing local refinement, and model
+    in a pretrained autoencoder's latent space rather than pixels. The authors prove that three or more
+    stacked autoregressive-flow blocks with alternating variable orderings are universal approximators
+    of continuous densities, and derive a classifier-free guidance rule directly from the flow's own score.
+  method: STARFlow operates in the latent space of a pretrained SD-1.4 VAE, a 32 by 32 token grid for 256-pixel
+    images, not in pixels. The flow is trained on latents perturbed with Gaussian noise at scale 0.3 rather
+    than on clean latents, and a pixel decoder is separately fine-tuned on noisy latents with an L2, LPIPS
+    and GAN loss so it stays compatible with the flow's non-clean output. The training objective is exact
+    log-likelihood, not noise, velocity or a discrete token. Each latent coordinate is generated autoregressively
+    as an affine transform of previously generated coordinates, so the network predicts a per-coordinate
+    mean and log-variance rather than a denoising target. The deep-shallow architecture default is 18 layers
+    then 6 shallow two-layer blocks at width 2048 for ImageNet at 1.4B parameters, or 24 layers then 6 shallow
+    blocks at width 3072 for text-to-image at 3.8B parameters. Only the deep block receives conditioning,
+    which comes from a frozen T5-XL encoder for text.
+  evidence: On ImageNet at 256 pixels the 1.4B model reaches FID 2.40 using classifier-free guidance with
+    weight between 3.0 and 4.0, trained on 400 million images at batch size 512 across 32 H100 GPUs for
+    about 22 weeks. Reported at similar scale in the same paper, SiT reaches 2.06 at 675M parameters, VAR
+    reaches 1.73 at 2.0B parameters and MAR reaches 1.55 at 943M parameters, so STARFlow is competitive
+    but does not beat the best diffusion or autoregressive baselines at these sizes. Zero-shot COCO text-to-image
+    FID is 3.00 for the 1.4B model against DiT-XL slash 2 at 3.04 with 674M parameters and EDM2-XXL at
+    1.25 with 1.5B parameters. On a larger text-to-image setup trained on roughly 700 million pairs, STARFlow
+    reaches FID 9.1, behind Imagen's 7.3, Parti-20B's 7.2 and eDiff-I's 7.0. GenEval overall score is 0.56,
+    slightly above SDXL's 0.55.
+  limitations: The authors concede that relying entirely on a pretrained, frozen autoencoder leaves joint
+    design of the latent space and the flow unexplored. Inference remains un-optimized despite the deep-shallow
+    speedup, since autoregressive sampling still proceeds sequentially through all coordinates and blocks.
+    Training cannot use clean latents directly; noise injection is required for stability and complicates
+    the pipeline. Evaluation is restricted to class- and text-conditional image generation on standard
+    benchmarks, and the authors state that generalization to video, 3D or more diverse real-world distributions
+    remains to be seen. They also note the decoder fine-tuning may have reached a performance ceiling,
+    with reconstruction FID around 2.73 bounding a generation FID of 2.40.
+  why_it_matters: This is presented as the first successful demonstration of normalizing flows operating
+    effectively at this scale and resolution, giving the field a third paradigm alongside diffusion and
+    autoregressive modeling that keeps a tractable exact likelihood, something diffusion and flow matching
+    do not provide directly. The deep-shallow architecture and the score-derived guidance rule are general
+    enough that they could transfer to other autoregressive-flow designs.
 abstract: 'We present STARFlow, a scalable generative model based on normalizing flows that achieves strong
   performance in high-resolution image synthesis. The core of STARFlow is Transformer Autoregressive Flow
   (TARFlow), which combines the expressive power of normalizing flows with the structured modeling capabilities

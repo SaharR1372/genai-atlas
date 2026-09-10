@@ -34,6 +34,50 @@ summary: A single-stage few-step objective that matches distributions between ma
   interpolant, giving distribution-level convergence guarantees that consistency models lack, with no
   pretraining or distillation. Reaches 1.99 FID on ImageNet 256 in 8 steps.
 explanation: null
+explained:
+  depth: full-text
+  before: Diffusion models and flow matching produce high-quality samples only after many sequential
+    denoising steps. Existing ways to cut that down, either distilling a pretrained diffusion model or
+    training Consistency Models, are described by the authors as prone to training collapse without careful
+    tuning and regularization, such as pre-generated data-noise pairs and early stopping, and Consistency
+    Models typically need a separately maintained teacher or EMA target network alongside the trained
+    student.
+  problem: The paper frames few-step generative modeling as a trilemma among high-fidelity outputs,
+    efficient inference and stable training, and sets out to train stable few-step models from scratch,
+    without distilling from a pretrained teacher and without the tuning burden Consistency Models carry.
+  idea: Learn a mapping between the marginal distribution of a stochastic interpolant at any time t and
+    its marginal at any earlier time s, and train it by matching distributions, via maximum mean discrepancy
+    across many sampled particles at s, rather than enforcing the pointwise self-consistency constraint
+    Consistency Models use. Because the target distribution at each step is built inductively from the
+    model's own previous-iteration output rather than from a frozen teacher, single-stage training with
+    one network suffices.
+  method: IMM trains a randomly initialized network with no pretrained initialization and no separate
+    teacher or EMA target network, which the paper places in a few-step-from-scratch category distinct
+    from distillation methods. For ImageNet 256, it uses the DiT-XL/2 architecture at 675M parameters. The
+    objective is not a per-sample regression onto noise, velocity or clean data; it minimizes an MMD-based
+    moment-matching loss between two independently sampled mappings from a shared start time t to a shared
+    target time s, so training pushes the model's output distribution at s toward the true marginal
+    distribution at s in kernel-embedding moments rather than toward one target value per sample. The paper
+    proves this loss reduces to the Consistency Model loss for a particular kernel and step schedule, making
+    Consistency Models a special case of the IMM family. At sampling time, classifier-free guidance is
+    applied with weight w; conditioning is randomly dropped with some probability during training, and
+    guidance is applied only at inference.
+  evidence: On ImageNet 256x256 with classifier-free guidance at w=1.5, IMM reaches 1.99 FID at 8 inference
+    steps, 2.51 FID at 4 steps, 3.99 FID at 2 steps and 8.05 FID at 1 step. On CIFAR-10 trained from scratch,
+    it reaches a 2-step FID of 1.98 and a 1-step FID of 3.20, which the paper reports as state of the art
+    for 2-step generation among models trained from scratch, ahead of iCT's 2.46 and sCT's 2.06 at 2 steps
+    and matching or exceeding CTM with a GAN loss at 1.87.
+  limitations: The authors concede that a pushforward objective combined with restart samplers can achieve
+    superior results, and they leave that combination to future work rather than incorporating it. They
+    also report that training with very small particle counts, for example two particles, causes training
+    instability and performance degradation, while larger particle counts mean fewer diffusion times are
+    sampled per step, making particle count a tuning trade-off rather than a free win. The accessible text
+    does not state whether the ImageNet-256 experiments model images in raw pixel space or in a pretrained
+    autoencoder's latent space, and it does not disclose the training compute budget.
+  why_it_matters: By replacing pointwise self-consistency with distribution-level moment matching, IMM
+    gives few-step generative training a provable convergence guarantee, the model distribution converges
+    to the true marginal at every time pair, which Consistency Models lack. It also removes the two-network
+    distillation setup that both diffusion distillation and Consistency Models rely on.
 abstract: Diffusion models and Flow Matching generate high-quality samples but are slow at inference,
   and distilling them into few-step models often leads to instability and extensive tuning. To resolve
   these trade-offs, we propose Inductive Moment Matching (IMM), a new class of generative models for one-

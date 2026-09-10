@@ -31,6 +31,46 @@ summary: 'Turns model collapse into a training signal: deliberately train on you
   then extrapolate *away* from the degradation direction. An ICLR 2026 oral, and increasingly load-bearing
   as the open web fills with generated images.'
 explanation: null
+explained:
+  depth: full-text
+  before: Fine-tuning generative models on their own synthetic samples was known to cause model autophagy
+    disorder, a rapid collapse in sample quality and diversity as errors compound across generations.
+    Prior fixes required external verifiers, auxiliary discriminators, inference-time modifications, or
+    likelihood computations, adding overhead and tying the fix to a specific architecture.
+  problem: Self-training degrades a model in a specific, predictable direction rather than randomly, but
+    no method exploited that structure as a signal instead of merely fighting it.
+  idea: Fine-tune a model briefly on its own synthetic samples to expose the direction of degradation,
+    then reverse that update by extrapolating the model weights away from it. Because samplers that favor
+    high-probability regions make the synthetic and real data gradients predictably anti-aligned, reversing
+    the synthetic-data update pushes the model toward the true data distribution rather than away from it.
+  method: Starting from a base model theta_r trained on real data, Neon generates synthetic samples with
+    the model's own inference procedure, briefly fine-tunes on them to obtain degraded weights theta_s,
+    then merges as theta_Neon = (1+w)*theta_r - w*theta_s for extrapolation strength w > 0. This is a post-hoc
+    weight merge requiring no architectural change and no additional real data. It is applied to diffusion
+    models (EDM-VP), flow matching, autoregressive models (xAR, VAR), and inductive moment matching few-step
+    generators, working directly on whatever the base model's own objective already predicts (noise, velocity,
+    tokens, or the few-step generator's output) since Neon only touches the weight-space direction of the
+    self-training update, not the base training objective itself.
+  evidence: On ImageNet 256x256, Neon raises xAR-L from FID 1.28 to a new state of the art of 1.02 using
+    750k synthetic samples and about 0.36% additional training compute relative to the base model's budget.
+    On CIFAR-10 with EDM-VP it improves FID from 1.79 to 1.38 using 6k synthetic samples and 1.75% additional
+    compute, and on FFHQ-64 with EDM-VP unconditional it improves FID from 2.39 to 1.12 using 18k samples
+    and 0.85% additional compute. With as few as 1k synthetic samples, xAR models already reach near-optimal
+    performance. Applied to a 4-step inductive moment matching model on ImageNet-256, Neon brings 4-step
+    FID to 1.68, nearly matching the 8-step baseline's 1.98 and roughly halving inference cost at matched
+    quality.
+  limitations: The authors concede the theoretical guarantee of anti-alignment holds only when the base
+    model's error is already small, in a local neighborhood of the true distribution, though they report
+    ablations showing robustness across a broader quality range in practice. They note performance degrades
+    at extreme guidance scales during synthetic data generation, and that performance is U-shaped in synthetic
+    dataset size, with very small sets suffering from variance and very large sets amplifying curvature
+    effects. The method's theory is built around mode-seeking inference samplers and is predicted to fail
+    under diversity-seeking, high-temperature sampling.
+  why_it_matters: It reframes model collapse from a failure mode to be prevented into a diagnostic signal
+    that can be corrected with a nearly free post-hoc weight merge, working across diffusion, flow matching,
+    autoregressive, and few-step generators alike. As the open web increasingly contains generated images,
+    a cheap, architecture-agnostic way to turn self-training into an asset rather than a liability becomes
+    increasingly load-bearing for how future generative models keep improving.
 abstract: Scaling generative AI models is bottlenecked by the scarcity of high-quality training data.
   The ease of synthesizing from a generative model suggests using (unverified) synthetic data to augment
   a limited corpus of real data for the purpose of fine-tuning in the hope of improving performance. Unfortunately,

@@ -38,6 +38,57 @@ summary: Freezes a pretrained UNet diffusion model entirely and adds a trainable
   through zero-initialized convolutions, so training starts as a no-op and can never inject harmful noise
   into the base model. The origin of adapter-based spatial conditioning.
 explanation: null
+explained:
+  depth: full-text
+  before: Adding spatial structure control (edges, depth, pose, segmentation) to a diffusion model meant
+    either training a translation model from scratch on task pairs, as Pix2Pix-style conditional GANs
+    and diffusion translation methods like Palette, PITI, and sketch-guided diffusion did, or relying
+    on hand-crafted rules. Personalization methods like Textual Inversion and DreamBooth showed that
+    small datasets could work for subject identity, but no comparable approach existed for spatial conditioning.
+    Task-specific paired datasets are typically under 100k images, roughly 5x10^4 times smaller than
+    LAION-5B, so training or fine-tuning directly on them risked overfitting and catastrophic forgetting
+    of the pretrained model's prior, and large training clusters were not always available.
+  problem: Add diverse, spatially precise conditioning signals to a large pretrained text-to-image diffusion
+    model using only modest task-specific data and compute, without damaging the pretrained model's
+    existing generative prior.
+  idea: Freeze the entire pretrained diffusion model and make a trainable copy of its encoder blocks.
+    Feed the copy the spatial condition, and connect its output back into the frozen decoder through
+    convolution layers initialized to zero, so training begins as an exact no-op and cannot inject harmful
+    noise into the base model in early training.
+  method: This is attention-and-feature-space conditioning; no new latent is written, and pixels are
+    never touched directly. A small encoder network of four convolution layers (4x4 kernels, 2x2 strides)
+    maps a 512x512 spatial condition image down to a 64x64 feature map matching Stable Diffusion's latent
+    resolution. A trainable copy of the UNet's 12 encoding blocks and 1 middle block, spanning four resolutions
+    (64, 32, 16, 8), consumes this feature map, and its outputs are added into the 12 skip connections
+    and the middle block of the frozen UNet through zero-initialized convolutions. The base UNet's encoder,
+    decoder, and attention layers are entirely frozen; only the trainable copy, the small condition encoder,
+    and the zero convolutions are trained. There is no mask or region-preservation mechanism for arbitrary
+    "keep this part unchanged" edits. The spatial condition map itself is the only locality signal, since
+    ControlNet performs condition-to-image synthesis rather than editing an existing image in place.
+  evidence: On ADE20K segmentation-conditioned generation, ControlNet reaches FID 15.27, CLIP-score 0.26,
+    CLIP-aesthetic 6.31, against PITI's FID 19.74 and CLIP-score 0.20, and against from-scratch baselines
+    VQGAN (FID 26.28) and LDM (FID 25.35); unconditioned Stable Diffusion scores FID 6.09. On condition
+    reconstruction fidelity (IoU against ADE20K ground truth, which scores 0.58), ControlNet reaches
+    0.35 versus PITI's 0.26. In a user study on sketch conditioning (20 sketches, 12 raters, 1-5 scale),
+    ControlNet scores 4.22 +/- 0.43 on result quality and 4.28 +/- 0.45 on condition fidelity, against
+    PITI's 1.10 +/- 0.05 and 1.02 +/- 0.01. A depth-conditioned ControlNet trained on one RTX 3090Ti
+    with 200k samples over 5 days was indistinguishable by users (discrimination accuracy 0.52 +/- 0.17,
+    chance is 0.50) from Stable Diffusion V2 Depth-to-Image, trained on over 12M images on an A100 cluster.
+    Training compute varied by condition type. Canny edges and HED boundaries each used 3M pairs at 600 and
+    300 GPU-hours, segmentation used 164k COCO pairs at 400 GPU-hours, and normal maps used 25.5k pairs
+    at 100 GPU-hours. The paper also reports a "sudden convergence phenomenon," where the model abruptly
+    starts following the conditioning image, usually in under 10,000 optimization steps.
+  limitations: The authors concede that "when the semantic interpretation is wrong, the model may have
+    difficulty to generate correct contents," even under strong prompting, which occurs when the conditioning
+    image is complex or semantically ambiguous. The paper has no dedicated limitations section; its discussion
+    covers dataset-scale robustness and content interpretation but does not otherwise quantify failure
+    modes. It also notes that applying ControlNet to only 50% of diffusion sampling iterations produces
+    results that fail to follow the input shape, indicating the mechanism has limited robustness to partial
+    application.
+  why_it_matters: Zero-initialized trainable copies became the standard way to attach new, spatially
+    precise conditioning to a frozen foundation model without retraining it or risking catastrophic forgetting,
+    even from datasets as small as a few thousand pairs. It is the origin point of the adapter-conditioning
+    line that essentially every later structural-control method builds on.
 abstract: We present ControlNet, a neural network architecture to add spatial conditioning controls to
   large, pretrained text-to-image diffusion models. ControlNet locks the production-ready large diffusion
   models, and reuses their deep and robust encoding layers pretrained with billions of images as a strong

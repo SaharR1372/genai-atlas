@@ -29,6 +29,51 @@ summary: Reframes inversion for rectified-flow models as an optimal-control prob
   stochastic differential equation, so the trajectory is actively steered rather than passively re-integrated.
   Addresses drift, one of three distinct residual errors the 2024 flow-inversion papers each isolate.
 explanation: null
+explained:
+  depth: full-text
+  before: DDIM inversion and its refinements such as Null-Text Inversion dominated diffusion model inversion
+    but deviate from the original image because of nonlinearities in the drift and diffusion coefficients
+    of the diffusion SDE, and fixing this at test time typically required training additional parameters
+    or optimizing latent variables, both expensive. Rectified flow models such as Flux have a simpler,
+    straight-line probability path, but their inversion was underexplored, and prior attention-based editing
+    controls such as Prompt-to-Prompt do not transfer to Flux because its MM-DiT architecture entangles
+    text and image processing unlike a UNet.
+  problem: Invert a real or corrupted image into the starting noise of a rectified flow model faithfully
+    enough to reconstruct or edit it, without the drift error that standard reverse-ODE re-integration
+    introduces, and without training or per-image optimization.
+  idea: Treat inversion as an optimal-control problem, find the controller that steers any image toward
+    typical Gaussian noise by solving a linear quadratic regulator, and show the resulting controlled
+    trajectory is equivalent to a rectified stochastic differential equation with a closed-form solution.
+  method: Flux is used entirely frozen; nothing is trained, and there is no per-image latent optimization,
+    only an analytical controller applied at test time. Because Flux is a rectified-flow model, both inversion
+    and editing take place in its VAE latent space, the same latent space the frozen vector field already
+    operates in. Region protection comes from two scalar controller-guidance schedules rather than a mask
+    or attention injection. A forward controlled ODE with guidance weight gamma in zero to one interpolates
+    between standard rectified-flow inversion at gamma equals zero, which stays close to the source, and
+    the optimal controller at gamma equals one, which pushes toward typical noise; a mirrored reverse controlled
+    ODE with guidance weight eta in zero to one similarly interpolates between faithfulness to the source
+    image and editability during regeneration, and the paper's practical recipe holds eta constant only up
+    to a chosen timestep and sets it to zero afterward so late-stage denoising is free to follow the edit
+    prompt while early steps stay anchored to the source latent trajectory.
+  evidence: On LSUN Bedroom stroke-to-image synthesis, the method reaches an L2 faithfulness score of 82.65
+    against SDEdit-SD1.5's 86.72 and a KID realism score of 0.025 against SDEdit-SD1.5's 0.029 and Null-Text-Inversion-plus-Prompt-to-Prompt's
+    0.234, with 62.11% user preference over SDEdit-Flux. On LSUN Church, L2 is 80.36 against 90.72 and KID
+    is 0.059 against 0.089, with 66.22% user preference. On SFHQ face editing for a wearing-glasses edit,
+    face-reconstruction distance is 0.442 against SDEdit-Flux's 0.632, DINO patch similarity is 0.951 against
+    0.892, and CLIP-image similarity is 0.900 against Null-Text-Inversion-plus-Prompt-to-Prompt's 0.845, at
+    a runtime of 39 seconds against that baseline's 85 seconds despite Flux being roughly 12 times larger.
+    A large-scale human evaluation of 9,000 comparisons from 126 participants found the method preferred
+    over every baseline by at least 59.67% on overall satisfaction.
+  limitations: The authors concede they could not compare against several established diffusion-based editing
+    methods because those implementations either do not exist for Flux or are not directly applicable, since
+    Flux's MM-DiT architecture makes prior attention-control methods built for UNet-based models incompatible,
+    and no public Flux implementation of Null-Text Inversion exists. They describe the paper's contribution
+    as primarily theoretical, validated against the baselines that were available rather than the full set
+    that would be ideal.
+  why_it_matters: It gives rectified-flow models a principled, training-free inversion method with a closed-form
+    controller instead of an ad hoc re-integration of the reverse ODE, and it shows that faithfulness-versus-editability
+    control can be implemented as a pair of scalar interpolation schedules over a frozen model's own vector
+    field, without any spatial mask or attention manipulation.
 abstract: 'Generative models transform random noise into images; their inversion aims to transform images
   back to structured noise for recovery and editing. This paper addresses two key tasks: (i) inversion
   and (ii) editing of a real image using stochastic equivalents of rectified flow models (such as Flux).

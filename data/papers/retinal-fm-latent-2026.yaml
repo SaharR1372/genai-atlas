@@ -34,6 +34,52 @@ summary: 'Tests four retinal foundation models as generative latent spaces and r
   conventional latent diffusion when scored by that same foundation model, but the advantage largely disappears
   under classifiers trained on real images. The paper names this a synthetic-to-real representation gap.'
 explanation: null
+explained:
+  depth: full-text
+  before: Diffusion models for retinal image synthesis are trained to reconstruct pixels well. Their
+    latent spaces, whether pixel space or a generic VAE, are optimized for appearance fidelity and are
+    not explicitly organized around clinically meaningful phenotypes such as age, sex or disease risk.
+  problem: Retinal foundation models (RFMs) already learn representations that support strong downstream
+    clinical prediction. It is untested whether those same representations, used as a generative substrate
+    instead of only as a prediction backbone, preserve demographic and clinical phenotype information through
+    the act of generation, and whether that preservation holds up outside the foundation model that defined
+    the space.
+  idea: Treat a frozen retinal foundation model's representation as the generative latent itself, following
+    the representation-tokenizer recipe, then test whether synthetic images and representations sampled
+    from that space still carry clinically meaningful structure when judged by an independent evaluator
+    rather than by the same foundation model.
+  method: The generation space is a frozen retinal foundation model's latent representation, not pixel space
+    or a domain-trained VAE. The paper's stated reason is that RFMs are trained on large unlabeled datasets
+    to learn transferable representations that already support a wide range of downstream clinical tasks,
+    so their latent structure is hypothesized to organize generation around clinically relevant axes more
+    faithfully than a reconstruction-only VAE. Four RFMs are tested, namely RETFound (ViT-L, 904k images), PRETI
+    (ViT-B, 1.01M images), FLAIR (ResNet-50 plus BERT, 288k images) and URFound (ViT-B, vision-language,
+    180k images). A two-stage RepTok pipeline is used, where a DiT-B decoder conditioned on frozen RFM representations
+    is trained with flow matching to reconstruct VAE-compressed image latents, and separately a 1D MLP-Mixer
+    is trained with flow matching and classifier-free guidance to generate the RFM's CLS-token embedding
+    from demographic and clinical metadata.
+  evidence: The paper reports both distribution metrics and downstream clinical prediction tasks, but the
+    downstream numbers are the ones that matter and they cut against the method. Reconstruction FID favors
+    RepTok (3.29 to 3.41 versus 24.13 for conventional latent diffusion), but generation FID favors the
+    baseline (32.01 to 40.53 versus 24.13). Evaluated internally, within the originating foundation model,
+    RepTok reaches near-ceiling sex prediction and outperforms real-image tokens on age and hypertension
+    prediction. Evaluated externally, with a ResNet32 classifier trained only on real images, the advantage
+    mostly disappears. Age R-squared is 0.623 for real data versus 0.541 for URFound-synthetic and 0.265
+    for RETFound-synthetic; sex accuracy is 0.725 for real versus 0.587 for URFound and 0.576 for RETFound;
+    hypertension accuracy is 0.717 for real versus 0.698 to 0.718 for synthetic, essentially flat. The paper
+    states directly that conventional latent diffusion generally shows stronger conditioning adherence than
+    all RepTok variants except URFound once evaluation moves outside the originating foundation model. There
+    is no reader study.
+  limitations: The paper concedes what it calls a previously uncharacterized synthetic-to-real representation
+    gap, where gains measured within the generating foundation model are substantially attenuated under classifiers
+    trained on real images. It also concedes that external classifiers are sensitive to image transformations
+    even on reconstructions of real images, that BMI prediction stays difficult across every model tested,
+    and that the CLIP-trained FLAIR model underperforms while URFound succeeds despite having the smallest
+    pretraining dataset of the four.
+  why_it_matters: This is the cautionary result the foundation-model-latent line needs. It shows that evaluating
+    a generative latent using the same model that defines it can manufacture an advantage that a genuinely
+    independent classifier does not confirm, so future work in this line cannot rely on internal foundation-model
+    metrics and must close the synthetic-to-real gap before any clinical claim is credible.
 abstract: Medical foundation models learn latent representations of clinically meaningful phenotypes,
   yet their ability to support controllable image generation remains largely unexplored. We evaluate four
   retinal foundation models within the representation tokenizer framework and examine whether demographic

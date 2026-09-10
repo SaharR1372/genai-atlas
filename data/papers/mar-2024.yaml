@@ -42,6 +42,47 @@ summary: 'Shows vector quantization is not required for autoregressive image gen
 explanation: null
 lines:
 - line-continuous-tokens
+explained:
+  depth: full-text
+  before: Autoregressive image generators followed language modeling by quantizing images into discrete
+    tokens with a VQ tokenizer, scored with categorical cross-entropy over a finite vocabulary. That discrete
+    tokenizer was hard to train and reconstructed images worse than a continuous VAE, with the VQ-16 tokenizer
+    reaching reconstruction FID 5.87 against 1.43 for the continuous KL-16 tokenizer.
+  problem: Discreteness was treated as necessary for autoregressive modeling because categorical cross-entropy
+    needs a finite vocabulary, but autoregression only requires modeling how tokens depend on each other
+    in some order, not that each token's own value be categorical.
+  idea: Replace the discrete vocabulary and cross-entropy loss with a small diffusion process that models
+    each token's continuous distribution conditioned on the transformer's output vector. This Diffusion
+    Loss lets autoregressive and masked-autoregressive transformers operate directly on continuous-valued
+    tokens.
+  method: Images are encoded into continuous per-token latents by an off-the-shelf KL-16 VAE, giving a
+    16 by 16 grid of tokens for a 256px image with no vector quantization anywhere. A causal AR or bidirectional
+    MAR transformer consumes these tokens and outputs a per-position conditioning vector z; a separate
+    small denoising MLP, three residual blocks of width 1024 by default, takes z and predicts the noise
+    added to that token's clean latent under a standard epsilon-prediction diffusion loss, trained on a
+    1000-step noise schedule with the timestep sampled four times per image. At inference each token is
+    drawn by running 100 reverse diffusion steps through this MLP conditioned on z. The MAR variant predicts
+    random subsets of masked tokens per step, generating an image in about 64 steps instead of one token
+    at a time, which the authors describe as a general form of autoregression, next set-of-tokens prediction.
+  evidence: On ImageNet 256x256 at 400 epochs with classifier-free guidance, MAR-B (208M params) reaches
+    FID 2.31, MAR-L (479M) reaches FID 1.78, and MAR-H (943M) reaches FID 1.55, with Inception Score up
+    to 303.7. Without guidance the same three models score FID 3.48, 2.60, and 2.35. At 512x512, MAR-L
+    trained 400 epochs reaches FID 1.73 with CFG and 2.74 without. Default MAR-L generates at roughly 0.3
+    seconds per image at FID near 2.0, a better speed-quality trade-off than DiT-XL at matched quality.
+    Swapping cross-entropy for Diffusion Loss on the same MAR backbone and KL-16 tokenizer keeps FID at
+    3.50 without guidance, isolating the gain to enabling continuous tokens rather than to a stronger tokenizer.
+  limitations: The authors concede generation quality is bounded by the off-the-shelf tokenizer, which
+    they leave unmodified, and state that pre-training better tokenizers is beyond the paper's scope. Generated
+    images show noticeable artifacts, which they note is common for methods trained only on ImageNet. MAR
+    forfeits the key-value caching that speeds causal AR inference because it uses bidirectional attention,
+    compensating by predicting multiple tokens per step instead. Training an MAR model with a plain L2
+    loss in place of the diffusion loss gives what they call a disastrous FID above 100, since it collapses
+    each token to a deterministic mean. Evaluation is limited to ImageNet given compute constraints, and
+    the authors say further validation is needed for other domains.
+  why_it_matters: The paper decouples two problems that latent diffusion conflates by using autoregression
+    to model how tokens depend on each other and a small diffusion head to model each token's own distribution.
+    Removing the VQ tokenizer as a bottleneck opens continuous-valued autoregression as a path competitive
+    with, and faster than, full latent diffusion at matched benchmark quality.
 abstract: 'Conventional wisdom holds that autoregressive models for image generation are typically accompanied
   by vector-quantized tokens. We observe that while a discrete-valued space can facilitate representing
   a categorical distribution, it is not a necessity for autoregressive modeling. In this work, we propose

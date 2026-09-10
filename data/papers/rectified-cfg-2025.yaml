@@ -33,6 +33,44 @@ status:
 summary: Reworks classifier-free guidance specifically for rectified-flow models, where the original diffusion-era
   formulation is mismatched to straight-path transport and degrades samples at high guidance scales.
 explanation: null
+explained:
+  depth: full-text
+  before: Classifier-free guidance was carried over unchanged from diffusion models to rectified-flow
+    models, linearly extrapolating the unconditional velocity toward the conditional velocity the same
+    way it extrapolates score functions in diffusion.
+  problem: That extrapolation is mismatched to deterministic rectified flows. Diffusion's stochastic sampling
+    regularizes the trajectory back toward the data manifold, while a rectified flow's deterministic ODE
+    integration provides no such correction, so standard CFG pushes samples off the manifold and produces
+    color blow-outs, warped geometry and text misalignment at high guidance scales.
+  idea: Replace linear extrapolation with a predictor-corrector scheme. First take a conditional rectified-flow
+    step to keep the sample anchored on the learned transport path, then apply a scheduled, decaying interpolation
+    between conditional and unconditional velocities rather than an unbounded extrapolation.
+  method: This is a training-free, inference-time sampling algorithm, not a new base generator. Each step
+    first computes a predictor update using only the conditional velocity field, moving the sample halfway
+    toward the next timestep to anchor it near the transport path. A corrector then evaluates conditional
+    and unconditional velocities at that predicted point and adds a time-scheduled correction term, decaying
+    as sampling approaches the data, built from the difference between those two velocities rather than
+    a full linear mix of them. The authors prove the resulting velocity field is marginally consistent
+    and that trajectories stay within a bounded tubular neighborhood of the data manifold, with the bound
+    scaling with training error and numerical step size. It was applied unmodified, with no retraining,
+    to four already-trained flow models, Flux, Stable Diffusion 3, Stable Diffusion 3.5 and Lumina-Next.
+  evidence: On MS-COCO 10K, Rectified-CFG++ improves FID over standard CFG for all three models tested
+    at matched settings, Flux from 37.86 to 32.23, Lumina from 26.93 to 22.49, and SD3 from 23.89 to 23.39,
+    while also improving or holding HPSv2 and CLIP scores. On T2I-CompBench, it improves compositional
+    attribute binding, texture rises from 0.7413 to 0.7627 and shape from 0.5792 to 0.6014. Standard CFG
+    degrades sharply once guidance scale exceeds about 7.5, while Rectified-CFG++ stays stable across a
+    wide range of scales in the paper's sweep. At 512x512 with 20 function evaluations, Rectified-CFG++
+    reaches FID 74.47 against CFG's 85.82 at 28 function evaluations, matching or beating quality with
+    fewer sampling steps.
+  limitations: The authors concede the method is scoped to flow-based models, with applicability to diffusion
+    models left unclear, and that failure cases are only briefly catalogued rather than analyzed in depth
+    at extreme guidance scales. The correction schedule still carries its own hyperparameters, a maximum
+    weight and a decay exponent, even though the paper frames the method as adding no tuning beyond the
+    guidance scale itself.
+  why_it_matters: Guidance strength is the main lever practitioners use to trade fidelity for prompt adherence,
+    and this work removes the specific failure mode, off-manifold drift, that made pushing that lever hard
+    on the rectified-flow models now used by most leading text-to-image systems, without retraining any
+    of them.
 abstract: 'Classifier-free guidance (CFG) is the workhorse for steering large diffusion models toward
   text-conditioned targets, yet its native application to rectified flow (RF) based models provokes severe
   off-manifold drift, yielding visual artifacts, text misalignment, and brittle behaviour. We present

@@ -31,6 +31,51 @@ summary: Injects visual information into a frozen language model through gated c
   budget first. The gates initialize near zero so the language model is never disturbed at the start of
   training.
 explanation: null
+explained:
+  depth: full-text
+  before: Contrastive vision-language models such as CLIP dominated the field. They embed images and text
+    into a joint space with a contrastive loss and generalize well to zero-shot classification, but they
+    only match a fixed set of candidate labels and cannot produce free-form language. Prior generative
+    visual language models such as VisualGPT needed thousands of annotated examples of task-specific fine-tuning
+    to adapt to a new task, and adding two examples per class could even decrease CLIP's own zero-shot accuracy.
+  problem: There was no visual language model that could be handed a handful of examples of a new task,
+    interleaved with images, and immediately perform it the way GPT-3 does for text, across both open-ended
+    tasks like captioning and dialogue and closed-ended tasks like classification.
+  idea: Bridge a frozen pretrained vision-only model and a frozen pretrained language-only model with new
+    trainable layers, so the large-scale visual and linguistic knowledge each was pretrained with is preserved
+    and only the connecting layers need to be learned from interleaved image-text web data.
+  method: Visual features from a frozen NFNet-F6 vision encoder are compressed by a Perceiver Resampler,
+    a set of learned latent query tokens that cross-attend to the flattened visual features and output
+    a fixed 64 tokens regardless of how many images or video frames were input. Those 64 tokens are then
+    injected into a frozen Chinchilla language model through newly inserted GATED XATTN-DENSE blocks, a
+    cross-attention layer followed by a feed-forward layer, placed before every seventh transformer block
+    in the 80B model. Each new layer's output is multiplied by tanh of a learnable scalar initialized at
+    zero before being added back to the residual stream, so at initialization the added layers are skipped
+    entirely and the model behaves exactly like the untouched frozen language model, which the paper reports
+    improves training stability and final performance. The vision encoder and the language model are both
+    kept frozen throughout; only the Perceiver Resampler and the GATED XATTN-DENSE layers are trained. This
+    is the defining example of the gated cross-attention fusion pattern, as opposed to a linear projector
+    splicing visual tokens directly into the input sequence.
+  evidence: Trained on 43 million interleaved webpages with 185 million images (M3W), 1.8 billion alt-text
+    pairs (ALIGN), 312 million image-text pairs (LTIP), and 27 million short videos (VTP), none of it annotated
+    for a specific downstream task. Three sizes were built, Flamingo-3B (1.4B frozen LM plus 1.2B trainable),
+    Flamingo-9B (7B frozen LM plus 1.6B trainable), and Flamingo-80B (70B frozen LM plus 10B trainable).
+    Using only 32 task-specific examples in context, Flamingo-80B surpasses the fine-tuned state of the
+    art on 6 of 16 evaluated benchmarks despite using roughly 1000 times less task-specific data, and sets
+    a new few-shot state of the art on all 16 tasks with published few-shot baselines. When further fine-tuned
+    with a larger annotation budget, it sets a new overall state of the art on five more benchmarks, VQAv2,
+    VATEX, VizWiz, MSRVTTQA, and HatefulMemes.
+  limitations: The paper concedes Flamingo's classification accuracy lags behind CLIP-style contrastive
+    models, since contrastive pretraining is specifically optimized for that task. It concedes Flamingo
+    inherits the risks of the large language models it is built on, including hallucination and toxic or
+    biased output, and that it exhibits gender and racial biases specifically when prompted with images.
+    It concedes sensitivity to the ordering of few-shot examples in the prompt due to recency bias, and
+    that true zero-shot evaluation requires an approximation using text-only examples with images removed
+    rather than a genuinely example-free setting.
+  why_it_matters: Flamingo established that visual language models could inherit few-shot in-context learning
+    from large frozen language models without fine-tuning either pretrained component, by training only
+    a small bridge between them. It is the reference point for the gated cross-attention fusion family,
+    the alternative lineage to the linear-projector approach that LLaVA popularizes a year later.
 abstract: 'Building models that can be rapidly adapted to novel tasks using only a handful of annotated
   examples is an open challenge for multimodal machine learning research. We introduce Flamingo, a family
   of Visual Language Models (VLM) with this ability. We propose key architectural innovations to: (i)

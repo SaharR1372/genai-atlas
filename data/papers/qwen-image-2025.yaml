@@ -39,6 +39,56 @@ summary: A 20B MM-DiT whose distinguishing contribution is a data pipeline built
   an area every prior open system was visibly weak at. Uses a vision-language model as the text encoder
   rather than CLIP or T5, and became the base most 2025-26 open editing and RL work builds on.
 explanation: null
+explained:
+  before: Open text-to-image systems could follow prompts reasonably well but broke down on rendered text.
+    The paper states that even strong commercial systems such as GPT Image 1 and Seedream 3.0 struggle
+    with multi-line text, non-alphabetic scripts such as Chinese, localized text insertions, and seamless
+    blending of text with surrounding imagery. Editing systems separately struggled to satisfy visual consistency,
+    keeping untouched regions pixel-faithful, and semantic coherence, preserving global meaning through
+    structural edits, at the same time.
+  problem: Build a single foundation model that both renders complex, especially logographic, text reliably
+    and edits images while holding those two conflicting editing objectives together.
+  idea: Text rendering quality is treated as primarily a data problem rather than an architecture problem,
+    solved with a progressive curriculum that grows text complexity and resolution together, while editing
+    consistency is solved by feeding the model both a semantic and a pixel-faithful view of the input image.
+  method: Generation happens in a VAE latent space compressed 8x8 spatially with 16 channels, not pixels.
+    Qwen-Image is a Multimodal Diffusion Transformer trained with flow matching, whose loss is the mean
+    squared error between a predicted and ground-truth velocity field mapping a Gaussian noise sample toward
+    the clean image latent, so the network predicts velocity rather than noise or clean data directly.
+    Text conditioning comes from the last hidden layer of Qwen2.5-VL, a vision-language model rather than
+    a CLIP or T5 text encoder, fed into the diffusion transformer through joint attention using Multimodal
+    Scalable RoPE, which assigns text tokens 2D positions so they interleave with image tokens rather than
+    being cross-attended separately. Training follows a five-stage curriculum in which resolution grows
+    from 256x256 through 640x640 to 1328x1328, non-text data is progressively replaced by text-bearing data, data quality
+    is refined, the data distribution is rebalanced, and synthetic data is added last, generated as pure
+    text renders on clean backgrounds, text composited onto physical media like paper or wood, and complex
+    layouts such as slide decks and UI mockups. For editing, the VAE-encoded latent of the input image
+    is concatenated with the noised target latent along the sequence dimension, and MSRoPE is extended
+    with a frame dimension so the model can tell multiple images apart; this reconstructive VAE signal
+    is combined with the semantic features Qwen2.5-VL already extracts, giving the editing module both
+    a pixel-faithful and a meaning-faithful view of the source image.
+  evidence: 'GenEval reaches 0.87 for the base model and 0.91 after RL post-training, which the paper presents
+    as the first system to cross 0.9 on this benchmark. DPG-Bench reaches 88.32. On the text-rendering benchmarks
+    built for this report, ChineseWord scores 58.30 overall, with 97.29% accuracy on the 3,500 most common
+    (Level-1) characters falling to 40.53% on Level-2 and 6.48% on Level-3 rare characters; LongText-Bench
+    reaches 0.943 on English and 0.946 on Chinese, the paper''s highest reported score on the Chinese track.
+    For editing, GEdit-Bench overall score is 7.56 on the English track and 7.52 on Chinese, and ImgEdit
+    overall score is 4.27. On novel view synthesis over the GSO dataset the model reaches SSIM 0.884 against
+    0.859 for FLUX.1 Kontext. The fetched text does not state the CFG or guidance scale used for these
+    numbers.'
+  limitations: The paper does not carry a dedicated limitations section, but its own numbers concede that
+    rare and complex Chinese characters remain hard, with ChineseWord accuracy falling from 97.29% on common
+    characters to 6.48% on the rarest tier. On the AI Arena human-evaluation leaderboard the model trails
+    the leading Imagen 4 Ultra Preview by roughly 30 Elo points. The authors also exclude Chinese-language
+    prompts from their closed-source arena comparison because most competing commercial APIs do not reliably
+    support Chinese text generation, which limits how directly the Chinese-text claims can be benchmarked
+    against closed competitors.
+  why_it_matters: It shows that the text-rendering gap plaguing open text-to-image models was substantially
+    a data-curriculum problem rather than an irreducible architectural limitation, and it demonstrates a
+    concrete recipe, dual semantic-plus-reconstructive conditioning, for reconciling the visual-consistency
+    and semantic-coherence demands of unified generation-and-editing models. Its open release made it the
+    base most subsequent 2025-26 open editing and RL work builds on.
+  depth: full-text
 abstract: We present Qwen-Image, an image generation foundation model in the Qwen series that achieves
   significant advances in complex text rendering and precise image editing. To address the challenges
   of complex text rendering, we design a comprehensive data pipeline that includes large-scale data collection,

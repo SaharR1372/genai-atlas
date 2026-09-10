@@ -29,6 +29,44 @@ summary: 'Converts self-attention into mutual self-attention: queries come from 
   keys and values are pulled from the source, so content is retrieved rather than resampled. A mask derived
   from cross-attention reduces foreground and background confusion, and degrades on cluttered scenes.'
 explanation: null
+explained:
+  depth: full-text
+  before: Prior tuning-free editing methods such as Prompt-to-Prompt, SDEdit and Plug-and-Play manipulated
+    cross-attention or injected features to preserve layout, but by design kept the original layout or object
+    shape fixed, so they failed at non-rigid edits such as changing an object's pose. The one method that
+    handled non-rigid edits, Imagic, required fine-tuning the entire diffusion model and then optimizing
+    a per-image text embedding, which is time-consuming and impractical.
+  problem: Perform complex non-rigid edits, such as changing pose or viewpoint, while keeping an object's
+    identity, texture and overall appearance consistent, without any per-image fine-tuning.
+  idea: Convert ordinary self-attention into mutual self-attention. Keep the query from the branch being
+    generated, the target image, but pull the key and value from the source image's own reconstruction process,
+    so the target queries retrieve correlated content from the source rather than resampling it from scratch,
+    preserving texture and identity even when the target's layout changes.
+  method: At denoising step t and U-Net layer l, the query Q^l stays local to the target branch while K^l
+    and V^l are swapped for the source branch's K^l_s and V^l_s, giving {Q, K_s, V_s} in place of ordinary
+    {Q, K, V}. This substitution applies only in the decoder part of the U-Net and only after a threshold
+    denoising step, controlled by two hyperparameters, S=4 for the starting step and L=10 for the starting
+    layer; before that point ordinary self-attention runs unchanged, because early steps and encoder layers
+    set the layout that mutual attention would otherwise overwrite. A mask, extracted from the cross-attention
+    map of the text token naming the foreground object, splits the mutual-attention computation into a foreground
+    term that attends within the masked region and a background term that attends outside it, which stops
+    the query for the foreground object from retrieving background content and vice versa. No parameters
+    are trained anywhere in this pipeline. The space being edited is the diffusion model's standard latent
+    space, but the edit itself is executed purely by substituting attention keys and values at inference;
+    no separate latent is written and no blending step follows, so this is attention-and-feature-space manipulation
+    rather than a latent-editing or locality-loss mechanism, with the cross-attention-derived mask as its
+    only protection for background content.
+  evidence: The fetched paper reports no quantitative metrics, no CLIP score, structure distance, or user
+    study numbers; all comparisons against Prompt-to-Prompt, SDEdit and Plug-and-Play are qualitative figures.
+  limitations: The authors concede the method fails when Stable Diffusion itself cannot generate the desired
+    layout or shape, and fails when the target introduces content unseen in the source image, producing
+    artifacts, their example being a palm not present in the source. They also note the mask can confuse
+    foreground and background when the two regions share similar patterns and colors, and that in video
+    extensions the method animates only foreground objects and struggles to bring the background to life.
+  why_it_matters: It establishes attention-only, training-free key-value substitution as a way to decouple
+    what changes from what is preserved, without a written mask over pixels or a locked latent, and its
+    layer-and-step-gated masked variant is a direct ancestor of later training-free editing methods, including
+    cache-based ones such as KV-Edit.
 abstract: Despite the success in large-scale text-to-image generation and text-conditioned image editing,
   existing methods still struggle to produce consistent generation and editing results. For example, generation
   approaches usually fail to synthesize multiple images of the same objects/characters but with different

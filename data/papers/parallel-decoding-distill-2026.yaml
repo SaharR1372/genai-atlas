@@ -31,6 +31,52 @@ status:
 summary: Trajectory-based few-step distillation that avoids the Jacobian-vector-product and finite-difference
   machinery MeanFlow-style objectives rely on, reporting state of the art at four to eight function evaluations.
 explanation: null
+explained:
+  depth: full-text
+  before: State-of-the-art few-step distillation for video diffusion and flow models relied on variational
+    score distillation and adversarial losses. These distribution-based losses are notoriously hard to
+    optimize and prone to mode collapse, which shows up as reduced sample diversity and a lack of motion
+    in generated video. Trajectory-based alternatives in the MeanFlow family avoided that instability but
+    required Jacobian-vector products or finite-difference approximations to regress the derivative of the
+    mean velocity, machinery that is expensive or unstable to scale to large video models.
+  problem: No trajectory-based distillation method had successfully scaled to few-step, high-resolution
+    video generation while both avoiding the JVP or finite-difference machinery of MeanFlow-style training
+    and preserving the sample diversity that distribution-based methods sacrifice.
+  idea: Instead of distilling a single large multi-step-to-one-step mapping, train a parallel decoder that
+    predicts multiple denoising steps within a fixed time block from a single network evaluation. The decoder
+    learns a representation of mean velocity across each interval in the block directly by regression
+    against teacher-estimated velocities, without differentiating through the mean velocity via JVPs or
+    finite differences.
+  method: PDD operates in the native latent space of each pretrained teacher model (video, audio, or image
+    VAE latents) and keeps the teacher flow model frozen throughout. It trains a shared backbone plus N
+    parallel linear output heads, one per discretized time step within a block, on top of the pretrained
+    architecture. During training the student generates intermediate states via its own parallelized
+    process, the frozen teacher estimates ground-truth mean velocities at those same states using a Runge-Kutta
+    solver (Euler or midpoint), and a stop-gradient is applied to the teacher's estimate so gradients do
+    not flow through it. The student's parallel decoding loss then regresses its own predicted mean velocities
+    onto these teacher-estimated targets, so what is actually trained is a direct regression onto mean
+    velocity rather than a derivative of it, and what is predicted at each step is that mean velocity over
+    an interval rather than instantaneous noise, clean data, or a single-point velocity.
+  evidence: On LTX-2.3 text-to-video/audio (22B parameters, 10-second 720p), PDD at 8 NFE matches or beats
+    the official distilled model after only 250 training iterations, against a teacher that itself required
+    4x30 NFE. On Wan 14B text-to-video at 4 NFE, PDD reaches VBench overall 84.92 against the teacher's
+    83.90, with diversity metrics well above distribution-based baselines DMD2 and AnyFlow, including a
+    V-JEPA 2 cosine distance of 0.0791 versus DMD2's 0.0568. On Qwen-Image text-to-image (20B) at 8 NFE,
+    PDD reports OneIG 0.541, DPG-Bench 88.46, and GenEval 0.86, the best across all three benchmarks among
+    compared methods, with OneIG diversity of 0.181 against DMD2's 0.109 while staying competitive on human
+    preference (HPSv2 31.56). On ImageNet-256 at 1 NFE with the midpoint solver, PDD reaches FID 2.69, competitive
+    with Pi-Flow's 2.85 though behind FreeFlow's 1.45. Sampling at 1, 2, 4, or 8 NFE is supported from a
+    single trained model without retraining.
+  limitations: The authors concede that their large-scale text-to-image and video experiments rely on data-free
+    training, and that investigating PDD in data-dependent settings beyond ImageNet-256 remains future work.
+    They also note that motion in generated videos increases later in training, a convergence dynamic they
+    flag as needing further investigation, and identify adaptive block-size selection as an unexplored
+    direction.
+  why_it_matters: It is presented as the first trajectory-based distillation method to scale to few-step,
+    high-resolution video generation while keeping the diversity that distribution-based methods like DMD2
+    lose to mode collapse, and it does so with a single regression objective that sidesteps the JVP and
+    finite-difference machinery MeanFlow-style training needs, at 4-8 NFE across 14B-22B-parameter production-scale
+    models.
 abstract: Generation in video diffusion or flow models is computationally expensive due to the slow and
   iterative sampling process. Current state-of-the-art (SOTA) acceleration methods heavily rely on variational
   score distillation (VSD) and adversarial losses to distill diffusion models into few-step generators.

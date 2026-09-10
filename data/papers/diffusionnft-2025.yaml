@@ -34,6 +34,51 @@ summary: Optimizes the forward diffusion process directly instead of doing polic
   reverse sampler, which makes it compatible with any black-box sampler and requires only clean images.
   An ICLR 2026 oral and a cleaner formulation than Flow-GRPO's ODE-to-SDE conversion.
 explanation: null
+explained:
+  depth: full-text
+  before: Recent online RL methods for diffusion models, such as Flow-GRPO and DanceGRPO, discretize the
+    reverse sampling process into a multi-step Markov decision process so GRPO-style policy gradients can
+    be applied. This ties training to first-order SDE samplers, breaks consistency with the forward diffusion
+    process risking degeneration into cascaded Gaussians, and forces a complicated two-model scheme when
+    combined with classifier-free guidance.
+  problem: A diffusion model has a single forward (noising) process but many possible reverse (denoising)
+    samplers. The paper asks whether diffusion RL can be performed on the forward process instead of the
+    reverse process, avoiding the solver restrictions, forward-reverse inconsistency and likelihood estimation
+    that reverse-process RL requires.
+  idea: Split online rollouts by reward into a positive subset and a negative subset. The difference between
+    the velocity field implied by the positive subset and the velocity field implied by the negative subset
+    defines an implicit policy-improvement direction, which can be regressed with a supervised flow-matching-style
+    loss instead of estimated with a policy-gradient computed over the reverse trajectory.
+  method: The base model is SD3.5-Medium, a flow-matching model whose pretrained objective predicts a
+    velocity field along the noise-to-data trajectory. DiffusionNFT fine-tunes it with LoRA, rank 32 and
+    alpha 64, on top of the frozen pretrained weights. Online rollouts are split by a reward threshold into
+    positive and negative subsets with mixing coefficient r, and an implicit positive policy v_theta+ =
+    (1-beta) v_old + beta v_theta and implicit negative policy v_theta- = (1+beta) v_old - beta v_theta are
+    defined. The loss regresses v_theta+ toward the base model's target velocity on the reward-positive
+    subset and v_theta- toward it on the negative subset, weighted by r and 1-r. This is a supervised
+    regression on the forward process rather than a GRPO-style policy gradient that needs log-probability
+    ratios from unrolling the reverse sampler; it requires only clean images and their rewards, no sampling
+    trajectories, importance sampling or likelihood estimates.
+  evidence: 'On SD3.5-Medium without CFG, DiffusionNFT raises GenEval from a 0.24 baseline to 0.98 within
+    about 1k training steps. A multi-reward run reaches 0.94 GenEval and 0.91 OCR accuracy at 1.7k steps,
+    against Flow-GRPO''s 0.95 GenEval and 0.66 OCR after more than 5k steps and with CFG applied. The paper
+    reports 3x to 25x lower wall-clock cost than Flow-GRPO for comparable GenEval gains, and DiffusionNFT
+    running CFG-free still exceeds the scores it reports for larger CFG-based models such as SD3.5-Large
+    (8B) and FLUX.1-Dev (12B) on the benchmarks tested. In the same head-to-head it also reports higher
+    PickScore (23.80 vs 22.51), HPSv2.1 (0.331 vs 0.316), Aesthetics (6.01 vs 5.90) and ImageReward (1.49
+    vs 1.29) than Flow-GRPO.'
+  limitations: The authors concede that removing the negative-policy loss term causes reward to collapse
+    almost instantly during online training, so the negative branch is not optional the way purely positive
+    reward-weighted fine-tuning can be for language models. Because the same online rollouts are used both
+    for reward evaluation and as training data, sample quality is critical, and the paper finds ODE samplers
+    outperform SDE samplers, especially on PickScore. A soft-update coefficient trades stability against
+    speed, since fully on-policy updates converge fast but can collapse catastrophically, while near-offline
+    updates are stable but converge impractically slowly. Multi-reward training also required a staged
+    schedule and manual reward reweighting rather than one fixed recipe.
+  why_it_matters: By moving RL onto the forward process, DiffusionNFT decouples reward-driven fine-tuning
+    from the choice of sampler and from CFG, and turns policy improvement into an off-policy supervised
+    regression rather than an on-policy gradient estimator. The authors position this as a step toward a
+    general, unified, off-policy RL recipe usable across modalities beyond diffusion image generation.
 abstract: Online reinforcement learning (RL) has been central to post-training language models, but its
   extension to diffusion models remains challenging due to intractable likelihoods. Recent works discretize
   the reverse sampling process to enable GRPO-style training, yet they inherit fundamental drawbacks,

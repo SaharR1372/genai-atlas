@@ -37,6 +37,43 @@ status:
 summary: An efficiency-oriented unified text-to-image framework using a Gemma-2 text encoder, reported
   to beat SD3 and Janus-Pro on several axes at lower cost. A common open efficiency baseline.
 explanation: null
+explained:
+  depth: full-text
+  before: Lumina-Next and comparable DiT-based text-to-image systems injected text conditioning through
+    zero-initialized gated cross-attention, treating text embeddings as a fixed external feature rather
+    than letting text and image tokens interact directly. Captions used to train these systems came from
+    generic vision-language models not tailored to text-to-image data, producing captions that were inaccurate
+    or insufficiently detailed.
+  problem: Cross-attention conditioning limits the efficiency of multimodal fusion and constrains task
+    expansion, while the lack of a captioning system built specifically for text-to-image data caps how
+    well a model can learn prompt alignment.
+  idea: Treat text and image tokens as one joint sequence processed by self-attention instead of routing
+    text through a separate cross-attention branch, and pair this with a captioner purpose-built for text-to-image
+    training data rather than a generic VLM captioner.
+  method: Unified Next-DiT concatenates text tokens from a frozen Gemma-2 2B encoder with image tokens
+    and processes them jointly through single-stream self-attention, so text and image tokens attend
+    to each other directly instead of through gated cross-attention. Generation happens in VAE latent
+    space, and the model is trained with a flow-matching objective that regresses the velocity field between
+    noise and data rather than predicting noise or clean data directly. UniCap, a fine-tuned Qwen2-VL-7B,
+    generates multi-granularity, multi-perspective, multilingual captions for the roughly 110M-image training
+    set, and training proceeds in three progressive stages at 256px on about 100M images, 1024px on about
+    10M images, and a final high-quality tuning stage on about 1M images. The model totals 2.6B parameters,
+    trained for roughly 591 A100 GPU-days. At inference, CFG-Renormalization rescales velocity magnitude
+    to avoid over-saturation at high guidance scales and CFG-Truncation skips conditional evaluation after
+    early timesteps for about a 20% speedup.
+  evidence: 'Lumina-Image 2.0 reaches GenEval 0.73 and DPG-Bench 87.20 (best among the models it compares
+    against), and 0.8211 on T2I-CompBench color and 0.6028 on shape. In human preference arenas as of February
+    2025 it scores 982 Elo on Artificial Analysis (behind FLUX Pro at 1122, ahead of DALL-E 3 at 970) and
+    969 overall / 1031 alignment on Rapidata (second to FLUX Pro''s 1040), and its AGI-Eval score of 0.4545
+    is well above Lumina-Next''s 0.3229. All of this comes from a 2.6B-parameter model, smaller than many
+    of the systems it is compared against.'
+  limitations: The authors concede the model struggles to consistently generate correct results for complex
+    and diverse structures such as human bodies and for rare concepts, shows disordered details in dense
+    textures, and fails at accurately rendering long and complex text.
+  why_it_matters: It establishes joint self-attention over concatenated text-image tokens, rather than
+    cross-attention, as a cheaper and more effective way to fuse modalities in a DiT, and demonstrates that
+    a captioning system tailored to text-to-image training data measurably improves prompt alignment at
+    a fixed parameter budget.
 abstract: 'We introduce Lumina-Image 2.0, an advanced text-to-image generation framework that achieves
   significant progress compared to previous work, Lumina-Next. Lumina-Image 2.0 is built upon two key
   principles: (1) Unification - it adopts a unified architecture (Unified Next-DiT) that treats text and

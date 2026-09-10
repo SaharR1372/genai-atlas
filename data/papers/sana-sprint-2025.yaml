@@ -37,6 +37,52 @@ summary: Combines continuous-time consistency distillation with an adversarial t
   so it depends on a strong multi-step teacher — the contrast case against MeanFlow and Drifting, which
   train few-step behavior from scratch.
 explanation: null
+explained:
+  depth: full-text
+  before: Before this, few-step text-to-image distillation split into two camps. Consistency distillation
+    such as LCM kept training stable but eroded quality below four steps, especially semantic alignment
+    to the prompt. Adversarial approaches such as ADD and LADD reached strong single-step fidelity but
+    suffered oscillatory GAN dynamics and needed careful re-tuning for every new backbone, while variational
+    score distillation methods required training a second diffusion model alongside the student, adding
+    memory and compute overhead.
+  problem: The paper asks whether a single distillation recipe can combine the training stability of consistency
+    distillation with the sample fidelity of adversarial distillation, and whether one model can serve
+    1 to 4 inference steps without training a separate model per step count.
+  idea: Reformulate a pretrained flow-matching teacher into the TrigFlow parameterization so continuous-time
+    consistency distillation (sCM) applies without training from scratch, then add a latent adversarial
+    loss (LADD) on top. sCM anchors the student to the teacher's trajectory and keeps training stable,
+    while LADD sharpens single-step sample fidelity where sCM alone is weakest.
+  method: SANA-Sprint operates in the VAE latent space inherited from the SANA teacher, not pixels. Training
+    regresses the TrigFlow-parameterized consistency function, which predicts the clean latent x0 along
+    the probability-flow ODE, using the sCM loss weighted by e^{w(t)/D} between the student's own output
+    at two nearby noise levels. The teacher is a pruned and fine-tuned version of SANA-1.5 (4.8B); before
+    distillation it is briefly fine-tuned for 5,000 iterations to add QK-normalization and a dense timestep
+    embedding c_noise(t) = t, then frozen and used only to supply the velocity field and, through its frozen
+    features, the discriminator for the LADD term. Guidance is distilled directly into the student via
+    a CFG embedding rather than run as a separate classifier-free-guidance forward pass at inference. Student
+    sizes of 0.6B and 1.6B parameters are trained with total loss sCM plus 0.5 times LADD, with 50% of
+    training timesteps forced to t = pi/2 (max-time weighting) to stabilize the hardest single-step regime.
+    A single step-adaptive model is trained once and sampled at 1, 2 or 4 steps at inference, rather than
+    training a separate model per step count.
+  evidence: On MJHQ-30K at 1 inference step, with guidance distilled into the model rather than run as
+    test-time CFG, SANA-Sprint-1.6B reaches FID 7.59 and GenEval 0.74 in 0.1s on H100, against 1-step FLUX-schnell's
+    FID 7.26 / GenEval 0.69 at 0.68s and 4-step FLUX-schnell's FID 7.94 / GenEval 0.71 at 2.10s. At 4 steps
+    SANA-Sprint-1.6B improves to FID 6.66 and GenEval 0.77 in 0.31s. An ablation at matched settings isolates
+    the two loss terms, sCM alone gives FID 8.93, LADD alone gives FID 12.20 and is unstable, and the combined
+    loss gives FID 8.11, showing the hybrid corrects a real weakness of each term rather than just averaging
+    them.
+  limitations: The authors do not include a dedicated limitations section, but several constraints are
+    conceded in the method description. The recipe depends on a strong pretrained flow-matching teacher
+    (SANA-1.5 4.8B) rather than learning few-step behavior from scratch, so the student's quality ceiling
+    is set by the teacher. Training used 32 A100 GPUs across 4 DGX nodes plus a separate 5,000-iteration
+    teacher fine-tuning stage before distillation could begin. The authors also note Flash Attention's
+    JVP kernel is unavailable in PyTorch, so they fall back to linear attention specifically to keep the
+    sCM Jacobian-vector product tractable.
+  why_it_matters: It shows a single step-adaptive model, distilled once, can match or beat a leading few-step
+    baseline across 1, 2 and 4 steps without per-step retraining, and that hybridizing consistency distillation
+    with an adversarial term fixes a specific quality gap each leaves open alone. Because it depends entirely
+    on a strong pretrained teacher, it marks the distillation pole of the one-step landscape, against which
+    training-from-scratch approaches like MeanFlow and Drifting Models are the contrasting case.
 abstract: 'This paper presents SANA-Sprint, an efficient diffusion model for ultra-fast text-to-image
   (T2I) generation. SANA-Sprint is built on a pre-trained foundation model and augmented with hybrid distillation,
   dramatically reducing inference steps from 20 to 1-4. We introduce three key innovations: (1) We propose

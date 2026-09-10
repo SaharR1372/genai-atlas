@@ -37,6 +37,45 @@ summary: 'The cleanest existing case of editing inside a genuinely frozen repres
   own costs plainly, including over-smoothing from lossy inversion and edited points occasionally leaving
   the decoder''s support.'
 explanation: null
+explained:
+  depth: full-text
+  before: Visual counterfactual explainers such as DVCE, DIME, ACE and FastDiME relied on iterative gradient-based
+    optimization through pixels, which is slow, often produces adversarial noise rather than genuine semantic
+    change, and yields entangled edits that move several attributes at once. Linear-direction methods such
+    as InterFaceGAN and GANSpace had found interpretable editing directions inside GAN latent spaces, but
+    not inside the embedding space of a frozen foundation model.
+  problem: Foundation models pick up spurious correlations and shortcut strategies, and existing correction
+    methods either need group labels that are usually unavailable or depend on expensive gradient-based
+    adversarial optimization that produces slow, entangled counterfactuals.
+  idea: Freeze the foundation encoder and learn a disentangled dictionary of semantic directions directly
+    in its embedding space, found by Procrustes alignment when supervision is available or by SVD when it
+    is not, then edit by reflecting a chosen component and decode the result with a trained diffusion
+    decoder, avoiding gradient-based optimization entirely.
+  method: Editing happens in a frozen representation-model latent, the embedding space of a CLIP-style
+    encoder, not a VAE latent and not pixel space. The encoder is kept frozen throughout to preserve its
+    semantic manifold; what gets trained is the dictionary of directions and a diffusion decoder that maps
+    the encoder's embedding, together with a DDIM-inverted noise code, back to pixels. Protection of what
+    the user did not ask to change comes from DDIM inversion rather than any spatial mask, attention injection
+    or locality loss. Inverting a real image yields a stochastic spatial code that is held fixed while only
+    the semantic embedding is edited by reflecting a dictionary component, so non-semantic content such as
+    background and texture is preserved by construction rather than through an explicit region-level control.
+  evidence: On a synthetic Square dataset, DiDAE with Procrustes alignment reaches a non-adversarial flip
+    rate of 17.5% against 6.0% for DiME, 0% for ACE and 36.0% for SCE, generating counterfactuals at roughly
+    64.18 per second against roughly 0.02 per second for DiME and ACE. Distilling DiDAE counterfactuals into
+    a ResNet-18 via Counterfactual Knowledge Distillation raises average group accuracy to 91.9% against a
+    51.1% baseline, 61.3% for GroupDRO and 78.6% for P-ClArC. On CelebA-Blond, DiDAE reaches a ResNet-18
+    non-adversarial flip rate of 42.0% at roughly 12.04 counterfactuals per second, and DiDAE-CFKD raises
+    OpenCLIP average group accuracy to 72.3% against a 55.0% baseline and 66.8% for a projection-based method.
+  limitations: The authors concede that SCE slightly outperforms DiDAE on flip rate and gain on the Square
+    dataset, attributing the gap to two factors of their own method, the lossy nature of DDIM inversion,
+    which can cause over-smoothing and loss of detail, and sparse reflections occasionally landing outside
+    the diffusion decoder's support, which produces suboptimal generations. They also concede a distinct
+    trade-off against existing approaches, incurring minor reconstruction-fidelity costs on standard CNNs
+    in exchange for much higher inference speed.
+  why_it_matters: It shows that linear editing directions, first demonstrated inside GAN latent spaces by
+    InterFaceGAN and GANSpace, transfer to the frozen embedding space of a foundation model, and that gradient-free
+    direction edits can generate diverse disentangled counterfactuals orders of magnitude faster than
+    gradient-based optimization, at some cost in edit quality on the hardest cases.
 abstract: Foundation models, despite their robust zero-shot capabilities, remain vulnerable to spurious
   correlations and 'Clever Hans' strategies. Existing mitigation methods often rely on unavailable group
   labels or computationally expensive gradient-based adversarial optimization. To address these limitations,

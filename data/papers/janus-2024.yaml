@@ -31,6 +31,44 @@ summary: Diagnoses the conflict in single-encoder unified models, where understa
   and generation wants reconstructable detail, and resolves it with two separate visual encoders feeding
   one shared language backbone.
 explanation: null
+explained:
+  depth: full-text
+  before: Chameleon-style unified models used one visual encoder to feed both understanding and generation,
+    encoding images once through a shared VQ tokenizer for the entire model.
+  problem: A single encoder is forced to serve two conflicting needs at once. Understanding wants high-level
+    semantic abstraction such as object categories and attributes, while generation wants low-dimensional
+    encoding capable of fine-grained spatial structure and texture, and the paper diagnoses this conflict
+    as the source of Chameleon's weak multimodal understanding.
+  idea: Keep a single shared autoregressive transformer, but give it two separate visual pathways instead
+    of one, so understanding and generation each get an encoder suited to what they need.
+  method: Understanding uses SigLIP-Large-Patch16-384, a continuous encoder, with its features mapped into
+    the LLM's embedding space by a two-layer MLP adaptor. Generation uses a separate discrete VQ tokenizer,
+    codebook size 16,384, downsampling factor 16, whose codebook embeddings are mapped in by a second two-layer
+    MLP adaptor. Both token streams are concatenated into one sequence and processed by a single shared
+    DeepSeek-LLM 1.3B transformer backbone, one set of weights rather than a mixture of experts. Training
+    uses one standard next-token cross-entropy loss over the combined sequence, with no separate loss weight
+    for understanding versus generation tokens, though there are two separate output heads, the LLM's own
+    text head and a separate randomly initialized head for image tokens. So two tokenizers and two adaptors
+    feed one backbone trained by one objective. Training runs three stages, adaptor-only training with
+    encoders and LLM frozen (10,000 steps), unified pretraining with the LLM unfrozen on a 2:3:5 understanding-text-generation
+    data ratio (180,000 steps), then instruction tuning with the generation encoder frozen again (24,000
+    steps), on 128 A100-40GB GPUs for 7 days.
+  evidence: Against Show-o (also 1.3B), Janus reaches MME 1338 versus 949, a 41 percent gain, and GQA 59.1
+    versus 48.7, a 30 percent gain. Against Chameleon 34B, MM-Vet is 34.3 versus 8.3. Against LLaVA-v1.5
+    7B, Janus at only 1.3B is competitive or better, with POPE 87.0 versus 85.9 and MMBench 69.4 versus 64.3. On
+    generation, GenEval overall is 61 percent versus Show-o's 53, SDXL's 55, and DALL-E 2's 52. FID on MSCOCO-30K
+    is 8.53 versus Show-o's 9.24 and LWM's 12.68.
+  limitations: The paper reports minimal explicit limitations. Images are fixed at 384 by 384 resolution.
+    Generation FID is not compared directly against the strongest specialized diffusion systems such as
+    RAPHAEL (6.61) or Imagen (7.27), against which Janus's 8.53 would trail. The paper's own ablation compares
+    a decoupled-encoder setting against a shared-encoder setting and shows decoupling preserves understanding
+    performance, but it does not fully explore whether the reverse conflict, generation quality under decoupling
+    versus a generation-only model, remains open.
+  why_it_matters: The paper's whole premise is that a single shared encoder measurably degrades understanding
+    when jointly trained for generation, evidenced by Chameleon's weak scores, and that decoupling the
+    encoder while keeping one shared transformer and one objective fixes this without needing separate
+    backbones or mixture-of-experts routing. It reframes what "unified" means for the field, showing the
+    backbone and the objective can stay one while the tokenizer does not have to.
 abstract: In this paper, we introduce Janus, an autoregressive framework that unifies multimodal understanding
   and generation. Prior research often relies on a single visual encoder for both tasks, such as Chameleon.
   However, due to the differing levels of information granularity required by multimodal understanding

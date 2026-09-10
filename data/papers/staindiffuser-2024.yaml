@@ -31,6 +31,41 @@ summary: Virtual staining from H&E to immunohistochemistry with a dual diffusion
   and cell-segmentation jointly. Explicitly motivated by the small-data regime of pathology, where thousands
   rather than millions of paired samples are available.
 explanation: null
+explained:
+  depth: full-text
+  before: Pix2Pix and CycleGAN dominated virtual IHC staining but the paper states they "suffer from
+    hallucinations or staining irregularities when H&E stain has less discriminate information," such as for
+    CD3 lymphocytes that leave little visible trace in H&E. Diffusion models generate higher-quality images,
+    but the paper states they "require extensive and diverse datasets (often millions of samples) to achieve
+    a robust performance," which pathology datasets of thousands of paired samples cannot supply.
+  problem: Perform virtual staining from H&E to IHC markers, including markers like CD3 with weak visual
+    correlates in H&E, using a diffusion model that converges on a dataset of thousands rather than millions
+    of samples.
+  idea: Train two diffusion processes jointly, one generating the IHC stain and one performing H&E-based cell
+    segmentation on the same cells, on the premise that segmentation and staining are learning to localize
+    the same objects and can share representations through an explicit multitask coupling.
+  method: The generation space is pixel space. Both diffusion branches denoise directly to image pixels with
+    a shared H&E encoder and FFT attention blocks linking the segmentation and generation branches, with no
+    VAE or latent compression at any point. The paper gives no explicit justification for pixel space; its
+    stated rationale concerns the multitask architecture, not the representation space. Training uses coarse
+    segmentation labels from automated thresholding rather than manual annotation, and patches are 128x128 at
+    20x magnification, downsampled to 64x64 for inference. The two branches share a combined noise-prediction
+    loss.
+  evidence: The paper reports only distribution metrics, PSNR, SSIM, FID, FD, KID, and FLS, and no downstream
+    clinical task or pathologist reader study, though the authors state they plan to check whether these
+    metrics correlate with pathologist judgment in future work. On CD3, StainDiffuser scores FID 18.70, worse
+    than CycleGAN's 13.12 and Pix2Pix's 17.405, with PSNR 19.08 and SSIM 0.612. On CK8/18, StainDiffuser
+    scores FID 5.923, better than Pix2Pix's 10.26 and CycleGAN's 8.722, with PSNR 22.43 and SSIM 0.774. The
+    paper itself flags the CD3 result as evidence against its own metrics, stating plainly that "quantitative
+    results fail to align with improved staining performance," and that StainDiffuser looks qualitatively
+    best on CD3 lymphocytes despite the worse FID.
+  limitations: The paper concedes its own distribution metrics do not track the quality differences it cares
+    about, and it concedes it has not validated any metric against pathologist judgment. It concedes training
+    used only 100 epochs and inference patches as small as 64x64. It concedes the segmentation branch still
+    needs coarse annotations, produced automatically but not manually verified.
+  why_it_matters: It is offered as a small-data recipe for diffusion-based virtual staining, but its own
+    admission that FID and SSIM disagree with visual staining quality on the harder marker undercuts using
+    those same metrics as the primary evidence for the method's benefit.
 abstract: 'Hematoxylin and Eosin (H&E) staining is widely regarded as the standard in pathology for diagnosing
   diseases and tracking tumor recurrence. While H&E staining shows tissue structures, it lacks the ability
   to reveal specific proteins that are associated with disease severity and treatment response. Immunohistochemical

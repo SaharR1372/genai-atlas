@@ -37,6 +37,53 @@ summary: 'Handles generation and editing in one rectified-flow model by the simp
   concatenate the reference image''s tokens onto the generation sequence and let attention do the rest.
   No adapters, no inversion, no task-specific heads. Became the open reference point for in-context editing.'
 explanation: null
+explained:
+  depth: full-text
+  before: Local editing tools such as LaMa, latent-diffusion inpainting, RePaint, Stable Diffusion inpainting,
+    and FLUX.1 Fill relied on explicit masks. Instruction-based generative editors such as IP-Adapter,
+    InstructPix2Pix, Emu Edit, OmniGen, HiDream-E1, and ICEdit were trained on synthetic edit pairs
+    and inherited whatever flaws those synthetic generation pipelines had. Autoregressive multimodal
+    editors folded into systems like GPT-Image and Gemini's native image generation gave lower quality
+    than denoising approaches and ran too slowly for interactive use. Across all of these, keeping a
+    character's or object's appearance stable across repeated edits remained an open, largely unsolved
+    problem.
+  problem: Unify generation and editing in a single flow-matching model, handling both local edits and
+    open-ended in-context generation tasks, without inversion, without a task-specific architecture
+    per capability, and without the identity drift that accumulates across multi-turn editing.
+  idea: Take the reference image's latent tokens and simply append them to the sequence being generated,
+    then let the model's existing attention layers work out the correspondence between reference and
+    target. No adapter module, no inversion procedure, and no dedicated editing head are introduced.
+  method: The edit happens in VAE latent space; FLUX.1 is a rectified-flow transformer operating on
+    a 16-channel latent autoencoder. Context image tokens are appended to the target image's tokens
+    and processed jointly, first through double-stream blocks that keep separate weights per modality,
+    then through 38 single-stream blocks where full self-attention runs over the whole concatenated
+    sequence. 3D RoPE gives target tokens position (0,h,w) and context tokens position (i,h,w) for i=1..N,
+    a constant offset that separates context from target as a "virtual time step" while leaving each
+    image's own 2D spatial layout intact. There is no explicit mask, region-specific loss, or other
+    locality mechanism. Preservation of un-edited regions is not architecturally enforced; it is a learned
+    behavior of joint full self-attention over the concatenated sequence alone. Training starts from
+    a pretrained FLUX.1 text-to-image checkpoint and jointly fine-tunes on image-to-image and text-to-image
+    tasks under the rectified-flow objective; the pro variant is further trained with LADD, and the
+    dev variant is guidance-distilled into a 12B diffusion transformer.
+  evidence: The paper introduces KontextBench, 1026 image-prompt pairs across five tasks (416 local
+    editing, 262 global editing, 92 text editing, 63 style reference, 193 character reference). Using
+    AuraFace embedding cosine similarity, FLUX.1 Kontext [pro] scores highest on character preservation
+    among compared systems including GPT-Image-1 and Runway Gen-4, and shows slower identity drift than
+    those systems across repeated sequential edits. Inference reaches 3 to 5 seconds per 1024x1024 image
+    for both text-to-image and image-to-image, up to an order of magnitude faster than the compared
+    systems. A separate Internal-T2I-Bench of 1,000 prompts scores prompt following, aesthetics, realism,
+    typography accuracy, and speed.
+  limitations: The authors concede that excessive multi-turn editing introduces visible artifacts, showing
+    degraded output after six iterative edits. They note the model "occasionally fails to follow instructions
+    accurately," that distillation "can introduce visual artifacts that impact the fidelity of the output,"
+    and give concrete failure cases such as modifying a scene globally (adding milk foam) instead of
+    performing the requested local edit (repositioning a mug). They list extending to multiple image
+    inputs, further scaling, reducing inference latency for real-time use, and reducing multi-turn degradation
+    as open problems.
+  why_it_matters: Sequence concatenation plus ordinary full attention, with no adapters, no inversion,
+    and no task-specific heads, was enough to match or beat specialized editing systems on character
+    consistency and speed. This made the concatenate-and-attend mechanism the open reference point that
+    subsequent in-context editing work is measured against.
 abstract: 'We present evaluation results for FLUX.1 Kontext, a generative flow matching model that unifies
   image generation and editing. The model generates novel output views by incorporating semantic context
   from text and image inputs. Using a simple sequence concatenation approach, FLUX.1 Kontext handles both

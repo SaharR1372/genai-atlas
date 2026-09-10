@@ -34,6 +34,48 @@ summary: Observes that cross-attention maps bind words to spatial regions, then 
   No mask, no fine-tuning, no inversion. Struggles with non-rigid changes to pose, shape or viewpoint,
   which is precisely what motivated MasaCtrl.
 explanation: null
+explained:
+  depth: full-text
+  before: Text-to-image editing with a fixed generative model required a spatial mask to localize the
+    edit, which discards whatever original structure and content was inside the mask, or full re-noising
+    and re-denoising toward a new target description, which risks changing the whole image since even
+    a small prompt change can push the model toward a completely different output.
+  problem: Edit an image by changing only its text prompt, with no user-supplied mask, while keeping
+    the parts of the image the new prompt does not concern.
+  idea: The cross-attention layers of a text-conditioned diffusion model bind words in the prompt to
+    spatial regions of the image being generated. If those cross-attention maps from the original generation
+    are injected into the generation of an edited prompt, the edited image keeps the original's spatial
+    layout wherever the prompts still agree.
+  method: 'Space: no new latent at all. This is an attention-and-feature-space method built on Imagen,
+    a pixel-space cascaded diffusion model (a 64x64 text-to-image model followed by unmodified super-resolution
+    stages); only the 64x64 base model''s cross-attention is touched, and only the text-conditioned
+    channels of its hybrid attention modules, never the self-attention channels. Three inference-time
+    operations are defined, all as edits to the cross-attention maps M_t of the generation process, with
+    no training, fine-tuning, extra data, or optimization: (1) word swap replaces a word and injects
+    the source image''s attention map M_t* in place of the edited map M_t only while t < tau, a chosen
+    timestep threshold, so early denoising steps preserve the original layout and later steps adapt
+    to the new word; (2) adding a phrase uses an alignment function A between the two prompts'' tokens,
+    so for shared tokens the edited generation reuses the source attention map at the aligned index,
+    while unaligned new tokens are left free to form their own attention; (3) attention re-weighting
+    scales the attention values of one chosen word by a factor c in [-2, 2] to strengthen or weaken
+    its influence without changing the prompt itself. Protection: entirely attention-based, with no
+    mask. Fidelity to the unedited image comes only from injecting or partially reusing the source cross-attention
+    maps for the timesteps and tokens the two prompts share; there is no explicit locality loss, no
+    latent blending, and no spatial mask constraining the effect.'
+  evidence: The paper's evaluation is qualitative. It demonstrates the method across a diverse set of
+    generated images and prompts, including localized word-swap edits, global stylistic edits by adding
+    a phrase, and fine-grained attribute control through the re-weighting parameter c, but reports no
+    LPIPS, CLIP-score, or user-study numbers.
+  limitations: The authors concede the method cannot spatially reposition an object already in the image,
+    since cross-attention injection preserves layout rather than moving content. They concede the attention
+    maps are computed at low resolution, which constrains how precisely an edit can be localized. They
+    also concede that editing real images requires DDIM inversion first, and that this inversion introduces
+    visible distortions in many cases and depends on having a prompt that suitably describes the real
+    image.
+  why_it_matters: It showed that a diffusion model's own cross-attention maps already encode enough
+    of the layout-to-word binding to control an edit, with no mask, no fine-tuning, and no new latent
+    space at all. Its blind spot on non-rigid change (pose, shape, viewpoint) is exactly what motivated
+    MasaCtrl's move to inject self-attention and mutual queries instead of only cross-attention.
 abstract: Recent large-scale text-driven synthesis models have attracted much attention thanks to their
   remarkable capabilities of generating highly diverse images that follow given text prompts. Such text-based
   synthesis methods are particularly appealing to humans who are used to verbally describe their intent.

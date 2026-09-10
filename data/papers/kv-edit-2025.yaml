@@ -31,6 +31,47 @@ summary: 'The strictest preservation guarantee available: background tokens'' ke
   Inversion-free with constant cache overhead. It earns its precision claim architecturally rather than
   statistically, at the cost of struggling with edits where the background itself must change.'
 explanation: null
+explained:
+  depth: full-text
+  before: Training-free inversion-denoising editing methods, including attention-injection approaches such
+    as PnP and head-routing methods that modify attention maps, improved similarity to the source image,
+    but the paper found there remains a significant gap between improved similarity and perfect consistency.
+    Training-based inpainting methods avoided that gap but at the cost of expensive training and potential
+    quality degradation.
+  problem: Background regions drift during editing because of three compounding sources of error, discretization
+    error accumulated during inversion, the new text condition's influence spreading into the background,
+    and the edited foreground content itself perturbing nearby background regions.
+  idea: Rather than correcting drift after the fact, cache the background tokens' key and value pairs during
+    inversion and hold them fixed. During denoising only the foreground, edit-region, tokens are regenerated
+    while attending to an unchanging, frozen representation of the background, removing the mechanism by
+    which background drift could occur rather than suppressing its symptoms.
+  method: During inversion on a FLUX.1-dev rectified-flow DiT, the keys and values of background tokens
+    are recorded at every timestep and block layer along the inversion path. During denoising, attention
+    is computed only for foreground tokens as queries against both the cached background keys and values
+    and freshly computed foreground keys and values, formally Att(Q^fg, (K^fg, K^bg), (V^fg, V^bg)); background
+    tokens are never re-queried or regenerated, they are read from the cache. The method is training-free,
+    no parameters are updated, and it plugs into any DiT-based model. The edit is executed inside the model's
+    noise-space tokens, decoded to pixels by the VAE only at the end, and the protection mechanism is explicit
+    and architectural, a preserved KV cache over the background tokens, not a soft loss or a post-hoc blend.
+    An inversion-free variant denoises immediately after each inversion step and takes the vector difference
+    between the two results to build the probability-flow path, letting the KV cache be released immediately
+    after use, reducing cache memory from O(N) timesteps to O(1).
+  evidence: On PIE-Bench (620 images), KV-Edit reaches PSNR 35.87 for background preservation, against
+    a 17.86-24.44 range for prior training-free competitors and a VAE-reconstruction-only upper bound of
+    37.65; LPIPS is 9.92e-3 against a 17.22-208.43 range for competitors; MSE is 4.69e-4 against 3.86-219.22.
+    Human preference score is 27.21, close to the training-based RF-Edit's 27.60 and above the training-based
+    FLUX-Fill's 25.76. CLIP text-alignment score is 22.39, at or above the competitor range of 20.83-22.44.
+    In a 110-image user study with over 20 participants, KV-Edit is preferred over RF-Inversion 85.1% of
+    the time overall and 94.8% of the time specifically for background preservation, and over FLUX-Fill
+    61.9% of the time overall.
+  limitations: The authors concede the inversion-free, O(1) variant may occasionally result in content
+    retention artifacts, and state they leave further analysis of the inversion-free approach for future
+    work. Because unedited regions are read verbatim from a frozen cache, edits where the background itself
+    needs to change fall outside what the mechanism is built for.
+  why_it_matters: It replaces similarity losses and attention-injection heuristics with an architectural
+    guarantee, an unmodified KV cache, so background preservation becomes an inference-time constraint rather
+    than a training objective the model only approximates, at zero training cost and compatible with any
+    DiT backbone.
 abstract: Background consistency remains a significant challenge in image editing tasks. Despite extensive
   developments, existing works still face a trade-off between maintaining similarity to the original image
   and generating content that aligns with the target. Here, we propose KV-Edit, a training-free approach

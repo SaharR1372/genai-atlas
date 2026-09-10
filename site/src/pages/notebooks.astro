@@ -13,6 +13,14 @@ const NOTEBOOKS = [
     runtime: "about a minute",
   },
   {
+    slug: "rae",
+    title: "Representation autoencoders, run against the VAE they replace",
+    question: "The line this atlas is built around claims you can throw away the VAE. Does it hold up?",
+    body: "Loads three representation autoencoders built on frozen DINOv2, SigLIP 2 and MAE encoders and puts one image through each alongside Stable Diffusion's autoencoder. Ends at the finding that reframed the line: three metrics, three different winners, and the encoder that reconstructs best is not the one that generates best.",
+    uses: ["RAE (official)", "DINOv2", "SigLIP 2", "MAE", "SD 1.5 VAE"],
+    runtime: "a few minutes",
+  },
+  {
     slug: "editing",
     title: "How editing methods actually differ",
     question: "Every editing method claims to preserve what you did not change. They mean different things by it.",

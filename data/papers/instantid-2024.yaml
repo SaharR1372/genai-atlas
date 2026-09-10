@@ -38,6 +38,44 @@ summary: 'From a single face photo, preserves identity in seconds with no per-id
   and landmark images are integrated with the text prompt to steer generation, plugging into existing
   pretrained checkpoints (SD1.5, SDXL) as an adapter.'
 explanation: null
+explained:
+  depth: full-text
+  before: Personalization methods that fine-tune per identity, such as Textual Inversion, DreamBooth and
+    LoRA, need multiple reference images and a lengthy per-identity training pass. Single-image ID-embedding
+    methods used CLIP image embeddings, which carry only broad, ambiguous semantic information such as composition,
+    style and color, and could not preserve fine facial identity; other ID-embedding methods such as PhotoMaker
+    and FaceStudio required extensive fine-tuning across many parameters or lacked compatibility with community
+    checkpoints.
+  problem: Preserve a person's facial identity from a single reference photo, in seconds and without any
+    per-identity fine-tuning, while staying compatible with existing pretrained Stable Diffusion checkpoints
+    and community plugins.
+  idea: Replace the weak CLIP image embedding with a strong face-recognition embedding, and separate identity
+    conditioning into a strong semantic signal, the face embedding, and a deliberately weak spatial signal,
+    five facial landmarks only, so the model gets enough structure to place the face without overriding
+    pose or composition from the text prompt.
+  method: A face-recognition embedding, from an antelopev2-style model, is projected into the text-feature
+    space and injected through a decoupled cross-attention Image Adapter in the style of IP-Adapter. Five
+    landmarks (eyes, nose, mouth corners) condition a ControlNet-style IdentityNet, whose text-conditioning
+    branch is dropped and replaced by the ID embedding at its cross-attention layers. Only the Image Adapter
+    and IdentityNet parameters are trained; the underlying Stable Diffusion UNet, SD1.5 or SDXL, stays entirely
+    frozen. Generation and editing happen in the VAE latent space inherited unchanged from SD1.5 or SDXL,
+    and IdentityNet's spatial control is a residual injection into that same latent-space denoising process.
+    There is no mask or region-restriction mechanism. Conditioning is global across the generated image,
+    and the method deliberately keeps the spatial signal weak, five points rather than a dense pose map
+    or segmentation mask, specifically so it does not lock down a region, trading any explicit locality
+    guarantee for text editability elsewhere in the image.
+  evidence: The fetched paper reports no quantitative metrics such as FID, face-embedding cosine similarity,
+    or CLIP-T; comparisons against IP-Adapter-FaceID-Plus, LoRA and InsightFace face-swapping are qualitative
+    figure comparisons only. Training used LAION-Face (50 million image-text pairs) plus 10 million curated
+    human images on 48 NVIDIA H800 GPUs with a batch size of 2 per GPU.
+  limitations: The authors concede the face embedding entangles facial attributes tightly, which makes
+    independent editing of attributes such as age or expression difficult, and that the method inherits
+    biases from the underlying face-recognition model. They also flag the risk of generating offensive or
+    culturally inappropriate imagery given how easily identity can be transferred.
+  why_it_matters: It shows a plug-in adapter, requiring no per-identity fine-tuning at inference, can approach
+    fine-tuned personalization quality from a single image without touching the base diffusion weights,
+    at the cost of any explicit guarantee about which pixels remain unchanged, an adapter-and-global-conditioning
+    approach that later identity-preserving editing work follows.
 abstract: 'There has been significant progress in personalized image synthesis with methods such as Textual
   Inversion, DreamBooth, and LoRA. Yet, their real-world applicability is hindered by high storage demands,
   lengthy fine-tuning processes, and the need for multiple reference images. Conversely, existing ID embedding-based

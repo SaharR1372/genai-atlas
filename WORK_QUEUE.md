@@ -24,6 +24,13 @@ why-it-matters, with `depth` recording abstract vs full-text.
       dit-2023, sit-2024, ldm-2022, sd3-2024. 28 papers done total; validator warned on 73 remaining
       landmark/core papers after this batch (down from 87 minus the 5 already done minus these 23,
       so the count also reflects new landmark/core papers added by other concurrent sessions).
+- [x] All 19 medical-imaging papers with no `explained` block — session 8: chung-ye-2021,
+      dar-memorization-2023, frd-2024, roentgen-2022, maisi-2024, biomedjourney-2023, jalal-2021,
+      staindiffuser-2024, dscm-2020, mededit-2024, monai-gen-2023, synthrad-2024, pixcell-2025,
+      radedit-2023, syndiff-2022, retinal-fm-latent-2026, stream-2026, ktena-2024 (DOI-only, via
+      PubMed). All full-text depth. Found `mededit-2024` miscategorized under
+      `line-medical-transfer-vae` (it is pixel-space, no VAE at all) — flagged, not fixed, since
+      the task scope was `data/papers/*.yaml` only. See CHANGELOG's session 8 entry.
 - [ ] Remaining landmark + core papers (validator warns on each; run `scripts/validate.py` for the
       current count)
 - [ ] Strong-followup and emerging papers

@@ -34,6 +34,42 @@ explanation: null
 lines:
 - line-one-step-objectives
 - line-representation-latent
+explained:
+  depth: full-text
+  before: RAE showed strong flow-matching generation in a single denoising pass but was reported to distill
+    poorly into few-step samplers. Separately, Drifting Models emerged as a trajectory-free one-step distillation
+    method that measures distributional discrepancy through a contrastive drifting field rather than matching
+    denoising trajectories, but needed an auxiliary MAE module to stay stable on the dispersed, VAE-style
+    latent spaces it was originally built for.
+  problem: Direct trajectory-matching distillation of RAE-based flow models is unstable because RAE latents
+    are far more anisotropic and curved than VAE latents, roughly two orders of magnitude more curved by
+    the paper's measurements, which breaks methods that assume smooth, nearly straight teacher trajectories.
+  idea: RAE latents are compact and semantically concentrated rather than dispersed, so a Drifting Model
+    style objective, which supervises a one-step generator through a contrastive field instead of a trajectory,
+    can be applied directly to RAE latents and no longer needs the auxiliary MAE that stabilized it on
+    dispersed VAE-style spaces.
+  method: The teacher is a pretrained DiT-DH flow model trained with flow matching inside frozen RAE latent
+    space, and the student is a one-step generator initialized from that same teacher's weights; the RAE
+    encoder-decoder itself stays frozen throughout. The drifting objective is defined per RAE token representation,
+    with three modifications for stability, a single rather than bidirectional softmax for theoretical
+    consistency, Laplace-distributed input perturbation to smooth gradients, and partial gradient detachment
+    on negative samples (192 of 256 detached). The paper adds an extrapolation-based guided sampling pipeline
+    usable at one step for near zero extra cost.
+  evidence: On ImageNet 256x256, DiT-DH-XL reaches FID 1.77 at 1 NFE after only 16 epochs (about 10k steps)
+    of distillation, and DiT-DH-L reaches FID 2.12 under the same budget. This surpasses a prior RAE-distillation
+    baseline, MF-RAE, at FID 1.89 to 2.03, and approaches the original Drifting Model's FID range of 1.61
+    to 1.77 without needing that method's auxiliary MAE module. An ablation shows removing the single-softmax
+    change alone causes training collapse, and the full set of modifications lifts FID from 1.94 to 1.77.
+  limitations: The paper concedes its theoretical analysis rests on a simplified high-dimensional model
+    that only approximates real RAE latent distributions. It also concedes that training a drifting-style
+    one-step generator entirely from scratch on RAE latents, without initializing from a pretrained flow
+    model, remains unsolved, with a decode-encode variant trained from scratch reaching only FID 7.04.
+    Reliance on abundant same-class positive samples may also limit scalability to text-to-image settings.
+  why_it_matters: It closes the perceived gap between RAE's strong single-pass generation quality and its
+    reported weakness under distillation. It also shows that a semantically concentrated latent space helps
+    rather than hinders a trajectory-free one-step distillation objective, the opposite of what the dispersed
+    VAE-style spaces Drifting Models were designed for required, reinforcing that RAE-style latents behave
+    as a structurally different regime rather than a drop-in replacement for VAE latents.
 abstract: Despite the significant training acceleration and promising performance, Representation Autoencoders
   (RAEs) are mainly criticized for poor distillation effectiveness. In this work, we argue that RAE is
   competent at high-quality one-step generation. We achieve 1.48 FID with only 16-epoch distillation on

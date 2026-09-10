@@ -24,6 +24,50 @@ axes:
   - mean-velocity
 lines:
 - line-one-step-objectives
+explained:
+  depth: full-text
+  before: Flow matching and diffusion models generate high-quality images but need many sampling steps,
+    since the network only learns an instantaneous velocity field that must be integrated numerically.
+    Prior attempts at one-step sampling, including consistency models, relied on extra consistency constraints
+    imposed on the network's behavior and needed a carefully designed discretization curriculum, pre-training,
+    or distillation from a multi-step teacher.
+  problem: One-step generation lacked a principled training target. Existing few-step methods were built
+    from heuristic consistency constraints rather than a mathematical identity, and every strong one-step
+    model available depended on a pretrained multi-step teacher or a curriculum rather than training from
+    scratch.
+  idea: Define average velocity as the displacement between two timesteps divided by the interval, in
+    contrast to the instantaneous velocity flow matching learns. A self-contained identity relates average
+    velocity to instantaneous velocity without requiring the integral to be computed, giving a direct regression
+    target that supports one-step sampling.
+  method: MeanFlow operates in the VAE latent space used by standard latent diffusion transformers, a
+    32 by 32 by 4 latent for ImageNet 256x256, encoded by a pretrained tokenizer; CIFAR-10 experiments
+    work directly in pixel space. A DiT-style network u_theta(z_t, r, t) is trained to predict the average
+    velocity field between two arbitrary timesteps r and t, rather than the instantaneous velocity that
+    flow matching predicts. The training target follows the MeanFlow Identity, u(z_t,r,t) = v(z_t,t) minus
+    (t minus r) times the total derivative of u along the trajectory, where v is the ordinary instantaneous
+    conditional velocity and the derivative term is computed with a Jacobian-vector product in a single
+    backward pass with a stop-gradient on the target, adding only 16% wall-clock overhead over plain flow
+    matching. At sampling, one evaluation u_theta(noise, 0, 1) maps noise directly to data in a single
+    step, with more steps optional. Classifier-free guidance is folded into the ground-truth field the
+    network is trained to match rather than applied at sampling time, so the model outputs an already-guided
+    average velocity and pays no extra evaluations for guidance at inference. Training is entirely from
+    scratch with no pretraining, distillation, or curriculum.
+  evidence: On ImageNet 256x256 with guidance folded into the training target as described and 240 epochs
+    of training, MeanFlow-XL/2 (676M params) reaches FID 3.43 at 1 NFE, versus 10.60 for the prior best
+    one-step method, Shortcut-XL/2, and 34.24 for iCT-XL/2 under the same 1-NFE budget. A longer 1000-epoch
+    run, MeanFlow-XL/2+, reaches FID 2.20 at 2 NFE, close to SiT-XL/2's FID 2.06 at 250 NFE, a multi-step
+    baseline evaluated with its own standard sampler. Smaller MeanFlow variants at 1 NFE score FID 6.17
+    (MeanFlow-B/2, 131M), 5.01 (MeanFlow-M/2, 308M) and 3.84 (MeanFlow-L/2, 459M). On unconditional CIFAR-10,
+    MeanFlow reaches FID 2.92 at 1 NFE, comparable to prior one-step methods iCT at 2.83 and IMM at 3.20.
+  limitations: The authors concede that even the longer-trained MeanFlow-XL/2+ at 2 NFE still slightly
+    trails the 250-NFE multi-step SiT-XL/2 baseline, describing the result as largely, not fully, closing
+    the gap. They note the JVP computation still adds measurable training overhead, they build on a DiT
+    backbone rather than proposing a new architecture, and experiments are limited to class-conditional
+    ImageNet and CIFAR-10.
+  why_it_matters: Replacing heuristic consistency constraints with an identity that falls directly out
+    of the definition of average velocity gives one-step generative modeling a principled target trainable
+    from scratch. Narrowing the 1-NFE to multi-step gap this far removes distillation from a pretrained
+    teacher as a precondition for competitive one-step models.
 links:
   code: null
   weights: null

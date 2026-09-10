@@ -11,3 +11,4 @@ site/public/graph.json
 .DS_Store
 # generated from notebooks/*.ipynb by notebooks/publish.sh
 site/public/notebooks/
+external/

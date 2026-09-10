@@ -38,6 +38,51 @@ summary: 'Moves adapter-based conditioning from spatial control to image-prompt 
   the frozen model''s existing text cross-attention output. Only 22M parameters, and the decoupling keeps
   image and text prompts from fighting over one shared attention layer.'
 explanation: null
+explained:
+  depth: full-text
+  before: Adding image-prompt capability to a pretrained text-to-image diffusion model meant either
+    fully fine-tuning the model on image embeddings, as SD Image Variations and Stable unCLIP did,
+    or replacing the text encoder with an image encoder outright. Fine-tuning eliminated the model's
+    text-prompting ability, cost large compute, and produced weights that could not transfer to other
+    custom checkpoints or work alongside tools like ControlNet. Lighter adapters such as T2I-Adapter's
+    style branch and Uni-ControlNet's global controller avoided full fine-tuning but only reached coarse
+    style-level control, clearly weaker than the fully fine-tuned models.
+  problem: Existing lightweight adapters inject image features into the same cross-attention layers
+    that the base model's key and value projections learned for text. Those projections were trained
+    to adapt to text features specifically, so merging image features in aligns them to text space
+    and discards image-specific detail, which is why prior adapters stayed coarse-grained.
+  idea: Give the image prompt its own cross-attention branch with its own key and value projections,
+    separate from the text branch, and add the two branches' outputs together. Decoupling removes the
+    forced alignment to text-only projections without touching the base model at all.
+  method: This is attention-and-feature-space conditioning only; no new latent is written and no pixels
+    or VAE latents are touched directly. For each of the 16 cross-attention layers in Stable Diffusion,
+    a new key projection and value projection are added and trained on image features, while the existing
+    query projection is shared and stays frozen along with the rest of the UNet and the CLIP image encoder.
+    A small trained projection network (a linear layer plus layer normalization) turns the CLIP image
+    encoder's single global embedding into a 4-token sequence fed to the new branch. The text and image
+    cross-attention outputs are simply summed. There is no mask or spatial localization mechanism, and conditioning
+    is global over the whole generation, with no protection for regions a user did not intend to change,
+    consistent with this being an image-prompt adapter for generation rather than a region-preserving
+    edit tool. Total trainable parameters are 22M, essentially just the per-layer K/V pairs plus the
+    small projection network.
+  evidence: On 5,000 COCO2017 validation images with 4 generations each (20,000 images total), scored
+    with CLIP ViT-L/14, IP-Adapter reaches CLIP-T 0.588 and CLIP-I 0.828 using 22M trainable parameters.
+    SD Image Variations (860M trainable parameters) reaches CLIP-T 0.548 and CLIP-I 0.760, and SD unCLIP
+    (870M) reaches CLIP-T 0.584 and CLIP-I 0.810. Lighter adapters score lower still. Uni-ControlNet's
+    global controller (47M) reaches CLIP-T 0.506 and CLIP-I 0.736, and T2I-Adapter's style branch (39M)
+    reaches CLIP-T 0.485 and CLIP-I 0.648. IP-Adapter matches or exceeds the fully fine-tuned models
+    at roughly 1/40th the trainable parameter count.
+  limitations: The authors concede the method "cannot synthesize images that are highly consistent
+    with the subject of a given image like some existing methods, e.g., Textual Inversion and DreamBooth";
+    it reproduces content and style resemblance, not exact subject identity. Their own ablation shows
+    that using finer-grained multi-token image features (16 tokens from grid features instead of one
+    global embedding) improves subject consistency but also leaks spatial structure into the conditioning,
+    which reduces generation diversity.
+  why_it_matters: A 22M-parameter decoupled cross-attention branch, added to an otherwise untouched
+    frozen backbone, matched or beat models that fine-tuned thirty to forty times as many parameters.
+    Because the base model stays frozen, the adapter composes with other fine-tuned checkpoints and
+    with structural-control tools like ControlNet, and the decoupled-attention pattern itself became
+    a template reused across later adapter-based conditioning and personalization work.
 abstract: 'Recent years have witnessed the strong power of large text-to-image diffusion models for the
   impressive generative capability to create high-fidelity images. However, it is very tricky to generate
   desired images using only text prompt as it often involves complex prompt engineering. An alternative

@@ -34,6 +34,55 @@ summary: Builds counterfactual image generation on normalizing flows and variati
   invertible model. A different lineage from the rest of this section, chosen for causal correctness rather
   than sample quality.
 explanation: null
+explained:
+  depth: full-text
+  before: Structural causal models existed in econometrics and epidemiology, but typically with simple
+    linear mechanisms. Deep generative models such as VAEs, GANs, and normalizing flows captured associations
+    well, and some prior work reached the intervention level of Pearl's hierarchy, but the paper states that
+    existing deep causal methods "lack tractable abduction capabilities and therefore cannot generate
+    counterfactuals."
+  problem: Build a structural causal model with deep learning components that can answer all three levels of
+    Pearl's ladder of causation, association, intervention, and counterfactual, on high-dimensional data such
+    as images, which requires tractably inferring the exogenous noise that abduction depends on.
+  idea: Give each causal mechanism an invertible core, either a full normalizing flow or a lower-dimensional
+    invertible transformation wrapped around a flexible non-invertible network trained with variational
+    inference, so that abduction, inferring the noise behind an observation, becomes exact or tractably
+    approximate rather than intractable.
+  method: This is not a diffusion model. It is a normalizing-flow and variational-inference based causal
+    model, and its mechanism should be described on those terms. Three mechanism types are proposed. The
+    fully invertible normalizing-flow version operates directly in data space and is exact but expensive for
+    high-dimensional images. The amortized version the paper favors splits each mechanism into an invertible
+    low-level component and a non-invertible high-level component, trained with an ELBO through a VAE-style
+    encoder; the paper's stated reason is architectural flexibility, that the "invertible transformation can
+    be made shallower, while the upstream non-invertible component... is expected to capture more of the
+    high-level structure of the data." The choice of an invertible mechanism at all, rather than a purely
+    generative model like a plain VAE or GAN, is explicitly because counterfactual abduction-action-prediction
+    needs to invert the generative process to recover the exogenous noise; the paper is explicit that this
+    tractable inversion is "missing from existing deep causal learning methods," which is its own stated
+    reason for the whole architectural family, not merely for a preferred variant. Counterfactual inference
+    itself follows three steps, abduction recovers the noise posterior from an observation, action edits the
+    structural assignment for the intervened variable, and prediction resamples through the modified graph
+    using the recovered noise.
+  evidence: The paper reports no downstream clinical task and no reader study; evidence is log-likelihood,
+    density matching against known ground truth, and qualitative visual inspection of counterfactuals. On
+    synthetic Morpho-MNIST with a known causal graph, the causally structured model raises the causal
+    conditional log p(intensity given thickness) to -4.30 against -5.19 for both an independent model and a
+    plain conditional decoder, evidence the causal structure is being used rather than just correlated
+    features. On real brain MRI from the UK Biobank, 13,750 2D slices at 64x64, the paper reports that
+    learned joint densities of age, brain volume, and ventricle volume given sex closely match kernel density
+    estimates of the real data, and that counterfactual interventions on age, brain volume, ventricle volume,
+    and sex produce the expected direction of anatomical change, larger ventricles and reduced brain volume
+    with older intervened age, for instance, while preserving cortical folding identity in generated images.
+    This is distributional and qualitative evidence, not a clinical judgment of realism.
+  limitations: The paper concedes the framework requires all variables to be observed to compute a
+    counterfactual, limiting applicability when some causes are unmeasured. It concedes the causal graph
+    itself is assumed rather than learned or discovered from data. It concedes that flexible neural mechanisms
+    may not cleanly separate the causal roles of their inputs as intended, and that counterfactuals under
+    such flexible models may not be uniquely defined. It explicitly cautions against using the framework for
+    consequential decisions such as healthcare or policy without validating its causal assumptions.
+  why_it_matters: It establishes that answering a genuinely causal "what if" question about an image requires
+    invertible machinery for abduction, which conditional generation, however good its sample quality,
+    structurally cannot provide.
 abstract: 'We formulate a general framework for building structural causal models (SCMs) with deep learning
   components. The proposed approach employs normalising flows and variational inference to enable tractable
   inference of exogenous noise variables - a crucial step for counterfactual inference that is missing

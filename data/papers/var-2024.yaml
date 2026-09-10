@@ -41,6 +41,51 @@ summary: Redefines autoregressive image generation as coarse-to-fine next-*scale
 explanation: null
 lines:
 - line-discrete-tokens
+explained:
+  depth: full-text
+  before: Autoregressive image generators flattened a VQ tokenizer's 2D grid of discrete tokens into a
+    1D sequence with a raster scan, spiral, or z-curve order, then predicted tokens left to right with
+    causal attention as language models do. Generating an n by n grid this way costs O(n^2) autoregressive
+    steps and O(n^6) total computation, and diffusion transformers such as DiT-XL/2 had overtaken these
+    raster-order AR models on ImageNet, reaching FID 2.27 where prior AR baselines scored around 18.65.
+  problem: Raster-order next-token prediction is mismatched to images. A VQVAE's token grid carries bidirectional
+    spatial correlations that a strictly left-to-right causal order cannot respect, and flattening destroys
+    the 2D locality between neighboring tokens, both of which the authors argue hold autoregressive image
+    generation back from matching diffusion transformers.
+  idea: Redefine autoregression over images as coarse-to-fine next-scale prediction instead of next-token
+    prediction. Generate an entire low-resolution token map first, then predict each next, higher-resolution
+    token map conditioned on every coarser map already generated, mirroring how a human first perceives
+    global structure before local detail.
+  method: Space is discrete tokens. A multi-scale VQVAE encodes an image into K token maps r_1 through
+    r_K at increasing resolutions, sharing one codebook of size 4096, using a residual-style design in
+    which each map is refined by extra convolution layers to recover information lost during upscaling.
+    A GPT-2-style decoder-only transformer with adaptive layer norm predicts, at each of the K autoregressive
+    steps, every token in that entire scale's map in parallel, conditioned on all previously generated
+    coarser scales via a block-wise causal attention mask that lets a scale attend only to itself and
+    everything coarser than it. The objective is standard cross-entropy over the shared codebook's 4096-way
+    vocabulary at every token, factorizing the joint distribution over all K maps as a chain rule product
+    of per-scale conditionals; nothing about the objective is diffusion-based. At inference, key-value
+    caching removes the need for the attention mask, and generation proceeds scale by scale.
+  evidence: On ImageNet 256x256, VAR-d30 (2.0B params) reaches FID 1.92 and Inception Score 323.1, and
+    VAR-d30-re, the same model with classifier-free guidance at scale 2.0 plus a rejection-sampling step
+    added at inference, reaches FID 1.73 and IS 350.2, against DiT-XL/2's FID 2.27 (675M params) and
+    L-DiT-3B's FID 2.10 (3.0B params). VAR models are trained for 200 to 350 epochs depending on model
+    size, and the paper contrasts this against DiT-XL/2's far longer 1400-epoch training budget. VAR-d30
+    generates an image roughly 45 times faster than DiT-XL/2 by the paper's relative-speed comparison.
+    Across 12 model sizes from 18.5M to 2.0B parameters, test loss and token error rate both follow power
+    laws in parameter count and in training compute, with Pearson correlation coefficients near -0.998
+    across six orders of magnitude of compute, mirroring the scaling laws reported for language models.
+  limitations: The authors concede text-to-image generation is not covered and is left as an ongoing,
+    high-priority direction for future work. They state the multi-scale VQVAE tokenizer's own architecture
+    and training are kept unchanged from the baseline VQGAN design, and describe improving the tokenizer
+    itself as an orthogonal direction they did not pursue. Video generation is also explicitly not implemented,
+    though the authors suggest a 3D extension of next-scale prediction as future work. The zero-shot inpainting
+    and outpainting results are shown only qualitatively, with no quantitative metrics reported for them.
+  why_it_matters: Reformulating autoregression as next-scale rather than next-token prediction let a GPT-style
+    image model surpass diffusion transformers on ImageNet FID for the first time while training on fewer
+    epochs and running an order of magnitude faster at inference. The clean power-law scaling and zero-shot
+    task transfer argue that image autoregression, not only language modeling, can inherit the scaling
+    behavior that made large language models predictable to train.
 abstract: 'We present Visual AutoRegressive modeling (VAR), a new generation paradigm that redefines the
   autoregressive learning on images as coarse-to-fine "next-scale prediction" or "next-resolution prediction",
   diverging from the standard raster-scan "next-token prediction". This simple, intuitive methodology

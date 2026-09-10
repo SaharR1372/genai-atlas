@@ -1,0 +1,20 @@
+id: gemini-image
+type: system
+name: Gemini Image (Nano Banana)
+org:
+- Google DeepMind
+open: false
+releases:
+- version: gemini-3.1-flash-lite-image
+  date: 2026-07
+  arxiv: null
+  open: false
+  notes: Model id and availability confirmed from Google's own developer documentation, which describes
+    it as the efficiency specialist of the Gemini image family. The commonly cited July 2026 release date
+    could not be confirmed from a dated primary source.
+sections:
+- generation
+- editing
+summary: Google's closed image generation and editing family, widely referred to by its Nano Banana nickname.
+  Included as a pointer because it defines what the open systems are measured against, not because anything
+  is known about how it works. Google publishes no architectural detail.

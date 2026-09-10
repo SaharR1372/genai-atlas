@@ -32,6 +32,51 @@ summary: Connects a frozen CLIP vision encoder to a language model through a sin
   cheapest possible bridge between the two modalities, and the reason the same trick can later be reused
   to condition a generator.
 explanation: null
+explained:
+  depth: full-text
+  before: Prior work connected vision and language through more elaborate machinery, Flamingo's gated
+    cross-attention layers and BLIP-2's Q-former, and separately, text-only instruction tuning had already
+    shown that models like InstructGPT and FLAN generalize far better to new tasks once tuned on instruction-following
+    data. Multimodal models such as Flamingo, BLIP-2, KOSMOS-1, and LLaMA-Adapter showed strong visual transfer
+    but were not explicitly instruction-tuned on vision-language instruction data, and no large multimodal
+    instruction-following dataset existed to tune one on.
+  problem: There was no large-scale multimodal instruction-following dataset, and building one by human
+    annotation is slow and hard to specify well, so no general-purpose visual assistant that follows open-ended
+    human instructions about an image existed.
+  idea: Use a language-only GPT-4, which never sees the image itself, to synthesize multimodal instruction-following
+    data by feeding it symbolic textual surrogates of the image, namely captions describing the scene and
+    bounding boxes localizing objects and their spatial relations, then instruction-tune a vision-language
+    model on the result.
+  method: A frozen pretrained CLIP ViT-L/14 vision encoder produces grid visual features Zv, which a single
+    trainable linear projection matrix W maps into Hv, tokens with the same dimensionality as the language
+    model's word embeddings, so the image contributes tokens directly into the LLM's input sequence rather
+    than through cross-attention. The language model is LLaMA. Training has two stages. In stage one, feature
+    alignment pretraining, both the vision encoder and the LLM are kept fully frozen and only the projection
+    matrix W is trained, on 595K filtered CC3M image-caption pairs turned into simple question-caption pairs.
+    In stage two, end-to-end instruction tuning, the vision encoder stays frozen but both the projection
+    matrix and the LLM weights are now updated, on 158K generated multimodal instruction samples covering
+    conversation, detailed description, and complex reasoning. This single-linear-layer bridge is the defining
+    example of the encoder-projector fusion pattern, the pattern later reused to condition image generators
+    on a language model's representations.
+  evidence: The 158K instruction dataset splits into 58K conversation samples, 23K detailed description
+    samples, and 77K complex reasoning samples, generated with GPT-4 rather than ChatGPT because GPT-4 gave
+    consistently higher-quality data including better spatial reasoning. On a synthetic multimodal instruction-following
+    evaluation judged by GPT-4, the fully instruction-tuned model reaches an 85.1% relative score against
+    GPT-4 itself, against only 21.5% with no instruction tuning at all. On ScienceQA, LLaVA alone reaches
+    90.92% accuracy, and combining it with GPT-4 in a judge ensemble reaches 92.53%, a new state of the
+    art at the time versus the prior 91.68% from MM-CoT-Large. Removing the pretraining stage and training
+    from scratch drops ScienceQA accuracy to 85.81%.
+  limitations: The paper describes itself as work in progress. It concedes the projection scheme is a deliberately
+    simple, lightweight choice and leaves more sophisticated connection architectures as future work. It
+    concedes the pretraining data is limited to a filtered subset of CC3M and the instruction data to a
+    subset of COCO images, restricting concept coverage such as entities and OCR text. It concedes GPT-4
+    sometimes fails to generate answers when the image content genuinely requires visual grounding it cannot
+    infer from captions and boxes alone, and it does not explore alternative vision encoders that provide
+    object-level features.
+  why_it_matters: LLaVA showed that a single trained linear layer is sufficient to bridge a frozen vision
+    encoder and a language model once instruction-tuning data exists, making the encoder-projector pattern
+    the cheapest and most widely reused way to build a vision-language model, and the same mechanism later
+    carries over to conditioning image generators on language-model representations.
 abstract: 'Instruction tuning large language models (LLMs) using machine-generated instruction-following
   data has improved zero-shot capabilities on new tasks, but the idea is less explored in the multimodal
   field. In this paper, we present the first attempt to use language-only GPT-4 to generate multimodal

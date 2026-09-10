@@ -36,6 +36,51 @@ summary: Learns disease-progression editing from pairs of longitudinal radiology
   model to turn two visits into an edit instruction. Latent diffusion, and one of the few genuine image-editing
   systems in the medical literature.
 explanation: null
+explained:
+  depth: full-text
+  before: InstructPix2Pix showed instruction-following image editing worked for natural images but carries
+    no medical domain knowledge. RoentGen conditions chest X-ray generation on text descriptions alone,
+    with no prior image as input, so it is not built to preserve patient-specific invariants such as anatomy,
+    race or age when depicting a disease change.
+  problem: Unconstrained counterfactual medical image generation, showing what a patient's chest X-ray would
+    look like under a described disease progression while holding everything else about that patient fixed,
+    was largely unexplored.
+  idea: Mine real longitudinal patient records for supervision. Take two chest X-rays of the same patient
+    taken at different times, use GPT-4 to turn the pair of radiology reports into a short natural-language
+    description of the progression between them, and train an editing model on the resulting prior-image,
+    progression-text, new-image triples.
+  method: Editing happens in VAE latent space, extending Stable Diffusion v1.5's architecture with a frozen
+    VQGAN autoencoder and a frozen BiomedCLIP text encoder plus a trained linear projection layer, while the
+    UNet denoiser is the component that gets trained. The prior image is concatenated with the noisy latent
+    state, following InstructPix2Pix's conditioning scheme, while the progression text cross-attends inside
+    the UNet. There is no mask, attention injection, or explicit locality loss protecting regions the description
+    does not mention; region preservation is implicit, coming only from conditioning on the concatenated
+    prior-image latent rather than from any spatial control mechanism, so editing is global in principle
+    rather than locally constrained. Training uses a two-stage curriculum, first pretraining the UNet on
+    69,846 single image-report pairs from MIMIC-CXR with the prior image replaced by a constant dummy image
+    for 200 epochs, then fine-tuning on roughly 9,354 to 10,000 real counterfactual triples with a genuine
+    prior image for 128 more epochs, because the counterfactual triples are far too scarce to train from
+    scratch without overfitting.
+  evidence: On held-out MIMIC-CXR pairs, BiomedJourney reaches a composite CMIG score of 83.23 against
+    RoentGen's 66.08, InstructPix2Pix's 42.12, and plain Stable Diffusion's 18.14. Race-preservation AUC
+    rises to 97.22 from RoentGen's 84.71, and age-preservation Pearson correlation rises to 79.38 from
+    RoentGen's 28.91. Mean pathology AUC across five common findings, atelectasis, cardiomegaly, edema,
+    effusion and pneumothorax, is 80.54 against RoentGen's 79.61, measured with a DenseNet-121 classifier
+    trained on CheXpert labels. Label-distribution KL divergence is 10.9 against RoentGen's 40.74, and a
+    segmentation Dice score checking anatomical alignment is 81.05 against RoentGen's 67.38. These are all
+    automated proxy metrics standing in for clinical judgment, not a radiologist reader study.
+  limitations: The authors concede that image resolution is a likely cause of recurring errors including
+    failure to generate very fine-grained changes, and that early versions of the model produced severe
+    hallucinations, duplicated organs and ribs, traced to view mismatches and resolution misalignment in
+    the training pairs before data cleaning fixed it. They concede MIMIC-CXR covers only emergency medicine,
+    which limits the disease trajectories the model has seen, that they did not explore more powerful image
+    or text encoders or full fine-tuning of all components, and that additional accuracy and feature-retention
+    measurements could be incorporated into the evaluation. The training data itself skews toward older
+    and white patients.
+  why_it_matters: It shows instruction-based editing can be trained without hand-written edit instructions
+    by mining the causal structure already present in longitudinal clinical records, and it demonstrates
+    that preserving patient identity under a described disease change is achievable through conditioning
+    alone, without any explicit spatial control mechanism.
 abstract: Rapid progress has been made in instruction-learning for image editing with natural-language
   instruction, as exemplified by InstructPix2Pix. In biomedicine, such methods can be applied to counterfactual
   image generation, which helps differentiate causal structure from spurious correlation and facilitate

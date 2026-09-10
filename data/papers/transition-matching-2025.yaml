@@ -38,6 +38,52 @@ summary: Recasts generation as learning discrete-time Markov transition kernels 
   them as rival camps. Its fully-causal variant is reported as the first such model to match or beat flow-based
   methods on text-to-image.
 explanation: null
+explained:
+  depth: full-text
+  before: Diffusion and flow matching had an extensively investigated design space that the authors argue
+    offered limited further headroom. Continuous-token autoregressive generation was emerging as a way
+    to unify text and media generation, but with less theoretical grounding and generally weaker or slower
+    quality than flow-based methods, and the two paradigms were treated as separate camps.
+  problem: Whether diffusion and flow matching on one side, and continuous autoregressive generation on
+    the other, can be described as instances of a single more general framework, and whether the extra
+    design freedom that framework allows can improve on both.
+  idea: Recast generation as learning discrete-time Markov transition kernels between consecutive states
+    over a small number of steps, rather than committing to either a continuous ODE or SDE or a strict
+    token-by-token autoregression. Because the kernel at each step can be an expressive, non-deterministic
+    distribution rather than a fixed deterministic velocity, the same formulation covers a flow-matching-like
+    variant and two autoregressive variants that differ only in how much conditioning history each transition
+    sees.
+  method: Generation happens in the latent space of an SDXL VAE, a 32 by 32 by 4 grid for 256-pixel images,
+    not in pixels or a semantic representation space. Three variants share a common backbone, either a
+    1.7B-parameter DiT or an LLM, plus a small 40M-parameter MLP head, and differ in what the head's kernel
+    predicts and conditions on. Difference Transition Matching, DTM, generalizes flow matching to discrete
+    time by learning the posterior distribution of Y equals X_T minus X_0, a stochastic drift-like difference
+    field between the noisy and clean states, and it generates all tokens of a step independently and non-causally.
+    Autoregressive Transition Matching, ARTM, learns the same style of per-token transition kernel but
+    conditions each token's prediction on previously generated tokens within the same state, making it
+    partially causal. Full History Transition Matching, FHTM, additionally conditions on the entire trajectory
+    of past states, giving a fully causal backbone compatible with teacher forcing and with integration
+    into large language model architectures. All variants are trained with a flow-matching-style loss on
+    their kernel's drift field, with text conditioning dropped at probability 0.15 for classifier-free
+    guidance.
+  evidence: Trained for 500K iterations at batch size 2048 on 350M licensed Shutterstock image-caption
+    pairs, DTM reaches CLIPScore 26.84, PickScore 21.18 and ImageReward 0.532 on PartiPrompts using classifier-free
+    guidance at scale 6.5 and only 16 backbone forward passes, against a flow-matching baseline's CLIPScore
+    25.97, PickScore 21.04 and ImageReward 0.233 using 128 forward passes, roughly a sevenfold reduction
+    in sampling cost at matched or better quality. FHTM-3, the fully causal variant, reaches CLIPScore
+    27.00 and GenEval overall 0.52 against the flow-matching baseline's GenEval 0.47, which the paper presents
+    as the first fully causal model to match or surpass flow-based methods on text-to-image in a continuous
+    domain. ARTM and FHTM need substantially more backbone forwards than DTM, for example 3 times 256 against
+    DTM's 32, so neither shares DTM's speed advantage.
+  limitations: The authors concede that DTM's kernel generates every token within a step independently,
+    which limits the kernel's expressive power. They also concede that the autoregressive kernels exploit
+    the linear structure of a linear noising process and collapse to a degenerate function under it, which
+    is why ARTM and FHTM instead use an independent-per-step noising process. They note limited exploration
+    of time schedulers and distillation for the new kernels.
+  why_it_matters: Putting diffusion, flow matching and continuous-token autoregression inside one Markov-transition
+    formulation turns what looked like separate research programs into different settings of a single design
+    space. The fully causal FHTM variant gives a concrete path to folding continuous image generation into
+    the same causal architectures used for language modeling.
 abstract: 'Diffusion and flow matching models have significantly advanced media generation, yet their
   design space is well-explored, somewhat limiting further improvements. Concurrently, autoregressive
   (AR) models, particularly those generating continuous tokens, have emerged as a promising direction

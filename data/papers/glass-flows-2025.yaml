@@ -34,6 +34,55 @@ summary: Simulates a flow model inside a flow model to get the sample quality of
   at the cost of deterministic ODE sampling, with no retraining. An ICLR 2026 oral and a pure inference-time
   win.
 explanation: null
+explained:
+  depth: full-text
+  before: Flow and diffusion models offer two sampling regimes. Deterministic ODE integration is efficient
+    but produces a single trajectory. Stochastic SDE simulation supports the branching and particle reweighting
+    that reward-alignment methods such as Feynman-Kac Steering need, but requires many more discretization
+    steps and is markedly less efficient. Methods that needed to sample Markov transitions had no known
+    way to do so with ODE integration, so they were locked into SDE sampling's inefficiency to get the
+    stochasticity they needed.
+  problem: How to sample the same stochastic Markov transitions between two diffusion or flow timesteps
+    that SDE sampling provides, but using efficient ODE integration instead, and without retraining the
+    underlying model.
+  idea: Construct an inner flow-matching model, a second ODE, whose solution reproduces the stochastic
+    Markov transition between two timepoints of the original model. This inner flow is not trained separately;
+    it is derived in closed form from the pretrained model's own denoiser using a Gaussian sufficient statistic
+    that combines two noisy observations of the latent into one effective input.
+  method: GLASS Flows require no new training of any generative model. Given a current noisy state at
+    time t and a target time t prime, the method defines a joint Gaussian over the two states with a tunable
+    correlation parameter rho, combines them into a weighted sufficient statistic, and maps to an effective
+    diffusion time through the noise schedule. The pretrained model's existing denoiser is called at that
+    effective time, and its output is combined with the sufficient statistic into a velocity field for
+    an auxiliary integration variable s. Integrating this inner velocity field from s equals 0 to s equals
+    1 with M ODE steps produces one sample of the stochastic transition, and each of those M steps calls
+    the pretrained model exactly once, the same per-step cost as ordinary ODE sampling. Choosing rho to
+    match DDPM's own correlation reproduces DDPM transitions exactly, while other values of rho explore
+    a wider family of valid Markov chains. Total sampling cost is K times M denoiser calls for K outer
+    transitions of M inner steps each, and the special cases K equals 1 recovers standard flow matching
+    sampling while M equals 1 recovers DDIM.
+  evidence: On posterior sampling with DiT and SiT on ImageNet at 256 pixels, GLASS Flows reach substantially
+    lower FID than DDPM-style SDE sampling at matched, small step counts, clearly outperforming SDE sampling
+    already at 6 inner steps. On text-to-image generation with FLUX at 50 NFEs, GLASS Flows perform on
+    par with ordinary ODE sampling while still producing stochastic transitions, closing the gap that previously
+    forced a choice between the two. Combined with Feynman-Kac Steering on FLUX using 8 particles and 400
+    total NFEs, FKS with GLASS at rho 0.4 reaches CLIP score 39.8, PickScore 72.6, HPSv2 24.1, ImageReward
+    1.40 and GenEval 74.3, against a 50-NFE flow baseline's CLIP score 34.9, PickScore 63.2, HPSv2 23.4,
+    ImageReward 0.88 and GenEval 63.2, and against FKS run with ordinary DDPM sampling in place of GLASS,
+    which reaches CLIP score 39.0, PickScore 64.1, HPSv2 23.4, ImageReward 1.19 and GenEval 63.8. Adding
+    gradient guidance on top of FKS-GLASS raises ImageReward from 1.45 to 1.52 and GenEval from 72.7 to
+    73.1.
+  limitations: The authors concede the method assumes Gaussian probability paths and leave non-Gaussian
+    formulations untested. The correlation parameter rho must be chosen manually, with no theoretical characterization
+    of an optimal value given. Gradient-based guidance experiments needed a reduced resolution of 672 by
+    672 pixels because of memory constraints. The authors also note that reward guidance alone, without
+    sequential Monte Carlo, underperforms, and that most of the practical gains come from combining GLASS
+    with SMC-style methods such as Feynman-Kac Steering.
+  why_it_matters: It removes a real trade-off that inference-time reward alignment methods faced between
+    SDE sampling's stochasticity and ODE sampling's efficiency, using nothing more than a closed-form reparameterization
+    of an already-trained model. Because the derivation rests on general Gaussian sufficient-statistic
+    reasoning rather than anything specific to one architecture, the same construction plausibly extends
+    to other applications that currently depend on SDE sampling, such as editing and reward fine-tuning.
 abstract: 'The performance of flow matching and diffusion models can be greatly improved at inference
   time using reward alignment algorithms, yet efficiency remains a major limitation. While several algorithms
   were proposed, we demonstrate that a common bottleneck is the sampling method these algorithms rely

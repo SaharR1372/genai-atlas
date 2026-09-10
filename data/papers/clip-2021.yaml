@@ -39,6 +39,42 @@ summary: Trains an image encoder and a text encoder jointly with a contrastive o
   as a full entity (see DECISIONS.md D018) because the conditioning axis cannot be explained without its
   origin point.
 explanation: null
+explained:
+  depth: full-text
+  before: Computer vision systems predicted a fixed, pre-specified set of object categories such as the 1000 ImageNet
+    classes. Any new visual concept required collecting and labeling additional data. Earlier attempts to learn from
+    natural language supervision, including VirTex, ICMLM and ConVIRT, trained at a scale of only around 100000 to
+    200000 images and did not demonstrate strong transfer.
+  problem: Learn visual representations directly from the raw, weakly aligned text that already exists on the
+    internet, at a scale large enough to make the resulting representation competitive with fully supervised training,
+    and flexible enough to be redirected to new visual concepts just by naming them.
+  idea: Train an image encoder and a text encoder together with a contrastive objective that pulls the embeddings of
+    matching image caption pairs together and pushes apart the embeddings of the incorrect pairings in each batch. The
+    resulting joint embedding space lets a natural language description act directly as a zero-shot classifier.
+  method: This is not a generative model, so no generative space or training target applies to it. What CLIP
+    contributes instead is a joint embedding space. The image encoder is either a modified ResNet, up to RN50x64, or a
+    Vision Transformer, up to ViT-L/14 at 336 pixels. The text encoder is a 12-layer, 512-width, 63M-parameter
+    Transformer over byte pair encoded text capped at 76 tokens, with the end of sequence token's activation used as
+    the text embedding. Both towers are trained from scratch, with no ImageNet initialization and no pretrained text
+    weights, on 400 million image caption pairs called WIT. The objective is a symmetric cross-entropy loss over
+    cosine similarities scaled by a learnable temperature initialized at 0.07, with batch size 32768 for 32 epochs.
+  evidence: Zero-shot top-1 accuracy on ImageNet reaches 76.2 percent for the best model, matching the original
+    supervised ResNet-50 despite using none of its 1.28 million labeled training examples, and far above the 11.5
+    percent zero-shot accuracy of the prior Visual N-Grams baseline. Evaluated across more than 30 datasets, zero-shot
+    CLIP beats a ResNet-50 linear probe on 16 of 27 of them. As a linear-probe feature extractor, the best model,
+    ViT-L/14 at 336 pixels, beats Noisy Student EfficientNet-L2 on 21 of 27 datasets. Prompt engineering matters, a
+    single template adds 1.3 percentage points on ImageNet, and ensembling 80 templates adds another 3.5.
+  limitations: The authors concede zero-shot CLIP is weak on fine-grained categories, underperforming a logistic
+    regression probe by more than 10 points on Flowers102 and FGVCAircraft, and weak on abstract or systematic tasks
+    such as counting objects in CLEVRCounts, satellite imagery in EuroSAT and RESISC45, and tumor detection in
+    PatchCamelyon. It reaches only 88 percent on MNIST, worse than logistic regression on raw pixels. The authors
+    estimate roughly a 1000-fold increase in compute would be needed for zero-shot CLIP to reach overall state of the
+    art, which they call infeasible with current hardware, and they note CLIP is far less data efficient than humans
+    in the few-shot regime.
+  why_it_matters: CLIP predates this atlas's 2023 to 2026 window and is not itself a generative model, but its text
+    tower became the first widely used source of prompt embeddings for text-to-image diffusion through cross-attention
+    in LDM and Stable Diffusion, and it remains one of the encoders SD3 and SDXL-class models concatenate. The
+    conditioning axis this atlas tracks cannot be explained without this origin point.
 abstract: State-of-the-art computer vision systems are trained to predict a fixed set of predetermined
   object categories. This restricted form of supervision limits their generality and usability since additional
   labeled data is needed to specify any other visual concept. Learning directly from raw text about images

@@ -31,6 +31,51 @@ summary: A large unified editing dataset and benchmark spanning many edit types,
 explanation: null
 lines:
 - line-evaluation
+explained:
+  depth: full-text
+  before: Prior instruction-editing datasets such as InstructPix2Pix (313K pairs), MagicBrush (10K), SEED-Data-Edit
+    (3.7M) and UltraEdit (4M) used low-resolution images, coarse post-processing filters, and open-source
+    LLMs to generate prompts, which introduced knowledge biases and rarely covered identity-preserving,
+    multi-object, or multi-turn edits. Existing benchmarks such as EditBench and EditVal scored edits with
+    generic similarity metrics like CLIP score, PSNR and SSIM, which correlate poorly with human judgment
+    and do not stratify task difficulty or test multi-turn interactions.
+  problem: Open-source instruction-editing models lag proprietary ones such as GPT-4o-Image and Gemini-2.0-Flash
+    primarily because of low-quality training data and benchmarks that cannot reliably measure edit quality,
+    especially for complex, identity-preserving, or multi-turn edits.
+  idea: Build a large, automatically curated instruction-editing dataset using detection, segmentation
+    and VLM-based filtering, and pair it with a benchmark scored along three separate axes, instruction
+    adherence, editing quality and detail preservation, rather than one collapsed similarity score. Train
+    a model, ImgEdit-E1, on this data to test how much of the open/closed-source gap is a data problem.
+  method: The dataset pipeline starts from a 600K-image LAION-Aesthetics subset filtered for resolution
+    and aesthetic score; YOLO-World and SAM2 localize and segment candidate edit regions, GPT-4o writes
+    per-type instructions from the caption, bounding box and target object, and task-specific inpainting
+    workflows built on FLUX and SDXL, with IP-Adapter, ControlNet and Canny/Depth LoRA plug-ins, execute
+    each of 13 edit types before GPT-4o scores and filters the result, yielding 1.2 million pairs (1.1M
+    single-turn, 110K multi-turn). ImgEdit-E1 feeds the reference image and instruction to a Qwen2.5-VL-7B
+    plus a SigLIP vision encoder; their features are projected by MLPs and concatenated into FLUX's conditioning.
+    Stage one trains only the MLP connectors with FLUX and Qwen2.5-VL frozen; stage two additionally fine-tunes
+    FLUX's image branch. Editing happens in FLUX's VAE latent space through standard DiT denoising. The
+    trained ImgEdit-E1 model has no explicit mask, attention-lock, or KV-preservation mechanism protecting
+    unedited regions; region fidelity is whatever the paired supervision teaches the DiT to reproduce, and
+    the benchmark's separate detail-preservation axis exists precisely because that fidelity is not architecturally
+    guaranteed. Masking is used only inside the offline dataset-construction pipeline, to constrain SAM2-guided
+    inpainting, not inside the trained editing model itself.
+  evidence: ImgEdit's GPT-4o-rated quality score is 4.71 against UltraEdit's 4.25 and MagicBrush's 3.88,
+    and its forensic fake score (via the FakeShield detector, lower is better) is 0.050 against UltraEdit's
+    0.993 and MagicBrush's 0.987. On the 734-case ImgEdit-Bench basic suite, ImgEdit-E1 scores 4.04 on the
+    alter task versus GPT-4o-Image's 4.26, and is one of only two models, with GPT-4o-Image, able to perform
+    object-extraction edits at all. ImgEdit-Judge, a Qwen2.5-VL-7B fine-tuned on 200K rating records, reaches
+    roughly 70% agreement with human raters, ahead of GPT-4o-mini and base Qwen2.5-VL.
+  limitations: The authors state ImgEdit-E1 is not the paper's core contribution and was not given ablations
+    on architecture, data composition, or training process. They concede the model is not yet optimal as
+    a unified generative model for tasks such as text rendering, a limitation they note is shared by all
+    current open-source editing models. Forensic detectability scores near 1.00 for every open-source model
+    on the benchmark indicate edits remain visually identifiable as edits.
+  why_it_matters: It reframes the open/closed-source editing gap as primarily a data and evaluation problem
+    rather than an architecture problem, and its three-axis benchmark, especially the separate detail-preservation
+    score, gives the field a way to measure region fidelity independently of instruction-following, the
+    exact axis that attention- and cache-based editing methods later try to guarantee architecturally instead
+    of through data alone.
 abstract: Recent advancements in generative models have enabled high-fidelity text-to-image generation.
   However, open-source image-editing models still lag behind their proprietary counterparts, primarily
   due to limited high-quality data and insufficient benchmarks. To overcome these limitations, we introduce

@@ -37,6 +37,46 @@ summary: 'A pre-2023, pixel-space (not latent) cascaded diffusion model, kept as
   and image-text alignment more than scaling the image diffusion model does. This finding is the reason
   T5 (then T5+CLIP, then full VLMs) displaced CLIP-alone as the conditioning source in later systems.'
 explanation: null
+explained:
+  depth: full-text
+  before: GLIDE and DALL-E 2 conditioned text-to-image diffusion on embeddings from CLIP, a model trained on paired
+    image-text data rather than on text alone. Sampling with a high classifier-free guidance weight, needed for strong
+    text alignment, tended to push predicted pixel values out of the range the network was trained on, producing
+    saturated or unnatural images.
+  problem: Build a text-to-image diffusion model with deep language understanding, and determine directly whether
+    sample fidelity and text alignment are limited more by the capacity of the text encoder or by the capacity of the
+    image diffusion model.
+  idea: Condition a cascade of diffusion models entirely on a large language model that was pretrained on text alone
+    and then frozen, rather than on an image-text contrastive encoder, and fix the guidance-induced saturation problem
+    with a new dynamic thresholding step at sampling time.
+  method: Imagen operates in pixel space at every stage, not a learned latent, and its training objective predicts the
+    added noise, the standard epsilon-prediction diffusion loss. A frozen T5-XXL text encoder conditions all three
+    stages, a 2 billion parameter base model that generates 64 by 64 images, a 600 million parameter efficient U-Net
+    that upsamples to 256 by 256, and a 400 million parameter model, with self-attention removed, that upsamples to
+    1024 by 1024. Text conditions the network through a pooled embedding added to the timestep embedding and through
+    cross-attention over the full text sequence at multiple resolutions. Classifier-free guidance drops the text
+    condition 10 percent of the time during training, and at sampling time a new dynamic thresholding step clips the
+    predicted image to a percentile-based absolute pixel value and renormalizes, which the authors show removes the
+    saturation artifacts high guidance weights otherwise cause.
+  evidence: Imagen reaches a zero-shot FID of 7.27 on COCO's 30000-image split, using classifier-free guidance with
+    dynamic thresholding at sampling and without ever training on COCO, against DALL-E 2's 10.39 and GLIDE's 12.24,
+    and against Make-A-Scene's 7.55, which was trained on COCO directly. In a human evaluation on 200 COCO image pairs
+    with 73 ratings per image, raters preferred Imagen's photorealism 39.5 percent of the time against the real
+    images, rising to 43.9 percent on the subset without people, and rated its image-text alignment at 91.4 against
+    91.9 for the original captions, essentially matched. On the 200-prompt, 11-category DrawBench benchmark, human
+    raters preferred Imagen over DALL-E 2, GLIDE, Latent Diffusion Models and VQGAN plus CLIP in side-by-side
+    comparisons, though exact preference margins are not given in the main text. Training used a batch size of 2048
+    for 2.5 million steps, on 256 TPU-v4 chips for the base model and 128 for each super-resolution stage.
+  limitations: The authors concede Imagen's photorealism preference drops specifically on images containing people,
+    from 43.9 percent to 39.5 percent overall. DrawBench includes dedicated categories for text rendering, counting
+    and spatial relations precisely because these are recognized weak points, and the authors separately note CLIP
+    score itself is an ineffective way to evaluate counting. The model is trained on roughly 460 million internal
+    image-text pairs plus about 400 million pairs from the web-scraped LAION dataset, and the authors state there are
+    limitations in this training data without detailing them in the main text.
+  why_it_matters: The central finding, that scaling the frozen text encoder improves sample fidelity and text
+    alignment more than scaling the image diffusion model, is why T5, and later full vision-language models, displaced
+    CLIP-alone conditioning across the field. Dynamic thresholding also became a standard fix for the saturation high
+    classifier-free guidance weights otherwise cause.
 abstract: 'We present Imagen, a text-to-image diffusion model with an unprecedented degree of photorealism
   and a deep level of language understanding. Imagen builds on the power of large transformer language
   models in understanding text and hinges on the strength of diffusion models in high-fidelity image generation.

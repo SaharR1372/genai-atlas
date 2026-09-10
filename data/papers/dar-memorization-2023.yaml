@@ -31,6 +31,43 @@ summary: Shows 3D latent diffusion models memorize and reproduce training sample
   and knee MRI, detected with a contrastive detector. The patient-privacy constraint that makes medical
   synthetic data harder than the natural-image case.
 explanation: null
+explained:
+  depth: full-text
+  before: 3D latent diffusion models had become state of the art for medical image synthesis and were being
+    promoted as a route to open data sharing without compromising patient privacy, but whether they actually
+    memorize training data had gone largely unexamined in the medical imaging community. Prior memorization
+    work looked only at 2D pixel-space models using pixel-level correlation, which misses rotated or flipped
+    near-copies that data augmentation can still produce.
+  problem: The paper asks whether 3D latent diffusion models trained on medical imaging datasets reproduce
+    identifiable training samples, which would undermine the privacy rationale for releasing synthetic
+    data.
+  idea: Train self-supervised contrastive encoders so that augmented versions of the same image cluster
+    together in embedding space, then use nearest-neighbor distance in that space to flag generated samples
+    that are near-duplicates, including rotated or flipped copies, of training images.
+  method: The generative model is a 3D latent diffusion model architecture adopted directly from prior work,
+    trained separately on 242 photon-counting coronary CT angiography sub-volumes and 904 knee MRI volumes.
+    The paper gives no explicit reasoning for using a latent rather than a pixel-space model; the autoencoder
+    is carried over as inherited 3D latent diffusion practice rather than argued for in this paper, and
+    the absence of any stated rationale is itself notable given how load-bearing the memory argument is
+    elsewhere in the 3D medical literature. Memorization is detected with a contrastive encoder reduced
+    to 32-dimensional embeddings, using mean squared embedding distance between generated and training
+    samples to surface candidate copies, which two annotators then manually classified.
+  evidence: This is not downstream clinical or reader-study evidence in the ordinary sense, but it is stronger
+    than a bare distribution metric because it directly compares generated samples against real training
+    identities. On coronary CT angiography, 59 percent of the 242 training volumes, 142 of 242, were manually
+    confirmed as memorized among 1,000 generated samples. On knee MRI, manual review of 150 randomly sampled
+    copy candidates out of 3,600 generated samples found 33 percent were confirmed copies. Adding data
+    augmentation during training reduced coronary CT memorization from 59 percent to 41 percent, but did
+    not eliminate it.
+  limitations: The paper concedes it does not test or propose any mitigation strategy for memorization,
+    and states that understanding the underlying causes is left to future work. Its definition of a copy
+    is restricted to rotated and flipped variants for simplicity, so it likely undercounts memorization
+    under other deformations. Only two modalities and two relatively small training sets are tested, and
+    only 150 of 3,600 MRI candidates were manually reviewed.
+  why_it_matters: It shows that the small training sets typical of medical imaging make 3D latent diffusion
+    models prone to memorizing patient data at what the authors call an alarming and large scale, directly
+    undercutting the privacy justification for treating synthetic data as a substitute for real patient
+    data in sharing and research.
 abstract: Generative latent diffusion models have been established as state-of-the-art in data generation.
   One promising application is generation of realistic synthetic medical imaging data for open data sharing
   without compromising patient privacy. Despite the promise, the capacity of such models to memorize sensitive

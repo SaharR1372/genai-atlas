@@ -36,6 +36,56 @@ summary: Uses two decoding pathways with unshared parameters for text and image,
   shared path, and covers text-to-image, editing, and in-context generation in one model. A CVPR 2026
   paper and the leading fully open unified system.
 explanation: null
+explained:
+  depth: full-text
+  before: OmniGen v1 shared parameters across text and image tasks inside a single transformer. Upgrading
+    its base language model from Phi-3 to Qwen made image generation quality worse despite a stronger language
+    model, and mixture-of-experts routing initialized from the text parameters underperformed random initialization
+    for the image branch. Fixed learnable query tokens used for conditioning also struggled with long text
+    rendering.
+  problem: Whether completely decoupling the parameters used for understanding and text from the parameters
+    used for image generation, rather than sharing or adapting them, preserves both capabilities while
+    improving instruction-aligned generation, editing, and in-context generation.
+  idea: Freeze a pretrained vision-language model for understanding and text, and attach a fully separate,
+    randomly initialized diffusion transformer for image generation, connecting the two only through the
+    frozen model's hidden states.
+  method: A frozen Qwen2.5-VL-3B-Instruct multimodal LLM handles understanding and text, with only the
+    embedding of a special image token trained; understanding uses that model's own ViT encoder. A separate,
+    randomly initialized 32-layer diffusion transformer of roughly 4B parameters is the dedicated generation
+    pathway, conditioned on a VAE that feeds the diffusion decoder only and never enters the MLLM itself.
+    So there are two encoders, a ViT for understanding and a VAE for generation, two backbones, a frozen
+    autoregressive MLLM and a trained diffusion transformer, and two objectives, a frozen autoregressive
+    cross-entropy loss and a trained rectified-flow diffusion loss, joined by concatenating MLLM hidden
+    states with VAE features and passing them through a refiner network before the diffusion transformer,
+    using a novel Omni-RoPE positional scheme with modality-id, spatial-height, and spatial-width components.
+    Of the roughly 7B total parameters, only the 4B diffusion transformer is trained during the main stages;
+    a later reflection stage unfreezes everything. The reflection dataset is built by generating an image,
+    having an MLLM judge, Doubao-1.5-pro, critique it against the instruction, and iterating instruction-image-reflection
+    sequences for fine-tuning.
+  evidence: On GenEval, OmniGen2 scores 0.80 overall, 0.86 with an LLM rewriter, against BAGEL's 0.88, while
+    training only 4B parameters on 15 million text-to-image pairs versus BAGEL's 14B parameters and 1.6
+    billion pairs. On DPG-Bench it reaches 83.57, close to SD3-Medium's 84.08 and ahead of UniWorld-V1's
+    81.38. On Emu-Edit, CLIP-Out is 0.309, the highest among compared editing models, with CLIP-I 0.876
+    and DINO 0.822. On ImgEdit-Bench, overall score is 3.44, state of the art among open-source editors,
+    with an Action sub-score of 4.68. On the new OmniContext in-context generation benchmark, average score
+    is 7.18, ahead of BAGEL's 5.73 and OmniGen v1's 4.34, but behind GPT-4o's 8.80 and Flux.1 Kontext's
+    8.58. Reported understanding scores, MMBench 79.1, MMMU 53.1, MM-Vet 61.8, equal the frozen Qwen2.5-VL-3B
+    baseline.
+  limitations: The paper concedes that text generation ability comes from the frozen MLLM component rather
+    than from end-to-end training, and states OmniGen2 supports simultaneous image and text output rather
+    than being a fully native multimodal model. It concedes noticeably worse results on Chinese prompts
+    than English ones, limited generalization to instructions that modify human body shape due to data
+    scarcity, and significant degradation when input images are low quality or under 256 pixels on their
+    longest side. It concedes ambiguity in multi-image inputs unless the prompt specifies object-source
+    correspondence. The reflection stage is conceded to over-reflect on simple instructions, sometimes generating
+    unnecessary requirements or failing to revise outputs correctly, which the authors attribute to the
+    3B-scale MLLM's limited perception and insufficient reflection training data rather than to the architecture.
+  why_it_matters: Because the MLLM stays frozen throughout the main training stages, generation training
+    cannot degrade its understanding by construction, and the reported understanding scores match the frozen
+    baseline exactly, directly addressing the parameter-conflict problem the paper diagnoses in OmniGen
+    v1. It represents the most decoupled point on the unified-models spectrum covered here, two backbones
+    and two objectives joined only by conditioning, raising the question of how much weight-sharing "unified"
+    needs to require at all.
 abstract: 'In this work, we introduce OmniGen2, a versatile and open-source generative model designed
   to provide a unified solution for diverse generation tasks, including text-to-image, image editing,
   and in-context generation. Unlike OmniGen v1, OmniGen2 features two distinct decoding pathways for text

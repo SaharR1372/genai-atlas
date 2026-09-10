@@ -30,6 +30,52 @@ summary: Distils several specialist foundation models, CLIP for semantics, DINOv
   SAM for segmentation, into one student backbone, on the argument that no single pretraining objective
   is best at everything.
 explanation: null
+explained:
+  depth: full-text
+  before: By 2023 several visual foundation models had emerged with distinct, complementary
+    strengths. CLIP gave zero-shot vision-language alignment, DINOv2 gave dense structural
+    correspondence, SAM gave class-agnostic segmentation. A practitioner who needed several of these
+    capabilities together had to run multiple separate backbones.
+  problem: Determine whether the complementary strengths of these differently-trained foundation
+    models can be merged into a single backbone, without retraining any of them from scratch on
+    their original objectives, and without sacrificing the individual capabilities each one offers.
+  idea: Distil several teacher foundation models into one student encoder at once, matching both a
+    summary, global feature and a spatial, per-token feature to each teacher. The student can then
+    exceed any single teacher, since it draws on complementary structure across objectives that no
+    individual teacher's own training exposed it to.
+  method: This is multi-teacher agglomerative distillation. Four teachers are distilled
+    simultaneously, DFN CLIP ViT-H/14 at 378px, OpenAI CLIP ViT-L/14 at 336px, DINOv2 ViT-g/14 at
+    224px, and SAM ViTDet-H at 1024px. The student, either a standard ViT-H/16 or a novel hybrid
+    CNN-transformer architecture called E-RADIO with YOLOv8-style C2f blocks plus windowed
+    attention, is trained with a summary-feature cosine loss plus a spatial-feature loss combining
+    cosine similarity, weighted 0.9, and smooth-L1, weighted 0.1. Teachers operate at different
+    resolutions and patch sizes, so their outputs are bilinearly interpolated to a common grid
+    before the loss is computed, and equal loss weighting across teachers was found sufficient, with
+    more elaborate balancing schemes giving little advantage. The student's entire supervision comes
+    from matching frozen pretrained teachers' features rather than any label, caption, or clustering
+    loss of its own, which is the multi-teacher agglomerative supervision this atlas's taxonomy names
+    RADIO-style. The paper contains no discussion of image generation, diffusion training, or
+    representation-alignment targets for generative models; RADIO is evaluated purely as a
+    discriminative and vision-language backbone.
+  evidence: RADIO-ViT-H/16 reaches 82.93% zero-shot ImageNet-1k accuracy, exceeding its own CLIP
+    teacher's 77.19%, and 86.06% k-NN accuracy, ahead of the DINOv2 teacher's 83.41%. On ADE20k
+    linear-probe segmentation it reaches 84.71 mIoU, well above the paper's own DINOv2 and SAM
+    comparison points of 48.68 and 28.08 respectively. On COCO instance segmentation used as a SAM
+    replacement it reaches 76.23 mIoU, close to SAM-H's own 77.18. Used as the vision backbone in the
+    LLaVA-1.5 framework it reaches 86.20% GQA and 56.32% TextVQA. E-RADIO runs at 468 tokens per
+    second on an A100 with TensorRT against RADIO's 158, roughly 3 times faster, and the paper reports
+    E-RADIO is at least 6 to 7 times faster than the teacher models at matched resolution while
+    staying competitive on most benchmarks.
+  limitations: The paper concedes RADIO exhibits a "latent low resolution and high resolution mode,"
+    a mode-switching artifact the authors attribute to the partitioned training between the CLIP and
+    DINO objectives on one side and the SAM objective on the other, and state they intend to fix this
+    in future work.
+  why_it_matters: Establishes that a single frozen encoder can absorb multiple foundation models'
+    complementary properties, semantic language grounding, dense correspondence, class-agnostic
+    segmentation, through distillation alone. That is exactly the kind of unified representation
+    later work treats as a candidate off-the-shelf feature source, and RADIO variants already appear
+    as discriminative baselines in this atlas's own DINOv3 comparison tables (AM-RADIOv2.5), though
+    the paper itself makes no generative claim of its own.
 abstract: 'A handful of visual foundation models (VFMs) have recently emerged as the backbones for numerous
   downstream tasks. VFMs like CLIP, DINOv2, SAM are trained with distinct objectives, exhibiting unique
   characteristics for various downstream tasks. We find that despite their conceptual differences, these

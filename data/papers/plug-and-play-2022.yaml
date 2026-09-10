@@ -34,6 +34,44 @@ summary: Inverts the guidance image, then injects its recorded spatial convoluti
   maps into specific decoder layers and timesteps of the target generation. Preserves structure globally
   rather than by mask, so appearance changes leak into regions meant to stay fixed.
 explanation: null
+explained:
+  depth: full-text
+  before: SDEdit added noise to a guidance image and denoised it back with a new prompt, trading structure
+    for appearance change through a single noise-level knob. Prompt-to-Prompt manipulated cross-attention
+    maps but only captured rough, object-level regions tied to words already in the source text prompt.
+    VQGAN-CLIP and DiffuseIT shared the same structure-versus-semantics tradeoff at lower overall quality.
+  problem: Give a user fine-grained control over the structure of a generated image while letting a text
+    prompt change its appearance substantially, without training or fine-tuning and without the guidance
+    image needing to come from the same model.
+  idea: A pretrained diffusion model's internal spatial features and self-attention maps, recorded while
+    denoising a guidance image, encode enough layout information that copying them into the denoising process
+    of a target image preserves structure even as the target's appearance changes to match a new prompt.
+  method: No new latent is written for the edit; this is attention-and-feature manipulation only, applied
+    at inference time on top of a shared starting noise. The guidance image is first brought into the model
+    through DDIM inversion, which produces the initial noise the target generation also starts from. A
+    forward pass over the guidance image records spatial features at decoder layer four and self-attention
+    matrices at every decoder layer, at each denoising step. During target generation with the new text
+    prompt, the computed target features at layer four are overridden by the recorded guidance features up
+    to step 40 of 50, and self-attention matrices are similarly overridden at all decoder layers up to step
+    25, with tau-A and tau-f both lowered to 25 for guidance images with little texture. There is no mask
+    or other per-region protection; structure preservation is entirely global, coming from injecting the
+    same spatial features and self-attention everywhere rather than constraining specific regions.
+  evidence: On ImageNet-R-TI2I, 150 image-text pairs across 10 object classes, the method reaches a DINO
+    self-similarity distance of 0.051, lower and therefore better than SDEdit low-noise's 0.065, SDEdit
+    high-noise's 0.095, Prompt-to-Prompt's 0.084 and DiffuseIT's 0.142, while its CLIP score of 0.275 is
+    competitive with these baselines. On Wild-TI2I, 148 pairs of which 53% are real images, self-similarity
+    distance is 0.058 on real images and 0.048 on generated images, with CLIP scores of 0.282 and 0.289.
+  limitations: The authors concede that injecting features in deeper layers, which better preserves structure,
+    also leaks appearance information into the generated image, giving as an example that shades of a red
+    t-shirt and blue jeans remain visible after the edit. They concede the method depends on semantic
+    association between source and translated content in diffusion feature space, so it does not work well
+    on detailed segmentation-style masks where regions are colored arbitrarily with no semantic correspondence.
+    They also concede that DDIM inversion of textureless, minimal images can produce a latent dominated by
+    low-frequency appearance information, which then leaks into the result.
+  why_it_matters: It established that manipulating a diffusion model's own internal features and attention
+    at inference time, with no training, no mask and no latent optimization, is enough to control structure
+    during text-driven image translation, at the explicit cost of a global rather than a regional preservation
+    guarantee, a tradeoff every attention-based editing method after it has had to confront.
 abstract: Large-scale text-to-image generative models have been a revolutionary breakthrough in the evolution
   of generative AI, allowing us to synthesize diverse images that convey highly complex visual concepts.
   However, a pivotal challenge in leveraging such models for real-world content creation tasks is providing

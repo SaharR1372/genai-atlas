@@ -35,6 +35,58 @@ summary: 'Creates the instruction-editing task by manufacturing its training dat
   the instruction. Nothing constrains what stays fixed, which is the failure every later paper measures
   against.'
 explanation: null
+explained:
+  depth: full-text
+  before: Prompt-to-Prompt could keep an edited image consistent with a source image by reusing cross-attention
+    maps, but only within its own generation process and only by re-describing the whole target image,
+    not by giving an instruction. SDEdit edited by adding noise to an input image and denoising it toward
+    a new full target caption, but needed that full re-description and struggled to preserve identity
+    under substantial changes. Text2Live produced a color-and-opacity overlay layer, which restricted
+    it to additive edits.
+  problem: Let a user edit an image by writing a plain instruction ("turn him into a cyborg") rather
+    than a full description of the desired result, and do it in a single forward pass with no per-image
+    optimization or inversion.
+  idea: Manufacture a paired training set that never existed by combining a language model that writes
+    edit instructions with a text-to-image model that renders consistent before-and-after image pairs
+    from those instructions, then train an ordinary conditional diffusion model to imitate that mapping
+    directly, which lets it generalize to real images and freely written instructions at inference.
+  method: 'Space: VAE latent space, built on Stable Diffusion v1.5. This is a single forward-pass conditional
+    diffusion model: the noisy latent z_t is denoised conditioned on the encoded input image E(c_I),
+    which is concatenated channel-wise with z_t at the first convolutional layer (the new channels are
+    zero-initialized), plus the text instruction c_T fed through the existing text-conditioning pathway.
+    Training data comes from two stages: GPT-3 Davinci is fine-tuned on 700 human-written (input caption,
+    instruction, output caption) triples to generate 454,445 instruction triples from LAION-Aesthetics
+    V2 6.5+ captions; each caption pair is then rendered into 100 candidate image pairs with Stable
+    Diffusion plus Prompt-to-Prompt, sweeping the cross-attention injection strength p ~ U(0.1, 0.9),
+    and filtered by CLIP thresholds (image-image similarity >= 0.75, image-caption similarity >= 0.2,
+    directional CLIP similarity >= 0.2), keeping up to 4 pairs per caption pair. At inference the model
+    uses two independent classifier-free guidance scales, s_I for the input image and s_T for the instruction,
+    so the two forms of adherence can be traded off. Protection: none. There is no mask, no attention
+    injection, and no locality loss anywhere in the model; edits are global over the whole latent, and
+    the only lever affecting how much of the source image survives is the image guidance scale s_I,
+    a scalar that trades off consistency against instruction-following rather than protecting any specific
+    region.'
+  evidence: 'The editing model trained for 10,000 steps on 8x40GB A100 GPUs over 25.5 hours at 256x256,
+    batch size 1024, and generalizes at inference to 512x512 with 100 Euler-ancestral denoising steps,
+    taking roughly 99 seconds per image on an A100. Against SDEdit, the paper reports InstructPix2Pix
+    achieves higher CLIP image similarity (input consistency) at matched directional CLIP similarity
+    (instruction adherence) across a sweep of both methods'' guidance parameters; no absolute CLIP or
+    LPIPS numbers are reported, the comparison is a tradeoff curve. Ablations show that training on
+    a smaller generated dataset reduces the model''s ability to perform larger edits, and removing the
+    CLIP-based filtering from dataset generation reduces image consistency.'
+  limitations: The authors concede the model is limited by the visual quality of its generated dataset
+    and therefore by the underlying Stable Diffusion model used to build it. They concede it struggles
+    with counting objects and with spatial reasoning, including instructions like moving an object left
+    or swapping the positions of two objects. They concede it inherits well-documented biases from the
+    data and pretrained models, citing gender-profession correlations in outputs. They also concede
+    the approach is bounded by the human-written instructions used to fine-tune GPT-3, by GPT-3's own
+    ability to generate good instructions, and by Prompt-to-Prompt's ability to render a consistent
+    edited counterpart image.
+  why_it_matters: It established that an instruction-following image editor could be trained entirely
+    from synthetic paired data distilled out of a language model and a generative model, with no real
+    edited-image pairs at all. Because it has no mechanism at all for protecting unedited regions, it
+    also became the reference case of uncontrolled global editing that essentially every later editing
+    paper defines its own locality mechanism against.
 abstract: 'We propose a method for editing images from human instructions: given an input image and a
   written instruction that tells the model what to do, our model follows these instructions to edit the
   image. To obtain training data for this problem, we combine the knowledge of two large pretrained models

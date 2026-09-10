@@ -33,6 +33,42 @@ summary: 'Reconstructs undersampled MRI by alternating score-model sampling with
   the solver needs an invertible mapping between image and measurement domain, which a learned latent
   would break.'
 explanation: null
+explained:
+  depth: full-text
+  before: Reconstructing undersampled MRI relied on hand-crafted sparsity priors such as compressed sensing,
+    or on supervised networks trained on paired k-space data that had to be retrained for every new sampling
+    pattern.
+  problem: The paper addresses reconstructing accelerated MRI from arbitrary undersampling patterns without
+    retraining, while also handling complex-valued data, multi-coil parallel imaging, and providing uncertainty
+    quantification that regression models cannot give.
+  idea: Train a single unconditional score model on magnitude images alone, then at inference alternate
+    reverse-diffusion sampling steps with a data-consistency projection that enforces agreement with the
+    measured k-space.
+  method: Generation happens directly in pixel space, with an NCSN++ score network trained by denoising
+    score matching under a variance-exploding SDE on 25,000 fastMRI knee slices. At inference, predictor-corrector
+    sampling (2000 steps by default) alternates with a projection step that adds lambda times the adjoint
+    operator applied to the measurement residual, where the forward operator maps image pixels to subsampled
+    k-space via Fourier transform and coil sensitivities. The paper does not explicitly argue for pixel
+    space over a latent; it never discusses the alternative, since latent diffusion for images was not
+    yet an established paradigm when this was written in October 2021. The pixel-space choice is structurally
+    implied rather than argued for explicitly, since the projection step needs the forward operator to
+    act directly on what the score model outputs, and that operator is only well-defined as a mapping from
+    image pixels to k-space.
+  evidence: Evidence is mostly reconstruction-quality metrics rather than downstream clinical task or reader-study
+    evidence, though one downstream detection result is reported. On single-coil complex data at 2D Gaussian
+    8x undersampling, the method reaches PSNR 29.45 dB and SSIM 0.676 against a supervised U-Net's 19.99
+    dB and 0.520. On multi-coil parallel imaging at the same setting it reaches PSNR 31.43 dB against E2E-VarNet's
+    20.97 dB. A separate pathology-detection experiment reports mAP 0.754, matching the 0.754 achieved
+    from fully sampled reference images. No radiologist reader study is reported.
+  limitations: The paper concedes multi-coil reconstruction shows some averaging effect compared with single-coil
+    reconstruction, that naive parallel-imaging inference costs c times longer per coil, and that its two
+    multi-coil algorithms trade off differently by sampling pattern, one favoring 1D masks and the other
+    2D. Reconstruction already takes about 10 minutes for real-valued and 20 minutes for complex data at
+    2000 sampling steps.
+  why_it_matters: One trained prior generalizes across any undersampling pattern without retraining, decoupling
+    the learned image model from the measurement operator. Because sampling is generative rather than a
+    point estimate, it also yields uncertainty quantification that standard supervised regression cannot
+    provide.
 abstract: Score-based diffusion models provide a powerful way to model images using the gradient of the
   data distribution. Leveraging the learned score function as a prior, here we introduce a way to sample
   data from a conditional distribution given the measurements, such that the model can be readily used

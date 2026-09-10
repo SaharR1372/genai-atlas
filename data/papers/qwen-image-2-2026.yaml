@@ -32,6 +32,50 @@ status:
 summary: The successor generation of Qwen-Image, extending fidelity and editing. Included because the
   Qwen-Image family is the open baseline most 2026 work measures against.
 explanation: null
+explained:
+  before: Qwen-Image and its contemporaries had pushed text rendering and editing forward but the paper
+    argues specific failure modes remained open. As rendered character counts grow, models show escalating
+    glyph distortion, character omission, and layout collapse; most systems are trained mainly on English
+    or Chinese glyphs and struggle with other scripts; 2K-resolution photorealistic generation still shows
+    repeated textures, incoherent lighting, and loss of fine detail; and complex prompts with multiple
+    entities or spatial constraints frequently cause concept omission or visual hallucination. Few systems
+    combined strong generation and strong editing in one model.
+  problem: Extend the Qwen-Image line to handle ultra-long text rendering, multilingual typography, high-resolution
+    photorealism, complex instruction following, and efficient deployment, in one unified generation-and-editing
+    model.
+  idea: Couple a larger, more capable vision-language condition encoder with a higher-compression VAE and
+    a redesigned Multimodal Diffusion Transformer, then drive quality further with a multi-stage data pipeline
+    and RLHF built on task-specific reward models.
+  method: Generation happens in a VAE latent space, not pixels, using an f16c64 configuration, 16x spatial
+    compression with 64 latent channels, a substantially higher compression ratio than the 8x used in the
+    original Qwen-Image, produced by a residual autoencoder with 79M encoder and 259M decoder parameters
+    trained with a semantic alignment loss. The Multimodal Diffusion Transformer backbone is conditioned
+    by Qwen3-VL rather than Qwen2.5-VL, joined to image tokens through Multimodal Scalable RoPE, and stabilized
+    with RMSNorm query-key normalization, bias-free modulation, and SwiGLU activations in its MLP layers.
+    Classifier-free guidance is used at inference. The fetched text describes the diffusion transformer
+    and its RLHF stage, which uses Group Relative Policy Optimization, but does not restate an explicit
+    noise-versus-velocity prediction formula for the base pretraining objective, so which quantity the
+    denoiser regresses is not confirmed from this reading beyond it being a diffusion-based objective in
+    this latent space. Training runs a six-stage curriculum moving from 256P text-to-image data through
+    edit-data mixing, synthetic data, stricter high-resolution filtering, and multi-resolution coverage
+    up to 2048P, ending in supervised fine-tuning; pretraining runs 700K steps at batch size 32 to 16K with
+    learning rate 1e-4, continual pretraining runs 250K further steps, and the text-to-image to editing
+    data ratio shifts from 9:1 early in training to 7:3 in later stages.
+  evidence: The paper reports no GenEval or DPG-Bench numbers for Qwen-Image-2.0. Its quantitative result
+    is an LMArena human-preference leaderboard placement of Elo 1168, ranked 9th globally and 1st among
+    Chinese models as of the access date stated in the paper, ahead of a system the paper calls Nano Banana.
+    Beyond that the comparisons against named 2026 competitors such as GPT-Image-2, NanoBanana Pro, Wan2.7
+    Pro, and Seedream 5.0 Lite are qualitative, for example noting that GPT-Image-2 renders characters at
+    an excessively small scale in a side-by-side text-rendering comparison.
+  limitations: The fetched text contains no dedicated limitations section and no sentence where the authors
+    concede a shortcoming of Qwen-Image-2.0 itself; the only failure-mode discussion in the paper is comparative,
+    pointing at weaknesses in competing systems rather than their own. The report also does not supply the
+    standard quantitative T2I benchmarks, GenEval and DPG-Bench, that would let this system be compared
+    numerically against the rest of the atlas on the same footing as its predecessor.
+  why_it_matters: If the Qwen-Image line keeps functioning as the open baseline the field measures against,
+    its move to a higher-compression latent, a stronger VLM conditioner, and RLHF alignment marks where
+    the open frontier for unified generation-and-editing systems stood as of this report.
+  depth: full-text
 abstract: We present Qwen-Image-2.0, an omni-capable image generation foundation model that unifies high-fidelity
   generation and precise image editing within a single framework. Despite recent progress, existing models
   still struggle with ultra-long text rendering, multilingual typography, high-resolution photorealism,

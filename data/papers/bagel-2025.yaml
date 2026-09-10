@@ -32,6 +32,60 @@ summary: A mixture-of-transformer-experts model with one expert for understandin
   routed over shared token sequences, trained on large-scale interleaved data. Unified at the sequence
   level, but not literally one network.
 explanation: null
+explained:
+  depth: full-text
+  before: Open unified models mostly took one of two forms. Quantized-autoregressive models such as Janus
+    and Emu3 predict discrete image tokens with a single loss but produce generation quality that trails
+    diffusion models. External-diffuser designs such as MetaQuery connect an LLM to a diffusion module through
+    a small number of compressed latent tokens, which the paper argues creates an information bottleneck
+    between understanding and generation.
+  problem: Whether integrating a diffusion-based generation objective directly inside the same transformer
+    as the language model, rather than compressing context through an external adapter, can close the gap
+    to proprietary systems such as GPT-4o and Gemini 2.0 while avoiding the understanding-generation bottleneck
+    of adapter-based designs.
+  idea: Give understanding and generation their own transformer expert, but let every token from both experts
+    attend to every other token in one shared self-attention, and combine a text cross-entropy loss with
+    a rectified-flow diffusion loss on image latents inside that shared attention rather than in a separate
+    module.
+  method: This is a mixture-of-transformer-experts model, not one set of weights. Two experts exist, one
+    for understanding and one for generation, each with its own duplicated feedforward and other block parameters,
+    giving 7B active and 14B total parameters; what is shared is the self-attention, since all tokens from
+    both experts attend to each other within every transformer block. Understanding uses continuous features
+    from a SigLIP2-so400m/14 ViT encoder with NaViT for native resolutions up to 980x980. Generation uses
+    continuous latents from a frozen, pretrained FLUX VAE at 8x downsampling and 16 channels, patchified
+    2x2, with no vector quantization anywhere in the generation path. Text tokens are trained with next-token
+    cross-entropy; image latents are trained with a rectified-flow MSE loss, and the two are weighted 0.25
+    to 1 in favor of the diffusion loss. BAGEL's generalized causal attention lets later tokens attend to
+    the clean VAE tokens and ViT tokens of a preceding image but not to its noised VAE counterparts, which
+    is also what conditions image editing on an unmodified encoding of the source image. Pretraining totals
+    about 5.5 trillion tokens across four stages, alignment, pretraining, continued training and supervised
+    fine-tuning, drawing on text, image-text pairs, interleaved video and interleaved web data, with the
+    interleaved-data fraction rising to 0.5 in later stages.
+  evidence: BAGEL reaches MMBench 85.0, MMMU 55.3 and MM-Vet 67.2, ahead of Janus-Pro-7B by 5.8, 14.3 and
+    17.2 points respectively, and GenEval 0.82, 0.88 with an LLM prompt rewriter, matching FLUX.1-dev's 0.82
+    and beating Janus-Pro-7B's 0.80. On GEdit-Bench it scores 7.36 structure coherence, 6.83 perceptual quality
+    and 6.52 overall, against Step1X-Edit's 7.09/6.76/6.70 and Gemini 2.0's 6.73/6.61/6.32. On the paper's
+    own IntelligentBench reasoning-editing benchmark it scores 44.9, and 55.3 with an added self-CoT reasoning
+    step, well behind GPT-4o's 78.9 but far above the open specialist Step1X-Edit's 14.9. A controlled ablation
+    at 1.5B scale compares a dense shared backbone, an MoE variant duplicating only the feedforward layers,
+    and the full MoT design used in BAGEL; the MoT variant gives the smoothest, most consistently decreasing
+    generation loss and the best overall performance, which the paper attributes to separate capacity mitigating
+    optimization conflict between the two objectives. Editing capability also requires far more pretraining
+    than the other capabilities, reaching 85% of its eventual GEdit performance only after 2.64T tokens against
+    0.18T for understanding and 0.68T for pure generation, with IntelligentBench needing 3.61T tokens.
+  limitations: The paper concedes that special-IP generation, complex text rendering, intricate multi-person
+    poses, operations like swapping the positions of objects, and generating multiple distinct instances
+    at once remain persistently difficult, and that text-rendering ability only emerges between roughly 1.5
+    and 4.5 trillion training tokens. Even with self-CoT reasoning, BAGEL's IntelligentBench score of 55.3
+    trails the private GPT-4o's 78.9 by a wide margin, and the model stays close to a copy-the-input fallback
+    before about 3.5 trillion tokens.
+  why_it_matters: BAGEL's own ablation is direct evidence for a tradeoff other unified papers only assert,
+    that a fully dense shared backbone measurably underperforms a design with separated capacity per modality
+    objective, at least at the 1.5B scale it tested. That makes explicit what unification costs when two
+    objectives compete for the same weights, and it also shows editing quality in a unified model is set
+    mainly by training scale and data composition, since the same shared-attention design acquires editing
+    capability late and gradually as pretraining tokens accumulate rather than through any editing-specific
+    mechanism.
 abstract: Unifying multimodal understanding and generation has shown impressive capabilities in cutting-edge
   proprietary systems. In this work, we introduce BAGEL, an open-source foundational model that natively
   supports multimodal understanding and generation. BAGEL is a unified, decoder-only model pretrained

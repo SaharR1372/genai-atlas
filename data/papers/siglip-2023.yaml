@@ -30,6 +30,49 @@ summary: Replaces CLIP's softmax contrastive loss with a pairwise sigmoid loss, 
   for a global view of the batch and makes language-image pretraining practical at much smaller batch
   sizes.
 explanation: null
+explained:
+  depth: full-text
+  before: CLIP's contrastive pretraining used a softmax-normalized loss that required a global view
+    of every pairwise image-text similarity in the batch to compute the per-example normalization.
+    Computing that normalization meant an expensive all-gather across devices and materializing a
+    batch-by-batch similarity matrix, which tied training efficiency directly to batch size.
+  problem: Remove the need for batch-wide normalization in language-image contrastive pretraining so
+    that large-batch training becomes cheaper to run and, separately, so that pretraining becomes
+    practical at much smaller batch sizes than softmax-based CLIP requires.
+  idea: Treat every image-text pair in the batch, matched or not, as an independent binary
+    classification problem and train with a sigmoid loss instead of a softmax over the batch.
+    Because each pair's loss term no longer depends on normalizing against every other pair, batch
+    size decouples entirely from the loss definition.
+  method: 'The sigmoid loss is -1/|B| times the sum over all image-text pairs of log(1/(1 +
+    exp(z_ij(-t . x_i . y_j + b)))), where z_ij is +1 for a matched pair and -1 otherwise, and both a
+    learnable temperature t and bias b, initialized at 10 and -10 respectively to offset the initial
+    imbalance of negatives, are learned jointly. Two training regimes are tested: SigLIP trains both
+    an image tower and a text tower from scratch; SigLiT (Locked-image Tuning) freezes a pretrained
+    image tower (ViT-g/14) and trains only the text tower contrastively against it. This is
+    contrastive language-image pretraining, the same supervision family as CLIP, with the loss
+    function as the only change; there is no self-distillation, masked reconstruction, or
+    autoregressive component. The paper contains no discussion of using the resulting encoder for
+    image generation, diffusion training, or as a representation-alignment target for a generative
+    model; it is presented and evaluated purely as a zero-shot classification and retrieval encoder.'
+  evidence: SigLiT with a frozen ViT-g/14 image tower and a 12-layer text tower reaches 84.5%
+    zero-shot ImageNet-1k accuracy after two days of training on 4 TPUv4 chips at a 20k batch size.
+    SigLiT with ViT-B/8 reaches 79.7% zero-shot accuracy in one day on 4 chips at batch size 32k.
+    SigLIP trained from scratch with a B/16 image tower and base text tower reaches 73.4% zero-shot
+    accuracy after 5 days on 32 TPUv4 chips. Both sigmoid and softmax losses saturate near a 32k
+    batch size, and pushing sigmoid up to one million gives only minor further gains. At a 16k batch
+    size sigmoid clearly outperforms softmax, while softmax needs roughly a 98k batch size to close
+    that gap.
+  limitations: The paper concedes the loss is heavily imbalanced at initialization, since negative
+    pairs vastly outnumber positive pairs in any batch, which motivated the bias-term
+    initialization as a workaround rather than a solved problem. It also concedes that the core
+    assumption, that an unmatched image-text pair is truly unrelated, is "usually noisy and
+    imperfect" in web-scraped data. The diminishing returns from very large batch sizes undercut the
+    paper's own motivation for pushing batch size further.
+  why_it_matters: Makes both very-large-batch and small-compute contrastive language-image
+    pretraining practical, since the loss no longer forces the two regimes to trade off against each
+    other. The paper itself never discusses generative use; SigLIP2, a later encoder in the same
+    family, is one of the three frozen encoders this atlas's RAE entry evaluates as a candidate
+    generative latent space, but that connection is made by RAE and by SigLIP2, not by this paper.
 abstract: We propose a simple pairwise Sigmoid loss for Language-Image Pre-training (SigLIP). Unlike standard
   contrastive learning with softmax normalization, the sigmoid loss operates solely on image-text pairs
   and does not require a global view of the pairwise similarities for normalization. The sigmoid loss

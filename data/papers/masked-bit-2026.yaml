@@ -30,6 +30,45 @@ status:
 summary: Moves autoregressive prediction down to the bit level rather than the codebook-entry level, sidestepping
   the vocabulary-size and codebook-collapse problems that constrain discrete token generation.
 explanation: null
+explained:
+  depth: full-text
+  before: Visual generation had split into two camps, continuous pipelines built on VAE latents and diffusion,
+    and discrete pipelines built on VQ tokenizers and autoregressive transformers, with continuous methods
+    dominating despite discrete tokens aligning naturally with how language models generate.
+  problem: The gap between the two camps had been attributed to discrete tokenizers being intrinsically
+    weaker, but standard discrete autoregressive methods actually could not scale codebook size, a linear
+    classification head becomes infeasible in memory past roughly 2^18 entries, and existing bit-based
+    prediction heads degrade in quality as the vocabulary grows.
+  idea: If the true cause of the continuous-discrete gap is the number of bits allocated per token rather
+    than discreteness itself, then a discrete tokenizer with a large enough codebook should match continuous
+    methods, provided the generator can be trained to predict that many bits without an infeasible classification
+    head.
+  method: BAR generates in a discrete token space produced by a lookup-free FSQ tokenizer, with an encoder
+    initialized from SigLIP2-so400m and a ViT-L decoder trained from scratch against a frozen DINO discriminator,
+    supporting codebook sizes tested up to 2^256. An autoregressive transformer built on RAR, with nothing
+    frozen, is trained jointly with a masked Bit Modeling head, a 3-layer SwiGLU network with adaptive
+    layer normalization. Rather than predicting a token as one classification over the full vocabulary,
+    the objective predicts the token's constituent bits through a masked, iterative bit-wise unmasking
+    process, so memory scales with the log base 2 of the codebook size instead of the codebook size itself.
+    At inference, bits are generated progressively over a small number of steps, for example four steps
+    of four bits each, using a linear classifier-free guidance schedule with scale 5.0 for the base model
+    and 5.3 for the large model.
+  evidence: BAR-L, 1.1 billion parameters, reaches gFID 0.99 on ImageNet-256 with CFG after 400 epochs,
+    ahead of the concurrent continuous RAE model at gFID 1.13 with 839 million parameters and xAR at gFID
+    1.24 with a 1.1 billion parameter model three times BAR-B's size. The 415 million parameter BAR-B reaches
+    gFID 1.13 with CFG. On throughput, BAR-B generates 24.33 images per second against RAE's 6.62, a 3.68
+    times speedup, and a smaller BAR-B/2 variant reaches 150.52 images per second at gFID 1.35. An ablation
+    at codebook size 2^32 shows the masked bit head holding gFID 1.37 while a linear head runs out of memory
+    and a plain bit-prediction head without masking degrades to gFID 5.81. On ImageNet-512 at only 200
+    epochs, BAR reaches gFID 1.09.
+  limitations: The authors concede that improved quality and efficiency raise misuse risk, naming deepfakes,
+    misinformation and harmful content generated at scale. Faster sampling variants trade quality for speed,
+    BAR-B/4 reaches 445.5 images per second but gFID rises to 2.34, so the largest efficiency gains are
+    not free.
+  why_it_matters: The result reframes the long-standing continuous-versus-discrete debate in visual generation
+    as a bit-budget question rather than a representation question, and the masked bit head removes the
+    vocabulary-size ceiling that previously forced discrete methods to choose between small codebooks and
+    infeasible memory cost.
 abstract: This paper challenges the dominance of continuous pipelines in visual generation. We systematically
   investigate the performance gap between discrete and continuous methods. Contrary to the belief that
   discrete tokenizers are intrinsically inferior, we demonstrate that the disparity arises primarily from

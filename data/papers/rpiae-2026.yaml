@@ -34,6 +34,51 @@ summary: 'Initializes from a representation encoder but fine-tunes it, built exp
   is the strongest evidence available that the obstacle to representation-space editing is reconstruction
   fidelity rather than lack of attention.'
 explanation: null
+explained:
+  depth: full-text
+  before: Representation-based tokenizers either reuse a pretrained encoder such as DINOv2 or SigLIP frozen
+    as the diffusion latent (RAE, FAE), or align diffusion features to representation features through
+    an external teacher without changing the encoder (REPA, VA-VAE). Freezing the encoder preserves its
+    semantic geometry but caps reconstruction adaptation, which reduces reconstruction fidelity and, as
+    the paper states directly, "degrades editing quality."
+  problem: A representation-space tokenizer needs a latent that is both semantically structured, so it
+    is easy to denoise and generate in, and pixel-accurate to reconstruct, so edited latents decode back
+    to faithful images. Frozen encoders give the first property but cap the second, and high-dimensional
+    representation features also make diffusion modeling harder.
+  idea: Fine-tune the representation encoder directly for reconstruction instead of freezing it, but anchor
+    its output to a frozen copy of the original pretrained encoder through a regularization loss, so the
+    semantic geometry that made the space useful for diffusion does not drift away during fine-tuning. Then
+    compress the resulting high-dimensional features into a compact variational latent for diffusion.
+  method: RPiAE keeps a trainable representation-model encoder, initialized from pretrained weights, alongside
+    a separately instantiated frozen "Pivot Replica Encoder" with identical initial weights that never updates.
+    Stage 1 trains the encoder and a pixel decoder end to end with a reconstruction loss (L1, GAN, perceptual)
+    plus a pivot regularization loss, an L2 distance between the trainable encoder's current features and
+    the frozen pivot's features, adaptively weighted by gradient norm; the encoder is explicitly trainable
+    here, which is the step frozen-encoder methods skip. Stage 2 freezes both the encoder and decoder and
+    trains only a small transformer "variational bridge" (1 encoder layer, 6 decoder layers) that compresses
+    the 768-dimensional representation feature into a 64-dimensional Gaussian latent, regularized toward
+    a standard normal with a KL term. Stage 3 freezes everything except the decoder and fine-tunes it again
+    for reconstruction quality under the fixed compact latent. For editing, RPiAE is further fine-tuned
+    on the OmniEdit dataset; the fetched text describes no mask, attention-injection, or KV-preservation
+    mechanism protecting unedited regions during editing, so region fidelity depends on the tokenizer's
+    reconstruction quality and the edit model's training rather than on an explicit locality mechanism.
+  evidence: Reconstruction FID is 0.50 against RAE-B's 0.57 (a non-representation VA-VAE baseline reaches
+    0.27); PSNR is 21.3 against RAE's roughly 18.8; LPIPS is 0.216 against RAE-B's 0.256. Class-conditional
+    ImageNet generation reaches gFID 1.51 with classifier-free guidance at 80 epochs. On GEdit-Bench-EN,
+    RPiAE's instruction-following score (G_SC) is 5.23 against RAE's 4.68, and its quality score (G_PQ)
+    is 8.34 against VA-VAE's 7.89. ImageNet linear-probe accuracy after fine-tuning is 84.18%, close to
+    the pretrained encoder's 84.56%, offered as evidence the pivot regularization preserves semantic structure.
+  limitations: An ablation shows Stage 1 alone already reaches near-final reconstruction (rFID 0.47) but
+    generation and editing remain weak (GenEval 0.58) until Stages 2 and 3 are added, so the full three-stage
+    pipeline, not encoder fine-tuning alone, is needed for the reported result. The paper reports that a
+    wider latent improves reconstruction but degrades generation and editing, and settles on 64 dimensions
+    as a compromise rather than a resolved tradeoff. Experiments are reported at 256x256 resolution, and
+    the fetched text gives no discussion of the added training cost of the three-stage schedule.
+  why_it_matters: It is a second independent group, after papers such as PS-VAE, to diagnose frozen representation
+    encoders as the specific cause of degraded editing fidelity, and it answers that diagnosis by unfreezing
+    and fine-tuning the encoder under a pivot regularizer rather than by adding external alignment losses,
+    evidence that the frozen-encoder editing gap in representation-space latents is fixable by training
+    rather than fundamental to the representation.
 abstract: Diffusion models have become the dominant paradigm for image generation and editing, with latent
   diffusion models shifting denoising to a compact latent space for efficiency and scalability. Recent
   attempts to leverage pretrained visual representation models as tokenizer priors either align diffusion

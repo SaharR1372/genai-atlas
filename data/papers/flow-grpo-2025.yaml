@@ -38,6 +38,51 @@ summary: Makes online reinforcement learning work for flow-matching models by co
   ODE into an SDE to recover the stochasticity policy-gradient methods need. Lifts SD3.5-Medium's GenEval
   score from 63% to 95%, and opened the 2025-26 wave of RL-for-diffusion work.
 explanation: null
+explained:
+  depth: full-text
+  before: Flow matching models like SD3.5-Medium are trained with a deterministic ODE sampler and a
+    velocity-prediction objective, so they generate by numerically integrating a fixed trajectory from
+    noise to data with no stochasticity beyond the initial seed. Online policy-gradient RL methods such
+    as GRPO, which had driven RL post-training gains in language models, need a stochastic sampling policy
+    with tractable per-step log-probabilities to compute importance ratios. A deterministic ODE cannot
+    provide that, so GRPO could not be applied to flow matching directly.
+  problem: The paper addresses two coupled obstacles to online RL for flow models. The deterministic ODE
+    conflicts with the stochastic exploration that GRPO-style methods require, and even once made
+    stochastic, many-step iterative sampling makes online rollouts too slow to be practical for RL training.
+  idea: Convert the deterministic probability-flow ODE into a stochastic differential equation with the
+    same marginal distributions at every timestep, recovering a tractable per-step Gaussian policy without
+    changing what the model generates in expectation. Pair this with a denoising-reduction strategy that
+    uses fewer denoising steps during RL training rollouts while keeping the original step count at
+    inference.
+  method: The base model is SD3.5-Medium, a flow-matching model whose pretrained objective regresses a
+    velocity field toward the ground-truth velocity in the SD3.5 VAE latent space. Flow-GRPO fine-tunes
+    it with LoRA, rank 32 and alpha 64, with the base transformer frozen. After the ODE-to-SDE conversion
+    each reverse step becomes an isotropic Gaussian policy, so GRPO-style group-relative policy gradients
+    apply directly. For each prompt a group of 24 samples is generated, rewards are normalized within the
+    group into an advantage, and the objective is a clipped importance-ratio policy gradient over the
+    reverse trajectory plus a KL penalty against a reference policy, computed in closed form since both
+    policies are Gaussian. Training uses 10 denoising steps while inference keeps 40, giving roughly a
+    4x rollout speedup without changing the deployed sampler.
+  evidence: 'On SD3.5-Medium, GenEval overall accuracy rises from 63% to 95%, with counting 63% to 95%,
+    position 24% to 99%, attribute binding 52% to 86%, and color 81% to 92%, surpassing the paper''s reported
+    GPT-4o score of 84%. Visual text rendering accuracy rises from 59% to 92%. PickScore rises from 21.72
+    to 23.31 with the KL term included, while DrawBench aesthetic, ImageReward and UnifiedReward scores
+    stay essentially unchanged, which the authors read as evidence of little to no reward hacking. Removing
+    the KL penalty raises reward further but the paper reports a sharp decline in image quality and a
+    collapse in visual diversity. Denoising Reduction alone gives roughly a 4x training speedup with no
+    reported performance loss, and the model generalizes from training prompts with 2 to 4 objects to
+    correctly generating 5 to 6 objects at test time.'
+  limitations: The authors concede that a multi-reward ensemble across several reward models led to local
+    blurriness and reduced diversity, and they abandoned that approach rather than solving it. They note
+    the KL penalty is necessary rather than merely helpful, since removing it lets reward increase at the
+    cost of quality and diversity. The paper is scoped to text-to-image generation and explicitly flags
+    video generation as unresolved, citing the difficulty of defining video reward models, balancing
+    objectives such as realism and temporal coherence, and the higher resource cost of video rollouts.
+  why_it_matters: By recovering a tractable stochastic policy from a deterministic ODE sampler, Flow-GRPO
+    makes GRPO-style policy-gradient RL, already proven for language model post-training, applicable to
+    flow-matching image generators without retraining the base model from scratch. The paper frames itself
+    as the first to bring GRPO to flow matching this way, and later methods such as DiffusionNFT responded
+    directly to the solver and CFG limitations this approach left open.
 abstract: 'We propose Flow-GRPO, the first method to integrate online policy gradient reinforcement learning
   (RL) into flow matching models. Our approach uses two key strategies: (1) an ODE-to-SDE conversion that
   transforms a deterministic Ordinary Differential Equation (ODE) into an equivalent Stochastic Differential

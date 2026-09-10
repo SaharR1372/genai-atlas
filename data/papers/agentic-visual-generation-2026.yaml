@@ -30,6 +30,57 @@ summary: Surveys the emerging space where generative models are wrapped in an ag
   than called once, and proposes a taxonomy of control methods spanning image, video, 3D and interface
   generation.
 explanation: null
+explained:
+  depth: full-text
+  before: Agentic visual generation systems, LLM or VLM controllers that plan, call tools, and revise visual
+    outputs, had proliferated across image, video, editing, 3D, world, slide and interface generation,
+    but were classified inconsistently. Papers pointed to planning depth, tool count, number of collaborating
+    roles, or the presence of reinforcement learning as evidence a system was agentic, even though none
+    of these tracks what generation decisions the controller can actually make.
+  problem: The field lacked a single, consistent criterion for when a visual generation system counts as
+    agentic and, once it does, how agentic it is, so that a two-tool image editor and a system that learns
+    reusable workflows across tasks both got called agentic on loose grounds.
+  idea: Define agenticity by the deepest point in a generation trajectory at which a controller can causally
+    change a future generation decision, and use that single criterion to place systems on an ordinal five-level
+    scale, rather than treating planning depth, tool count, multi-role collaboration, or RL as independent
+    signals of agenticity.
+  method: This is a taxonomy and survey, not a trained model. The authors do not train or evaluate any
+    generative component themselves; the visual generation models inside surveyed systems are almost always
+    used off the shelf as fixed tools, with training, where it appears at all, applied to a routing, repair,
+    or reward policy rather than to the generator. The taxonomy has five levels ordered by causal reach.
+    L0 Fixed Support is a predetermined inference path with no deployed controller making generation-level
+    decisions, such as plain Latent Diffusion, ControlNet, or a fixed scorer like ImageReward. L1 Conditioning
+    Control lets the controller prepare the input, a prompt, layout, retrieved evidence, camera or temporal
+    spec, or structured content, that reaches a fixed downstream generator, without choosing which operation
+    runs. L2 Execution Control lets the controller select and invoke the actual generation, editing, or
+    rendering operation from a set of tools. L3 Outcome-Adaptive Control lets the controller observe an
+    intermediate outcome, a render, execution state, physical constraint, or human feedback, and use it
+    to change the next operation within the same task, formalized as a state update s(t+1) = F(s(t), a(t),
+    o(t+1)). L4 Experience-Adaptive Control lets the controller retain information from a completed task,
+    a tool profile, episodic memory, a reusable procedure, or an updated policy, and use it to change decisions
+    on a later, independent task. Assignment is conservative, when a causal link is not demonstrated in
+    a paper the system is assigned the lower level. The authors compiled a structured corpus of roughly
+    400 systems, each tagged by level, task, mechanism, feedback type, memory type, resource, and provenance.
+  evidence: The evidence is corpus-level rather than benchmark numbers. Applying the taxonomy across roughly
+    400 systems spanning image, video, editing, 3D, world, slide and interface generation, the authors
+    find that L3 Outcome-Adaptive Control has grown steeply since 2025 and dominates recent work, while
+    L4 Experience-Adaptive Control remains a small fraction of the literature, which they read as evidence
+    that persistent experience reuse is still immature. Only four reviewed systems are assigned to L0,
+    but the authors attribute this to the corpus being assembled around controller-bearing systems rather
+    than to L0 being genuinely rare across the field.
+  limitations: The authors concede the corpus is built around controller-bearing systems, so the small
+    L0 count understates how much of the field is still fixed pipelines. The conservative lower-level default,
+    used whenever causal evidence is absent, means the taxonomy can undercount a system's true capability
+    if a paper does not clearly demonstrate the causal link. For 3D and world generation they note that
+    one appealing render cannot establish correctness behind the camera or under interaction, so outcome-adaptive
+    feedback is weaker evidence there than in 2D tasks. They also note diagnosis-and-correction coupling
+    is uneven across modalities, for instance a single final-image preference score cannot identify which
+    part of an interface failed. The hierarchy is deliberately one-dimensional, ordering systems by maximum
+    causal reach rather than capturing every capability combination independently.
+  why_it_matters: It replaces a set of loosely correlated but individually unreliable signals, planning
+    depth, tool count, role count, and RL use, with one criterion that is actually about what the controller
+    can change. That reframes how progress in agentic generation should be judged, as movement up a level
+    in causal reach rather than as more tools, longer plans, or more collaborating roles.
 abstract: Visual generation is evolving from generative models used through a single invocation into agentic
   control processes that can plan, select tools, inspect intermediate synthesized outputs, revise failures,
   and reuse prior experience. In most existing systems, the controller is an LLM or VLM, while visual

@@ -33,6 +33,54 @@ summary: Trains one editor across region-based edits, free-form edits and recogn
   and segmentation recast as generation, steering between them with learned task embeddings. Generalizes
   poorly to instructions outside that taxonomy.
 explanation: null
+explained:
+  depth: full-text
+  before: Instruction editors such as InstructPix2Pix generated their own training data from GPT-3 instructions
+    and Prompt-to-Prompt edited pairs, but that synthetic-only supervision left the resulting model struggling
+    to execute instructions precisely, especially localized or compositional ones. MagicBrush added manually
+    annotated real-image edits, but its target images all came from one tool, DALL-E 2's inpainting editor,
+    which bounded the diversity and edit types it could teach.
+  problem: Instruction-editing models generalize poorly to editing requests that sit even slightly outside
+    their training distribution, failing especially on combined edits, spatial and counting instructions,
+    and precise local changes.
+  idea: Treat instruction editing as one of many generative tasks, spanning region-based edits, free-form
+    edits, and computer-vision recognition tasks such as detection and segmentation recast as image generation,
+    and train a single model across all of them at once, using a learned embedding per task to steer generation
+    toward the right kind of edit.
+  method: Emu Edit is built on Emu, a 2.8B-parameter latent diffusion model with a 16-channel VAE, so
+    the edit is written in VAE latent space. The source image conditions the model two ways at once, its
+    latent is concatenated into the denoising network's input channels with the new weights zero-initialized,
+    following InstructPix2Pix, and its CLIP ViT-L embedding is added via cross-attention alongside the
+    T5-XXL text embedding. Sixteen task-embedding vectors, one per task, are learned jointly with the diffusion
+    weights and injected both through cross-attention and by addition to the timestep embedding; at inference
+    a fine-tuned Flan-T5-XL predicts which task embedding an instruction calls for. Region protection is
+    task-dependent rather than universal. For region-based tasks a DINO-derived mask blends edited and
+    original latents at each denoising step, the edited latent times the mask plus the original latent
+    times one minus the mask, but free-form and global edits carry no such mask and can change the image
+    with no locality constraint at all. Multi-turn edits use a separate per-pixel thresholding rule, reverting
+    a pixel to its prior value when the predicted change falls below 0.03, to limit drift across turns.
+    The 10 million training pairs were synthesized per task with Prompt-to-Prompt, DINO and SAM masks,
+    ControlNet-style conditioning, and Plug-and-Play DDIM inversion, after filtering out 70 percent of
+    an initially larger pool.
+  evidence: On the paper's own Emu Edit benchmark, 2,087 test samples across seven task categories, the
+    model reaches a CLIP directional similarity of 0.109 against InstructPix2Pix's 0.078 on the same set.
+    On the MagicBrush test set it reaches a CLIP directional similarity of 0.135 against the MagicBrush-trained
+    baseline's 0.123, and wins human evaluation with 77.33 percent preferred for text alignment and 76.71
+    percent for image faithfulness against MagicBrush's 59.54 percent and 60.39 percent. Ablating task
+    embeddings drops the directional CLIP score from 0.119 with the ground-truth task label, and 0.117
+    with a predicted label, down to 0.104 with none. With only 100 labeled examples of a held-out task,
+    super-resolution, the few-shot task-inversion procedure nearly matches an expert model trained on 100,000
+    examples of that task.
+  limitations: The paper does not evaluate instructions outside its sixteen-task taxonomy, and at inference
+    the model depends on a separate Flan-T5-XL classifier correctly predicting the task before the right
+    embedding can be applied, so an ambiguous instruction can be routed to the wrong task embedding. Locality
+    protection through masking applies only to region-based tasks; free-form and global edits have no
+    equivalent constraint. Multi-turn editing still accumulates error across turns despite the thresholding
+    safeguard.
+  why_it_matters: It shows that folding recognition tasks like detection and segmentation into the same
+    generative objective as editing measurably improves editing precision, evidence that broad multi-task
+    training functions as a form of regularization for instruction following rather than a distraction
+    from it, an early argument against training instruction editors as narrow specialists.
 abstract: Instruction-based image editing holds immense potential for a variety of applications, as it
   enables users to perform any editing operation using a natural language instruction. However, current
   models in this domain often struggle with accurately executing user instructions. We present Emu Edit,

@@ -32,6 +32,51 @@ summary: 'The closest thing to a genuinely single network among open unified mod
   transformer over interleaved text and vision tokens with one training objective. A discrete-diffusion
   adaptation module accelerates decoding roughly twentyfold without becoming a separate generative pipeline.'
 explanation: null
+explained:
+  depth: full-text
+  before: Emu3 and Emu2 had already shown next-token prediction could unify understanding and generation
+    in one autoregressive model, but only at short-form, small scale, leaving open whether the recipe could
+    scale to long, temporally coherent multimodal sequences, and whether serial token-by-token decoding
+    could ever be fast enough for practical image generation.
+  problem: How to pretrain one native multimodal model at trillion-token scale on long video-derived sequences
+    so it generates coherent interleaved text and vision over long horizons, while keeping per-image inference
+    latency low enough to be usable.
+  idea: Predict every token, text and vision alike, with one next-token objective over one shared vocabulary
+    sourced mostly from internet video frames and transcripts, then separately teach the same model to decode
+    a whole image's tokens in parallel through a discrete-diffusion-style adaptation rather than one token
+    at a time.
+  method: For editing specifically, the edit is produced as discrete vision tokens from a single IBQ visual
+    tokenizer with a 131,072-entry codebook, the same token space used for pure text-to-image generation,
+    not a VAE latent and not a manipulated attention map. An edit is posed as an X2I instance, an instruction
+    plus a set of zero or more input images, and the model autoregressively predicts the output image's
+    tokens conditioned on the source image tokens and instruction tokens already in its context. The paper
+    does not describe any explicit region-protection mechanism for editing, no mask, no attention injection
+    or replacement, and no locality loss; preservation of unedited regions is left to the model's learned
+    behavior from instruction-following training data rather than to an architectural constraint. More
+    broadly, one transformer, 34.1B parameters and 64 layers, shares one vocabulary of 151,854 text tokens
+    plus the 131,072 vision tokens for both understanding and generation. Pretraining and supervised fine-tuning
+    use a single cross-entropy next-token loss over the interleaved sequence, with vision-token loss down-weighted
+    to 0.5x relative to text; there is no diffusion loss in this stage. Discrete Diffusion Adaptation, DiDA,
+    is a separate later training stage, not part of pretraining, that teaches the model to initialize a
+    full image's tokens at once and refine them through bidirectional attention among noisy tokens while
+    still attending causally to clean tokens and earlier context. It changes how decoding happens at inference,
+    not what is modeled during pretraining, is not editing-specific, and applies to all image generation;
+    the paper reports it gives roughly a 20x per-image speedup. A further reinforcement learning stage using
+    GRPO with combined CLIP-alignment, OCR and layout, and face-identity rewards raised average reward from
+    about 4.5 to over 7.1.
+  evidence: Pretraining totals about 13 trillion tokens, 10T in stage one and 3T in stage two, drawn primarily
+    from 63 million internet videos. Emu3.5 matches or exceeds Gemini 2.5 Flash Image on several benchmarks,
+    LongText-Bench 0.976 English versus Gemini's 0.869, OneIG-EN 0.564 versus 0.550, and on editing, GEdit-Bench
+    7.59 versus 7.10 and OmniContext 8.82 versus 7.84.
+  limitations: The fetched text did not surface a distinct enumerated limitations section, and in particular
+    discloses no editing-specific failure modes or region-preservation limits, consistent with there being
+    no explicit protection mechanism to describe. The paper frames inference latency as the main constraint
+    it set out to fix with DiDA, and it reports only qualitative, not quantitative, results for its world-exploration
+    and embodied-manipulation claims.
+  why_it_matters: Among open unified models, Emu3.5 makes the strongest case for a genuinely single loss
+    and single vocabulary rather than a mixture of separate objectives. Because DiDA is added after pretraining
+    purely to accelerate decoding rather than to change what is modeled, it shows a path to fast parallel
+    image decoding without reintroducing a second generative objective into the core training recipe.
 abstract: We introduce Emu3.5, a large-scale multimodal world model that natively predicts the next state
   across vision and language. Emu3.5 is pre-trained end-to-end with a unified next-token prediction objective
   on a corpus of vision-language interleaved data containing over 10 trillion tokens, primarily derived

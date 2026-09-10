@@ -38,6 +38,46 @@ summary: Published the same month as ControlNet with the same goal but a much sm
   base model stays frozen, giving composable, generalizable spatial control at lower parameter cost than
   ControlNet's duplicated-encoder approach.
 explanation: null
+explained:
+  depth: full-text
+  before: Text-only prompting could not give reliable structural control, so a prompt like a car with
+    flying wings often failed to produce the intended structure. Prior conditioning methods such as PITI
+    needed their own retraining or lacked practical flexibility, and the concurrent ControlNet approach
+    duplicates the encoder half of the base UNet as a trainable copy, which is effective but doubles the
+    parameter and compute cost of that half of the network.
+  problem: How to give a frozen, pretrained text-to-image diffusion model precise external structural
+    control from a sketch, depth map, segmentation map, pose or color layout, without retraining or duplicating
+    its architecture.
+  idea: Train a small external adapter network that maps a control image to feature offsets added into
+    the frozen base model's encoder features at multiple scales, treating control as digging out capability
+    the pretrained model already has rather than teaching it new generation ability. Several trained adapters
+    can then be combined by simple weighted summation without any joint retraining.
+  method: T2I-Adapter is built on top of Stable Diffusion v1.4, so generation itself happens entirely
+    in SD v1.4's own frozen VAE latent space, and the base model's own denoising objective, its noise-prediction
+    training target, is completely unchanged and kept frozen. Only the adapter's conditioning pathway is
+    newly trained. The adapter itself is four feature-extraction blocks with three downsampling stages
+    using pixel unshuffle, taking a 512 by 512 control image down to 64 by 64 and extracting multi-scale
+    features with convolution and residual blocks. Its outputs are added directly into the UNet encoder
+    features at four matching scales. Model sizes are about 77M parameters for the base adapter, 18M for
+    a small version and 5M for a tiny version, all far smaller than SD's roughly 900M parameters, and the
+    whole SD network stays frozen throughout adapter training. Training uses non-uniform, cubic timestep
+    sampling that raises the probability of applying guidance during early denoising steps, since the authors
+    found adapter guidance was otherwise weak late in sampling. Multiple trained adapters compose through
+    a weighted sum of their outputs, again with no joint retraining.
+  evidence: On 5,000 COCO validation images, T2I-Adapter with text plus segmentation control reaches FID
+    16.78 and CLIP score 0.2652, and text plus sketch control reaches FID 17.36 and CLIP score 0.2666,
+    both improving on the unconditioned Stable Diffusion baseline's FID 24.68 and CLIP 0.2648, and both
+    beating PITI's segmentation-conditioned FID 19.36. Training took 10 epochs at batch size 8 on four V100
+    GPUs for about three days, using 164K COCO images for the sketch and segmentation adapters and 600K
+    LAION-AESTHETICS images for the keypose, depth and color adapters. No direct head-to-head FID or CLIP
+    comparison against ControlNet is given; ControlNet is mentioned only as concurrent work.
+  limitations: The authors concede that combining multiple adapters requires manually tuning each adapter's
+    weight in the combination, and they list adaptive fusion of multi-modal guidance signals as future
+    work rather than something this paper solves.
+  why_it_matters: It shows that precise spatial and color control can be added to a large frozen text-to-image
+    model through a small, cheaply trained side network rather than a duplicated encoder, at roughly 5
+    to 77 million adapter parameters against SD's roughly 900 million. This established adapter-style conditioning
+    as a practical, composable, storage-light alternative to heavier encoder-duplication approaches.
 abstract: The incredible generative ability of large-scale text-to-image (T2I) models has demonstrated
   strong power of learning complex structures and meaningful semantics. However, relying solely on text
   prompts cannot fully take advantage of the knowledge learned by the model, especially when flexible

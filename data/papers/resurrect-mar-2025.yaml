@@ -31,6 +31,45 @@ status:
 summary: A systematic study of what actually limits masked autoregressive models, isolating the tokenizer
   and the bidirectional architecture as the binding constraints rather than the objective itself.
 explanation: null
+explained:
+  depth: full-text
+  before: Standard autoregressive image generation predicts discrete tokens sequentially with causal attention
+    and many decoding steps. Masked autoregressive (MAR) models offered a parallel-decoding alternative,
+    predicting multiple masked tokens per step, but had consistently underperformed standard AR models
+    in image quality, and prior MAR work had mostly stayed in the 200M to 300M parameter range with little
+    exploration of scaling.
+  problem: It was unclear whether MAR's underperformance came from its masked-prediction objective itself,
+    from the choice of image tokenizer, or from architectural choices such as causal attention being carried
+    over from AR designs even though MAR does not need to preserve causal ordering.
+  idea: Systematically isolate each component. Compare tokenizers under matched AR and MAR training, then
+    replace causal attention with bidirectional attention plus 2D rotary position embeddings in a LLaMA-style
+    backbone, to test whether the objective or the surrounding architecture was the actual bottleneck.
+  method: Generation operates over discrete VQ tokens; the training objective predicts masked tokens conditioned
+    bidirectionally on the visible tokens, rather than predicting the next token in a fixed left-to-right
+    order. The paper evaluates four VQ tokenizers, MaskGIT-VQ, Chameleon-VQ, LlamaGen-VQ, and Open-MAGVIT2-VQ,
+    finding LlamaGen-VQ gives the best downstream generation quality in both AR and MAR setups despite
+    Open-MAGVIT2-VQ reconstructing better in isolation. The resulting model, MaskGIL, replaces the causal
+    attention of a LLaMA-style transformer with bidirectional attention and adds 2D RoPE to every layer,
+    since masked prediction has no need for a fixed generation order. At the 1.4B parameter scale, query-key
+    normalization and Post-Norm are added to control gradient norm growth that otherwise destabilizes training.
+    Sampling proceeds by iteratively unmasking tokens over a fixed small number of steps rather than one
+    token at a time.
+  evidence: MaskGIL-XXL at 1.4B parameters reaches FID 3.71 on ImageNet 256x256 using only 8 inference
+    steps, compared to LlamaGen-XXL's FID 2.34 at the same 1.4B parameter scale using 256 autoregressive
+    steps, so MaskGIL trades a modest FID gap for a 32-fold reduction in sampling steps. Class-conditional
+    generation uses CFG scales of 2.0 to 2.5. The text-to-image variant, MaskGIL-XL at 775M parameters
+    trained with CFG scale 4.0, reaches GenEval 0.49, ahead of LlamaGen's 0.32 but behind Lumina-mGPT's
+    0.56. An AR-plus-MAR hybrid, using AR to generate an initial 25% to 75% of the sequence before MaskGIL
+    completes the rest, cuts text-to-image generation time by 72.4% while preserving quality.
+  limitations: The authors concede a performance gap remains against AR models, showing up specifically
+    as lower recall, meaning reduced diversity relative to LlamaGen. They attribute the text-to-image model's
+    underperformance relative to larger competitors partly to limited training data and partly to its
+    smaller size next to 7B-parameter systems.
+  why_it_matters: It shows MAR's historical underperformance was not inherent to the masked-prediction objective
+    but came from suboptimal tokenizer choice and from architecture inherited wholesale from causal AR
+    models. Once tokenizer and attention pattern are fixed to match what MAR actually needs, it becomes
+    a practical, scalable alternative that trades a small quality gap for an order-of-magnitude reduction
+    in sampling steps.
 abstract: AutoRegressive (AR) models have made notable progress in image generation, with Masked AutoRegressive
   (MAR) models gaining attention for their efficient parallel decoding. However, MAR models have traditionally
   underperformed when compared to standard AR models. This study refines the MAR architecture to improve

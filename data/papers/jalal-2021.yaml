@@ -37,6 +37,46 @@ summary: Uses a score-based generative prior for compressed-sensing MRI and show
   distribution better than end-to-end supervised reconstruction, which fails when the anatomy or sampling
   pattern shifts.
 explanation: null
+explained:
+  depth: full-text
+  before: Classical compressed sensing MRI relies on fixed sparsity priors such as wavelets, which cap
+    achievable acceleration. End-to-end supervised networks like E2E-VarNet reach excellent in-distribution
+    performance, but the paper notes reconstruction quality "is known to suffer when applied out of
+    distribution." Earlier deep generative priors for compressed sensing had only been tested on faces and
+    MNIST-scale data and had not been shown competitive with supervised end-to-end methods on anything clinical.
+  problem: Build an MRI reconstruction method that stays reliable when the sampling pattern, anatomy, or
+    scanner setup at test time differs from what the model was trained on, since clinical deployment
+    guarantees exactly that kind of shift.
+  idea: Train a score-based generative prior once on brain scans, then solve the actual reconstruction at
+    inference time by Langevin-dynamics posterior sampling that combines the learned prior with the specific
+    measurement model, so the prior and the physics stay separate rather than being baked together into one
+    supervised mapping.
+  method: The generation space is complex-valued pixel space. An NCSNv2 score model with a RefineNet backbone
+    is trained directly on brain slices, treating the real and imaginary parts as separate channels, with no
+    autoencoder or latent compression anywhere. The paper gives no explicit justification for choosing pixel
+    space over a latent representation; it simply describes training the score model on fastMRI brain data.
+    Reconstruction proceeds by annealed Langevin dynamics that alternate a step along the learned score with
+    a measurement-consistency step weighted by an annealed noise schedule, decoupling the generative prior
+    from the forward operator.
+  evidence: The paper reports SSIM against the ground-truth MVUE image, not FID, and offers no downstream
+    clinical task and no reader study. In distribution, at 4x acceleration with equispaced sampling, the
+    method is described as comparable to E2E-VarNet and better than the other baselines, though the exact
+    SSIM values appear only in figures. Under distribution shift the evidence is qualitative and comparative
+    rather than absolute. With a horizontal instead of equispaced sampling mask, E2E-VarNet is reported to
+    show artifacts the paper calls unacceptable for clinical usage, while the score-based method keeps stable
+    average performance
+    and lower variance. On abdomen and knee anatomies never seen during brain-only training, the paper reports
+    qualitatively preserved detail, including a recovered meniscus tear on knee data, again without stated
+    SSIM numbers in the prose. The strongest evidence offered is theoretical, a robustness bound showing
+    posterior sampling degrades only by an additive log term under prior mismatch.
+  limitations: The paper concedes reconstruction takes about 16 minutes and 0.95 GB of memory per high-resolution
+    brain scan, far slower than an end-to-end network's few seconds. It concedes all experiments use
+    retrospective undersampling and that "further study is required to demonstrate prospective performance."
+    It concedes the theoretical robustness guarantee does not extend to general distribution shifts under
+    Fourier measurements, only to the specific cases it proves.
+  why_it_matters: It shows that separating a learned prior from the measurement model, rather than learning
+    the whole reconstruction end to end, buys generalization to sampling patterns and anatomies never seen in
+    training, at the cost of an order of magnitude more compute per scan.
 abstract: 'The CSGM framework (Bora-Jalal-Price-Dimakis''17) has shown that deep generative priors can
   be powerful tools for solving inverse problems. However, to date this framework has been empirically
   successful only on certain datasets (for example, human faces and MNIST digits), and it is known to

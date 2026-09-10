@@ -31,6 +31,41 @@ summary: Translates between imaging modalities (multi-contrast MRI, MRI to CT) w
   model trained without paired data, using cycle consistency. The argument made is diffusion versus GAN
   fidelity, not a claim about which space to work in.
 explanation: null
+explained:
+  depth: full-text
+  before: Medical image translation between modalities relied on conditional GANs mapping source to target
+    in one shot, but GANs characterize the target distribution only implicitly, with no likelihood to
+    evaluate, and are prone to discriminator collapse and mode collapse that limit sample diversity and
+    fidelity.
+  problem: Standard diffusion models offer better diversity and an explicit likelihood-based objective,
+    but need hundreds of sequential denoising steps, too slow for practical translation, and prior work
+    had no way to train such a model without paired source-target images, which most cross-modality medical
+    datasets lack.
+  idea: Combine diffusion with adversarial projections so a small number of large denoising steps can still
+    be sampled accurately, and wrap the diffusive generator in a cycle-consistent, non-diffusive pair of
+    modules so the whole system trains on unpaired data.
+  method: SynDiff generates directly in pixel space, with no learned latent involved anywhere. The stated
+    reason for large steps is speed, since standard diffusion needs hundreds of steps and SynDiff instead
+    takes a small number of large steps (step size 250, four steps total) for efficiency, but this breaks
+    the Gaussian-transition assumption ordinary diffusion sampling relies on, so a dedicated adversarial
+    projector is trained to model the resulting non-Gaussian transition probability directly. The paper
+    never discusses using a VAE or other latent space; it gives no reason to prefer or avoid one, it simply
+    never considers the option.
+  evidence: Evaluation is distribution and image-quality metrics only, PSNR and SSIM against a paired ground-truth
+    target image, with no downstream clinical task or reader study reported. On multi-contrast MRI translation
+    (IXI, T2 to T1) SynDiff reaches 30.13 dB PSNR and 94.61% SSIM against cGAN's 29.22 dB and 93.46%, and
+    DDPM's 24.93 dB and 89.49%. On MRI-to-CT translation (pelvic dataset) SynDiff reaches 26.86 dB PSNR
+    and 87.94% SSIM against cGAN's 25.07 dB and UNIT's 26.10 dB. The paper frames the 3.56 dB PSNR and
+    3.80-point SSIM gain over DDPM as evidence that adversarial projection recovers the quality standard
+    diffusion loses when forced to take large steps.
+  limitations: The paper concedes the method is built for one-to-one modality translation and would need
+    architectural changes to use more than one source modality per prediction, and suggests transformer-based
+    attention and larger training sets as directions likely to improve generalization further, rather
+    than presenting the current result as final.
+  why_it_matters: The contribution is about sampling efficiency and distributional fidelity for diffusion
+    versus GANs, not about which representation space to generate in. It sits in the pixel-space part of
+    the medical atlas as a data point that even fast, high-quality diffusion translation here was validated
+    only against image-quality metrics, not clinical downstream performance.
 abstract: Imputation of missing images via source-to-target modality translation can improve diversity
   in medical imaging protocols. A pervasive approach for synthesizing target images involves one-shot
   mapping through generative adversarial networks (GAN). Yet, GAN models that implicitly characterize

@@ -37,6 +37,41 @@ summary: Tokenizes text, images, and video into one discrete vocabulary and trai
   single objective is enough to match or beat specialized diffusion (SDXL) and vision-language (LLaVA-1.6)
   systems on their own tasks.
 explanation: null
+explained:
+  depth: full-text
+  before: Vision generation was dominated by diffusion models such as Stable Diffusion, and vision-language
+    understanding was dominated by compositional systems that bolt a CLIP-style encoder onto an LLM, such
+    as LLaVA. Earlier attempts at unification, including Emu and Chameleon, either still connected an LLM
+    to a separate diffusion model or fell short of task-specific systems on their own benchmarks.
+  problem: Whether a single next-token-prediction objective, with no diffusion component and no compositional
+    encoder-plus-LLM assembly, can match specialized systems at their own tasks.
+  idea: Tokenize text, images, and video into one discrete vocabulary and train a single decoder-only transformer
+    from scratch purely by next-token prediction over that vocabulary.
+  method: A single SBER-MoVQGAN-based visual tokenizer, codebook size 32,768, compressing 4 by 8 by 8 in
+    time and space, converts both images and video into discrete tokens. This is the only visual encoder
+    in the system, used both for what the model reads and what it generates, so there is no separate continuous
+    encoder for understanding. One 8B-parameter, 32-layer transformer processes a single combined vocabulary
+    of 184,622 text and vision tokens, trained with one cross-entropy loss over the whole sequence, with
+    vision-token loss weighted 0.5 relative to text. There is no diffusion head, no adapter module, and
+    no mixture of experts; understanding and generation are the same forward pass through the same weights,
+    differing only in which side of the sequence is being predicted. Training runs two pretraining stages
+    (text and image only, then adding video with context extended to 131,072 tokens) followed by quality
+    fine-tuning, instruction tuning, and DPO.
+  evidence: On GenEval, Emu3 scores 0.66 overall against SDXL's 0.55; on T2I-CompBench color, 0.7913 against
+    0.6369; on DPG-Bench, 80.60 against 74.65. Against LLaVA-1.6, Emu3 leads on SEEDBench (68.2 vs 64.7)
+    and OCRBench (687 vs 532) but trails on MMBench (58.5 vs 67.4) and MMVet (37.2 vs 43.9). On video, VBench
+    total score is 80.96, ahead of most open video diffusion models but behind proprietary Kling (81.85)
+    and Gen-3 (82.32).
+  limitations: The paper concedes a mixed picture against LLaVA-1.6 rather than a clean win, trailing on
+    MMBench and MMVet even as it leads on OCR and perception benchmarks. It also concedes that applying
+    DPO caused "a slight decline in the evaluation results," attributed to a mismatch between the DPO preference
+    data's emphasis on aesthetics and the focus of the automated evaluation models. Video generation is
+    conceded to fall short of the strongest proprietary systems.
+  why_it_matters: Emu3 is the field's cleanest existence proof that one vocabulary, one tokenizer, one backbone,
+    and one training objective can reach or beat specialized diffusion and compositional-VLM baselines
+    on their own turf, with no diffusion component anywhere in the system. It sets up the contrast with
+    later unified models such as Janus that keep next-token prediction but split the visual encoder in
+    two.
 abstract: 'While next-token prediction is considered a promising path towards artificial general intelligence,
   it has struggled to excel in multimodal tasks, which are still dominated by diffusion models (e.g.,
   Stable Diffusion) and compositional approaches (e.g., CLIP combined with LLMs). In this paper, we introduce

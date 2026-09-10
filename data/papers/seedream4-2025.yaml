@@ -33,6 +33,50 @@ summary: Folds text-to-image, editing, and multi-image composition into one syst
   and dense text rendering. Representative of the industry-wide collapse of 'generation' and 'editing'
   into a single model rather than two pipelines.
 explanation: null
+explained:
+  depth: full-text
+  before: Text-to-image systems such as Stable Diffusion and the FLUX series, and the instruction-editing
+    tools built on top of them, existed as separate pipelines, and diffusion transformers still relied
+    on VAE designs whose token counts limited how efficiently a model could scale to high resolution.
+  problem: How to fold text-to-image synthesis, instruction-based editing, and multi-image composition
+    into one framework that natively generates images from 1K up to 4K resolution without the inference
+    cost such unification usually adds.
+  idea: Pair an efficient diffusion transformer with a high-compression VAE that sharply cuts the number
+    of latent tokens, then post-train one model jointly on text-to-image and editing data with a fine-tuned
+    vision-language model handling task routing and prompt rewriting in front of it.
+  method: The paper describes an efficient, scalable DiT backbone paired with a VAE built for a high
+    compression ratio that reduces image-token count considerably, but it does not disclose the exact
+    compression ratio or the specific DiT architectural changes, so neither the space of the edit nor
+    its exact dimensionality can be pinned down from the text. A separate VLM, built on Seed1.5-VL and
+    used only as an input-side "PE model," reads the prompt and any reference images and produces captions,
+    task-routing decisions, and aspect-ratio estimates that are then fed to the DiT; it sits in front of
+    generation rather than acting as a preservation mechanism inside it. Joint capability across text-to-image
+    and editing comes from a three-stage multimodal post-training recipe, continued training for instruction
+    following, supervised fine-tuning for reference-to-edit consistency, and RLHF for human preference
+    alignment. Critically, the paper gives no architectural description of how unedited regions are protected
+    during an edit, such as masking, attention injection, or explicit latent blending. It states only
+    that the SFT stage "improves the consistency between the reference and edited images considerably,"
+    which indicates consistency is a learned property of the joint training data rather than an enforced
+    constraint.
+  evidence: Ranked first on both the text-to-image and image-editing leaderboards of the Artificial Analysis
+    arena as of September 18, 2025. On the paper's own MagicBench 4.0 human evaluation, 325 text-to-image
+    prompts, 300 single-image edit prompts, and 100 multi-image edit prompts, it outperforms comparators
+    by close to 20 percent on the combined GSB metric for multi-image editing. On the automatic DreamEval
+    benchmark, 128 sub-tasks and 1,600 prompts across three difficulty tiers, performance holds at the
+    easy and medium tiers but drops at the hard tier, most visibly in single-image editing. Generating
+    a 2K image takes up to 1.4 seconds without the VLM routing stage (the abstract's headline figure of
+    1.8 seconds does not match this number stated in the paper body), and the paper reports more than a
+    10x inference acceleration versus Seedream 3.0.
+  limitations: The authors concede that hard-tier prompts, particularly single-image edits, still expose
+    weak multimodal understanding and reasoning, and state this gap is meant to close by scaling the model
+    and its data further. As an API-only system with no released weights or code, the paper also withholds
+    the VAE compression ratio and the specific DiT modifications, and it describes no explicit mechanism
+    for protecting unedited regions, so how well spatial consistency holds outside the reported benchmarks
+    cannot be verified from the paper itself.
+  why_it_matters: It is a concrete industry data point for the shift from separate generation and editing
+    pipelines to one jointly trained model, showing that unification does not have to cost inference speed,
+    while the hard-tier regression shows that collapsing the two tasks into one model has not yet closed
+    the gap on compositionally demanding edits.
 abstract: We introduce Seedream 4.0, an efficient and high-performance multimodal image generation system
   that unifies text-to-image (T2I) synthesis, image editing, and multi-image composition within a single
   framework. We develop a highly efficient diffusion transformer with a powerful VAE which also can reduce

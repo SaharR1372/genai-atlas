@@ -30,6 +30,56 @@ summary: Finds that the most useful embeddings in a contrastively trained vision
   layers rather than at the output, and builds a recipe around extracting them. Relevant to representation-space
   generation because it questions which layer a frozen encoder should even be read from.
 explanation: null
+explained:
+  depth: full-text
+  before: Vision encoders typically needed task-specific pretraining objectives, contrastive
+    learning for classification and retrieval, captioning-style objectives for language-facing
+    tasks, and self-supervised methods such as DINO or MAE for dense spatial tasks. A single
+    generalist recipe was not believed to serve all of these needs at once.
+  problem: Show whether one carefully scaled contrastive vision-language pretraining recipe can
+    match specialized encoders across classification, video, multimodal-LLM, and dense spatial
+    tasks, and work out how to access the useful representations, since the best embeddings from such
+    a model turn out to sit in intermediate layers rather than at the network's output.
+  idea: Scale up contrastive image-text pretraining with a careful training recipe and a synthetic
+    video-captioning data engine, then add two lightweight alignment procedures, language alignment
+    and spatial alignment, that tap and surface the strong intermediate-layer features for downstream
+    language and dense-prediction use respectively.
+  method: The core Perception Encoder is trained with contrastive language-image pretraining, the
+    same supervision family as CLIP and SigLIP, on 5.4 billion image-text pairs sourced via MetaCLIP,
+    up to 86 billion samples seen, at three scales (B at 0.09B, L at 0.32B, and G at 1.88B vision
+    parameters), with progressive resolution scaling from 98 to 448 pixels, a 64k batch size, the
+    LAMB optimizer, 2D RoPE, and attention pooling. A separate video data engine produces 22 million
+    synthetically captioned videos, built with the Perception Language Model and Llama 3.3 70B
+    summarization, used to further contrastively finetune the model on video-text pairs. Two
+    frozen-backbone alignment stages then extract intermediate-layer features rather than training a
+    new encoder from scratch. Language alignment adapts frozen PE features into an 8B LLM's input
+    space for multimodal question answering, and spatial alignment self-distills frozen intermediate
+    features using SAM2-based spatial correspondence targets to build a PEspatial variant for dense
+    prediction. The core PE encoder stays frozen during both alignment stages; only lightweight
+    adapters or the consuming model are trained. No masked reconstruction or self-distillation loss
+    is used in the core pretraining. The paper contains no discussion of using PE features to train
+    or condition an image generation or diffusion model; every downstream task evaluated is
+    discriminative or a multimodal-LLM task, and generative use of this encoder is not proposed or
+    tested here.
+  evidence: PEcore-G reaches 85.4% zero-shot ImageNet-1k accuracy and 86.6% average zero-shot
+    ImageNet robustness, which the paper describes as the first open model to exceed prior
+    proprietary JFT-3B and WebLI baselines on this metric. With video finetuning, PEcore-G reaches
+    76.9% zero-shot Kinetics-400 accuracy against InternVideo2's 73.1%. PElang-G paired with an 8B
+    LLM reaches 94.6% DocVQA exact match and 80.9% InfographicVQA. PEspatial-G reaches 66.0 box mAP on
+    COCO detection with a simpler decoder, described as state of the art, and 60.3% mIoU on ADE20k
+    segmentation. Frozen linear probing on ImageNet reaches 89.5% for PEcore-G against DINOv2-g's
+    86.5%.
+  limitations: The paper concedes that the useful embeddings exist at different layers for different
+    tasks, a dichotomy that requires separate alignment procedures rather than one universal readout
+    layer. It also concedes that its video encoder relies on simple frame averaging rather than
+    temporal modeling, calling this "surprisingly effective" but not claiming it is optimal.
+  why_it_matters: If contrastive pretraining alone, properly scaled and read from the right layer,
+    matches specialist self-distillation and masked-reconstruction objectives across classification,
+    dense prediction, and multimodal QA, that weakens the case for needing separate encoders for
+    separate downstream needs. For this atlas it also sharpens the layer-selection question for any
+    paper that takes a frozen encoder's features as a generative training target or latent, since PE
+    shows the best layer is not the output layer, a finding this paper applies only to discriminative
+    tasks.
 abstract: 'We introduce Perception Encoder (PE), a state-of-the-art vision encoder for image and video
   understanding trained via simple vision-language learning. Traditionally, vision encoders have relied
   on a variety of pretraining objectives, each tailored to specific downstream tasks such as classification,

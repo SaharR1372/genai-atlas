@@ -33,6 +33,44 @@ summary: 'Over ten thousand human-annotated editing triplets where annotators we
 explanation: null
 lines:
 - line-editing-vae-latent
+explained:
+  depth: full-text
+  before: Instruction-editing models were trained on synthetic pairs, such as InstructPix2Pix's 313,010
+    examples generated from GPT-3 instructions and Prompt-to-Prompt edits, which carried annotation errors
+    and did not capture the diversity of real-world edit requests. The few manually built alternatives,
+    such as EditBench's 240 examples, were too small or too narrow in domain to train a model.
+  problem: No existing dataset combined real source images, open-domain content, multi-turn editing, and
+    manual human annotation at a scale sufficient to train and evaluate instruction-based editors.
+  idea: Manually annotate a large set of real-image edit triplets, source image, instruction, and target
+    image, through an interface that constrains each edit to a drawn region, so unrelated parts of the
+    image are preserved by the annotation process itself rather than left for a model to learn.
+  method: MagicBrush contains 5,313 annotation sessions and 10,388 turns, yielding over 10,000 manually
+    annotated triplets. Annotation used Amazon Mechanical Turk workers, 19 of whom were retained after
+    a qualification quiz and a graded trial period, operating a DALL-E 2 inpainting interface. For each
+    turn a worker wrote an edit instruction and a global caption, drew a free-form mask around the region
+    to change, and iteratively refined the DALL-E 2 prompt until the result matched intent, with the inpainting
+    tool itself keeping pixels outside the mask untouched, which is the dataset's substitute for an explicit
+    locality mechanism at training time. Sessions ran up to three turns, and the dataset spans single-turn
+    and multi-turn editing, both mask-provided and mask-free settings, and edit categories covering object
+    addition, replacement and removal, action changes, color changes, text and pattern changes, and object-count
+    changes. Quality was controlled with ongoing spot checks that removed underperforming workers plus
+    a manual post-hoc review pass, with annotators self-rating average consistency at 4.1 out of 5 and
+    image quality at 3.9 out of 5.
+  evidence: Fine-tuning InstructPix2Pix on MagicBrush, evaluated single-turn and mask-free, improves L1
+    from 0.1122 to 0.0625, L2 from 0.0371 to 0.0203, CLIP-I from 0.8524 to 0.9332, and DINO similarity
+    from 0.7428 to 0.8987 relative to the un-tuned model. The same fine-tuned model degrades on multi-turn
+    sequences, with L1 rising to 0.0964. In a 100-sample human multiple-choice comparison it was picked
+    as most consistent 51 times against 33 for the original InstructPix2Pix, 16 for GLIDE, and 0 for Text2LIVE,
+    and on a 5-point scale it averages 3.1 for consistency and 3.6 for image quality against the un-tuned
+    model's 3.0 and 3.2.
+  limitations: The authors concede that even the fine-tuned model's output is still notably inferior to
+    the ground-truth target images, that under 5 percent of triplets contain minor unintended extra changes,
+    that the dataset has no global style-transfer editing category, and that using a single tool, DALL-E
+    2, to produce every ground-truth image may bias what kinds of edits the dataset can teach.
+  why_it_matters: It supplies the human-verified, locality-constrained supervision that synthetic pipelines
+    could not produce, and the authors' own finding, that a model fine-tuned on this data still falls
+    well short of the ground truth, stands as the field's own measure of how large the gap to practical
+    instruction editing remains.
 abstract: 'Text-guided image editing is widely needed in daily life, ranging from personal use to professional
   applications such as Photoshop. However, existing methods are either zero-shot or trained on an automatically
   synthesized dataset, which contains a high volume of noise. Thus, they still require lots of manual

@@ -22,10 +22,6 @@ arc:
 - paper: biomedjourney-2023
   role: improvement
   note: Disease-progression editing learned from pairs of longitudinal radiology reports.
-- paper: mededit-2024
-  role: evidence
-  note: A neuroradiologist could not distinguish generated strokes from real ones — a reader study rather
-    than a distribution metric.
 - paper: pixcell-2025
   role: scaling
   note: A pathology foundation generator on SD3's VAE, using foundation-model embeddings as the condition

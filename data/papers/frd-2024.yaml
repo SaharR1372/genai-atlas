@@ -31,6 +31,43 @@ summary: Argues that evaluating medical generative models with ImageNet-derived 
   Radiomics-native features detect distribution shift at 0.94 AUC where ImageNet features reach only 0.79
   — indirect but concrete evidence that natural-image representations are a poor fit for anatomy.
 explanation: null
+explained:
+  depth: full-text
+  before: Medical generative models and image-translation methods were evaluated with FID and related metrics
+    such as KID and CMMD built on Inception-v3 or other ImageNet-pretrained features, or with RadFID using
+    RadImageNet features, or else with costly downstream task-specific evaluation such as segmentation
+    performance.
+  problem: The paper addresses the absence of a distribution-comparison metric for medical images that
+    is simultaneously clinically interpretable, stable on the small datasets typical of medical imaging,
+    and predictive of downstream task performance and radiologist-perceived quality.
+  idea: Replace deep natural-image features with standardized radiomic features, the texture, shape, and
+    intensity descriptors already used clinically in radiology, and compute a Frechet distance between
+    Gaussians fit to those radiomic feature distributions instead of to Inception features.
+  method: FRD extracts 464 PyRadiomics features per image, including first-order intensity statistics and
+    GLCM, GLRLM, and GLSZM texture features computed on the raw image and on four wavelet-filtered variants,
+    following Imaging Biomarker Standardization Initiative definitions. Each feature is z-scored against
+    the reference set before the Frechet distance is computed and log-transformed for stability. This is
+    a metric paper rather than a generative model, so there is no generation-space claim to make. FRD does
+    not encode or decode images and is not itself a latent representation used for synthesis; it only measures
+    distance between existing image distributions.
+  evidence: The paper backs its central claim, that ImageNet-derived features correlate poorly with clinical
+    structure, with several kinds of evidence rather than a single distribution-metric comparison. For
+    out-of-domain detection across four datasets, FRD reaches average AUC 0.94 against ImageNet-feature
+    FID's 0.79 and RadImageNet-feature RadFID's 0.74. FRD's correlation with downstream segmentation Dice
+    score is Pearson r of negative 0.43, compared with FID's negative 0.17, meaning FRD better predicts
+    whether a translated image preserves diagnostic utility, the closest this paper comes to task-based
+    evidence. Against radiologist-perceived quality ratings, FRD correlates at Pearson r of negative 0.65,
+    in the expected direction, while FID correlates at positive 0.37, the wrong direction. FRD also stays
+    stable down to 10 images per set, where FID and RadFID become unstable.
+  limitations: The paper concedes FRD's values are tied to the PyRadiomics toolkit's specific feature definitions,
+    that its correlation with downstream performance and radiologist ratings is weaker on the small, heterogeneous
+    CHAOS abdominal dataset, that it is validated only on radiology modalities such as MRI, CT, and X-ray
+    and not on pathology, ultrasound, or endoscopy, and that its dataset-level out-of-domain variant is
+    described as preliminary.
+  why_it_matters: Across out-of-domain detection, downstream task correlation, and radiologist agreement,
+    the paper argues that the field's default use of ImageNet-derived FID to evaluate medical generative
+    models is measuring the wrong thing, and offers a metric that tracks clinically relevant structure
+    instead.
 abstract: Determining whether two sets of images belong to the same or different distributions or domains
   is a crucial task in modern medical image analysis and deep learning; for example, to evaluate the output
   quality of image generative models. Currently, metrics used for this task either rely on the (potentially

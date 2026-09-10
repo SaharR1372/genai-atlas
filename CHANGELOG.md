@@ -2,6 +2,34 @@
 
 ## Unreleased
 
+### 2026-09-10 — Session 8 (Sonnet 5) — WORK_QUEUE Q1/Q2, all 19 medical papers explained
+- **All 19 medical-imaging papers with no `explained` block now have one**, all at `depth:
+  full-text`: chung-ye-2021, dar-memorization-2023, frd-2024, roentgen-2022, maisi-2024,
+  biomedjourney-2023, jalal-2021, staindiffuser-2024, dscm-2020, mededit-2024, monai-gen-2023,
+  synthrad-2024, pixcell-2025, radedit-2023, syndiff-2022, retinal-fm-latent-2026, stream-2026, and
+  ktena-2024 (Nature Medicine, no arXiv; full text pulled via PubMed Central, PMCID PMC11031395).
+  Fanned out across 4 parallel subagents, each fetching `arxiv.org/html/<id>vN` (or PubMed for the
+  one DOI-only paper) and writing directly into `data/papers/*.yaml`.
+- Every block states the paper's **generation space** (pixel / domain-trained VAE / borrowed
+  natural-image VAE / foundation-model latent / normalizing flow) and the paper's own stated
+  rationale for it, or explicitly notes the absence of one, per the medical-specific requirement.
+- **Miscategorization found and flagged (not fixed this session, per file-scope constraint):**
+  `mededit-2024.yaml` is tagged `lines: [line-medical-transfer-vae]`, but the fetched full text
+  shows it is a plain pixel-space DDPM (RePaint-style inpainting on 128x128 T1 slices) with no VAE,
+  VQGAN, or latent of any kind — it does not fine-tune Stable Diffusion or use any borrowed
+  autoencoder. The line's `core_bet` ("keeping its natural-image VAE frozen") does not describe
+  this paper's mechanism at all. `data/lines/line-medical-transfer-vae.yaml` needs its arc entry
+  for mededit-2024 reassigned to `line-medical-pixel-space`, or removed, in a future session.
+- Two more findings from the fetched text, consistent with (not contradicting) existing line
+  claims: `dar-memorization-2023` is the direct evidentiary source for
+  `line-medical-domain-vae`'s "demonstrated memorization risk" weakness (59% of coronary CT
+  training volumes, 33% of sampled MRI candidates confirmed memorized); `ktena-2024`'s fetched full
+  text confirms `line-medical-pixel-space`'s claim that it carries "the strongest downstream
+  evidence in the whole medical section" — three-modality downstream gains plus a genuine
+  dermatologist reader study — while itself arguing no rationale for pixel space at all.
+- `scripts/validate.py` clean (0 errors, 0 warnings on any of the 19 files) after every edit. Only
+  `data/papers/*.yaml` touched, per the task's own constraint.
+
 ### 2026-09-10 — Session 7 (Opus 5) — notebooks, capability matrix, VFM/VLM sections
 - **Runnable notebooks with real outputs** (queue Q4). `latents.ipynb` measures what each generation
   of autoencoder discards and contrasts a DINOv2 feature map against an SD latent; `editing.ipynb`

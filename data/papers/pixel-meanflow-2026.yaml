@@ -37,6 +37,57 @@ summary: 'Carries MeanFlow into pixel space, removing the tokenizer entirely whi
   The clearest convergence point of the pixel-space and one-step lines: if it holds, neither a VAE nor
   a foundation encoder is needed at either training or sampling time.'
 explanation: null
+explained:
+  depth: full-text
+  before: MeanFlow methods such as iMF-XL/2 already achieved one-step generation with FID 1.72 on ImageNet
+    256x256, but did so in VAE latent space, still requiring a pretrained tokenizer and its decoder at
+    both training and inference. Separately, pixel-space diffusion work such as JiT showed a plain transformer
+    can generate directly on raw pixels by predicting clean data (x-prediction) rather than noise, under
+    the manifold hypothesis that denoised images lie on a low-dimensional manifold even though noised
+    quantities do not, but JiT still needed many sampling steps.
+  problem: One-step generation and latent-free pixel-space generation had each been solved separately, but
+    combining them poses a direct conflict. One-step MeanFlow training requires the network to model trajectories
+    across arbitrary (r, t) time pairs, a task suited to a velocity-space target, while pixel-space generation
+    requires an x-prediction target aligned to the low-dimensional image manifold, since a network asked
+    to predict a noised quantity in raw pixel space rather than a denoised one fails catastrophically. No
+    method had achieved genuine one-step, latent-free, pixel-space generation.
+  idea: Separate what the network outputs from what the loss is computed on. Let the network predict clean
+    pixels directly, on the presumed low-dimensional image manifold, while defining the training loss through
+    MeanFlow's average-velocity formulation in velocity space, connecting the two through an explicit
+    algebraic transformation between the manifold and the average-velocity field.
+  method: pMF operates entirely in pixel space with no VAE and no pretrained tokenizer at either training
+    or sampling time. A DiT-style Vision Transformer with patch size 16 at 256x256 (patch dimension 768)
+    or patch size 32 at 512x512 (patch dimension 3072) directly outputs a denoised-image prediction x_theta(z_t,
+    r, t), the network's actual output space, rather than noise or velocity. This is converted to an average
+    velocity via u_theta = (z_t - x_theta) / t, and the MeanFlow loss is computed in that velocity space
+    following the iMF formulation V_theta = u_theta + (t - r) * JVP_stopgrad, with loss equal to the squared
+    difference between V_theta and the instantaneous velocity v = noise - x. The JVP that computes du/dt
+    is still used, via automatic differentiation, to build this velocity-space loss target; what changes
+    relative to prior MeanFlow work is that the network's own parameterized output is x-prediction on the
+    manifold rather than a raw velocity or noise prediction. Models range from B/16 (119M parameters) to
+    H/16 (956M), trained for 160 to 360 epochs at batch size 1024 with the Muon optimizer and a perceptual
+    loss (LPIPS plus ConvNeXt features) applied only below a noise threshold.
+  evidence: pMF-H/16 at 360 epochs reaches FID 2.22 at 256x256 and pMF-H/32 reaches FID 2.48 at 512x512,
+    both at true one-step (1 NFE) sampling with classifier-free guidance. This trails the latent-space one-step
+    iMF-XL/2 at FID 1.72 (1 NFE) and the multi-step latent SiT-XL/2+REPA at FID 1.42 (250x2 NFE), but improves
+    on the multi-step pixel-space JiT-G/16 at FID 1.82 (100x2 NFE) despite using far fewer function evaluations,
+    and clearly beats the one-step pixel-space EPG-L/16 (FID 8.82, which relies on pretraining) and StyleGAN-XL
+    (FID 2.30, at 1574 GFLOPs versus pMF-H/16's 271 GFLOPs). Ablations show the choice of prediction target
+    is decisive. At 256x256, x-prediction reaches FID 3.53 while u-prediction (raw velocity) collapses to
+    FID 164.89 under the same setup. Restricting the MeanFlow time sampling to only r=t or only r=0, instead
+    of the full (r, t) plane, degrades FID to between 106 and 389.
+  limitations: pMF still trails the best latent-space one-step method by about 0.5 FID points (2.22 versus
+    1.72), so the paper does not claim latent-free pixel-space generation is yet better than latent one-step
+    generation, only competitive. The perceptual loss can only be applied when the added noise is below
+    a certain threshold. The paper trains from scratch with no distillation from a larger model, and the
+    manifold hypothesis is only empirically supported for the general r in (0, t) case, not theoretically
+    proven; the authors state their simulations merely "suggest" the predicted x behaves like a denoised
+    image.
+  why_it_matters: It is the first method to combine one-step sampling with fully latent-free pixel-space
+    generation, showing that separating the network's prediction target (x on the manifold) from the loss's
+    computation space (MeanFlow velocity) resolves what looked like a direct conflict between the two lines
+    of work. If the approach holds up at scale, it removes both the VAE and any foundation encoder from
+    the generation pipeline entirely, at training and sampling time alike.
 abstract: 'Modern diffusion/flow-based models for image generation typically exhibit two core characteristics:
   (i) using multi-step sampling, and (ii) operating in a latent space. Recent advances have made encouraging
   progress on each aspect individually, paving the way toward one-step diffusion/flow without latents.

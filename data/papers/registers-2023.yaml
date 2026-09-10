@@ -31,6 +31,52 @@ summary: Identifies high-norm artifact tokens that appear in trained vision tran
   put global information. Now standard in DINOv2, DINOv3 and SigLIP 2, so anything generating in those
   feature spaces depends on it.
 explanation: null
+explained:
+  depth: full-text
+  before: Trained vision transformers, including supervised (DeiT-III), contrastive (OpenCLIP), and
+    self-distilled (DINOv2) models, were used as frozen feature extractors on the assumption that
+    every dense patch token carries local, spatially meaningful information suitable for dense
+    prediction and object discovery.
+  problem: A small fraction of patch tokens in trained ViTs, roughly 2.37% of tokens, were found to
+    have about 10 times higher norm than typical tokens and to concentrate in uniform,
+    low-information background regions. These high-norm tokens degrade the spatial usefulness of the
+    dense feature maps that downstream dense-prediction and object-discovery methods rely on.
+  idea: These high-norm tokens are not a defect but a symptom of the model repurposing low-information
+    patches to store global image information during the forward pass, discarding their local spatial
+    content to do so. Giving the model dedicated extra tokens that carry no patch-level image content
+    of their own, for it to use for this global bookkeeping, removes its need to repurpose real patch
+    tokens and cleans up the dense feature map entirely.
+  method: A handful of extra learnable register tokens, similar to the class token but carrying no
+    patch-level positional meaning, are appended to the input sequence right after patch embedding,
+    alongside the class token and patch tokens. They attend and are attended to like any other token
+    during the forward pass but are discarded before the final classification or dense-prediction
+    readout. No other architectural or loss change is required, so the fix applies unchanged whether
+    the base model's supervision is supervised classification (DeiT-III), contrastive language-image
+    pretraining (OpenCLIP), or DINO-style self-distillation (DINOv2), and was validated by retraining
+    each of those three with registers added. Ablations vary the register count from 0 to 16; one
+    register removes the norm artifact entirely, and more registers give modest further downstream
+    gains. This is an architecture-only fix, changing what tokens a ViT is given rather than its
+    pretraining objective. The paper contains no discussion of generative models, diffusion, or
+    representation-alignment training targets; it evaluates the fix purely on dense prediction,
+    object discovery, and classification.
+  evidence: 'On DINOv2 ViT-L, adding registers raises ADE20k linear-probe mIoU from 46.6 to 47.9 and
+    lowers NYU depth RMSE from 0.378 to 0.366, with ImageNet linear-probe accuracy improving slightly
+    from 84.3 to 84.8. Unsupervised object discovery via LOST on DINOv2 improves substantially, VOC2007
+    CorLoc from 35.3 to 55.4, though the paper notes this still falls short of the original DINO''s
+    reported 61.9. Registers "entirely removed the norm outliers" from patch tokens, concentrating
+    high-norm activity exclusively in the register tokens themselves. Overhead is small: 4 registers
+    add under 2% FLOPs, 16 registers up to 6%.'
+  limitations: The paper concedes it has "not been able to fully determine which aspects of the
+    training led to the appearance of artifacts in different models," beyond noting that pretraining
+    paradigm, model size, and training length all appear to play a role. For OpenCLIP specifically,
+    the object-discovery gains from registers are described as "less striking," and the paper leaves
+    the diversity and possible regularization of what registers learn to store as an open question for
+    future work.
+  why_it_matters: Register tokens are now a standard component; DINOv3 explicitly adopts 4 register
+    tokens following this paper, and SigLIP2 does as well. Any paper that takes a registers-equipped
+    encoder's patch features as a generative training target or latent is implicitly relying on this
+    fix for clean dense features in the first place, even though this paper itself makes no claim
+    about generative use.
 abstract: Transformers have recently emerged as a powerful tool for learning visual representations. In
   this paper, we identify and characterize artifacts in feature maps of both supervised and self-supervised
   ViT networks. The artifacts correspond to high-norm tokens appearing during inference primarily in low-informative

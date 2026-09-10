@@ -29,6 +29,61 @@ summary: Diagnoses spectrally stiff convergence in Drifting Models, where fine d
   slowly than coarse structure, and lifts the dynamics into phase space with an auxiliary velocity term.
   The clearest methodological advance on the drifting paradigm since the original paper.
 explanation: null
+explained:
+  depth: full-text
+  before: First-order Drifting Models train a one-step generator by iteratively nudging the current output
+    samples toward the data distribution using a kernel-based, non-neural drift field, avoiding the multi-step
+    ODE integration of diffusion or flow matching. But convergence to that fixed point is markedly uneven
+    across scales. The paper shows each Fourier mode of the density residual decays at a rate set purely
+    by the kernel spectrum, so high-frequency, fine-detail content resolves far more slowly than coarse
+    structure.
+  problem: The paper asks whether this spectral stiffness, the frequency-dependent decay that leaves fine
+    detail lagging behind coarse structure during drifting-model training, can be fixed without giving
+    up one-step inference at deployment time.
+  idea: Lift the first-order drift dynamics into phase space by attaching an auxiliary, artificial velocity
+    variable to every training sample. The resulting second-order ODE, position driven by velocity and
+    velocity driven by the drift field minus a time-decaying damping term, is shown to be the continuous-time
+    limit of Nesterov's accelerated gradient method, which gives every Fourier mode accelerated convergence
+    instead of a rate fixed purely by the kernel spectrum.
+  method: The generator itself keeps the same form as first-order drifting, a single network f_theta maps
+    noise directly to a sample and is trained with a stop-gradient regression loss against a drifted target.
+    What changes is how that target is produced. Training samples are advanced through N steps of a semi-implicit
+    phase-space integrator, v_(n+1) equals (1 minus alpha over (n+1)) times v_n plus eta_1 times the drift
+    field at x_n, and x_(n+1) equals x_n plus eta_2 times v_(n+1), with damping coefficient alpha of at
+    least 3, step sizes eta_1 and eta_2 set to 0.25 or 0.125 depending on the task, and initial velocity
+    zero. The network still regresses the resulting position directly, so it predicts a clean sample rather
+    than noise or a velocity field; only the kernel-side target generation is made second-order. On MNIST
+    the generator is a DiT backbone operating in pixel space at 28 by 28 resolution, trained 200 epochs
+    at batch size 256 with learning rate 2e-4. On the Swiss-roll and dynamical-systems experiments it operates
+    directly on raw low-dimensional coordinates, and on robotic control it outputs action sequences, so
+    the paper is never evaluated in a VAE latent or token space.
+  evidence: 'At matched single-step (1-NFE) inference with no guidance mechanism reported, second-order
+    drifting reaches FID 48.2 on MNIST against 59.5 for first-order drifting at the same 1-NFE budget;
+    both remain behind a consistency-model baseline at FID 33.0, while comfortably beating a 128-NFE diffusion
+    baseline (FID 99.0) and a 22-NFE rectified-flow baseline (FID 99.0). On synthetic Swiss-roll data, KL
+    divergence to the target distribution falls from 0.0127 to 0.0089, a 30% reduction, with MMD roughly
+    unchanged. On the Lorenz and FitzHugh-Nagumo dynamical systems with event conditioning, KL divergence
+    falls from 0.3659 to 0.3118 and from 0.4115 to 0.3788, 12 to 15% reductions. On robotic control (Robomimic-style
+    tasks), second-order drifting matches or exceeds Diffusion Policy and first-order drifting success
+    rates while needing far fewer training epochs: Tool Hang success rises from 38% (first-order, 50 epochs)
+    to 71% (second-order, 30 epochs) against Diffusion Policy''s 30% at 5000 epochs, and the Can task reaches
+    99% success in 16 epochs versus 3050 epochs for Diffusion Policy.'
+  limitations: The authors concede several bounds on the claim. The method is presented as an acceleration
+    specific to drifting-model training dynamics, not shown to generalize to other generative frameworks.
+    They do not prove the frequency dependence is fully removed, only accelerated, since a constant damping
+    coefficient cannot optimally damp every frequency simultaneously, so some spectral inefficiency remains. The step
+    sizes, damping coefficient and step count N require task-specific tuning with no principled selection
+    method beyond empirical search. Naive historical-velocity warm-starting is unstable because the optimization
+    is non-stationary. Convergence is slower on contact-rich robotic tasks such as BlockPush and PushT,
+    which the authors attribute to multimodality. For images the method is validated only on MNIST at 28
+    by 28 resolution, with no CIFAR-10, CelebA, or ImageNet results.
+  why_it_matters: It is a concrete mechanistic fix to the drifting paradigm rather than a purely empirical
+    tweak. It names a specific cause, spectral stiffness from the kernel's frequency response, and repairs
+    it with a classical acceleration technique while preserving the one-step inference that makes drifting
+    models attractive. Because the demonstrated gains are on MNIST, synthetic manifolds, dynamical-system
+    trajectories and robot action sequences rather than natural images at scale, it reads as a methodological
+    advance on drifting dynamics rather than evidence that drifting can yet compete with diffusion or flow
+    matching on realistic image generation.
 abstract: 'Drifting models are a recent class of one-step generative models that evolve the model distribution
   during training using a predefined sample-based drift field. Although they avoid iterative inference,
   their kernel-based drift fields induce frequency-dependent training dynamics: In the linearized regime,

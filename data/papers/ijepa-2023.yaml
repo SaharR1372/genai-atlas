@@ -30,6 +30,57 @@ summary: Predicts representations of masked regions in latent space rather than 
   on the argument that pixel reconstruction wastes capacity on detail that carries no semantic content.
   Tested as a REPA alignment target and found weaker than DINOv2.
 explanation: null
+explained:
+  depth: full-text
+  before: Self-supervised ViT pretraining had split into two families. Invariance-based methods
+    (DINO, iBOT) rely on hand-crafted image augmentations that introduce biases which can hurt
+    pretraining under data distributions unlike the ones the augmentations were designed for, and
+    that don't obviously generalize to other modalities. Generative pixel-reconstruction methods
+    (MAE) avoid hand-crafted augmentations but produce representations of a lower semantic level that
+    underperform invariance-based methods under simple linear probing and need heavier fine-tuning to
+    be competitive.
+  problem: Learn highly semantic image representations without relying on hand-crafted
+    data augmentations, while still converging efficiently and probing well with a simple linear
+    readout.
+  idea: Predict the representations of masked target blocks of an image from a single context block,
+    using a learned predictor, rather than predicting an augmented view of the whole image
+    (invariance-based methods) or the raw pixels of the masked region (MAE-style methods).
+    Predicting in representation space rather than pixel space lets the model skip unpredictable
+    low-level detail and spend its capacity on semantic content.
+  method: The architecture has three parts, a context encoder (a ViT run over the visible patches
+    only), a target encoder (an exponential moving average of the context encoder's weights, not
+    updated by backpropagation), and a narrow ViT predictor that is conditioned on positional tokens
+    and predicts each masked target block's representation from the context encoding. Training
+    minimizes the average L2 distance between predicted and actual target representations. The
+    masking strategy samples 4 target blocks per image from the target encoder's output, each with
+    scale in 0.15 to 0.2 of the image and aspect ratio 0.75 to 1.5, and uses a large context block
+    (scale 0.85 to 1.0) with the target regions removed. Tested at ViT-B/16, ViT-L/16, ViT-H/14, and
+    ViT-H/16 at 448px resolution on ImageNet and ImageNet-22k for 300 to 600 epochs, with ViT-H/14
+    trainable on 16 A100 GPUs in under 72 hours. This is neither the DINO-style self-distillation nor
+    the MAE-style masked pixel reconstruction the taxonomy names directly. It uses an EMA
+    teacher-student pair like DINO, but its objective is latent masked-block prediction through an
+    explicit predictor network rather than global-view feature matching or pixel reconstruction. The
+    paper's own post-hoc visualizations decode I-JEPA representations back to pixels using an
+    existing diffusion-based decoder (RCDM), but only to inspect what the representations encode;
+    this is not part of training and the paper does not discuss using I-JEPA as an alignment target
+    or latent space for training a generative model.
+  evidence: On ImageNet-1k linear probing, I-JEPA ViT-H/14 reaches 79.3% top-1 at 300 epochs and
+    ViT-H/16 at 448px reaches 81.1%, against MAE ViT-H/14's 77.2% after 1600 epochs, more than five
+    times as many epochs, and data2vec ViT-L/16's 53.5%. On ImageNet 1% low-shot, I-JEPA ViT-H/14
+    reaches 73.3% top-1 and ViT-H/16@448 reaches 77.3%, against MAE's 71.5%. An ablation predicting
+    in pixel space instead of representation space under an otherwise matched setup drops accuracy
+    from 66.9% to 40.7% top-1, isolating representation-space prediction as the source of the gain.
+    On low-level transfer tasks (Clevr/Count, Clevr/Dist) I-JEPA is competitive with or exceeds DINO
+    and iBOT.
+  limitations: The paper offers little explicit limitations discussion. It does concede that
+    ViT-G/16 does not improve performance on low-level downstream tasks, attributing this to its
+    larger input patch size being detrimental to tasks that need local prediction.
+  why_it_matters: Established that masked prediction in latent space, rather than pixel space, can
+    match or exceed both invariance-based self-distillation and MAE-style pixel reconstruction while
+    using far less compute and no hand-designed augmentations. This atlas's own summary for this
+    paper notes it was later tested as a REPA alignment target and found weaker than DINOv2; that
+    finding and that use come from the REPA paper and later work, not from I-JEPA itself, which never
+    proposes or tests its representations as a generative training target.
 abstract: 'This paper demonstrates an approach for learning highly semantic image representations without
   relying on hand-crafted data-augmentations. We introduce the Image-based Joint-Embedding Predictive
   Architecture (I-JEPA), a non-generative approach for self-supervised learning from images. The idea
