@@ -1,8 +1,18 @@
 # Generative Vision Atlas
 
+### → **[saharr1372.github.io/genai-atlas](https://saharr1372.github.io/genai-atlas/)**
+
 A living research atlas of modern generative vision (2023–2026): a website and structured knowledge
 base organized around ideas, representations, objectives, architectures, and open problems — not a
 paper list. See [`docs/blueprint.md`](docs/blueprint.md) for the full project design.
+
+204 papers, each with a structured account written from the paper's full text: what came before, the
+problem, the idea, the method, what the evidence actually supports, and what it does not. 35 research
+lines, grouped by the design bet they share rather than by topic. Four runnable notebooks with
+outputs produced on an A100.
+
+The site deploys from `main` on every change to `site/`, `content/`, `data/` or `scripts/`, and the
+workflow validates the data before it builds anything from it.
 
 **Starting a new session? Read [`CLAUDE.md`](CLAUDE.md) first, then
 [`PROJECT_STATE.md`](PROJECT_STATE.md).**

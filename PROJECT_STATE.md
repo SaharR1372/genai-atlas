@@ -538,7 +538,13 @@ blaming epsilon-prediction and using velocity prediction throughout.
 2. 31 of 35 lines still have no narrative prose. Only `line-representation-latent`,
    `line-adapter-conditioning`, `line-pixel-space` and `line-cascaded-pixel` do.
 3. WORK_QUEUE Q7: Krea 2 and the remaining open models still to run.
-4. GitHub Pages publishing still needs the placeholder site URL replaced, and the user's go-ahead.
+4. ~~GitHub Pages publishing~~ **done (D024)**. Live at https://saharr1372.github.io/genai-atlas/,
+   deployed by `.github/workflows/deploy.yml` on every push to `main` touching `site/`, `content/`,
+   `data/`, or `scripts/`. The workflow runs `validate.py` and `build_graph.py` before building, so
+   invalid data cannot reach the published site. The sub-path is handled by `site/base-href.mjs` at
+   build time, not in the source: keep writing root-absolute links like `/papers/x` in both `.astro`
+   and MDX. To move to a custom domain later, set `SITE_URL` to the domain and `SITE_BASE=/`, which
+   disables the rewriter automatically.
 
 **Two traps recorded so they are not rediscovered.**
 - Astro keys a content entry by *filename*, not the `id` in its frontmatter, and `getEntry()` returns
