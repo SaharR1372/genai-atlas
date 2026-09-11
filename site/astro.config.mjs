@@ -1,5 +1,6 @@
 import { defineConfig } from "astro/config";
 import mdx from "@astrojs/mdx";
+import sitemap from "@astrojs/sitemap";
 import baseHref from "./base-href.mjs";
 
 // See docs/blueprint.md section 5 (Decision D002) for the stack rationale.
@@ -13,5 +14,7 @@ export default defineConfig({
   site: process.env.SITE_URL ?? "https://saharr1372.github.io",
   base: process.env.SITE_BASE ?? "/genai-atlas",
   trailingSlash: "ignore",
-  integrations: [mdx(), baseHref()],
+    // A public research site should be discoverable; the sitemap is generated from
+  // the same routes Astro builds, so it cannot drift from what actually exists.
+  integrations: [mdx(), sitemap(), baseHref()],
 });
