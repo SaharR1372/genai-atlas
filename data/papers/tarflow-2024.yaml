@@ -54,3 +54,61 @@ abstract: 'Normalizing Flows (NFs) are likelihood-based models for continuous in
   estimation for images, beating the previous best methods by a large margin, and generates samples with
   quality and diversity comparable to diffusion models, for the first time with a stand-alone NF model.
   We make our code available at https://github.com/apple/ml-tarflow.'
+explained:
+  before: Normalizing flows had been part of the early wave of deep generative models alongside GANs and
+    VAEs, but by 2023-2024 they had fallen far behind diffusion models on image generation benchmarks.
+    Prior NF architectures such as Glow and Flow++ trailed diffusion and autoregressive baselines badly
+    on both likelihood and sample quality, and the field had largely concluded that the invertibility
+    constraint made flows structurally weaker than diffusion or GAN alternatives, so research attention
+    moved elsewhere.
+  problem: The paper asks whether normalizing flows are actually incapable of competitive image generation,
+    or whether they had simply never been given a modern, scalable architecture and the right training
+    recipe.
+  idea: Build the flow transform out of a stack of causal Vision Transformer blocks applied to image patches,
+    alternating the autoregression direction between successive blocks so information can flow both ways
+    across the stack, and pair this with training-time Gaussian noise augmentation, a Tweedie's-formula
+    denoising step at sampling time, and a guidance mechanism, so that the resulting model is a stand-alone,
+    exactly-invertible flow competitive with diffusion.
+  method: 'The whole model (TarFlow) is trained end to end by maximum likelihood; nothing is frozen. Each
+    of T stacked flow blocks does: permute the patch sequence (reverse order, alternating with identity/reverse
+    across blocks), then apply a causal affine coupling transform where a causal ViT predicts a per-position
+    shift mu and log-scale alpha from only the preceding positions in the permuted order, and the current
+    position is rescaled by these. Rather than training only on quantization-dequantization noise, the
+    model is trained on data convolved with a larger Gaussian (sigma around 0.05-0.15 depending on task,
+    versus a dequantization bin of about 0.002) which stretches the support of the training distribution;
+    at sampling time a training-free Tweedie''s-formula denoising step (x = y + sigma^2 * grad_y log p_model(y))
+    removes this added noise from generated samples. For class-conditional guidance the model interpolates
+    the predicted mu/alpha between class-conditioned and null-conditioned (label dropped with probability
+    0.1 during training) passes, CFG-style, with an optional linear schedule of the guidance weight across
+    the T blocks. For unconditional guidance, since there is no label to drop, the paper instead scales
+    the temperature of the attention softmax in a second forward pass and interpolates the affine parameters
+    between temperature 1 and temperature tau.'
+  evidence: On unconditional ImageNet 64x64 likelihood estimation, a [patch2-ch768-8 flows-8 layers] TarFlow
+    trained with dequantization noise gets 2.99 bits-per-dimension, beating the prior best (NFDM, 3.20
+    BPD) by a wide margin, versus 3.69 for Flow++ and 3.81 for Glow. On class-conditional ImageNet 64x64
+    FID with denoising and guidance weight w=2, TarFlow reaches 2.90 FID versus ADM(dropout) at 2.09 and
+    EDM at 1.55 -- close to but not beating strong diffusion baselines. On unconditional ImageNet 64x64
+    FID, TarFlow gets 18.42, clearly behind AGM (10.07) and FM (13.93) at that budget -- so the paper's
+    own numbers show it is not yet state-of-the-art unconditionally. On conditional ImageNet 128x128,
+    a [patch4-ch1024-8-8] model with noise sigma 0.15 reaches 5.03 FID versus Simple Diffusion at 1.94
+    and ADM-G at 2.97. Training used 8 to 32 GPUs for up to 200-320 epochs (14 days), batch sizes 256-768;
+    sampling 32 images from the IN64 model takes about 2 minutes on a single A100 with KV-caching. No
+    explicit denoising step count or classifier-free-guidance-interval is reported (guidance interval
+    as a separate hyperparameter from weight is not used here); the model produces samples in a single
+    sequential autoregressive pass per flow block rather than an iterative denoising loop, so 'step count'
+    does not directly map onto the diffusion notion of sampling steps.
+  limitations: The paper concedes that reverse (sampling) is inevitably sequential along the autoregression
+    direction, unlike training which is parallel, and states that efficient sampling was explicitly not
+    the focus of this work, leaving room for improvement. The Tweedie denoising step is more memory-intensive
+    than a plain flow reverse pass because it needs cached activations for backpropagation through the
+    score. Parameter counts are not reported, there is no direct wall-clock or FLOP comparison against
+    diffusion baselines, and the guidance-schedule search is limited to a linear schedule. On the unconditional
+    ImageNet 64x64 FID metric the model still trails the diffusion baselines it compares against by a
+    wide margin (18.42 vs 10.07), so the claim of 'comparable to diffusion' sample quality holds most
+    clearly in the conditional and likelihood settings, not universally.
+  why_it_matters: 'It shows normalizing flows were not fundamentally uncompetitive, only architecturally
+    stale, and gives the field a flow model with exact likelihoods and diffusion-comparable conditional
+    sample quality in one stand-alone architecture. This directly seeds a new architecture line: the causal-ViT
+    autoregressive-flow block introduced here is the component that STARFlow and STARFlow2 later scale
+    and fuse with language models.'
+  depth: full-text

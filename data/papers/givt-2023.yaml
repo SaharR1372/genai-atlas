@@ -44,3 +44,67 @@ abstract: 'We introduce Generative Infinite-Vocabulary Transformers (GIVT) which
   outperforms VQ-GAN (and improved variants thereof) as well as MaskGIT, and achieves performance competitive
   with recent latent diffusion models. Finally, we obtain strong results outside of image generation when
   applying GIVT to panoptic segmentation and depth estimation with a VAE variant of the UViM framework.'
+explained:
+  before: The dominant recipe for using transformers in image generation was to first learn a discrete
+    codebook with a VQ-VAE/VQ-GAN, then train a transformer (causal, as in VQ-GAN, or masked/bidirectional,
+    as in MaskGIT) to model the resulting discrete token sequence. Vector quantization introduces its
+    own approximation error and codebook-design choices, and forces every image to be represented as a
+    sequence of discrete symbols even though the underlying latent representation is naturally continuous.
+  problem: Model a sequence of real-valued (continuous) latent vectors directly with a transformer, without
+    quantizing them into a finite vocabulary first, while keeping the same causal or masked training recipes
+    that made discrete-token transformers work.
+  idea: 'Replace only two components of a standard decoder-only transformer: swap the finite-vocabulary
+    embedding lookup for a linear projection of continuous input vectors, and swap the categorical output
+    head (softmax over a codebook) for the parameters of a multivariate Gaussian mixture model, so the
+    transformer can be trained by ordinary negative-log-likelihood on the unquantized latent sequence
+    of a beta-VAE instead of a VQ-VAE.'
+  method: 'A continuous beta-VAE (Gaussian encoder and prior, reparameterized sampling, trained with a
+    mix of MSE, perceptual, and GAN losses, with the beta coefficient controlling KL regularization strength
+    on the latent) is trained first to produce a sequence of real-valued latent vectors per image (latent
+    dimension d=16 in the main experiments, beta=5e-5). A BERT-Large-sized transformer (24 layers, 16
+    heads, MLP hidden dim 4096, embedding dim 1024) is then trained on these latent sequences in two variants:
+    GIVT-Causal, which flattens the latent grid row by row and predicts each d-dimensional vector conditioned
+    on all previous vectors under a causal attention mask (mirroring VQ-GAN''s setup), and GIVT-MaskGIT,
+    which trains with random masking and gradual unmasking at inference (mirroring MaskGIT). At every
+    output position the transformer predicts the 3dk parameters of a k-component Gaussian mixture per
+    dimension (means, softplus-activated scales, softmax-activated mixture weights) rather than logits
+    over a codebook; the paper finds no clear benefit from k>1 mixture components for image generation,
+    so the default is effectively a single diagonal Gaussian per position. The whole GIVT+VAE pipeline
+    is trained by cross-entropy (equivalently, negative log-likelihood) on the continuous distribution.
+    At inference, guidance is implemented as Distribution-Based Classifier-Free Guidance (DB-CFG): the
+    model is run twice per step, once conditioned on the true class and once on a null class, and rejection
+    sampling (up to 1000 samples) draws from the resulting unnormalized CFG distribution since a closed-form
+    CFG sample is not available for a mixture output.'
+  evidence: On class-conditional ImageNet 256x256, the best GIVT-Causal configuration (temperature t=0.95
+    plus DB-CFG=0.5, 256 sequential steps since generation is one token position at a time) reaches FID
+    4.29, versus a VQGAN baseline (top-k sampling, guidance 0.05, 256 steps) at FID 5.20 and a MaskGIT
+    baseline (CFG=0.1, 16 steps) at FID 4.51; a diffusion reference (DiT-XL/2-G, CFG=1.50, 250 steps)
+    reaches FID 2.27, so GIVT-Causal beats the VQ-based non-diffusion baselines but trails the diffusion
+    baseline. Without any guidance or temperature tricks, GIVT-Causal alone scores a much weaker 12.64
+    FID, showing most of the gain comes from DB-CFG and temperature scaling rather than the base model.
+    GIVT-MaskGIT with DB-CFG=0.2 and 16 inference steps reaches FID 5.57, close to but slightly behind
+    the raw MaskGIT-with-guidance baseline's 4.51 FID at the same 16 steps. At 512x512, GIVT-MaskGIT with
+    DB-CFG=0.2 (16 steps) reaches FID 5.81, ahead of the paper's own MaskGIT baseline at that resolution
+    (7.80 FID, 16 steps). Unconditional ImageNet generation with GIVT-Causal plus beam search (4 beams/1
+    fan) and temperature 0.95 reaches 24.95 to 17.67 FID depending on configuration (17.67 with the beam+temperature
+    combination). No diffusion-style guidance interval (as opposed to a single DB-CFG weight) is reported
+    anywhere in the paper -- guidance here is a single scalar strength applied uniformly, not scheduled
+    over an interval.
+  limitations: 'The paper''s own DB-CFG mechanism needs rejection sampling because there is no closed-form
+    way to sample from the unnormalized CFG-adjusted Gaussian-mixture distribution, and it notes that
+    full covariance modeling of the GMM output would make DB-CFG intractable, so they restrict to diagonal
+    covariance. Beyond image generation, GIVT is applied to panoptic segmentation and depth estimation
+    via the UViM framework, but results are mixed: on COCO panoptic segmentation, GIVT''s inference-time
+    PQ (40.2) beats the VQ-based UViM baseline (39.0) by a small margin, while on NYU Depth v2, GIVT''s
+    inference-time RMSE (0.474) is slightly worse than the VQ baseline (0.459), so GIVT does not uniformly
+    outperform the discrete baseline outside image generation. The paper states only that GIVT can, in
+    principle, model any sequence of feature vectors but concedes it can be challenging to model sequences
+    that are prohibitively long or follow a complex distribution, and does not give a systematic account
+    of failure cases beyond that. The authors explicitly leave extension to other modalities such as audio
+    and time-series as future work rather than something demonstrated in this paper.'
+  why_it_matters: It shows a second, independent route (alongside diffusion-loss-based continuous-token
+    models) to removing vector quantization from transformer-based image generation -- a linear-projection
+    input plus Gaussian-mixture output head -- that is competitive with VQ-based discrete-token baselines
+    and reuses the same causal or masked training recipes those baselines used, predating and sitting
+    alongside the MAR line of continuous-token autoregressive models as a sibling formulation.
+  depth: full-text

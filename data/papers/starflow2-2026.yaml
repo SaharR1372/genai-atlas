@@ -45,3 +45,65 @@ abstract: Deep generative models have advanced rapidly across text and vision, m
   KV-cache without re-encoding. Experiments demonstrate strong performance across image generation and
   multimodal understanding benchmarks, validating autoregressive flows as a viable foundation for unified
   multimodal modeling.
+explained:
+  before: 'Unified multimodal generation systems that both understand and generate interleaved text and
+    images had converged on pairing an autoregressive language model for text with a diffusion-based image
+    generator, glued together (e.g. via a mixture-of-transformers or cross-attention bridge). This leaves
+    a structural mismatch: text generation is causal and single-pass with a KV-cache, while image generation
+    is iterative denoising over many steps with no natural causal structure, so visual outputs cannot
+    enter the language model''s cache the way text tokens do without extra re-encoding.'
+  problem: Design a unified architecture where the visual generator shares the same causal, KV-cacheable,
+    left-to-right computational structure as the language model, so that generated visual tokens can be
+    consumed by later steps exactly like generated text tokens, without a separate diffusion sub-process.
+  idea: Because an autoregressive normalizing flow (TarFlow) is itself a stack of causal Transformer blocks
+    with the same causal mask and KV-cache mechanism as an LLM, it can be vertically interleaved with
+    a pretrained vision-language model stream through residual skip connections operating under one shared
+    causal mask, so text and flow-generated visual latents both live in the same sequence and cache.
+  method: 'The architecture (Pretzel) has two streams under one causal mask: a frozen pretrained VLM (Qwen2.5-VL-7B-Instruct)
+    that processes the full interleaved text-image sequence, and a trainable TarFlow stream of causal
+    affine-coupling blocks that models visual latents autoregressively. They exchange information at every
+    position through zero-initialized projections: the VLM''s hidden state is injected into the flow stream
+    as a conditioning signal, and the flow stream''s correction is injected back into the VLM''s output
+    distribution. A ''deep-shallow'' design splits the flow into shallow visual-only blocks (alternating
+    scan directions) that first transform FAE latents into a simpler intermediate representation, and
+    a single deep autoregressive pass that models that intermediate representation conditioned on the
+    full multimodal context. The FAE (Feature Auto-Encoder) is a frozen encoder built on DINOv2-g/14 features
+    that supplies one shared continuous latent space used both as the VLM''s visual input and as the flow''s
+    generation target. The VLM and FAE are frozen throughout; the deep TarFlow (24 transformer layers,
+    width 3072), the shallow flow blocks (2 blocks of 4 layers each, width 3072), a visual adapter (one
+    MLP plus one FiLM layer), and the zero-initialized skip connections are trained, in three stages (adapter
+    and skip connections only activate/train in later stages), for 3.6B trainable parameters total on
+    top of the 10.6B-parameter full model. Because generated visual latents are produced in the FAE/flow''s
+    own causal pass and mapped once through the adapter into VLM representation space, they enter the
+    shared KV-cache directly rather than needing to be re-encoded by a separate vision encoder.'
+  evidence: At 10.6B total parameters and 256x256 resolution, STARFlow2 reports GenEval overall 0.82 (Single
+    Object 0.99, Two Objects 0.89, Counting 0.84, Colors 0.80, Position 0.86, Color Attributes 0.56),
+    matching BAGEL-14B (0.82) and FLUX.1[dev]-12B (0.82) and beating Janus-Pro-7B (0.80), though trailing
+    TUNA-7B (0.90) and Mogao-7B (0.89). On DPG-Bench it scores 84.94 overall, ahead of Mogao-7B (84.33)
+    and BLIP3-o-8B (81.60), but behind BAGEL-14B (85.07), Show-o2-7B (86.14), and TUNA-7B (86.76). On
+    multimodal understanding it scores MME-P 1528.8, GQA 55.8, SEED-Bench 71.1, MMBench-en 71.5, MMMU-val
+    44.7, AI2D 67.7, notably below its own frozen backbone Qwen2.5-VL-Instruct (MME 1677.9, GQA 60.7,
+    SEED 83.8) and below BAGEL-14B on SEED/MMMU -- so joint training costs some understanding quality
+    relative to the frozen VLM alone. An ablation (their Table 4) shows joint Stage-3 training lifts GenEval
+    from 0.51 (Stage-1, text-to-image only) to 0.82 and DPG-Bench from 82.02 to 84.94. Training used 64
+    H100 GPUs, global batch size 1024, AdamW, learning rate 1e-4 (stages 1-2) then 5e-5 (stage 3), bfloat16.
+    No guidance scale, guidance interval, or sampling step count is reported because flow-based visual
+    generation here is a single autoregressive pass, not iterative denoising, so the diffusion-style guidance/step
+    axis this atlas tracks does not apply to this paper's own image-generation numbers.
+  limitations: The paper concedes the multi-stage training procedure adds complexity and risk of under-optimization
+    at each stage. Image quality and fine-grained fidelity (including text rendering) are bounded by the
+    frozen FAE latent space, since the flow can only be as good as the representation it is decoding.
+    STARFlow2 is not state-of-the-art on every benchmark (it trails TUNA-7B and Mogao-7B on GenEval, and
+    several 7B/14B baselines on DPG-Bench and multimodal understanding scores), and the authors attribute
+    the gap to needing more data scale, training stability, and better visual representation learning.
+    A reported ablation shows that naively combining the VLM and TarFlow via horizontal mixture-of-transformers-style
+    fusion fails in two ways -- freezing the VLM while training only the flow branch degrades generation
+    quality, while jointly finetuning the VLM collapses its understanding performance (MME drops to roughly
+    800) -- which the paper uses to justify its vertical, skip-connection design instead, but which also
+    shows the naive alternative genuinely does not work.
+  why_it_matters: 'It turns TarFlow''s causal-Transformer structure into a load-bearing architectural
+    fact: because a normalizing flow can share a literal KV-cache with a language model, it offers a route
+    to unified multimodal generation without the causal/diffusion structural mismatch that other unified
+    models carry, at the cost (shown in their own ablations) of some loss in multimodal understanding
+    relative to the frozen backbone.'
+  depth: full-text

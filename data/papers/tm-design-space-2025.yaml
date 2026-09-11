@@ -48,3 +48,70 @@ abstract: Transition Matching (TM) is an emerging paradigm for generative modeli
   image aesthetics. Lastly, we believe the experiments presented highlight the design aspects that are
   likely to provide most quality and efficiency gains, while at the same time indicate what design choices
   are not likely to provide further gains.
+explained:
+  before: Transition Matching had been proposed as a generalization of diffusion, flow matching, and continuous-state
+    autoregressive models, using a large backbone plus a small 'head' module to make the internal transition
+    step tractable, but the design choices for that head -- its architecture, size, how it scales with
+    sequence length, its time weighting, and how to sample from it -- had not been systematically studied;
+    practitioners had no evidence-based guidance on which of these choices actually improve quality or
+    efficiency.
+  problem: Systematically map the design space of the Transition Matching head and its sampler to find
+    which architectural and training choices genuinely improve generation quality or efficiency, and which
+    do not, for the time-continuous bidirectional (difference) variant of TM.
+  idea: Train a large, fixed text-to-image backbone once and vary only the head module -- its architecture
+    (MLP, convolutional, or Transformer), its size, a learned 'sequence scaling' that expands each token
+    into several head-internal tokens, its batch size, its time weighting, and a family of stochastic
+    samplers parameterized by how often (frequency) and how strongly (scale) they inject noise during
+    the inner sampling loop -- across dozens of controlled training runs, so that the effect of each axis
+    can be isolated.
+  method: 'The backbone is a fixed DiT with 24 self- and cross-attention layers and hidden dimension 2048,
+    trained on 350M text-image pairs at 256x256 resolution (encoded to 16x16x16 latents via an SDXL-VAE)
+    for 500k iterations with standard classifier-free guidance; only the head module varies across the
+    56 trained 1.7B-parameter models. The head is trained by flow matching to predict the difference target
+    Y = X1 - X0 given the backbone''s latent representation of the current state, and three head architectures
+    are compared: an MLP acting independently per image token, a 2D convolution over the token grid, and
+    a Transformer with attention across tokens; head hidden width is swept over {768, 1024, 1280, 1536,
+    2048} with matched layer counts {6, 6, 8, 12, 16}. A learned linear ''sequence scaling'' layer maps
+    each backbone token into l head-internal tokens, with l tested in {1, 4, 9, 16, 25, 36}. Head batch
+    size k_h is swept over {1, 4, 16, 64}. A family of stochastic samplers is defined by injecting Gaussian
+    noise into the intermediate state at a controllable frequency tau (how many of the 32x32 backbone-times-head
+    sampling steps receive injected noise) and scale c (how much of the remaining time-to-target the noise
+    step advances); tau=32 is the ''high frequency'' setting (noise at nearly every step) and tau=1 is
+    the ''low frequency'' setting (noise almost never). All 549 resulting evaluations are scored on 25
+    metrics across four prompt sets (MS-COCO, PartiPrompts, GenEval, T2I-CompBench) and aggregated into
+    a single composite rank in [0,1].'
+  evidence: The best overall configuration (DTM++) uses an MLP head, no sequence scaling (l=1), head batch
+    size 16, log-normal time weighting for both backbone and head, and a high-frequency stochastic sampler
+    (tau=32, c=0.2), reaching composite rank 0.66, versus 0.36 for a baseline D-TM configuration (MLP
+    head, l=1, batch size 4, uniform time weighting, deterministic/linear sampling) and 0.28 for an FM
+    log-normal baseline. On MS-COCO, DTM++ scores CLIPScore 26.3, PickScore 21.5, Aesthetic 5.78, ImageReward
+    0.47, versus the FM baseline's CLIPScore 26.2, PickScore 21.3, Aesthetic 5.67, ImageReward 0.3. A
+    runner-up configuration (DTM+) uses a Transformer head with sequence scaling l=4, batch size 16, and
+    a low-frequency sampler (tau=1, c=0.8), reaching rank 0.58 and the highest MS-COCO aesthetic score
+    of the compared configurations, 5.88 versus DTM++'s 5.78, confirming the paper's claim that the Transformer-with-sequence-scaling/low-frequency-sampling
+    combination excels specifically at aesthetics. On GenEval, DTM++ and DTM+ both score 0.58 overall
+    versus 0.52 for FM log-normal; on T2I-CompBench, DTM++ scores 0.4625 and DTM+ scores 0.4487 versus
+    0.4332 for FM log-normal. For inference cost, the paper reports FM's own peak performance requires
+    32 midpoint sampling steps (64 function evaluations, about 4 seconds), whereas the D-TM-MLP configuration
+    reaches a higher composite rank in about 0.8 seconds, a roughly 5x wall-clock speedup at matched or
+    better quality. A 'Dense' ablation, which reuses the backbone itself for the head role instead of
+    a small separate module, reaches only rank 0.25, well below any D-TM head variant. No single fixed
+    classifier-free-guidance scale or guidance interval value is stated in the main results tables; the
+    paper says only that standard CFG was used during training/backbone setup, without giving the numeric
+    scale used at evaluation.
+  limitations: 'The paper explicitly restricts its conclusions to 256-resolution image generation, stating
+    that higher resolutions and other modalities such as video or audio could yield different conclusions.
+    It reports a negative finding it cannot explain: MLP heads give better text-adherence scores than
+    the more expressive Transformer heads, which the authors call an open question. Head size does not
+    correlate strongly with performance even up to a head nearly as large as the backbone, sequence scaling
+    helps Transformer heads but not MLP heads, and head batch size gains plateau past 16 for Transformer
+    heads while slowing training further. Larger sequence-scaling factors for the Transformer head become
+    competitive with the best model at l=36 but were excluded from the main comparison because of prohibitive
+    training cost, so the paper does not fully chart that regime.'
+  why_it_matters: It replaces ad hoc choices in the Transition Matching head and sampler with an evidence-based
+    recipe (small MLP head, no sequence scaling, high-frequency stochastic sampling) that reaches state-of-the-art
+    ranking among tested configurations at roughly 5x lower wall-clock cost than a tuned FM baseline,
+    and separately documents that a Transformer head with low-frequency sampling trades some of that efficiency
+    for better image aesthetics -- turning TM head design from guesswork into a mapped, falsifiable design
+    space at 1.7B scale.
+  depth: full-text

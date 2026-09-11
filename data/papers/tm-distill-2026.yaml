@@ -27,9 +27,10 @@ status:
   verified: true
   verified_on: '2026-09-10'
   verified_by: opus
-summary: Applies transition matching to distil diffusion trajectories into few-step generation. Included
-  as evidence the formulation travels beyond its originating group, though its own target is video and
-  therefore outside this atlas's scope.
+summary: Applies transition matching to distil diffusion trajectories into few-step video generation.
+  Recorded here as evidence the formulation travels beyond its originating group, with the caveat that
+  the paper itself claims only the video result; its own target is video and therefore outside this atlas's
+  scope.
 explanation: null
 abstract: 'Large video diffusion and flow models have achieved remarkable success in high-quality video
   generation, but their use in real-time interactive applications remains limited due to their inefficient
@@ -46,3 +47,64 @@ abstract: 'Large video diffusion and flow models have achieved remarkable succes
   Wan2.1 1.3B and 14B text-to-video models demonstrate that TMD provides a flexible and strong trade-off
   between generation speed and visual quality. In particular, TMD outperforms existing distilled models
   under comparable inference costs in terms of visual fidelity and prompt adherence. Project page: https://research.nvidia.com/labs/genair/tmd'
+explained:
+  before: Large video diffusion and flow models produce high-quality video but need many sequential denoising
+    steps, which makes them too slow for real-time interactive use. Prior distillation methods (e.g. Distribution
+    Matching Distillation variants, consistency-style methods) compress diffusion sampling into one or
+    a few steps but tend to trade away visual fidelity and prompt adherence as the step count drops toward
+    one or two.
+  problem: Distill a large pretrained video diffusion/flow model into a fast few-step generator without
+    the fidelity and prompt-adherence losses that existing few-step distillation methods incur.
+  idea: Split the frozen teacher's stack into a large early-layer backbone that computes a semantic representation
+    once per outer step and a small late-layer 'flow head' that performs several lightweight inner flow
+    updates conditioned on that representation, so the student gets more effective refinement per expensive
+    backbone evaluation; train this student first with a MeanFlow-style objective and then refine it with
+    distribution matching distillation that backpropagates through the full unrolled inner-flow rollout.
+  method: 'The teacher (Wan2.1 1.3B or 14B text-to-video) is frozen throughout. The student architecture
+    reuses the teacher''s early layers as the main backbone and its final few DiT blocks (e.g. 5 of 30
+    blocks for the 1.3B model) as the flow head, which is adapted into a conditional flow map that predicts
+    a transition from an inner noisy state at time s to an earlier time r, conditioned on the backbone''s
+    feature at the current outer step. Stage 1 (TM-MeanFlow) trains this flow head with a MeanFlow-style
+    objective using a finite-difference approximation of the average velocity along trajectory segments.
+    Stage 2 applies an improved distribution-matching-distillation variant (DMD2-v): a fake-score network
+    (initialized from the teacher) and a lightweight Conv3D GAN discriminator are trained alongside the
+    student, combining a variational-score-distillation (reverse-KL) loss and a GAN loss; critically,
+    the inner flow steps are unrolled during this stage so gradients backpropagate through the entire
+    multi-step generation trajectory, closing the train/inference mismatch that would otherwise exist
+    between a rollout used at inference and a single-step loss used at training.'
+  evidence: 'Experiments distill Wan2.1 1.3B and 14B text-to-video models at 480x832 resolution, 81 frames,
+    using 500k text-video pairs (479k after filtering), evaluated on VBench. Guidance settings: classifier-free
+    guidance scale 5 during DMD2-v distillation and 3 during TM-MeanFlow pretraining (no separate guidance
+    interval is reported). On the 1.3B model, the teacher (50x2 NFE) scores VBench overall 84.26; TMD-N2H5
+    at an effective 2.33 NFE scores 84.68 overall, ahead of a 4-step rCM baseline (84.43) and a 4-step
+    DMD2-v baseline (84.60) at nominally higher step counts. At close to one step, TMD-N2H5 at effective
+    NFE 1.17 scores 83.80 overall versus 1-step rCM at 82.65 and 1-step DMD2-v at 83.24. On the 14B model,
+    the teacher (50x2 NFE) scores 86.22 overall; TMD-N4H5 at effective NFE 2.75 scores 84.62, which the
+    paper concedes does not beat the 2-step rCM (85.05) or 2-step DMD2-v (84.79) baselines at comparable
+    cost, though it still beats 4-step DMD2-v; at effective NFE 1.38, TMD-N4H5 scores 84.24 versus 1-step
+    rCM (83.02) and 1-step DMD2-v (83.69). A human preference study on 60 challenging VBench prompts (55
+    videos per prompt) on the 14B model found TMD preferred over the comparison baseline 63.26% of the
+    time for visual quality and 63.37% for prompt alignment at one step, and 51.85% / 71.97% at two steps.
+    An ablation (their Table 6) shows the TM-pretraining-only variant scores 84.61 versus 84.68 for the
+    full TM-MeanFlow variant on the same N2H5 configuration -- a small, not dramatic, difference.'
+  limitations: 'The paper concedes video''s high spatiotemporal dimensionality and complex inter-frame
+    dependencies make it hard to preserve both global motion coherence and fine spatial detail during
+    distillation, and that MeanFlow alone struggles with the large trajectory curvature of the video domain,
+    which is why the second distillation stage is needed. The method requires two separate training stages
+    rather than one, which the authors list as future work to unify. On the larger 14B model, the effective-NFE-2.75
+    configuration does not outperform 2-step baselines, showing the method''s advantage shrinks at higher
+    model and step scale. A knowledge-distillation warmup improves one-step generation but measurably
+    degrades two-step generation (83.79 vs 84.39 in their ablation), a trade-off the paper does not fully
+    resolve. On the specific question of whether this validates transition matching as a general-purpose
+    principle: the paper itself does not make that claim -- it explicitly frames its contribution as extending
+    TM to large-scale video and to a distillation setting rather than training a multi-step TM model from
+    scratch, and its own ablation shows plain TM pretraining is nearly as good as the added MeanFlow objective,
+    so the results read as a domain-specific application of the TM head/flow-map machinery to video distillation
+    rather than a demonstration that transition matching itself is superior in general.'
+  why_it_matters: For this atlas it is evidence that the transition-matching backbone/head mechanism is
+    reusable outside its originating context (here repurposed for distilling an existing video diffusion
+    model rather than training a generator from scratch), but the paper's own numbers and framing stop
+    short of claiming this proves TM's superiority as a general paradigm; video generation itself is out
+    of this atlas's content scope, so the paper is included only as evidence the TM formulation travels,
+    not as a covered result in its own right.
+  depth: full-text

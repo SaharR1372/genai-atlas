@@ -44,3 +44,68 @@ abstract: Flow Matching (FM) underpins many state-of-the-art generative models, 
   FM when the target distribution has well-separated modes and non-negligible variances. We validate our
   theoretical results with controlled experiments on Gaussian distributions, and extend the comparison
   to real-world applications in image and video generation.
+explained:
+  before: 'Transition Matching (TM) had been introduced and shown, empirically, to reach higher generation
+    quality than Flow Matching (FM) with fewer sampling steps by replacing the deterministic Euler update
+    of FM with a small internal generative ''head'' that samples a stochastic transition at each outer
+    step. That empirical advantage had no accompanying theory: it was not known under what conditions
+    TM should beat FM, or why, which made the claim hard to trust as a general property rather than a
+    benchmark artifact of the specific models it was first shown on.'
+  problem: Give a precise, provable account of when and why Transition Matching outperforms Flow Matching,
+    rather than relying on empirical comparisons alone.
+  idea: For a unimodal Gaussian target, FM's deterministic Euler updates provably under-shoot the target
+    covariance at any finite step count, while TM's stochastic difference-latent updates add back exactly
+    the variance needed to track the target covariance, so TM attains strictly lower KL divergence to
+    the true target at every finite step budget; this unimodal result is then extended to Gaussian mixtures
+    by showing it holds locally whenever a sample's trajectory stays close to one well-separated mode.
+  method: 'This is a theory paper for its core contribution: no model is trained to derive Theorem 1 (the
+    unimodal Gaussian KL comparison) or Theorem 2 / Proposition 1 (the Gaussian-mixture local-unimodality
+    extension). The authors derive closed-form recursions for the variance ratio of the FM sampler (which
+    contracts geometrically below the target variance) and the TM sampler (which adds a stochastic term
+    at each inner step that lets the ratio converge toward but not exceed 1), then show the KL functional
+    is monotonic in that ratio, giving strictly lower KL for TM at any finite outer step count N and inner
+    step count S, with asymptotic rates O(1/N^2) for FM versus O(1/(N^2 S^2)) for TM. For the mixture
+    case they bound the total-variation distance between the true difference-latent posterior and its
+    single-component approximation, showing the error shrinks exponentially in the squared minimum separation
+    between mixture means, and define a ''good region'' condition on the sampling trajectory under which
+    the unimodal advantage transfers. Separately, to validate the theory on real data, the authors train
+    actual generative models: a DiT backbone with an MLP flow head, trained by both FM and TM objectives
+    on ImageNet-10K at 256x256 (KL-16 VAE latents, 400 epochs) for class-conditional image generation,
+    and on Kinect-600 at 128x128 for frame-conditioned video generation (360k training steps), comparing
+    against History-Guided Diffusion as the FM baseline.'
+  evidence: 'The paper''s authors are Jaihoon Kim (KAIST, work done during an internship at Amazon Web
+    Services), Rajarshi Saha (Amazon Web Services, corresponding author), Minhyuk Sung (KAIST), and Youngsuk
+    Park (Amazon Web Services) -- KAIST and Amazon Web Services only, with no Meta or Meta AI/FAIR affiliation
+    listed anywhere in the paper. This confirms the atlas''s framing: it is genuinely independent third-party
+    validation of transition matching, not an assessment by the originating lab. Empirically, on a synthetic
+    bimodal Gaussian-mixture target, TM attains lower KL than FM in the low-step, low-wall-clock-time
+    regime (under about 0.002 seconds), with the TM advantage growing as the mixture components are placed
+    farther apart, matching the theory. On ImageNet-10K 256x256 class-conditional generation (Inception
+    Score and FID over 50,000 samples), FM was run at N in {16, 32, 64, 96} steps while TM was run at
+    a fixed N=16 outer steps with inner steps S in {2, 4, 8, 16}; TM sits on a Pareto frontier above FM,
+    and TM with S=2 reaches an Inception Score comparable to FM at N=64, a reported 2.3x wall-clock speedup.
+    On Kinect-600 128x128 frame-conditioned video generation (Fréchet Video Distance), TM at fixed N=16
+    with S in {12, 16, 20} again dominates the FM/History-Guided-Diffusion Pareto front at matched compute;
+    the authors note this is the first application of TM to video generation. No classifier-free-guidance
+    scale or guidance interval is reported for either the image or video experiments, and no comparable
+    guidance settings are given for the FM baselines beyond step count, so guidance is not a controlled
+    variable in this paper''s empirical section.'
+  limitations: 'The paper is explicit about scope: the core theorems are proved only for Gaussian and
+    Gaussian-mixture targets, and the authors state real, high-dimensional data distributions are not
+    directly covered by the analysis. The TM advantage vanishes as the target variance approaches zero,
+    since the difference-latent distribution collapses to a Dirac delta and TM''s update reduces to the
+    FM update; the authors call this limiting regime ''of little interest.'' The mixture-case result requires
+    sample trajectories to stay inside a defined ''good region'' of sufficient separation from other modes,
+    which need not hold for closely spaced modes. For the real image and video experiments, the authors
+    explicitly flag that the link to their theory is a hypothesis, not a proven claim: ''we hypothesize
+    that conditional inputs (e.g., class labels, reference frames) reshape the target into well separated
+    modes with non-negligible component variance,'' with no theoretical guarantee that real conditional
+    distributions actually have this structure. They also note their compute-cost comparison assumes the
+    backbone evaluation cost is the same for FM and TM, which may not hold when architectures differ.
+    The paper makes no claims about autoregressive, VAE-based, language-model, or non-image/video domains.'
+  why_it_matters: It converts transition matching's step-efficiency advantage from an empirical claim
+    made by its originating group into a provable, mechanistically explained property (stochastic variance-preserving
+    updates versus deterministic variance-contracting ones) that a fully independent group outside Meta
+    could derive and verify on its own generative models, which is exactly the kind of validation this
+    atlas treats as strengthening a claim beyond a single lab's self-report.
+  depth: full-text

@@ -26,8 +26,9 @@ arc:
     does next-token text prediction.
 - paper: fluid-2024
   role: scaling
-  note: Scales the recipe to text-to-image and finds continuous tokens beat discrete ones as models grow,
-    with random generation order.
+  note: Scales the recipe to text-to-image at up to 10.5B parameters with random generation order. Continuous
+    tokens win at every scale tested, though the paper stops short of claiming the margin grows, and reports
+    GenEval plateauing past 3.1B.
 - paper: resurrect-mar-2025
   role: evidence
   note: Isolates the tokenizer and bidirectional architecture, not the objective, as what actually limits

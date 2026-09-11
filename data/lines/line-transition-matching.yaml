@@ -24,7 +24,9 @@ arc:
   note: Sweeps the head design across 56 models at 1.7B scale to find which configurations actually work.
 - paper: tm-distill-2026
   role: improvement
-  note: Shows the formulation travels to other groups and other modalities.
+  note: Extends transition matching to distilling video generation. Its own ablation shows plain TM pretraining
+    nearly matches the full TM-MeanFlow objective, and it claims only the narrow video result, not a general
+    validation of the paradigm.
 strengths:
 - Offers a single formalism where the field currently has two separate camps
 - From the group that introduced flow matching, so the theoretical framing is credible

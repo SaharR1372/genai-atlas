@@ -36,10 +36,12 @@ status:
   verified: true
   verified_on: '2026-09-10'
   verified_by: opus
-summary: Scales the continuous-token autoregressive recipe to text-to-image and finds continuous tokens
-  with random generation order beat discrete tokens as models grow. Shares authors with MAR and is the
-  direct large-scale test of that paper's bet, which makes its absence from this atlas until now the clearest
-  single coverage failure the audit found.
+summary: Scales the continuous-token autoregressive recipe to text-to-image at up to 10.5B parameters
+  with random generation order, finding continuous tokens consistently better than discrete ones at every
+  scale tested. The paper is careful not to claim the gap widens with scale, and reports GenEval plateauing
+  from 3.1B to 10.5B while FID keeps improving. Shares authors with MAR and is the direct large-scale
+  test of that paper's bet, which makes its absence from this atlas until now the clearest single coverage
+  failure the audit found.
 explanation: null
 abstract: 'Scaling up autoregressive models in vision has not proven as beneficial as in large language
   models. In this work, we investigate this scaling problem in the context of text-to-image generation,
@@ -54,3 +56,60 @@ abstract: 'Scaling up autoregressive models in vision has not proven as benefici
   a new state-of-the-art zero-shot FID of 6.16 on MS-COCO 30K, and 0.69 overall score on the GenEval benchmark.
   We hope our findings and results will encourage future efforts to further bridge the scaling gap between
   vision and language models.'
+explained:
+  before: Autoregressive transformers scale predictably and beneficially in language modeling, but prior
+    attempts to scale autoregressive vision models had not shown the same clean benefit, and it was unclear
+    which of several confounded design choices -- discrete VQ tokens versus continuous tokens, and fixed
+    raster-order (GPT-like, causal) versus random-order (BERT-like, bidirectional-with-masking) generation
+    -- was responsible for autoregressive vision models under-delivering relative to their language counterparts.
+  problem: Isolate whether token type (discrete vs. continuous) and generation order (raster vs. random)
+    are the factors holding back autoregressive text-to-image scaling, and determine which combination
+    scales best.
+  idea: Train the full 2x2 cross-product of discrete-vs-continuous tokens and raster-vs-random generation
+    order across a range of model sizes and measure validation loss against downstream evaluation metrics
+    separately, since the paper's central empirical finding is that continuous tokens give better visual
+    quality and random order gives better prompt-following (GenEval), which motivates combining both into
+    a single random-order, continuous-token model (Fluid) and scaling it up.
+  method: 'Four autoregressive variants are trained: GPT-like raster-order with discrete tokens, GPT-like
+    raster-order with continuous tokens, BERT-like random-order with discrete tokens, and BERT-like random-order
+    with continuous tokens, at model sizes 150M, 369M, 665M, 1.1B, 3.1B, and 10.5B parameters, on a subset
+    of the WebLI image-text dataset (images center-cropped and resized to 256x256), for 1M training steps
+    (about 3 epochs) at batch size 2048. Validation loss is tracked on 30K MS-COCO 2014 images and found
+    to scale predictably with model size for all four variants alike. Based on the finding that continuous
+    tokens give better visual quality and random order gives better GenEval scores, the paper trains Fluid,
+    the random-order continuous-token variant, up to 10.5B parameters, and evaluates it with classifier-free
+    guidance scale omega=5, temperature tau=0.975, and 64 generation steps (random-order models generate
+    iteratively over multiple steps, unlike a single raster pass); no separate guidance interval beyond
+    this single scalar CFG weight is reported.'
+  evidence: 'Fluid''s MS-COCO 30K zero-shot FID improves with scale: 7.23 at 369M, 6.84 at 665M, 6.59
+    at 1.1B, 6.41 at 3.1B, and 6.16 at 10.5B (reported as a new state of the art at that FID setting).
+    GenEval overall score also rises with scale but saturates: 0.62 at 369M, 0.65 at 665M, 0.67 at 1.1B,
+    0.70 at 3.1B, and 0.69 at 10.5B -- the paper explicitly states this plateaus from 3.1B to 10.5B rather
+    than continuing to improve. On the two atlas checks: (A) the paper does NOT claim the continuous-over-discrete
+    quality gap widens as scale grows; it states validation loss scales predictably for all variants but
+    that ''improvements observed in validation loss do not always translate linearly to better evaluation
+    metrics, implying that there is no strict power-law relationship between these metrics and model size,''
+    and documents GenEval plateauing at the largest scale tested -- so the honest claim is that continuous
+    tokens are consistently better than discrete at the scales tested (visual quality in particular),
+    not that the advantage provably grows with scale; readers should not cite this paper for a growing-gap-with-scale
+    claim. (B) Fluid explicitly uses random generation order: the paper states it scales up ''the Fluid
+    model, i.e., random-order model with continuous tokens, up to 10.5B parameters,'' confirming random
+    order, not raster order, is the final model''s design choice, motivated by the random-order variant''s
+    better GenEval scores in the earlier controlled comparison.'
+  limitations: The paper documents concrete failure modes rather than claiming a clean win everywhere.
+    In raster-order continuous-token models, generation can get stuck emitting gray tokens across lower
+    image regions and rarely recovers, which the authors attribute to learned positional embeddings struggling
+    to capture the discontinuity between the end of one raster line and the start of the next. In random-order
+    continuous-token generation, rare 'abnormal bright spot' artifacts appear, which the authors mitigate
+    by increasing diffusion sampling steps from 100 to 200 (a fix that trades compute for quality rather
+    than eliminating the failure mode). GenEval gains explicitly saturate between 3.1B and 10.5B parameters
+    even as FID keeps improving, so the two evaluation metrics do not move together at the largest scale,
+    and the paper concedes there is no strict power-law relationship between validation loss and either
+    FID or GenEval.
+  why_it_matters: It is the direct large-scale controlled test of whether continuous tokens and generation
+    order, not scale itself, were the bottleneck for autoregressive vision models, and it lands on a specific,
+    checkable answer -- continuous tokens win on visual quality and random order wins on GenEval at the
+    scales tested, combined in Fluid -- while also being explicit that the quality gap does not straightforwardly
+    widen with scale on every metric, which is a more qualified claim than the framing 'continuous beats
+    discrete as scale grows' would suggest.
+  depth: full-text
