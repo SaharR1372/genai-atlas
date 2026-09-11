@@ -39,7 +39,9 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          # Astro 7 requires Node >=22.12.0; pinning 20 here is what broke the
+          # first working deploy, and the build error gives no hint why.
+          node-version: "22"
           cache: npm
           cache-dependency-path: site/package-lock.json
 
