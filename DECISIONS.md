@@ -139,3 +139,22 @@ Format: id · date · decision · why · consequences. Revise by adding a new en
   entries, one of them a lie about where it goes, is worse than seven honest ones. The topics index
   also states outright how a topic differs from a research line, because those are the atlas's two
   browse axes and the distinction is not self-evident from the labels alone.
+- **D024 · 2026-09-11 · Published as a GitHub Pages project site at
+  `https://saharr1372.github.io/genai-atlas/`, with the sub-path handled at build time rather than
+  in the source.** The user asked for a public, shareable link. A project site serves from a
+  sub-path, but the atlas writes root-absolute links everywhere: about 30 in `.astro` components and
+  about 150 more inside MDX prose, where `import.meta.env.BASE_URL` is not available at all.
+  Rewriting all of them would have meant 180 edit sites and a permanent trap for anyone writing new
+  prose. Instead `site/base-href.mjs` is a small Astro integration that prefixes root-absolute
+  `href`/`src`/`action` values once, in the emitted HTML, at `astro:build:done`, skipping anything
+  Astro already prefixed. It reports what it rewrote (6741 links across 309 pages) so the step is
+  visible rather than magic. *Why:* the alternative was renaming the repo to `saharr1372.github.io`
+  to get the domain root, which would have claimed the user's entire GitHub user site for one
+  project — their decision to make, not a default to assume. Moving to a custom domain later needs
+  only `SITE_BASE=/`, at which point the integration disables itself.
+- **D025 · 2026-09-11 · Social preview cards are treated as part of the deliverable.** The head
+  already claimed `twitter:card: summary_large_image` while shipping no image and a relative
+  canonical URL, so every shared link would have previewed as a blank card pointing at a relative
+  path. Canonical and `og:url` are now absolute and base-aware, and `site/public/og.png` is a
+  generated 1200x630 card. *Why:* a research atlas that is meant to be shared is judged partly on
+  what the link looks like when it is shared.

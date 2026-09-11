@@ -6,10 +6,16 @@ import Base from "../layouts/Base.astro";
   <div id="search"></div>
   <link href="/pagefind/pagefind-ui.css" rel="stylesheet" />
   <script src="/pagefind/pagefind-ui.js" is:inline></script>
-  <script is:inline>
+  <script is:inline define:vars={{ BASE: import.meta.env.BASE_URL }}>
     window.addEventListener("DOMContentLoaded", () => {
       if (window.PagefindUI) {
-        new PagefindUI({ element: "#search", showSubResults: true });
+        new PagefindUI({
+          element: "#search",
+          showSubResults: true,
+          // Pagefind fetches its index from the site root by default, which is wrong
+          // when the atlas is served from a sub-path. BASE_URL carries the deployed base.
+          bundlePath: `${BASE.replace(/\/$/, "")}/pagefind/`,
+        });
       } else {
         document.getElementById("search").innerHTML =
           '<p style="color:var(--text-muted);">Search index not built yet — run <code>npm run build</code> (which runs Pagefind as a postbuild step) before previewing.</p>';
