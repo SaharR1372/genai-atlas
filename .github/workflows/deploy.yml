@@ -43,11 +43,11 @@ jobs:
           cache: npm
           cache-dependency-path: site/package-lock.json
 
-      # enablement: true turns Pages on for the repo the first time this runs, so the
-      # site can go live without anyone changing repository settings by hand.
+      # `enablement: true` was tried here and fails: it calls POST /repos/{o}/{r}/pages,
+      # which needs admin rights, and the workflow's GITHUB_TOKEN does not have them.
+      # Pages must be switched on once by a repo admin, under
+      # Settings -> Pages -> Build and deployment -> Source: GitHub Actions.
       - uses: actions/configure-pages@v5
-        with:
-          enablement: true
 
       - name: Build
         working-directory: site
