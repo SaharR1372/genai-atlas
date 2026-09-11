@@ -42,3 +42,53 @@ abstract: 'Pixel-space diffusion models directly model image distributions but r
   a decoder that injects scale-specific Gaussian-Lanczos observations across decoding stages for coarse-to-fine
   feature refinement. Extensive experiments show that the proposed approach converges substantially faster
   while consistently improving generation quality, achieving an FID of 1.52 on ImageNet-256.'
+explained:
+  before: 'Pixel-space diffusion models had begun reparameterizing what the network predicts (epsilon,
+    v, or x0, as in JiT), but every such reparameterization still supervised the network against the full
+    clean image at every noise level. The paper argues this is a mismatch: as noise decreases during sampling,
+    only coarse image structure is reliably inferable at first, and fine detail only becomes recoverable
+    later, yet fixed full-image supervision forces the network to fit undeterminable fine detail even
+    under heavy noise.'
+  problem: How to align the training supervision signal with the actual order in which image structure
+    becomes inferable during denoising, rather than always supervising against the full-resolution clean
+    image regardless of noise level.
+  idea: Replace the fixed clean-image target with a time-indexed observation of the clean image that starts
+    coarse and sharpens to the full image as noise decreases, so at every noise level the network is only
+    asked to predict what is actually recoverable at that noise level. The observation operator is built
+    from a family of Gaussian-Lanczos smoothing kernels whose scale is a function of time, and the network's
+    decoder is restructured to refine features through the same coarse-to-fine sequence of scales.
+  method: 'The backbone follows a two-stage Patch-DiT / pixel-decoder design similar to PixelDiT: a 26-block,
+    1152-hidden-dimension Patch-DiT encoder, followed by a 4-block GL-CoDA decoder in which each block
+    pools pixel features, extracts structural responses at a Gaussian-Lanczos scale (four scales total,
+    applied in coarse-to-fine order, with later blocks taking the difference from the previous scale''s
+    response to avoid redundancy), and refines decoder features with these responses via lightweight adapters.
+    The observation operator combines a Lanczos-windowed sinc kernel (sharper scale selectivity) with
+    Gaussian smoothing (suppresses ringing), with kernel width narrowing over time (parameters f0=2, sigma0=1,
+    linear schedule, 15-tap kernel support) until it becomes the identity at t=1. Training uses a path-consistent
+    flow-matching loss against a velocity target that accounts for the observation operator''s own time-derivative,
+    predicted directly as a velocity, plus a REPA representation-alignment loss; everything is trained
+    end to end, prediction target is velocity, and nothing in the description is stated as frozen (REPA
+    implies an external frozen encoder is used for its alignment target, consistent with standard REPA
+    practice, though the paper''s own wording for that encoder was not captured in the fetched text).'
+  evidence: 'On ImageNet 256x256, the model (798M parameters) reaches gFID 1.95 at 80 epochs and gFID
+    1.52 at 260 epochs, with sFID 4.61, IS 300.0, precision 0.78, recall 0.64 at the 260-epoch point.
+    On ImageNet 512x512 (798M parameters), gFID reaches 1.58, sFID 4.86, IS 299.8, precision 0.79, recall
+    0.69. Critically, the fetched paper does not report CFG scale, guidance interval, sampling step count,
+    or NFE for any of these results -- this is a real gap given the atlas''s standard of requiring guidance
+    and budget alongside any FID, and it means the 1.52 and 1.58 numbers cannot currently be compared
+    on equal footing with the other papers in this batch, all of which report their guidance settings.
+    An ablation shows the combined Gaussian-Lanczos kernel outperforms Gaussian-only (FID 2.10) or Lanczos-only
+    (FID 2.08) versions (FID 1.95, all at what appears to be the 80-epoch ablation setting), and that
+    coarse-to-fine ordering of the decoder''s scale injection is important: reversing it to fine-to-coarse
+    costs 0.35 FID (1.95 to 2.30).'
+  limitations: 'The paper states one explicit limitation: ''Our experiments focus on natural images; extending
+    the proposed scale-aware framework to specialized domains such as medical imaging is a promising direction
+    for future work.'' No other limitations about computational cost, failure cases, or missing guidance/step
+    reporting are discussed in the fetched text.'
+  why_it_matters: 'It reframes the object of reparameterization: instead of only changing what quantity
+    the network predicts (as JiT does), it changes what the network is supervised against at each noise
+    level, arguing this is a genuinely different and complementary axis to prediction-target reparameterization.
+    If the coarse-to-fine supervision principle generalizes, it offers a training-efficiency lever that
+    composes with, rather than competes against, the prediction-target fixes already established in this
+    line.'
+  depth: full-text

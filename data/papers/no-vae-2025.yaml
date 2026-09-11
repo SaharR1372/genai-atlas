@@ -49,3 +49,57 @@ abstract: 'Pixel-space generative models are often more difficult to train and g
   achieves an impressive FID of 8.82 on ImageNet-256, significantly outperforming its latent-space counterparts.
   This marks the first successful training of a consistency model directly on high-resolution images without
   relying on pre-trained VAEs or diffusion models. Our codes are available at: \href{https://github.com/AMAP-ML/EPG}{https://github.com/AMAP-ML/EPG}'
+explained:
+  before: By this point in the line, PixNerd and PixelDiT had shown a VAE could be removed entirely and
+    training done from a random initialization, but pixel-space models still lagged latent-space ones
+    in training efficiency and final quality -- the paper frames this as 'a persistent performance and
+    efficiency gap' that plain from-scratch pixel training had not closed.
+  problem: Whether pixel-space diffusion and consistency models can be made to match or beat latent-space
+    models in both quality and training efficiency by giving the network a better starting point than
+    random initialization, without reintroducing a VAE.
+  idea: Pretrain the model's own encoder first, self-supervised, so it already understands image semantics
+    before diffusion training starts, then attach a freshly initialized decoder and fine-tune everything
+    end to end as a pixel-space denoiser. The self-supervised objective aligns encoder representations
+    of images at different points along the same deterministic (noise-to-data) sampling trajectory, so
+    the representation the encoder learns is already suited to the trajectory the diffusion model will
+    later have to traverse.
+  method: 'Stage 1 pretrains a ViT encoder (16x16 patches at 256 resolution, 32x32 at 512) with a combined
+    contrastive loss and a representation-consistency loss (an InfoNCE-style objective with a two-stage
+    temperature schedule) that pulls together encoder representations of points evolving along the same
+    deterministic sampling trajectory, using a momentum encoder (EMA 0.99) and a 3-layer projector head,
+    trained for 600K steps (480 epochs) on ImageNet-1K. Stage 2 discards the projector, attaches a randomly
+    initialized decoder (same depth as the encoder, residual connections between them, adaLN-Zero time
+    conditioning) to the pretrained encoder, and fine-tunes the whole encoder-decoder end to end -- the
+    encoder is explicitly not frozen; an ablation shows a frozen encoder gets FID 22.44 versus 12.46 when
+    it is updated end to end. There is no VAE, no learned compression bottleneck, and no separately-trained
+    latent space at any point: the encoder-decoder is the full diffusion denoiser operating on pixel patches,
+    predicting the clean image (x-prediction) rather than noise or velocity. The same fine-tuned backbone
+    is used to train both a diffusion model and, separately, a consistency model (the latter adds an auxiliary
+    contrastive loss against a frozen copy of the pretrained encoder for stability).'
+  evidence: 'On ImageNet 256x256, the largest diffusion model, EPG-G/16 (1391M parameters, 1600 epochs),
+    reaches FID 1.58 at 75 NFE using interval-CFG with guidance interval (0.19, 1.61] (the paper does
+    not state the underlying scalar guidance weight, only the interval). On ImageNet 512x512, EPG-L/32
+    (540M parameters, 800 epochs) reaches FID 2.35 at 75 NFE, same interval-CFG setting. The consistency
+    model, EPG-L/16 (540M parameters, 560 epochs), reaches FID 8.82 at NFE 1 (single-step generation)
+    -- the paper describes this as the first successful training of a consistency model directly on high-resolution
+    pixels without a pretrained VAE or diffusion teacher. The training-compute claim is a wall-clock comparison
+    in Table 5: DiT-XL/2 needs 506 GPU-hours on their hardware versus 160 GPU-hours for EPG-XXL/16, i.e.
+    roughly 32%, which the abstract rounds to ''around 30% of its training compute.'''
+  limitations: 'The paper''s own Limitations subsection (Section 6) states: ''Our EPGs currently under-perform
+    leading latent-space methods like REPA and RAE. However, the performance gap can largely be explained
+    by a significant disparity in training compute.'' It also concedes that using self-supervised pretraining
+    directly as a diffusion pretraining method is ''ineffective, due to its representation collapse on
+    images of strong noise,'' which is why the two-stage recipe (pretrain a clean-and-trajectory-aware
+    encoder, then fine-tune with a fresh decoder) is needed rather than simply reusing an off-the-shelf
+    SSL encoder.'
+  why_it_matters: It complicates a clean 'tokenizer-free' story for this line. The model keeps and fine-tunes
+    a pretrained encoder -- what is discarded is specifically the VAE's separately-trained, frozen compression
+    bottleneck, not patchification or pretraining as such. The paper itself never calls this 'tokenizer-free';
+    it calls itself 'VAE-free' and 'end-to-end pixel-space,' and the fetched text shows the encoder is
+    patch-based (ViT patchify, 16x16 or 32x32) exactly like every other model in this line, and is updated
+    end to end rather than frozen. Calling it tokenizer-free is fair only in the narrow sense that there
+    is no separately-trained, frozen compression network standing between the diffusion process and the
+    pixels; it is not fair in the sense of implying no self-supervised prior or no patch tokenization
+    is involved. This is why the atlas should place it between the pixel-space line and the representation-latent
+    line rather than as a pure member of either.
+  depth: full-text

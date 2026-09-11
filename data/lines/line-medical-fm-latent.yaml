@@ -25,8 +25,12 @@ strengths:
 - Inherits the semantics of a model already trained on the target anatomy
 - Directly addresses the unvalidated assumption underneath the borrowed-VAE line
 - Medical foundation models already exist and are widely used for understanding
+- The two papers come from unrelated groups, one UK academic and one Korean industry, arriving at the
+  same idea independently within months of each other
 weaknesses:
-- Two papers old, both from 2026, with no independent replication
+- Two papers old, both from 2026. Searched deliberately in September 2026 across arXiv and PubMed for
+  a third group generating inside a medical foundation model's own representation space, and found none.
+  This is recorded as a genuinely nascent area rather than as incomplete coverage
 - The retinal result suggests gains may be partly an artifact of evaluating with the same foundation model
   that defines the latent
 - 'Untouched outside pathology and retina: no chest X-ray or general radiology work'

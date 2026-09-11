@@ -43,3 +43,51 @@ abstract: 'Latent-space modeling has been the standard for Diffusion Transformer
   pixel generative models. We further extend PixelDiT to text-to-image generation and pretrain it at the
   10242resolution in pixel space. It achieves 0.74 on GenEval and 83.5 on DPG-bench, approaching the best
   latent diffusion models. Code: https://github.com/NVlabs/PixelDiT'
+explained:
+  before: 'By the time of this paper, PixNerd and other pixel-space diffusion transformers had shown that
+    a VAE could be removed, but they still faced a granularity dilemma: coarse patches keep attention
+    affordable but blur per-pixel detail, while fine patches preserve detail but push the token sequence
+    into quadratic-cost territory. Latent diffusion models sidestepped this by compressing first, but
+    at the cost of lossy reconstruction, a train/generate objective mismatch that shows up as texture
+    smoothing or color shift, and extra decoding latency at sampling time.'
+  problem: How to model both global semantics and per-pixel texture in a single end-to-end pixel-space
+    transformer without paying the quadratic attention cost of running full per-pixel attention over a
+    long sequence.
+  idea: 'Split the transformer into two attention pathways that talk to each other: a patch-level DiT
+    that does standard attention over coarse 16x16 patch tokens to get global semantics cheaply, and a
+    pixel-level DiT that works on the full per-pixel tokens but compresses them down to patch-token length
+    before attention (Pixel Token Compaction) and modulates every individual pixel with its own AdaLN
+    parameters derived from the corresponding semantic token (pixel-wise AdaLN) instead of broadcasting
+    one AdaLN vector over a whole patch.'
+  method: Both DiTs are trained jointly end-to-end with a rectified-flow velocity-matching loss, plus
+    a representation-alignment loss (weight 0.5) against a frozen DINOv2 encoder applied at patch-level
+    layer 8; nothing else is frozen and there is no VAE. The patch-level DiT uses 16x16 patches at hidden
+    width 768-1536 depending on model size; the pixel-level DiT operates on individual pixels reshaped
+    as length-256 sequences per patch, at a much narrower per-pixel hidden width (16), with learned compaction/expansion
+    projections around its attention layers to keep sequence length bounded. The largest ImageNet model,
+    PixelDiT-XL, has 26 patch-level layers and 4 pixel-level layers at total 797M parameters; the text-to-image
+    model has 1,311M parameters trained on 26M image-text pairs at up to 1024x1024.
+  evidence: On ImageNet 256x256, PixelDiT-XL at 320 epochs reaches gFID 1.61, sFID 4.68, IS 292.7 with
+    100 sampling steps (FlowDPMSolver), CFG scale 2.75 and guidance interval [0.10, 0.90]; an earlier
+    80-epoch checkpoint gets FID 2.36 at CFG 3.25 with a wider interval [0.10, 1.00]. For text-to-image,
+    PixelDiT-T2I at 512x512 gets GenEval 0.78 and DPG-Bench 83.7; at 1024x1024 (after 100K iterations
+    of fine-tuning on top of 400K iterations of 512-resolution pretraining) it gets GenEval 0.74 and DPG-Bench
+    83.5, using 25 steps (FlowDPMSolver) and CFG 4.5 -- ahead of PixArt-Sigma (GenEval 0.54, DPG 80.5)
+    and roughly matching DALL-E 3, but trailing FLUX-dev on GenEval (0.67). An ablation shows a vanilla
+    patch-only DiT/16 baseline reaches only gFID 9.84 at 80 epochs, and that without Pixel Token Compaction
+    the dual-level architecture runs out of memory; compaction alone brings this to 3.50, and adding pixel-wise
+    AdaLN brings it to 2.36.
+  limitations: 'The paper''s own appendix states that pixel-space diffusion ''incurs higher computational
+    costs than latent approaches due to the raw data dimensionality'' and that their work only ''narrows''
+    rather than closes this efficiency gap: they report 311 GFLOPs per forward pass versus roughly 240
+    GFLOPs for a comparable latent DiT. They also note that scaling to higher resolutions still requires
+    re-tuning noise-schedule shift values, learning rate, and gradient clipping between 512 and 1024 resolution,
+    i.e. there is no single recipe that transfers across resolutions. This is the passage the atlas cites
+    as the field''s shared open admission: pixel data and noise distributions are more complex than latent
+    ones and no mature, resolution-independent training recipe yet exists.'
+  why_it_matters: It offers a concrete mechanism -- token compaction plus pixel-wise conditioning -- for
+    decoupling the cost of global attention from the resolution of per-pixel prediction, which is the
+    specific bottleneck that forced earlier pixel models into large, detail-losing patches. If this generalizes,
+    the field gets a reusable recipe for adding per-pixel fidelity to any patch-based pixel transformer
+    rather than a one-off architecture.
+  depth: full-text

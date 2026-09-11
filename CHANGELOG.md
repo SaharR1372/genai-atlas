@@ -2,6 +2,44 @@
 
 ## Unreleased
 
+### 2026-09-11 — Session 11 continued — the medical audit, and a warning that was right for the wrong reason
+
+**`line-medical-counterfactual` was a gap, and the field's own evidence points against the line's
+bet.** The line held one paper, from 2020. Eight added, five from arXiv and three journal-only
+verified through PubMed. The project blueprint had named "Ribeiro 2023" and "diffusion
+counterfactuals" as expected follow-ups and never added them; both are now in, as
+[Ribeiro et al. ICML 2023](https://doi.org/10.48550/arXiv.2306.15764) and Diff-SCM (CLeaR 2022).
+
+The genuinely interesting finding is not the count. This line bets that a medically meaningful
+counterfactual *requires* explicit causal machinery. The strongest clinical evidence in the area
+comes from work that uses none:
+- **Singla et al. (Medical Image Analysis 2022)** — a GAN counterfactual explainer with no structural
+  causal model, and the only paper here validated by a reader study with diagnostic radiology
+  residents. Counterfactual explanation was the only style that significantly improved their
+  understanding of the classifier over no explanation.
+- **DiffChest (Cell Reports Medicine 2024)** — a self-conditioned diffusion model, no causal graph,
+  515,704 radiographs from 194,956 patients across the US and Europe, Fleiss' kappa at or above 0.8.
+- **StylEx (EBioMedicine 2024)** — states outright that it is not designed to infer causality, then
+  produces expert-panel-validated counterfactual attribute discovery across eight tasks in three
+  modalities.
+
+The causal papers are evaluated on axioms; the non-causal ones on clinicians. That asymmetry is now
+recorded as the line's central unresolved problem rather than left implicit, and the three papers
+above carry the `challenge` role in its arc.
+
+**`line-medical-fm-latent` is genuinely small, and the warning that found it was right for the wrong
+reason.** The single-org warning fired claiming every paper was from Oxford. It is not: STREAM's
+authors are at **DEEPNOID Inc.**, a Korean medical-AI company, and the warning fired only because
+that paper's `orgs` field was empty. The `orgs` are corrected. Deliberate searches across arXiv and
+PubMed found no third group generating inside a medical foundation model's own representation space,
+so the line now records honestly that it is two papers from two unrelated groups — one UK academic,
+one Korean industry — who arrived at the same idea independently, and that no third exists yet.
+That is the outcome the thin-line warning was built to make possible: it asks a question, and
+"genuinely small" is an allowed answer as long as the line says so in its own text.
+
+**Worth carrying forward:** an empty `orgs` field made a coverage warning misfire into a false claim
+about a research group. Data gaps do not stay inert; they get rendered as assertions.
+
 ### 2026-09-11 — Session 11 continued — explanations, four corrections, one silent bug
 
 **39 of the 42 audit papers now carry full-text `explained` blocks**, each reporting guidance scale

@@ -1,0 +1,52 @@
+id: shortcut-cf-2023
+type: paper
+title: Fast Diffusion-Based Counterfactuals for Shortcut Removal and Generation
+short: Shortcut counterfactuals
+arxiv: '2312.14223'
+doi: null
+date: 2023-12
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- Technical University of Denmark
+- Pioneer Centre for AI
+authors:
+- Nina Weng
+- Paraskevas Pegios
+- Eike Petersen
+- Aasa Feragen
+- Siavash Bigdeli
+tier: strong-followup
+sections:
+- medical
+lines:
+- line-medical-counterfactual
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-11'
+  verified_by: opus
+summary: Classifier-guided diffusion with no structural causal model, used to detect and quantify shortcut
+  features such as pacemakers in medical classifiers across two chest X-ray datasets and a skin lesion
+  dataset. Evidence is classifier-behaviour quantification rather than causal axioms.
+explanation: null
+abstract: 'Shortcut learning is when a model -- e.g. a cardiac disease classifier -- exploits correlations
+  between the target label and a spurious shortcut feature, e.g. a pacemaker, to predict the target label
+  based on the shortcut rather than real discriminative features. This is common in medical imaging, where
+  treatment and clinical annotations correlate with disease labels, making them easy shortcuts to predict
+  disease. We propose a novel detection and quantification of the impact of potential shortcut features
+  via a fast diffusion-based counterfactual image generation that can synthetically remove or add shortcuts.
+  Via a novel inpainting-based modification we spatially limit the changes made with no extra inference
+  step, encouraging the removal of spatially constrained shortcut features while ensuring that the shortcut-free
+  counterfactuals preserve their remaining image features to a high degree. Using these, we assess how
+  shortcut features influence model predictions. This is enabled by our second contribution: An efficient
+  diffusion-based counterfactual explanation method with significant inference speed-up at comparable
+  image quality as state-of-the-art. We confirm this on two large chest X-ray datasets, a skin lesion
+  dataset, and CelebA. Our code is publicly available at fastdime.compute.dtu.dk.'

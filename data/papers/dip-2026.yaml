@@ -43,3 +43,52 @@ abstract: 'Diffusion models face a fundamental trade-off between generation qual
   This synergistic design achieves computational efficiency comparable to LDMs without relying on a VAE.
   DiP is accomplished with up to 10$\times$ faster inference speeds than previous method while increasing
   the total number of parameters by only 0.3%, and achieves an 1.79 FID score on ImageNet 256$\times$256.'
+explained:
+  before: 'Latent diffusion models were computationally efficient but relied on a VAE trained separately
+    from the diffusion model, which loses information and could not be corrected end to end. Pixel-space
+    diffusion transformers removed the VAE but had, in the paper''s telling, still not closed the efficiency
+    gap: to preserve fine detail they needed small patches (e.g. 2x2 or 4x4), and input sequence length
+    grows quadratically with resolution once patches are small, making high-resolution pixel diffusion
+    computationally prohibitive.'
+  problem: How to get pixel-space diffusion to computational efficiency comparable to latent diffusion
+    without shrinking patches, i.e. how to recover fine local detail from large, cheap-to-attend-over
+    patches.
+  idea: 'The authors first show, by overfitting a DiT to a single image in pixel space, that a large-patch
+    DiT captures global layout and color correctly but renders blurry textures and soft edges -- it lacks
+    local inductive bias for high-frequency detail. Their fix is to decouple the two jobs explicitly:
+    keep a DiT backbone on large (16x16) patches for cheap global structure, and add a small, co-trained
+    convolutional head, the Patch Detailer Head, that takes the DiT''s per-patch context feature plus
+    the noisy pixel patch and restores fine detail locally, patch by patch.'
+  method: The DiT backbone (a DDT variant) operates on 16x16 patches and is trained jointly, end to end,
+    with the Patch Detailer Head -- nothing is frozen. The Detailer Head is a small convolutional U-Net
+    (4 down- and 4 up-sampling blocks of convolution, SiLU, and pooling; kernel size 3 in the middle,
+    1 at the final layer) that takes each patch's global context vector (concatenated in at the bottleneck)
+    plus the noisy 3x16x16 pixel patch, and outputs the noise prediction for that patch -- so the prediction
+    target is epsilon (noise), with a flow-matching loss (Eq. 5) used for training. The head is attached
+    only after the final DiT block (tested against intermediate/hybrid placements, which were not simpler
+    or better) and adds only 629M to 631M parameters, i.e. 0.3% overhead. Alternative head designs (plain
+    MLP, coordinate-based MLP, intra-patch attention) were tried and the convolutional U-Net won on FID
+    at the lowest added cost.
+  evidence: On ImageNet 256x256 (v3 of the paper, which updates the numbers reported in earlier arXiv
+    versions), DiP-XL/16 at 600 epochs reaches FID 1.79 using 100x2 NFE, CFG scale 4.0 with guidance interval
+    [0.11, 0.97], at 631M parameters. An earlier checkpoint at 320 epochs (100 NFE, CFG 4.0) reaches FID
+    1.90, and at 160 epochs reaches FID 2.16. In 75-step inference, DiP reaches 0.70s per image and matches
+    PixelFlow-XL/4's FID while PixelFlow-XL/4 takes 7.50s -- this is the basis for the paper's 'more than
+    10x faster' claim, and it is a comparison against that one specific baseline (PixelFlow-XL/4) at that
+    one specific step count, not a universal multiplier over all pixel-space methods. Against a plain
+    DiT-only baseline of the same 629M parameters, adding the Detailer Head moves FID from 5.28 to 2.16
+    (at matched epoch count) at only 0.3% more parameters and comparable training cost (92 vs 84 GPU-hours
+    per 8 GPUs). On ImageNet 512x512, DiP-XL/32 reaches FID 2.31 at the same 631M parameters, CFG 4.0
+    and guidance interval [0.11, 0.97].
+  limitations: The paper has no dedicated limitations section. The closest the fetched text comes is acknowledging
+    that small patches still give better raw quality than large patches with a detailer head, that the
+    method is validated only on class-conditional ImageNet (the authors state they plan to extend it to
+    text-to-image and text-to-video as future work), and that a theoretical justification offered in the
+    appendix assumes a Gaussian data distribution with eigenvalue decay, which real image statistics may
+    not satisfy.
+  why_it_matters: 'It is a direct empirical rebuttal to the argument that motivated latents in the first
+    place: it claims LDM-comparable training and inference cost in raw pixel space, with a lightweight
+    add-on rather than an architectural rebuild. If the 10x-faster and epoch-count numbers hold up outside
+    class-conditional ImageNet, the computational-efficiency argument for keeping a VAE loses most of
+    its force.'
+  depth: full-text

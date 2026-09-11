@@ -8,7 +8,8 @@ date: 2026-06
 venue:
   name: arXiv
   status: preprint
-orgs: []
+orgs:
+- DEEPNOID Inc.
 authors:
 - Cho
 - Jeong
@@ -45,32 +46,34 @@ explained:
     such as ZoomLDM and PixCell use pretrained pathology vision foundation models, but only as a conditioning
     signal layered on top of a separate VAE latent space, not as the generative space itself.
   problem: Conditioning a VAE-latent diffusion model on a foundation-model embedding causes what the paper
-    calls conditioning collapse, where the conditioning signal accounts for 62 to 76 percent of output diversity
-    rather than the learned latent space. This both weakens unconditional generation and forces the model
-    to depend on access to the foundation model at inference time.
+    calls conditioning collapse, where the conditioning signal accounts for 62 to 76 percent of output
+    diversity rather than the learned latent space. This both weakens unconditional generation and forces
+    the model to depend on access to the foundation model at inference time.
   idea: Instead of conditioning on a foundation model's features, generate directly inside them. Because
     pathology foundation-model patch-token features are L2-normalized and lie on a hypersphere with strong
     angular structure, the generative process should use a Riemannian formulation native to that geometry
     rather than assuming a flat Euclidean latent.
   method: The generation space is the frozen UNI pathology foundation model's patch-token feature space
     itself, 256 tokens of dimension 1024 lying on the unit hypersphere, not a VAE latent or pixel space.
-    The paper's explicit reason is geometric. It measures these features as L2-normalized with strong angular
-    dominance (an angular-dominance score above 0.97), high intrinsic curvature and effective rank around
-    252 to 265, and argues a Euclidean latent diffusion formulation is mismatched to that structure, making
-    a Riemannian formulation the natural fit. A LightningDiT-XL model of roughly 676 million parameters
-    is trained with a novel stochastic bridge Riemannian flow matching, using a noise schedule that vanishes
-    at both endpoints so per-token rectifiability holds on the sphere, and a separate anisotropic ViT-XL
-    decoder maps generated tokens back to pixels with noise shaped by the SVD of the trained model's velocity-field
-    Jacobian, applying small noise along directions the generator is sensitive to and larger noise elsewhere.
-  evidence: The paper reports only distribution metrics; it offers no downstream clinical task and no reader
-    study, and it concedes this directly. On TCGA-BRCA, reconstruction FID is 2.42 for STREAM versus 4.88
-    for ZoomLDM and 2.88 for PixCell, and generation FID is 6.61 versus 7.43 and 104.18. PixCell's unconditional
-    generation FID of 104.18 is offered as direct confirmation of conditioning collapse once the foundation-model
-    conditioning is removed. Generation FvD, computed with a pathology-specific feature extractor, is 78.04
-    for STREAM versus 196.41 for ZoomLDM and 1298.00 for PixCell. On TCGA-COADREAD, generation FID is 7.68
-    for STREAM versus 8.09 for ZoomLDM. An ablation shows the two contributions are superadditive, reaching
-    reconstruction FID 3.52 and generation FID 6.86 combined, where the bridge component alone gives marginal
-    or slightly worse generation FID and the anisotropic decoder alone gives a modest reconstruction gain.
+    The paper's explicit reason is geometric. It measures these features as L2-normalized with strong
+    angular dominance (an angular-dominance score above 0.97), high intrinsic curvature and effective
+    rank around 252 to 265, and argues a Euclidean latent diffusion formulation is mismatched to that
+    structure, making a Riemannian formulation the natural fit. A LightningDiT-XL model of roughly 676
+    million parameters is trained with a novel stochastic bridge Riemannian flow matching, using a noise
+    schedule that vanishes at both endpoints so per-token rectifiability holds on the sphere, and a separate
+    anisotropic ViT-XL decoder maps generated tokens back to pixels with noise shaped by the SVD of the
+    trained model's velocity-field Jacobian, applying small noise along directions the generator is sensitive
+    to and larger noise elsewhere.
+  evidence: The paper reports only distribution metrics; it offers no downstream clinical task and no
+    reader study, and it concedes this directly. On TCGA-BRCA, reconstruction FID is 2.42 for STREAM versus
+    4.88 for ZoomLDM and 2.88 for PixCell, and generation FID is 6.61 versus 7.43 and 104.18. PixCell's
+    unconditional generation FID of 104.18 is offered as direct confirmation of conditioning collapse
+    once the foundation-model conditioning is removed. Generation FvD, computed with a pathology-specific
+    feature extractor, is 78.04 for STREAM versus 196.41 for ZoomLDM and 1298.00 for PixCell. On TCGA-COADREAD,
+    generation FID is 7.68 for STREAM versus 8.09 for ZoomLDM. An ablation shows the two contributions
+    are superadditive, reaching reconstruction FID 3.52 and generation FID 6.86 combined, where the bridge
+    component alone gives marginal or slightly worse generation FID and the anisotropic decoder alone
+    gives a modest reconstruction gain.
   limitations: The paper concedes that its core rectifiability guarantee, Theorem 3, is a population-level
     result under a per-token assumption and does not formally extend to cross-token dynamics on the full
     product manifold. It also concedes that the anisotropic decoder mechanism is validated only indirectly,
@@ -83,8 +86,8 @@ explained:
     breaking the usual reconstruction-generation tradeoff by improving both simultaneously and removing
     the need for foundation-model access at inference. But its evidence is entirely distribution-metric,
     and the companion challenge paper in this line shows that foundation-model-latent gains measured internally
-    can evaporate under independent evaluation, so STREAM's strong FID and FvD numbers are not yet the kind
-    of downstream evidence this atlas treats as decisive.
+    can evaporate under independent evaluation, so STREAM's strong FID and FvD numbers are not yet the
+    kind of downstream evidence this atlas treats as decisive.
 abstract: 'Synthetic histopathology image generation addresses critical challenges in computational pathology,
   including patient privacy and the growing need for large-scale training data for foundation models.
   Latent diffusion models have dominated the image generation domain, with recent works emphasizing that

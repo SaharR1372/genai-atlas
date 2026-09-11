@@ -1,0 +1,49 @@
+id: singla-2022
+type: paper
+title: Explaining the black-box smoothly - A counterfactual approach
+short: Singla et al.
+arxiv: null
+doi: 10.1016/j.media.2022.102721
+date: 2022-12
+venue:
+  name: Medical Image Analysis
+  status: journal
+orgs:
+- University of Pittsburgh
+- Carnegie Mellon University
+- University of Pittsburgh Medical School
+authors:
+- Sumedha Singla
+- Motahhare Eslami
+- Brian Pollack
+- Stephen Wallace
+- Kayhan Batmanghelich
+tier: core
+sections:
+- medical
+lines:
+- line-medical-counterfactual
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-11'
+  verified_by: opus
+summary: 'A GAN-based counterfactual explainer for chest X-ray classifiers with no structural causal model
+  anywhere in it, carrying the rarest evidence in this section: a reader study with diagnostic radiology
+  residents, in which counterfactual explanation was the only style that significantly improved their
+  understanding of the classifier''s decision over no explanation. The strongest single challenge to this
+  line''s core bet.'
+explanation: null
+abstract: A BlackBox Counterfactual Explainer for medical image classifiers. A GAN generates a progressive
+  set of perturbations to a query image so the classification decision flips, with a loss that preserves
+  essential details such as support devices. Audited on a multi-label chest X-ray classifier using clinically
+  relevant metrics including cardiothoracic ratio. A human-grounded experiment with diagnostic radiology
+  residents compared no explanation, saliency map, cycleGAN explanation and counterfactual explanation;
+  counterfactual explanation was the only method that significantly improved users' understanding of the
+  classifier's decision over the no-explanation baseline.

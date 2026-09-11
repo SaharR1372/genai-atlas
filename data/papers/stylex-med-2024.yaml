@@ -1,0 +1,60 @@
+id: stylex-med-2024
+type: paper
+title: Using generative AI to investigate medical imagery models and datasets
+short: StylEx (medical)
+arxiv: null
+doi: 10.1016/j.ebiom.2024.105075
+date: 2024-04
+venue:
+  name: EBioMedicine
+  status: journal
+orgs:
+- Google
+- Weizmann Institute of Science
+- University of California San Francisco
+authors:
+- Oran Lang
+- Doron Yaya-Stupp
+- Ilana Traynis
+- Heather Cole-Lewis
+- Chloe R Bennett
+- Courtney R Lyles
+- Charles Lau
+- Michal Irani
+- Christopher Semturs
+- Dale R Webster
+- Greg S Corrado
+- Avinatan Hassidim
+- Yossi Matias
+- Yun Liu
+- Naama Hammel
+- Boris Babenko
+tier: strong-followup
+sections:
+- medical
+lines:
+- line-medical-counterfactual
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-11'
+  verified_by: opus
+summary: StyleGAN-based counterfactual attribute discovery across eight tasks in retinal fundus, external
+  eye and chest radiograph imaging, validated by an interdisciplinary expert panel. States explicitly
+  that it is not designed to infer causality, and produces clinically useful counterfactual visualisations
+  regardless, which is why it sits here as a challenge.
+explanation: null
+abstract: 'A workflow for generating hypotheses about which visual signals correlate with a classifier''s
+  predictions: train a classifier, train a StyleGAN-based generator guided by it (StylEx), then extract
+  and visualise the top attributes the classifier is sensitive to by modifying each independently to produce
+  counterfactual visualisations, and finally review them with an interdisciplinary expert panel. Demonstrated
+  on eight prediction tasks across retinal fundus photographs, external eye photographs and chest radiographs.
+  Recovers known clinical features, exposes confounders beyond physiology such as chest X-ray underexposure
+  and eye makeup, and surfaces previously unknown attributes. States explicitly that it is not designed
+  to infer causality.'

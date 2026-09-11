@@ -1,0 +1,47 @@
+id: ribeiro-2023
+type: paper
+title: High Fidelity Image Counterfactuals with Probabilistic Causal Models
+short: Ribeiro et al.
+arxiv: '2306.15764'
+doi: null
+date: 2023-06
+venue:
+  name: ICML
+  status: conference
+orgs:
+- Imperial College London
+- Microsoft Research Cambridge
+authors:
+- Fabio De Sousa Ribeiro
+- Tian Xia
+- Miguel Monteiro
+- Nick Pawlowski
+- Ben Glocker
+tier: landmark
+sections:
+- medical
+lines:
+- line-medical-counterfactual
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-11'
+  verified_by: opus
+summary: 'The direct successor to the deep structural causal model framework, from the same group, using
+  hierarchical VAE-based causal mechanisms rather than diffusion. Its importance to this atlas is the
+  evaluation: it judges counterfactuals against the causal axioms of effectiveness and composition rather
+  than against distribution distance, which is the evidence standard this section asks for.'
+explanation: null
+abstract: We present a general causal generative modelling framework for accurate estimation of high fidelity
+  image counterfactuals with deep structural causal models. Estimation of interventional and counterfactual
+  queries for high-dimensional structured variables, such as images, remains a challenging task. We leverage
+  ideas from causal mediation analysis and advances in generative modelling to design new deep causal
+  mechanisms for structured variables in causal models. Our experiments demonstrate that our proposed
+  mechanisms are capable of accurate abduction and estimation of direct, indirect and total effects as
+  measured by axiomatic soundness of counterfactuals.

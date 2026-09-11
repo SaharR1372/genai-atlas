@@ -1,0 +1,56 @@
+id: diffchest-2024
+type: paper
+title: Reconstruction of patient-specific confounders in AI-based radiologic image interpretation using
+  generative pretraining
+short: DiffChest
+arxiv: null
+doi: 10.1016/j.xcrm.2024.101713
+date: 2024-09
+venue:
+  name: Cell Reports Medicine
+  status: journal
+orgs:
+- University Hospital RWTH Aachen
+- Technical University Dresden
+- UC Berkeley
+- University Hospital Zurich
+- Stanford University
+authors:
+- Tianyu Han
+- Laura Žigutytė
+- Luisa Huck
+- Marc Sebastian Huppertz
+- Robert Siepmann
+- Yossi Gandelsman
+- Christian Blüthgen
+- Firas Khader
+- Christiane Kuhl
+- Sven Nebelung
+- Jakob Nikolas Kather
+- Daniel Truhn
+tier: core
+sections:
+- medical
+lines:
+- line-medical-counterfactual
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-11'
+  verified_by: opus
+summary: A self-conditioned diffusion model, not a structural causal model, trained on 515,704 chest radiographs
+  from 194,956 patients across the US and Europe to generate patient-specific counterfactual visualisations
+  of confounders. Validated with high inter-reader agreement, Fleiss kappa at or above 0.8. The largest-scale
+  evidence in this line, and it carries no causal graph.
+explanation: null
+abstract: DiffChest, a self-conditioned diffusion model trained on 515,704 chest radiographs from 194,956
+  patients across the US and Europe, gives patient-specific explanations and visualises confounding factors
+  that might mislead a classifier. Inter-reader agreement reaches Fleiss' kappa of 0.8 or higher, validating
+  its ability to identify treatment-related confounders, which are detected at 10 to 100 percent prevalence
+  rates. Pretraining also yields diagnostic accuracy across 11 chest conditions.

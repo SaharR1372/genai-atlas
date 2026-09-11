@@ -1,0 +1,46 @@
+id: diff-scm-2022
+type: paper
+title: Diffusion Causal Models for Counterfactual Estimation
+short: Diff-SCM
+arxiv: '2202.10166'
+doi: null
+date: 2022-02
+venue:
+  name: CLeaR
+  status: conference
+orgs:
+- University of Edinburgh
+authors:
+- Pedro Sanchez
+- Sotirios A. Tsaftaris
+tier: core
+sections:
+- medical
+lines:
+- line-medical-counterfactual
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-11'
+  verified_by: opus
+summary: 'The first diffusion-based deep structural causal model: forward diffusion for abduction, then
+  anti-causal gradient guidance through the reverse process for action and prediction. Its experiments
+  are MNIST and ImageNet only, with no medical images, so it belongs here as the methodological bridge
+  that brought diffusion into the causal counterfactual family rather than as a clinical result.'
+explanation: null
+abstract: We consider the task of counterfactual estimation from observational imaging data given a known
+  causal structure. In particular, quantifying the causal effect of interventions for high-dimensional
+  data with neural networks remains an open challenge. Herein we propose Diff-SCM, a deep structural causal
+  model that builds on recent advances of generative energy-based models. In our setting, inference is
+  performed by iteratively sampling gradients of the marginal and conditional distributions entailed by
+  the causal model. Counterfactual estimation is achieved by firstly inferring latent variables with deterministic
+  forward diffusion, then intervening on a reverse diffusion process using the gradients of an anti-causal
+  predictor w.r.t the input. Furthermore, we propose a metric for evaluating the generated counterfactuals.
+  We find that Diff-SCM produces more realistic and minimal counterfactuals than baselines on MNIST data
+  and can also be applied to ImageNet data. Code is available https://github.com/vios-s/Diff-SCM.

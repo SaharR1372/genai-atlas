@@ -43,3 +43,54 @@ abstract: 'Pixel-space diffusion models bypass the reconstruction bottleneck of 
   state-of-the-art (SoTA) FID of $\mathbf{1.56}$ on ImageNet $256\times256$ directly within the pixel
   space. By combining the fine-grained stream with semantic guidance, HyperDiT offers a superior paradigm
   for high-fidelity pixel generation.'
+explained:
+  before: 'Pixel-space diffusion transformers such as PixelDiT and DiP had shown the granularity dilemma
+    could be managed, but by the paper''s account still traded away information: methods like DeCo used
+    AdaLN to broadcast global semantics into fine-grained patches, which the paper argues loses fine-grained
+    information, and PixelDiT compressed pixel tokens directly, which the paper argues also loses information.
+    Large patches alone give a macroscopic view of the manifold but a generation trajectory that ''hovers
+    above the manifold'', producing structurally correct but blurry images; small patches have the capacity
+    for fine detail but, without semantic guidance, get lost in the high-dimensional pixel space.'
+  problem: How to give fine-grained (small-patch) pixel tokens reliable access to global semantics without
+    compressing or discarding information in the process of connecting the two scales.
+  idea: Run two parallel streams at different patch sizes -- a coarse Semantics Flow (16x16 patches) and
+    a fine-grained Flow (8x8 patches) -- and connect them at several depths with cross-attention rather
+    than AdaLN, so fine-grained tokens actively query global semantic anchors instead of having semantics
+    broadcast into them. A scale-aware rotary embedding keeps the two token grids geometrically aligned,
+    and learnable register tokens supervised to match a pretrained vision foundation model inject dense
+    external semantics that the network's own AdaLN pathway cannot easily supply on its own.
+  method: The backbone runs a Semantics Flow on 16x16 patches and a Fine-grained Flow on 8x8 patches,
+    connected by multiple ('Hyper') cross-attention connectors at different depths, where fine-grained
+    queries are computed via AdaLN-conditioned projections and attend to keys/values from the semantic
+    stream. Scale-Aware RoPE re-indexes patches of different sizes onto a shared coordinate system (base
+    patch size 4) so cross-attention respects true spatial position. Learnable register tokens are added
+    to the semantic stream and trained with a REPA-style alignment loss against a frozen DINOv2 encoder
+    (the only frozen component); everything else, including both flows and the connectors, is trained
+    end to end with a velocity-prediction (flow-matching) objective -- there is no VAE. The largest models
+    reported are HyperDiT-H (952M parameters) and HyperDiT-XL (676M parameters); a smaller HyperDiT-B
+    (131M, 8 DiT blocks) is also used in ablations.
+  evidence: 'On ImageNet 256x256 at 600 epochs, HyperDiT-H reaches FID 1.56, IS 306.5, precision 0.80,
+    recall 0.64 at 952M parameters, and HyperDiT-XL reaches FID 1.63, IS 304.2 at 676M parameters; both
+    use CFG scale 2.9 with guidance interval [0.1, 1.0] and a 50-step Heun sampler. The paper reports
+    these against baselines run in the same setting: DeCo-XL/16 at FID 1.69, JiT-G/16 at FID 1.82, and
+    DiP-XL/16 at FID 1.79 (this DiP number matches what DiP''s own paper reports at its best late-training
+    checkpoint). An ablation building up from a DeCo baseline (FID 8.95) shows dense connections (7.74),
+    then cross-attention Hyper Connectors (7.04), then SA-RoPE (6.22), then registers (5.01), then the
+    REPA loss on registers only (4.27) each contribute measurable gains; applying the REPA loss to both
+    the large-patch tokens and the registers together, rather than registers alone, hurts FID back to
+    5.23. A separate patch-size ablation, holding the large patch at 16, shows shrinking the fine-grained
+    patch from 16 to 8 improves FID from 92.34 to 66.28, but going to 4 causes an out-of-memory failure.'
+  limitations: The paper concedes that shrinking the fine-grained patch size further, to p_s=4, 'inevitably
+    incurs a substantial increase in computation and memory consumption due to the quadratic complexity
+    of attention over massively extended sequences' -- in the ablation this setting actually fails with
+    an out-of-memory error rather than completing. It also concedes that fine-grained generation 'struggles
+    to converge to semantically coherent nodes' without the semantic-anchor cross-attention mechanism,
+    producing artifacts and hallucinated local textures -- meaning the architecture's central mechanism
+    is load-bearing, not optional. The fetched text does not state a limitation specifically about small
+    batch sizes; that framing is not confirmed by what was read.
+  why_it_matters: 'It reframes the granularity dilemma as a connectivity problem rather than a compression
+    problem: instead of choosing one patch size or broadcasting semantics via AdaLN, it argues cross-attention
+    between explicit multi-scale streams preserves more information end to end. If the pattern holds,
+    it suggests AdaLN-based conditioning, used throughout diffusion transformers generally, is a genuine
+    information bottleneck rather than just a convenient default.'
+  depth: full-text

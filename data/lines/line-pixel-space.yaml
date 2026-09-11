@@ -14,8 +14,10 @@ sections:
 arc:
 - paper: pixnerd-2025
   role: origin
-  note: Per-patch neural fields replace the VAE outright, single-scale and single-stage, at ImageNet 256
-    FID 2.15. Four months before JiT and independent of it.
+  note: 'Per-patch neural fields replace the VAE outright, single-scale and single-stage, at ImageNet
+    256 FID 2.15. Four months before JiT and independent of it, though its diagnosis differs: it blames
+    the two-stage pipeline''s accumulated error, not the prediction target, and uses velocity prediction
+    throughout.'
 - paper: jit-2025
   role: origin
   note: Argues epsilon-prediction rather than pixels caused pixel-space instability, and that x-prediction
@@ -38,8 +40,9 @@ arc:
   note: Adds one-step generation, removing the latent at sampling time as well as training time.
 - paper: pixelrepa-2026
   role: evidence
-  note: REPA, which accelerates latent DiTs, hurts JiT. Representation alignment turns out to depend on
-    the space being generated in.
+  note: 'REPA, which accelerates latent DiTs, makes JiT worse: FID 5.14 against vanilla JiT''s 4.37 at
+    200 epochs on ImageNet 256, with a diversity-collapse pattern. Its masked-adapter fix moves B/16 from
+    3.66 to 3.17 and reaches 1.81 at H/16.'
 - paper: registers-pixel-2026
   role: evidence
   note: Register tokens help pixel-space transformers more than latent ones, so pixel space is not just
@@ -58,14 +61,18 @@ arc:
     objection rather than working around it.
 - paper: pixel-t2i-empirical-2026
   role: scaling
-  note: The first systematic text-to-image training recipe, reporting 3.2x to 4.8x faster inference than
-    latent baselines and inverting the original efficiency argument for latents.
+  note: The first systematic text-to-image training recipe, reporting 3.18x to 4.75x end-to-end speedups
+    against three named latent baselines on the same backbones, measured as wall-clock latency at 1024px
+    on one H800.
 - paper: obsop-2026
   role: improvement
-  note: FID 1.52, from the same group as HyperDiT rather than an independent replication.
+  note: FID 1.52, from the same group as HyperDiT rather than an independent replication, and reported
+    with no guidance scale, interval or NFE anywhere in the text.
 - paper: pixsgr-2026
   role: improvement
-  note: FID 1.51 and 1.60 at 256 and 512, the lowest reported, and the least scrutinised.
+  note: FID 1.51 and 1.60 at 256 and 512, the lowest reported here and the least scrutinised. Its own
+    no-guidance ablation sits at 2.22, so most of that headline comes from the sampler rather than the
+    architecture.
 - paper: pixel-ar-pra-2026
   role: evidence
   note: The same bet under an autoregressive rather than diffusion objective, suggesting the tokenizer's
@@ -82,7 +89,9 @@ weaknesses:
 - Attention cost still scales badly with resolution; several papers here exist only to patch that
 - Every headline number is class-conditional ImageNet; text-to-image evidence is one paper old
 - PixelDiT states plainly that no mature training recipe exists for pixel data and noise distributions
-- The two lowest FIDs are single-version preprints, and two of the strongest results share authors
+- 'The two lowest FIDs are single-version preprints whose authors overlap, and one of them reports no
+  guidance setting at all while the other''s headline is mostly guidance: its no-CFG ablation is 2.22
+  against a reported 1.51'
 open_questions:
 - latent-vs-pixel-space
 competes_with:

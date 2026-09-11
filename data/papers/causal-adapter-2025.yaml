@@ -1,0 +1,48 @@
+id: causal-adapter-2025
+type: paper
+title: 'Causal-Adapter: Taming Text-to-Image Diffusion for Faithful Counterfactual Generation'
+short: Causal-Adapter
+arxiv: '2509.24798'
+doi: null
+date: 2025-09
+venue:
+  name: arXiv
+  status: preprint
+orgs:
+- AstraZeneca
+- Causality in Healthcare AI Hub
+- University of Edinburgh
+- Shanghai AI Laboratory
+authors: []
+tier: strong-followup
+sections:
+- medical
+lines:
+- line-medical-counterfactual
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-11'
+  verified_by: opus
+summary: Inserts structural-causal-model interventions into a frozen text-to-image diffusion model, tested
+  on ADNI brain MRI. Evaluated on effectiveness, composition, realism and minimality plus a counterfactual
+  latent divergence measure, with no clinical or reader-study evidence.
+explanation: null
+abstract: 'We present Causal-Adapter, a modular framework that adapts frozen text-to-image diffusion backbones
+  for counterfactual image generation. Our method supports causal interventions on target attributes and
+  consistently propagates their effects to causal dependents while preserving the core identity of the
+  image. Unlike prior approaches that rely on prompt engineering without explicit causal structure, Causal-Adapter
+  leverages structural causal modeling with two attribute-regularization strategies: (i) prompt-aligned
+  injection, which aligns causal attributes with textual embeddings for precise semantic control, and
+  (ii) a conditioned token contrastive loss that disentangles attribute factors and reduces spurious correlations.
+  Causal-Adapter achieves state-of-the-art performance on both synthetic and real-world datasets, including
+  up to a 91% reduction in MAE on Pendulum for accurate attribute control and up to an 87% reduction in
+  FID on ADNI for high-fidelity MRI generation. These results demonstrate robust, generalizable counterfactual
+  editing with faithful attribute modification and strong identity preservation. Code and models will
+  be released at: https://leitong02.github.io/causaladapter/.'

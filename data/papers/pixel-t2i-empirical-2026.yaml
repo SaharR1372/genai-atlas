@@ -45,3 +45,58 @@ abstract: 'This paper investigates an increasingly important topic in generative
   the resulting pixel-space models match or outperform their latent-space counterparts while delivering
   3.18 to 4.75 times end-to-end inference speedups. We hope that our findings provide useful empirical
   insights and practical guidelines for future research on pixel-space generation.'
+explained:
+  before: Prior pixel-space diffusion work, including everything else in this line, had been demonstrated
+    at small scale or in class-conditional settings (ImageNet). No one had published a practical recipe
+    for training a pixel-space text-to-image model at industrial data scale that reliably matched or beat
+    a comparable latent-space model, so it was unclear whether the class-conditional gains generalized.
+  problem: How to train a large-scale pixel-space text-to-image diffusion model that matches or exceeds
+    a latent-space model of the same backbone, given that the paper's own controlled comparison shows
+    direct large-scale pixel-space pretraining converges substantially more slowly than latent-space pretraining,
+    especially early in training.
+  idea: Do not pretrain in pixel space at all. Acquire the generative prior efficiently in latent space
+    first, at large scale, and only transition to pixel space during post-training, transplanting the
+    pretrained latent backbone's weights into the pixel-space model and re-deriving each of the transition's
+    design choices (initialization, data mix, prediction target, decoder, noise schedule, patch size)
+    empirically rather than by default.
+  method: 'Phase 1 is a standard latent-space diffusion pretraining of a 6B-parameter DiT backbone (Z-Image),
+    with Qwen-3-4B text conditioning, on 20B+ image-text pairs at progressive resolution 256 to 512. Phase
+    2 post-trains the same backbone directly in pixel space at 1024x1024: the backbone is initialized
+    from the latent checkpoint (found to converge far better than from-scratch pixel initialization),
+    pixel-specific input/output modules are added from scratch, and the whole model is optimized further
+    at batch size 128, learning rate 5e-5. Their chosen recipe uses a mixed 1:1 real/self-generated training
+    data ratio, x-prediction rather than v-prediction (found to consistently outperform v-prediction despite
+    the latent model having been trained with v-prediction), a DiP-style convolutional-UNet decoder head
+    (10.09M parameters, 834 GFLOPs) chosen over a JiT-style linear decoder, a DeCo-style decoder, or a
+    full pixel-transformer decoder (PiT, 2.25B parameters, 19,731 GFLOPs, found impractically expensive),
+    a noise-schedule shift of gamma=2 (found empirically optimal, not the theoretically SNR-matched gamma=8),
+    and progressive patch-size adaptation from 16 to 32 (direct ps32 or ps64 training reintroduces artifacts
+    and degrades local detail).'
+  evidence: 'The paper reports no FID; it evaluates on GenEval, DPG, OneIG, and LongText at 1024x1024,
+    and measures wall-clock end-to-end inference latency on a single H800 GPU with FlashAttention disabled.
+    Against Z-Image (latent, 100 NFE, 20.12s/image), their pixel model at 100 NFE reaches 4.56s/image
+    (4.41x faster) while scoring slightly higher on GenEval (0.7644 vs 0.7510) and DPG (87.60 vs 86.91).
+    Against Z-Image-Turbo (latent, 4-step distilled, 0.95s/image), their Turbo pixel model at 4 NFE reaches
+    0.20s/image (4.75x faster) with GenEval 0.7698 vs 0.7625 and DPG 86.85 vs 85.31. Against FLUX2-klein
+    (latent, 100 NFE, 20.25s/image), their pixel model reaches 6.38s/image (3.18x faster) with GenEval
+    0.8096 vs 0.8027 and DPG 86.88 vs 84.89. The paper''s own verbatim claim: ''Our final pixel-space
+    models maintain competitive overall benchmark performance while delivering 3.18x-4.75x end-to-end
+    speedups over their latent-space counterparts'' -- so the speedup range is measured strictly against
+    latent models built on the same underlying backbones (Z-Image, Z-Image-Turbo, FLUX2-klein), as wall-clock
+    inference time on one H800 GPU, not against a generic pixel-space baseline. No explicit CFG scale
+    is given in the reported metrics tables; distillation uses classifier-free guidance in training but
+    a scale/interval value is not stated in the fetched results tables.'
+  limitations: The paper concedes that further patch-size adaptation to ps64 'reintroduces artifacts'
+    and 'degrades local details,' calling preserving fine detail under extreme token compression 'an important
+    direction for future work.' It also concedes that self-generated training data 'inevitably inherit[s]
+    errors from the source latent model and its VAE decoder,' and that the theoretically SNR-matched noise-schedule
+    shift (gamma=8) underperforms an empirically tuned one (gamma=2) because 'spatial resolution alone
+    cannot fully characterize the distribution shift,' meaning the recipe still requires empirical calibration
+    rather than following from theory. The study is conducted primarily on one backbone family (Z-Image),
+    with generalization checked only against one additional external model (FLUX2-klein).
+  why_it_matters: It is the first evidence at industrial data scale that pixel-space text-to-image models
+    can be both faster at inference and at least as good on standard benchmarks as their latent counterparts,
+    which directly undercuts the efficiency argument that justified adopting latents in the first place
+    -- provided the speedup, measured here against three specific latent baselines on one GPU type, generalizes
+    to other hardware and serving setups.
+  depth: full-text

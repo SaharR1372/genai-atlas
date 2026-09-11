@@ -1,0 +1,57 @@
+id: pcgm-2025
+type: paper
+title: Integrating Anatomical Priors Into a Causal Diffusion Model
+short: PCGM
+arxiv: '2509.09054'
+doi: null
+date: 2025-09
+venue:
+  name: IEEE Transactions on Medical Imaging
+  status: journal
+orgs:
+- Stanford University
+authors:
+- Binxu Li
+- Wei Peng
+- Mingjie Li
+- Ehsan Adeli
+- Kilian M. Pohl
+tier: core
+sections:
+- medical
+lines:
+- line-medical-counterfactual
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: true
+  verified_on: '2026-09-11'
+  verified_by: opus
+summary: 'Combines an explicit causal graph with voxel-level anatomical constraint masks, applied through
+  a 3D ControlNet, for counterfactuals on 3D brain MRI. Offers evidence beyond distribution metrics: measurements
+  taken from the generated counterfactuals reproduce known disease effects on cortical regions reported
+  in the neuroscience literature.'
+explanation: null
+abstract: 3D brain MRI studies often examine subtle morphometric differences between cohorts that are
+  hard to detect visually. Given the high cost of MRI acquisition, these studies could greatly benefit
+  from image syntheses, particularly counterfactual image generation, as seen in other domains, such as
+  computer vision. However, counterfactual models struggle to produce anatomically plausible MRIs due
+  to the lack of explicit inductive biases to preserve fine-grained anatomical details. This shortcoming
+  arises from the training of the models aiming to optimize for the overall appearance of the images (e.g.,
+  via cross-entropy) rather than preserving subtle, yet medically relevant, local variations across subjects.
+  To preserve subtle variations, we propose to explicitly integrate anatomical constraints on a voxel-level
+  as prior into a generative diffusion framework. Called Probabilistic Causal Graph Model (PCGM), the
+  approach captures anatomical constraints via a probabilistic graph module and translates those constraints
+  into spatial binary masks of regions where subtle variations occur. The masks (encoded by a 3D extension
+  of ControlNet) constrain a novel counterfactual denoising UNet, whose encodings are then transferred
+  into high-quality brain MRIs via our 3D diffusion decoder. Extensive experiments on multiple datasets
+  demonstrate that PCGM generates structural brain MRIs of higher quality than several baseline approaches.
+  Furthermore, we show for the first time that brain measurements extracted from counterfactuals (generated
+  by PCGM) replicate the subtle effects of a disease on cortical brain regions previously reported in
+  the neuroscience literature. This achievement is an important milestone in the use of synthetic MRIs
+  in studies investigating subtle morphological differences.

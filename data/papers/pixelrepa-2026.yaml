@@ -46,3 +46,49 @@ abstract: 'Representation Alignment (REPA) has emerged as a simple way to accele
   Inception Score (IS) from 275.1 to 284.6 on ImageNet $256 \times 256$, while achieving $> 2\times$ faster
   convergence. Finally, PixelREPA-H$/16$ achieves FID$=1.81$ and IS$=317.2$. Our code is available at
   https://github.com/kaist-cvml/PixelREPA.'
+explained:
+  before: 'REPA had become a near-default trick for latent diffusion transformers: align an intermediate
+    transformer feature to a frozen pretrained semantic encoder''s (DINOv2) output and training converges
+    faster with better final FID. JiT had just shown a plain pixel-space transformer with x-prediction
+    could match tokenizer-based DiT models, but whether REPA would help it the same way it helps latent
+    models had not been tested.'
+  problem: Whether representation alignment, a technique validated in latent space, transfers to pixel-space
+    diffusion transformers, and if not, why.
+  idea: 'REPA does not transfer: applied naively to JiT it makes FID worse as training proceeds, because
+    pixel-space denoising happens in a very high-dimensional ambient image space while the alignment target
+    (a semantic encoder''s features) is a heavily compressed representation, so regressing directly toward
+    it acts as a shortcut objective that collapses the diversity of generated images that are visually
+    distinct but land near the same point in that compressed feature space. The fix is to not align raw
+    features directly but to pass them through a shallow, partially-masked adapter first, which both reduces
+    the degrees of freedom the alignment target can trivially exploit and gives the model room to represent
+    information that the compressed semantic target discards.'
+  method: 'The base model is JiT (plain ViT on raw pixel patches, x-prediction, no VAE). PixelREPA adds
+    a Masked Transformer Adapter: a lightweight two-block self-attention transformer that takes JiT''s
+    intermediate features (from the layer before the in-context block), applies random patch-token masking
+    at ratio 0.2, and maps the result into a transformed space that is aligned via cosine similarity to
+    a frozen DINOv2 encoder''s output (regularization weight lambda=0.1); DINOv2 is frozen throughout,
+    the adapter is trained, and the adapter is discarded at inference so it adds no sampling cost. Everything
+    else about JiT -- patch size 16x16, x-prediction target, no VAE -- is unchanged.'
+  evidence: 'The failure mode: at 200 epochs on ImageNet 256x256, JiT plus naive REPA reaches FID 5.14,
+    worse than vanilla JiT''s FID 4.37 at the same epoch count -- REPA actively hurts. On a subset of
+    images that cluster tightly near class centroids in DINOv2 feature space (''Most Similar 100''), vanilla
+    JiT beats JiT+REPA, while JiT+REPA only wins on images that are scattered in feature space (''Least
+    Similar 100''), which the paper reads as REPA overfitting to the narrow external feature space and
+    losing diversity on the images it collapses hardest on. With the fix: PixelREPA-B/16 reduces FID from
+    3.66 to 3.17 and raises IS from 275.1 to 284.6 on ImageNet 256x256 (131M parameters, results tracked
+    across 50 to 600 epochs, CFG interval [0.1,1.0], 50-step Heun sampler), reaching over 2x faster convergence
+    than vanilla JiT. The largest model, PixelREPA-H/16 (953M parameters), reaches FID 1.81 and IS 317.2,
+    ahead of JiT-H/16 (FID 1.86) and even JiT-G/16 (FID 1.82) despite having roughly half the parameters
+    of JiT-G.'
+  limitations: The paper does not state an explicit limitations section in the fetched text; it does concede
+    within its ablations that a higher mask ratio (0.5) degrades performance from excessive information
+    bottleneck, meaning the 0.2 ratio is a tuned hyperparameter rather than a robust default, and that
+    the method is validated only on ImageNet 256x256 with hyperparameters (lambda=0.1, r=0.2) fixed across
+    model sizes rather than shown to be robust across scales or datasets.
+  why_it_matters: 'It is a negative result that directly connects two lines the atlas tracks separately:
+    representation alignment is not a portable, space-independent trick, and its behavior depends on the
+    dimensionality relationship between the denoising space and the alignment target. That is direct evidence
+    against treating REPA as a free, general-purpose accelerator, and it suggests any future technique
+    imported from latent-space diffusion into pixel-space diffusion needs to be re-examined rather than
+    assumed to transfer.'
+  depth: full-text

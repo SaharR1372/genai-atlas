@@ -29,10 +29,12 @@ status:
   verified: true
   verified_on: '2026-09-10'
   verified_by: opus
-summary: Replaces the pretrained VAE with a per-patch neural-field parameterisation, giving single-scale
-  single-stage pixel diffusion with no tokenizer and no cascade. Reaches ImageNet 256 FID 2.15 and 512
-  FID 2.84. Published four months before JiT and reaching the same conclusion independently, which makes
-  it the technical origin of this line rather than a follow-up.
+summary: 'Replaces the pretrained VAE with a per-patch neural-field parameterisation, giving single-scale
+  single-stage pixel diffusion with no tokenizer and no cascade, at ImageNet 256 FID 2.15 and 512 FID
+  2.84. Published four months before JiT and reaching the same destination by a different route: its complaint
+  is the two-stage pipeline''s accumulated error and decoding artifacts, not the prediction target, and
+  it uses velocity prediction rather than the x-prediction JiT argues for. That makes it this line''s
+  technical origin without making it an anticipation of JiT''s argument.'
 explanation: null
 abstract: The current success of diffusion transformers heavily depends on the compressed latent space
   shaped by the pre-trained variational autoencoder(VAE). However, this two-stage training paradigm inevitably
@@ -44,3 +46,45 @@ abstract: The current success of diffusion transformers heavily depends on the c
   $256\times256$ and 2.84 FID on ImageNet $512\times512$ without any complex cascade pipeline or VAE.
   We also extend our PixNerd framework to text-to-image applications. Our PixNerd-XXL/16 achieved a competitive
   0.73 overall score on the GenEval benchmark and 80.9 overall score on the DPG benchmark.
+explained:
+  before: Diffusion transformers reached their best fidelity in a VAE-compressed latent space, but that
+    two-stage pipeline trained the VAE and the diffusion model separately. The VAE's reconstruction error
+    and decoding artifacts propagated into every generated image and could not be corrected by the diffusion
+    model, and the VAE itself needed adversarial and perceptual losses to train, adding a whole second
+    pipeline before any diffusion training could start. Pixel-space alternatives existed but paid for
+    dropping the VAE with cascaded multi-stage pipelines and much larger token counts.
+  problem: How to train a single-stage, end-to-end diffusion transformer directly on pixels, at a computational
+    cost comparable to a latent model, without a VAE and without a cascade of resolution stages.
+  idea: 'Replace the final linear projection of a diffusion transformer with a per-patch neural field:
+    instead of directly regressing a fixed-resolution patch of pixels, the transformer predicts the weights
+    of a small per-patch MLP, and that MLP is queried at continuous pixel coordinates (via a DCT-basis
+    positional encoding) to produce the velocity at each pixel. This lets one transformer token decode
+    a large patch of pixels through a lightweight, continuous decoder instead of a large flat linear head,
+    so patches can be big (16x16) without sacrificing per-pixel detail.'
+  method: The backbone is a standard diffusion transformer (SwiGLU, RMSNorm, RoPE2d) operating on 16x16
+    pixel patches, trained with a flow-matching/velocity-prediction objective, plus a representation-alignment
+    loss (weight 0.5) against frozen DINOv2-Base features. Nothing is frozen except the DINOv2 encoder
+    used only for the alignment loss; there is no VAE anywhere in the pipeline. The transformer's output
+    for each patch is not raw pixels but the parameters {W1, W2} of a 2-layer, 64-channel per-patch MLP
+    (with row-wise weight normalization); this MLP is evaluated at each pixel's coordinate (DCT-basis
+    encoding beats sine/cosine in ablations) together with the noisy pixel value to produce that pixel's
+    velocity. Text-to-image variants (PixNerd-XXL/16) extend the same architecture with text conditioning.
+  evidence: On ImageNet 256x256, PixNerd-XL/16 (700M params, 160 epochs) reaches FID 2.15 with sFID 4.55
+    and IS 297 using 100 Euler sampling steps, CFG scale 3.5 with guidance interval [0.1, 1.0]; the same
+    model with only 50 Euler steps gets FID 2.29, and a 50-step Adams-2 solver gets FID 2.16 -- so the
+    headline 2.15 needs 100 steps, not 50. On ImageNet 512x512 (fine-tuned from the 256 model, same CFG
+    3.5 and interval [0.1,1.0]), 100 steps give FID 2.84 versus 3.41 at 50 steps. For text-to-image, PixNerd-XXL/16
+    trained on a 45M image dataset reaches GenEval overall 0.73 and DPG-Bench overall 80.9 at 512x512,
+    using a 25-step Adams-2 solver and CFG 4.0.
+  limitations: The paper concedes that PixNerd 'shows unclear details in some cases' and 'still has gaps
+    with its latent counterparts', with occasional blurry or unnatural artifacts in specific scenarios
+    (they cite a steampunk-lab example), and suggests post-training processing could mitigate this. It
+    does not ablate patch size itself (16x16 is fixed by the large-patch design choice, not swept), and
+    it does not ablate the prediction target -- velocity/flow-matching is used throughout without comparison
+    to epsilon- or x-prediction.
+  why_it_matters: It shows a VAE can be removed without paying for a cascade of resolution stages, by
+    pushing per-pixel decoding into a lightweight continuous decoder rather than a large output layer
+    -- decoupling patch size (and thus sequence length) from per-pixel fidelity. That reopens single-stage
+    pixel diffusion as computationally viable at DiT-comparable cost, which is the precondition for every
+    later paper in this line.
+  depth: full-text

@@ -45,3 +45,52 @@ abstract: Pixel-space diffusion has recently emerged as a promising direction fo
   patches without the quadratic cost of dense attention. Extensive experiments on ImageNet validate the
   effectiveness of PixSGR. It achieves an FID of 1.51 at 256$\times$256 and maintains performance when
   scaled to 512$\times$512, attaining an FID of 1.60.
+explained:
+  before: Pixel diffusion models that added local refinement on top of a large-patch backbone, such as
+    DiP's Patch Detailer Head, were constrained by the quadratic cost of self-attention to refining each
+    patch in isolation. The paper argues that confining refinement to within a patch introduces boundary
+    artifacts, breaks structural continuity across patch edges, and cannot use long-range context that
+    would help refine any given patch.
+  problem: How to give patch-level refinement access to long-range, cross-patch context without paying
+    the quadratic cost of dense attention over the full fine-grained token sequence.
+  idea: Start generation from a supervised low-dimensional bottleneck that captures the coarse manifold
+    of the image cheaply, then progressively expand channel width and spatial resolution to add detail.
+    At the refinement stage, use the attention maps already computed at a coarser scale to decide, before
+    running fine-scale attention, which fine tokens are worth attending to globally -- so fine-scale refinement
+    gets non-local, cross-patch information but only pays attention cost on a sparse, pre-selected set
+    of tokens rather than the full dense set.
+  method: 'The backbone is a transformer with 4 low-channel bottleneck blocks (channel dimension divided
+    by 4), followed by 28 channel-expanded blocks, 24 spatial-refinement blocks, and further blocks up
+    to a PixSGR-H total depth, hidden dimension 1280, 16 attention heads, 16x16 patches at 256x256 (and
+    image_size/32 patches at 512x512). The bottleneck stage has an explicit auxiliary supervision loss
+    forcing its unpatchified prediction toward the clean image, and the model''s final prediction blends
+    the full prediction with this bottleneck prediction. Sparse Global Refinement uses each block''s coarse-scale
+    attention map to select top-k tokens (best setting: top-64 coarse, top-32 fine) and maps selected
+    coarse regions to fine tokens via a hybrid strategy (75% one-to-all mapping onto all four fine children
+    for the most-attended regions, 25% one-to-one mapping for broader but sparser coverage), which pre-sparsifies
+    the fine-scale attention pattern before it runs. The prediction target is x-prediction (clean image)
+    converted into a velocity for flow matching; everything is trained end to end and nothing is frozen.'
+  evidence: On ImageNet 256x256 at 320 epochs, PixSGR (875M parameters, batch size 1024, learning rate
+    2e-4) reaches FID 1.51 and IS 311.0 using CFG scale 3.0 over guidance interval [0.20, 0.98] plus an
+    additional internal guidance scale of 0.04 over interval [0.20, 0.70], at 100x2 NFE (reported as 50
+    ODE steps). Without CFG, the same 320-epoch model reaches only FID 2.22 and IS 237.4 with internal
+    guidance scale 0.15 and no interval restriction -- so essentially all of the headline FID improvement
+    over the no-CFG baseline comes from guidance, not the architecture alone. On ImageNet 512x512 at 300
+    epochs (879M parameters), FID reaches 1.60 with CFG scale 3.1 over interval [0.2, 1.0], same 100x2
+    NFE. Cumulative ablation from a JiT baseline (FID 78.9, presumably an early/short-training checkpoint)
+    shows the supervised bottleneck adds 3.2 points, sparse global attention adds the largest single gain
+    (5.4 points, to FID 70.3), convolutional upsampling adds 1.9 points, and internal guidance adds 4.8
+    points, ending at FID 63.6 in that ablation setting.
+  limitations: The paper has no dedicated limitations section in the fetched text. It does not discuss
+    inference speed or memory cost relative to latent models, does not discuss failure cases, and its
+    sparse-attention mechanism depends on coarse-scale attention already being concentrated in a small
+    set of tokens, a property the paper observes empirically in its own architecture but does not show
+    holds for other backbones. As instructed, this is flagged as a single-version (v1, dated September
+    2026), unreviewed arXiv preprint at time of writing, so its FID 1.51 and 1.60 numbers -- the lowest
+    pixel-space numbers found in this batch -- should be read as an unverified claim rather than a settled,
+    peer-reviewed result.
+  why_it_matters: If the sparse global refinement mechanism holds up, it offers a way to give patch-level
+    detail refinement genuine long-range context without the quadratic attention cost that has forced
+    every other model in this line into either large patches or isolated per-patch refinement -- directly
+    targeting the boundary-artifact problem that methods like DiP's per-patch detailer head do not solve.
+  depth: full-text
