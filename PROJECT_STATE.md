@@ -1,8 +1,47 @@
 # PROJECT_STATE
 
-Last updated: 2026-09-10 (session 10, Sonnet 5) — WORK_QUEUE Q1/Q2: wrote full-text `explained`
-blocks for all 38 papers whose first `sections` entry is `unified`, `vfm`, `vlm`, or `rae` and had
-none. See CHANGELOG.md's session 10 entry.
+Last updated: 2026-09-11 (session 11, Opus 5) — coverage audit. 42 verified papers added across
+eight research lines, pixel-space split into three lines, and the line the atlas called
+"mostly from one group" turned out to span a dozen. See CHANGELOG session 11.
+
+### Session 11 (2026-09-10/11, Opus 5) — the atlas was wrong about pixel space
+
+Triggered by the user asking why the pixel-space section held only two papers, and whether the
+atlas had really done its best at finding and categorizing work. It had not. Two audits ran, one
+over every line with a thin arc and one over pixel-space specifically. **All seven thin lines were
+atlas gaps. None was genuinely small.**
+
+**What changed in the data**
+- 42 papers added, every one fetched from arXiv with its recorded title checked against the fetched
+  title. Four had been recorded under titles that were truncations of the real ones.
+- `line-pixel-space` narrowed to *single-stage pixel transformers*; new `line-cascaded-pixel` holds
+  the older multiscale bet (CDM 2021 → simple diffusion → HDiT → SiD2 → Edify → PixelFlow); Latent
+  Forcing and CrossFlow went to `line-latent-hybrid` as the counter-position.
+- **The line's origin was wrong.** PixNerd (2507.23268, July 2025) predates JiT by four months and
+  reaches the same conclusion independently. Recorded as a priority claim that still needs checking
+  against PixNerd's own framing — see WORK_QUEUE Q8.
+- **`line-guidance-sampling` had no classifier-free guidance paper.** A line about inference-time
+  technique was missing the technique's origin. Added CFG, autoguidance, guidance interval, CFG++, APG.
+- Affiliations were taken only from author blocks actually read in fetched HTML. HyperDiT and
+  Observation Operators keep empty `orgs` because their blocks are not legible in any fetchable
+  rendering. The atlas prints nothing rather than an inference.
+
+**Systemic, not one-off.** `validate.py` now carries four coverage lints: arc of two or fewer
+papers; every paper from one organization; four or fewer papers spread over three or more years;
+and a line marked `ascendant`/`contested` with nothing in eighteen months. A first version also
+flagged `dominant` lines and produced seventeen warnings, most of them settled lines that are
+simply quiet — narrowed to the two statuses that make a claim about the present. Six actionable
+warnings remain, each a real question. 32 tests pass.
+
+**Where a warning is a true fact rather than a gap, the line's own text now says so** — the
+normalizing-flows line really is all Apple, and it says that in `weaknesses`.
+
+**Blocked mid-session.** The Sonnet subagent fan-out writing `explained` blocks for the 42 new
+papers hit the account's session rate limit; four of five batches were lost. 10 papers have
+full-text explanations, **32 do not**. The medical thin-line audit died with it. Both are queued as
+WORK_QUEUE **Q8** and **Q9**, with per-paper lists and the specific questions still to put to the
+sources. Lesson for the next fan-out: tell each agent to rewrite its JSON handoff after every
+paper, not once at the end.
 
 ### Session 10 (2026-09-10, Sonnet 5)
 Worked WORK_QUEUE.md Q1/Q2's unified/VFM/VLM/RAE subset: every paper in `data/papers/*.yaml` whose
