@@ -84,6 +84,38 @@ const STATUS_COLOR: Record<string, string> = {
     </div>
   </section>
 
+  <!-- ── fundamentals first ────────────────────────────────────────────────
+       This atlas starts at the frontier and assumes diffusion basics. Saying so
+       plainly, and pointing somewhere good, is more useful than pretending the
+       research pages are an entry point for someone learning the subject. -->
+  <section style="margin-bottom:3.5rem;">
+    <a
+      class="card section-border"
+      href="https://www.youtube.com/playlist?list=PLoROMvodv4rNdy8rt2rZ4T2xM0OjADnfu"
+      target="_blank"
+      rel="noopener"
+      style="--section-color: var(--section-vfm); display:block;"
+    >
+      <p class="badge" style="margin:0 0 0.6rem; border-color:var(--section-vfm); color:var(--section-vfm);">
+        New to this? Start with the fundamentals
+      </p>
+      <h2 style="font-size:1.25rem; margin:0 0 0.5rem;">
+        Stanford CME296: Diffusion &amp; Large Vision Models ↗
+      </h2>
+      <p class="measure" style="margin:0 0 0.6rem;">
+        This atlas begins where a course ends. It assumes you already know how diffusion and flow
+        matching work, and spends its time on what the field is still arguing about. If you want
+        that foundation first, or want it taught properly rather than reconstructed from papers,
+        this lecture course is the recommended starting point.
+      </p>
+      <p style="margin:0; font-size:0.85rem; color:var(--text-muted);">
+        Free on YouTube · then come back and read
+        {" "}<span style="color:var(--section-rae);">the representation debate</span> with the
+        background to judge it.
+      </p>
+    </a>
+  </section>
+
   <!-- ── the spectrum: the one diagram that explains the whole site ────── -->
   <section style="margin-bottom:3.5rem;">
     <h2 style="font-size:1.5rem; margin:0 0 0.4rem;">The argument the field is having</h2>
@@ -207,13 +239,20 @@ const STATUS_COLOR: Record<string, string> = {
     <h2 style="font-size:1.5rem; margin:0 0 1.25rem;">Start here</h2>
     <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px,1fr)); gap:1rem;">
       {[
+        { href: "https://www.youtube.com/playlist?list=PLoROMvodv4rNdy8rt2rZ4T2xM0OjADnfu", ext: true, t: "You want the fundamentals first ↗", d: "Stanford CME296: Diffusion & Large Vision Models. The background this atlas assumes, taught in order rather than reconstructed from papers." },
         { href: "/lines/line-representation-latent", t: "New to the latent debate", d: "The line that asks whether the generative space should be a pretrained representation at all." },
         { href: "/compare", t: "You want the numbers", d: "Head to head on ImageNet and text-to-image, with what the numbers can and cannot support." },
         { href: "/timeline", t: "You want the story in order", d: "How the field moved, and how long ideas sat unused before something made them work." },
         { href: "/notebooks", t: "You want to run something", d: "Four notebooks with real outputs from an A100: what each latent discards, RAE against the VAE it replaces, how editing methods differ, and why guidance breaks benchmarks." },
         { href: "/sections", t: "You want to browse by subject", d: "Six topic areas plus medical, each with its papers, its research lines, and its open problems." },
       ].map((x) => (
-        <a class="card" href={x.href} style="display:block;">
+        <a
+          class="card"
+          href={x.href}
+          style="display:block;"
+          target={x.ext ? "_blank" : undefined}
+          rel={x.ext ? "noopener" : undefined}
+        >
           <h3 style="font-size:0.98rem; margin:0 0 0.4rem;">{x.t}</h3>
           <p style="margin:0; font-size:0.88rem; color:var(--text-muted);">{x.d}</p>
         </a>
