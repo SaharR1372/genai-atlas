@@ -45,3 +45,46 @@ abstract: We present a general causal generative modelling framework for accurat
   mechanisms for structured variables in causal models. Our experiments demonstrate that our proposed
   mechanisms are capable of accurate abduction and estimation of direct, indirect and total effects as
   measured by axiomatic soundness of counterfactuals.
+explained:
+  before: Earlier deep structural causal model work used near-deterministic causal mechanisms for images,
+    including the diffusion-guided approach of Diff-SCM, which limited the fidelity and diversity of generated
+    counterfactuals and made mediation analysis (separating direct from indirect causal effects) difficult.
+  problem: Existing deep causal mechanisms could not produce high-fidelity counterfactuals for structured,
+    high-dimensional image variables while also supporting accurate estimation of direct, indirect, and
+    total causal effects, and existing evaluation practice for these counterfactuals leaned on distributional
+    similarity rather than causal correctness.
+  idea: Replace deterministic or near-deterministic causal image mechanisms with hierarchical VAE (HVAE)-based
+    stochastic mechanisms that sample a distribution over causal worlds rather than a single reconstruction,
+    enabling causal mediation analysis, and evaluate the resulting counterfactuals against causal axioms
+    instead of relying on distribution distance alone.
+  method: 'Two HVAE-based causal mechanisms are proposed: a conditional HVAE with an exogenous prior,
+    which keeps the latent prior unconditional but conditions the generative process on parent attributes,
+    and a hierarchical latent mediator model, which conditions the prior itself on the parents so that
+    direct and indirect effects can be decomposed via causal mediation analysis. Interventions follow
+    the standard abduction-action-prediction procedure, implemented through the HVAE''s posterior and
+    prior.'
+  evidence: 'Axiomatic evaluation against two causal axioms, not four: effectiveness and composition.
+    Effectiveness is defined as requiring positive mutual information between the counterfactual and the
+    intervened parent, and is measured via anticausal predictors trained to recover the intervened attribute
+    from the generated counterfactual. On Morpho-MNIST (Table 1), thickness intervention gives MAE 0.125-0.141,
+    intensity intervention gives MAE 1.48-2.71, and digit-class intervention gives accuracy 99.30-99.85%.
+    On two real medical datasets (Table 2), UK Biobank brain MRI (192x192, variables: MRI sequence, age,
+    sex, brain volume, ventricle volume) gives sex-intervention ROC-AUC 0.9905 and brain-volume MAE 24.55
+    ml, while MIMIC-CXR chest X-rays (192x192, variables: age, sex, race, pleural effusion) give sex-intervention
+    ROC-AUC 1.000 and disease-intervention ROC-AUC 0.982. Composition is measured as bits-per-dimension
+    distortion under a null intervention, reported at 0.674-0.942 bpd on Morpho-MNIST versus 2.04-2.17
+    bpd for a baseline mechanism. Reversibility and minimality are not formally tested. There is no reader
+    study, no clinician evaluation, and no downstream diagnostic task; the medical datasets are used only
+    for the same automated axiom metrics as the synthetic Morpho-MNIST dataset.'
+  limitations: The framework is restricted to Markovian structural causal models, assuming no unobserved
+    confounding, so any conclusion drawn is strictly dependent on the correctness of the assumed causal
+    graph; the authors explicitly urge practitioners to consider the ethical implications of their modeling
+    assumptions.
+  why_it_matters: This is the reference point in the atlas for evaluating counterfactuals against causal
+    axioms rather than distribution distance, and it is the correct reference for that framing, but the
+    axiom set it actually validates is effectiveness and composition, not the full set of effectiveness,
+    composition, reversibility and minimality. That distinction matters directly for causal-adapter-2025,
+    which borrows a four-axiom evaluation framework broader than what this paper itself tested, and it
+    matters for grading medical evidence in this section, since none of ribeiro-2023's medical-dataset
+    results involve a clinician or a downstream diagnostic outcome.
+  depth: full-text

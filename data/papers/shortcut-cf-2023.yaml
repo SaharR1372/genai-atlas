@@ -50,3 +50,49 @@ abstract: 'Shortcut learning is when a model -- e.g. a cardiac disease classifie
   diffusion-based counterfactual explanation method with significant inference speed-up at comparable
   image quality as state-of-the-art. We confirm this on two large chest X-ray datasets, a skin lesion
   dataset, and CelebA. Our code is publicly available at fastdime.compute.dtu.dk.'
+explained:
+  before: Shortcut learning from spurious features such as pacemakers or chest drains is a known failure
+    mode of medical image classifiers, and diffusion-based counterfactual explanation methods such as
+    DiME existed to visualize such shortcuts, but required rerunning the diffusion chain at every guidance
+    step, an O(T^2) cost that limited their use for large-scale shortcut auditing.
+  problem: Detect and quantify how much a classifier's prediction depends on a spurious, spatially localized
+    shortcut feature rather than genuine discriminative features, at a computational cost low enough for
+    practical use, and without needing a structural causal model of the underlying disease process.
+  idea: Build fast, purely classifier-guided diffusion counterfactuals (FastDiME) by computing guidance
+    gradients from the denoised image estimate at each step rather than rerunning the full reverse chain,
+    combined with an inpainting-style spatial mask so edits stay confined to the shortcut region, then
+    use the resulting shortcut-added and shortcut-removed counterfactuals to measure how far classifier
+    confidence moves.
+  method: Classifier guidance uses the denoised estimate ̄x_t^c at each reverse-diffusion step for gradient
+    computation instead of the noisy sample, reducing cost from O(T^2) to O(T) and giving roughly a 20x
+    speedup over DiME. A spatial mask is applied after a warm-up fraction (half) of the reverse steps
+    to keep classifier-guided changes localized to the shortcut region while classifier guidance continues
+    throughout, unlike post-hoc RePaint-style masking. No structural causal model or causal graph is built
+    anywhere in the pipeline; it is classifier-guided diffusion editing. Classifiers were deliberately
+    trained on datasets with varying shortcut-label correlation (100%, 75%, 50%) and evaluated on a natural
+    balanced test set and on the counterfactually edited set.
+  evidence: 'Classifier-behaviour quantification, not causal axiom tests and not a clinician reader study.
+    Metrics include the AUROC gap between a biased and an unbiased test subset, Mean Absolute confidence
+    Difference (MAD) and Mean confidence Difference (MD) after removing or adding the shortcut, plus image-quality
+    metrics FID, sFID, L1 distance, Flip Ratio, and Face Verification Accuracy (at least 99.2% on CelebA).
+    On CheXpert cardiomegaly with a pacemaker shortcut, the classifier trained on the fully correlated
+    split (D100) reached AUROC 0.98 on the biased test subset versus 0.58 on the unbiased subset (MAD
+    0.36), while the classifier trained on the balanced split (D50) showed AUROC 0.72 versus 0.73, i.e.,
+    essentially no shortcut gap. Datasets and approximate cohort sizes: CheXpert (pacemaker shortcut,
+    roughly 1,395 training and 349-388 test images), NIH ChestX-Ray8 (chest-drain shortcut, roughly 2,771
+    training and 693-1,728 test images), ISIC 2018 (ruler-marker shortcut, skin lesion, roughly 814 training
+    and 204-508 test images), and CelebA (smile-age shortcut, 10,000 training and 1,000-1,000 test images);
+    the medical images were resized to 224x224.'
+  limitations: Generation quality is bounded by the underlying diffusion model, which can itself reproduce
+    spurious correlations present in its training data; out-of-distribution generated samples cause the
+    counterfactual procedure to fail when predictions flip prematurely; the spatial-masking approach is
+    limited to localized shortcuts and fails on shortcuts that are spatially distributed; the medical
+    test cohorts are relatively small, on the order of 200 to 1,700 images.
+  why_it_matters: 'A second data point, alongside singla-2022, diffchest-2024 and stylex-med-2024, that
+    useful medical counterfactual tooling can be built entirely from classifier-guided diffusion with
+    no structural causal machinery at all. Its evidence standard is narrower than Singla''s clinician
+    reader study or DiffChest''s inter-reader agreement, however: it validates itself through direct manipulation
+    of classifier confidence across engineered contamination levels rather than through any human clinical
+    judgment, so it challenges the line''s causal-machinery premise without independently clearing the
+    atlas''s higher clinical evidence bar.'
+  depth: full-text

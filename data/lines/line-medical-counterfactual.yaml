@@ -16,9 +16,11 @@ arc:
     and prediction counterfactuals need.
 - paper: singla-2022
   role: challenge
-  note: A GAN counterfactual explainer with no causal model at all, and the only paper in this line validated
-    by a reader study with radiology residents. Counterfactual explanation was the only style that significantly
-    improved their understanding of the classifier.
+  note: 'A GAN counterfactual explainer with no causal model, validated by a reader study with 12 diagnostic
+    radiology residents: counterfactual explanation was the only style that significantly improved their
+    understanding of the classifier. Note the paper does not claim causal machinery is unnecessary. Its
+    own conclusion says counterfactual reasoning is incomplete without a causal structure, and leaves
+    that as future work. It challenges the line on evidence while conceding its premise.'
 - paper: diff-scm-2022
   role: precursor
   note: Brings diffusion into the causal counterfactual family, via forward diffusion for abduction and
@@ -26,8 +28,10 @@ arc:
     methodological bridge rather than clinical evidence.
 - paper: ribeiro-2023
   role: improvement
-  note: The direct successor to the origin paper, and the reference for evaluating counterfactuals against
-    causal axioms (effectiveness, composition) instead of distribution distance.
+  note: The direct successor to the origin paper, and the reference for judging counterfactuals by causal
+    axioms rather than distribution distance. It validates two of them, effectiveness and composition,
+    on Morpho-MNIST, UK Biobank brain MRI and MIMIC-CXR. Later papers score against four; this one did
+    not establish all four.
 - paper: shortcut-cf-2023
   role: challenge
   note: Classifier-guided diffusion, no causal model, used to find and quantify shortcut features like
@@ -38,9 +42,9 @@ arc:
     attribute discovery across eight tasks, expert-panel validated.
 - paper: diffchest-2024
   role: challenge
-  note: 515,704 radiographs from 194,956 patients, high inter-reader agreement, patient-specific confounder
-    counterfactuals, and no causal graph anywhere. The largest-scale evidence here is evidence against
-    the line's own bet.
+  note: 515,704 radiographs from 194,956 patients, no causal graph, latents perturbed by a linear-classifier
+    gradient. Fleiss' kappa at or above 0.8 for confounder detection, plus downstream diagnostic benchmarking
+    against CheXzero. The largest-scale evidence here comes from work that builds no causal machinery.
 - paper: causal-adapter-2025
   role: improvement
   note: Puts structural-causal-model interventions inside a frozen text-to-image diffusion model, on ADNI
@@ -57,7 +61,8 @@ weaknesses:
 - Requires an explicit causal graph, which is hard to specify for imaging
 - Sample quality lags behind mainstream diffusion
 - 'The strongest clinical evidence in this area comes from work that uses no causal machinery at all:
-  a radiologist reading study, a 194,956-patient cohort, and an expert-panel study, none of which build
-  a structural causal model. The causal papers are evaluated on axioms; the non-causal ones on clinicians.
-  That asymmetry is the line''s central unresolved problem'
+  a 12-resident reader study, a 194,956-patient cohort, and an expert-panel study. The causal papers are
+  evaluated on axioms, the non-causal ones on clinicians. That asymmetry is the line''s central unresolved
+  problem. It is a gap in what the causal side has demonstrated rather than a refutation of its premise,
+  and the strongest challenger explicitly agrees that causal structure is ultimately needed'
 explains: null

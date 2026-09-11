@@ -55,3 +55,57 @@ abstract: 3D brain MRI studies often examine subtle morphometric differences bet
   by PCGM) replicate the subtle effects of a disease on cortical brain regions previously reported in
   the neuroscience literature. This achievement is an important milestone in the use of synthetic MRIs
   in studies investigating subtle morphological differences.
+explained:
+  before: Counterfactual brain MRI generation had been optimized mainly for global appearance, e.g. via
+    cross-entropy losses, which the authors report fails to preserve fine-grained anatomical detail, leaving
+    subtle disease-related morphological differences (studied in conditions such as mild cognitive impairment,
+    HIV, and alcohol use disorder) undetected by prior generative approaches.
+  problem: Generate anatomically plausible 3D brain MRI counterfactuals that reproduce fine-grained, medically
+    relevant local morphological effects of variables such as age, sex, and diagnosis on specific cortical
+    regions, rather than only looking realistic in aggregate.
+  idea: 'Fuse an explicit probabilistic causal graph over metadata (age, sex, diagnosis) and regional
+    brain volumes with voxel-level anatomical priors: translate the causal graph''s predicted volume changes
+    into spatial binary masks confined to anatomically meaningful boundaries, and use those masks to guide
+    a diffusion decoder through a 3D ControlNet so the causal model constrains where the generator is
+    allowed to alter anatomy.'
+  method: Three modules. A Probabilistic Graph Module (PGM) models causal relationships between age, sex,
+    diagnosis and region-of-interest cortical volumes using a structural causal model with normalizing
+    flows and standard abduction-action-prediction inference. A Counterfactual Mask Generator (CMG) converts
+    the PGM's altered volume scores into binary spatial masks, modifying only cortical-cerebrospinal-fluid
+    boundaries (not white matter) by ranking boundary voxels with probability maps. A Mask-Guided Diffusion
+    (MGD) pipeline combines a continuous-VAE causal encoder adapted from video architectures (treating
+    2D slices as frames for cross-slice consistency), a 3D counterfactual denoising UNet with volumetric,
+    cross- and temporal attention plus a 3D-adapted ControlNet for mask guidance via skip connections,
+    and a 3D diffusion decoder for final refinement.
+  evidence: 'Three distinct evidence types beyond distribution metrics. Image-quality/distribution metrics:
+    FID and MMD computed via 3D ResNet-101/50 encoders, and MS-SSIM, where the method''s output differed
+    from real MRIs by 1.06% relative, best among baselines. Anatomical-plausibility metrics: FreeSurfer
+    segmentation of 34 Desikan-Killiany cortical regions, with Cohen''s d effect sizes between synthetic
+    and real volume distributions exceeding |d|>0.5 in only 1 of 32 regions (lateral occipital, d=0.53)
+    versus 24% of regions for the BrainSyn baseline. Neuroscience replication, the strongest evidence
+    in the paper: cortical volume changes for Alcohol Use Disorder (frontal, insula, parietal, cingulate,
+    temporal, occipital regions), extracted from generated counterfactuals via FreeSurfer after supratentorial
+    volume regression, replicated all six previously published AUD findings from Sullivan et al. (2018)
+    at Bonferroni-corrected significance (p<0.00833 across 6 regions), while two baselines (CDM and TUMSyn)
+    replicated only one finding each; the occipital-cortex effect was not replicated (p=0.989). A reader
+    study: three experts with 20+ years of experience attempted to distinguish 50 real from 50 synthetic
+    MRIs and reached only 46.0% classification accuracy against a 50% chance baseline, compared with 70.7%
+    accuracy for detecting the BrainSyn baseline''s synthetic images. Cohorts: ADNI (1,273 baseline T1w
+    MRIs, 380 controls, age 75.5±6.1, 50.7% female), NCANDA (3,081 T1w MRIs, 767 healthy adolescents,
+    age 16.1±2.5, 51.5% female), a combined training set of 3,954 MRIs from 667 subjects with a held-out
+    test set of 400 subjects (132 ADNI, 268 NCANDA); longitudinal subsets of 7 NCANDA and 23 ADNI subjects,
+    plus 41 HIV-positive participants (age 53.3±7.8, 36.5% female) from an SRI-Stanford study; and an
+    in-house AUD dataset of 222 AUD-diagnosed (age 48.05±10.33) and 199 control (age 47.21±12.64) subjects,
+    826 T1w MRIs total.'
+  limitations: Training required a single A100 GPU at batch size 1 for the encoder; longitudinal test
+    data is limited (roughly 30 NCANDA/ADNI subjects, and only two visits for the HIV cohort); the mask-guidance
+    strategy targets cortical-CSF boundaries only, so subcortical structures would need a different approach;
+    total training data, under 4,000 MRIs, is small for a diffusion model; the method failed to replicate
+    the AUD effect specifically in the occipital cortex.
+  why_it_matters: 'The paper in this batch that most directly supports the line''s core bet: an explicit
+    causal graph combined with anatomical priors is what lets the generated counterfactuals reproduce
+    a specific, independently published neuroscience finding region by region, evidence categorically
+    stronger than FID or SSIM and stronger than the axiom tests in ribeiro-2023, because it ties the generative
+    model''s output back to an external clinical/neuroscience literature result rather than to an internal
+    metric.'
+  depth: full-text

@@ -58,3 +58,61 @@ abstract: 'A workflow for generating hypotheses about which visual signals corre
   Recovers known clinical features, exposes confounders beyond physiology such as chest X-ray underexposure
   and eye makeup, and surfaces previously unknown attributes. States explicitly that it is not designed
   to infer causality.'
+explained:
+  before: Saliency-style explanations for medical imaging classifiers show where a decision is made but
+    not what visual attribute drives it, and CycleGAN-style whole-image class-transformation methods show
+    an overall class change but cannot disentangle individual fine-grained attributes from one another.
+  problem: Generate hypotheses about which individual, disentangled visual attributes a medical-imaging
+    classifier is sensitive to, including attributes that are confounders or reflect socio-cultural factors
+    rather than physiology, across multiple imaging modalities and tasks, with those hypotheses checked
+    by domain experts rather than assumed to be causal.
+  idea: Repurpose StylEx, a StyleGAN2-based generator whose disentangled 'StyleSpace' is trained to preserve
+    a classifier's decisions, to automatically discover the classifier's most influential attributes one
+    at a time, visualize each as a counterfactual with the attribute turned up or down, and route the
+    visualizations through an interdisciplinary expert panel (clinical, technical, social-science, and
+    human-factors specialists) for hypothesis formation rather than automated causal claims.
+  method: 'A four-stage pipeline. First, train a task classifier C and keep only tasks where it reaches
+    roughly AUC above 0.8, ensuring the images contain task-relevant signal. Second, train a StyleGAN2-like
+    generator G whose encoder E replaces the usual noise-to-latent mapping network, adding a reconstruction
+    loss for visual similarity to the input, a classifier-output-similarity loss applied at both the image
+    and classifier-activation level, and conditioning on the classifier''s own output so the StyleSpace
+    encodes classifier-relevant attributes. Third, automatically search each StyleSpace coordinate for
+    its effect on the classifier''s prediction by perturbing it up and down by a fixed multiple of its
+    standard deviation, select the top-k attributes per image in an Individual-Conditional-Expectation-like
+    procedure, and aggregate across many images per class using a fixed 0.15 prediction-change threshold,
+    discarding attributes whose effect direction is inconsistent across images. Fourth, present the resulting
+    counterfactual visualizations to an interdisciplinary expert panel for interpretation. The method
+    is applied to eight tasks across three modalities: retinal fundus photography from UK Biobank (self-reported
+    sex, systolic blood pressure >=140, smoking status), external eye photography from EyePACS/LACDHS
+    (cataract presence, HbA1c >=9%, hemoglobin <11 g/dL), and chest radiography (abnormality using IND1/CXR-14,
+    and a race-prediction model similar to prior work by Gichoya et al.).'
+  evidence: 'Expert-panel qualitative validation and replication of known clinical associations, not a
+    statistics-bearing reader study and not causal axiom tests. The paper reports which discovered attributes
+    the interdisciplinary panel classified as known clinical phenomena, for example cortical cataract
+    spokes and a dimmer red reflex for cataract, left-ventricular enlargement and mediastinal widening
+    for chest-X-ray abnormality, and retinal vein dilation for smoking status and arteriolar narrowing
+    for elevated blood pressure, both previously reported associations, versus attributes flagged as confounders,
+    for example chest-X-ray underexposure correlated with the classifier predicting ''abnormal,'' and
+    eye makeup correlated with the classifier predicting low hemoglobin, versus attributes the panel could
+    not confidently interpret at all. No quantified agreement statistic (no kappa, no ANOVA) and no reported
+    FID-style image-quality metric appear in the fetched text. The paper is explicit and repeats the point:
+    it states it is ''not designed to infer causality,'' that the core causal-inference assumptions of
+    consistency, exchangeability, and positivity do not hold for its method, and that prediction models
+    are explicitly distinguished from causal models with respect to the temporality of explanatory variables.'
+  limitations: Attribute interpretation is not automatic; it required close, time-consuming collaboration
+    between the machine-learning team and the expert panel, and some attributes could not be confidently
+    interpreted by anyone. Large perturbations in the manipulated latent can produce unrealistic images.
+    StyleGAN2 training works well only on structured, standardized-protocol image domains and struggles
+    in open-ended domains such as dermatology photographs with variable framing. Training is computationally
+    and data intensive, narrowing where the approach is feasible. Datasets are not demographically representative
+    of their source populations, so findings do not generalize across countries. The method is explicitly
+    not designed to establish causality.
+  why_it_matters: 'The clearest self-aware member of the challenger cluster in this batch: a non-causal
+    GAN explicitly disclaims causal inference, yet still recovers known clinical positive controls, such
+    as cataract spokes and cardiac enlargement, and surfaces genuine confounders, such as chest-X-ray
+    underexposure and eyeliner correlating with low hemoglobin, validated by an interdisciplinary panel
+    across eight tasks and three modalities. Because the authors draw the association-versus-causality
+    line so carefully themselves, this paper is less a rebuttal of the line''s core bet than a demonstration
+    that useful clinical hypothesis generation does not require explicit causal machinery, while conceding
+    that causal claims specifically would.'
+  depth: full-text

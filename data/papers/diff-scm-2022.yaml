@@ -44,3 +44,40 @@ abstract: We consider the task of counterfactual estimation from observational i
   predictor w.r.t the input. Furthermore, we propose a metric for evaluating the generated counterfactuals.
   We find that Diff-SCM produces more realistic and minimal counterfactuals than baselines on MNIST data
   and can also be applied to ImageNet data. Code is available https://github.com/vios-s/Diff-SCM.
+explained:
+  before: Deep structural causal models had been demonstrated on semi-synthetic, low-dimensional data,
+    and quantifying the causal effect of interventions for high-dimensional images with neural networks
+    remained an open problem. Separately, score-based and energy-based generative models were emerging
+    as an alternative to GANs and VAEs for image synthesis, but had not been connected to Pearl's abduction-action-prediction
+    framework.
+  problem: How to perform counterfactual inference (abduction, action, prediction) over high-dimensional
+    images using a single generative mechanism, given a known causal graph relating an image to a small
+    set of label variables.
+  idea: 'Treat the diffusion process itself as the causal mechanism: deterministic forward diffusion recovers
+    the exogenous noise of the image (abduction), and an intervention is carried out by guiding the reverse
+    diffusion process with the gradient of an anti-causal classifier trained on the intervened variable
+    (action and prediction), unifying stochastic differential equation diffusion with structural causal
+    models.'
+  method: A DDIM forward pass deterministically encodes the image into a latent noise variable. Reverse
+    diffusion is then guided by the gradient, with respect to the image, of an anti-causal predictor for
+    the intervened parent variable, pushing the sample toward the requested intervention. The paper introduces
+    Counterfactual Latent Divergence (CLD), a metric that scores the minimality of a counterfactual via
+    KL divergence in the latent space of a class-conditional autoencoder, balancing proximity to the original
+    class against distance from the target class. A scale hyperparameter controlling guidance strength
+    is tuned by optimizing CLD (optimal value 0.7 on MNIST).
+  evidence: 'Distribution and reconstruction metrics only, no causal axiom tests, no downstream task utility,
+    and no reader study. Quantitative results are reported only on MNIST: IM1 0.94±0.02 versus 1.10±0.03
+    for a Looveren & Klaise baseline, IM2 0.04±0.00 versus 0.05±0.00, and CLD 1.08±0.03 versus 1.25±0.03.
+    ImageNet 256x256 is used only for qualitative visual examples, with no quantitative table. No medical
+    imaging dataset appears anywhere in the experiments, confirming the atlas''s filing of this paper
+    as a methodological precursor rather than a clinical result.'
+  limitations: The authors state the empirical setting is restricted to specifications for two variables
+    (image and one label), and that extending to more complex causal graphs with multiple confounders,
+    including handling graph mutilation, is left to future work.
+  why_it_matters: This paper brought diffusion models into the causal-counterfactual family, replacing
+    the GAN and VAE causal mechanisms of earlier deep structural causal model work with score-based classifier
+    guidance, and supplies the abduction-action-prediction-via-diffusion machinery that later papers in
+    this line (ribeiro-2023's successors, pcgm-2025, causal-adapter-2025) build on or diverge from. Because
+    its own experiments never touch medical imaging, it functions in this atlas as a methodological bridge,
+    not as clinical evidence, exactly as the existing filing states.
+  depth: full-text

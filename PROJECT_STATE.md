@@ -1,8 +1,8 @@
 # PROJECT_STATE
 
-Last updated: 2026-09-11 (session 11, Opus 5) — coverage audit. 42 verified papers added across
-eight research lines, pixel-space split into three lines, and the line the atlas called
-"mostly from one group" turned out to span a dozen. See CHANGELOG session 11.
+Last updated: 2026-09-11 (session 11, Opus 5) — coverage audit complete. 50 verified papers added
+across nine research lines, pixel-space split into three, and **all 204 papers now carry full-text
+`explained` blocks**. See CHANGELOG session 11.
 
 ### Session 11 (2026-09-10/11, Opus 5) — the atlas was wrong about pixel space
 
@@ -514,3 +514,35 @@ transitions has its MDX written).
 
 **Not yet started**: pipeline (`pipeline/`, P7), medical section (P5), editing section (P3), unified
 section (P4), VFM/VLM brief pages (P4), publishing/GitHub Pages deploy (P8).
+
+**Closing state of session 11.** 204 papers, 347 graph nodes, 35 lines, 33 tests, validation clean,
+site builds with 0 errors. Every paper has a full-text `explained` block; the two long-standing
+abstract-depth warnings (genfirst-2026, pinaya-2022) are the only ones left, and both are blocked on
+papers with no HTML render.
+
+**Five of the atlas's own claims were corrected this session by reading full text**, which is the
+same failure mode as session 8's seven. It recurs whenever the atlas writes from a summary instead of
+a source, and it is worth assuming it is still happening somewhere: SiD2 does not match latent
+diffusion (1.48 against EDM2-XXL's 1.40, and the paper concedes latent scales better); simple
+diffusion argues comparability, not that cascades are unnecessary; Fluid does not claim continuous
+tokens win *more* as scale grows; Re-Imagen's framing is long-tail entity memorisation, not a general
+theory of knowledge failure; and PixNerd reaches JiT's destination by a different route, never
+blaming epsilon-prediction and using velocity prediction throughout.
+
+**Exact next tasks.**
+1. `line-adapter-conditioning`, `line-cross-attention-vlm`, `line-editing-attention`,
+   `line-editing-inversion` and `line-medical-domain-vae` all trip the new staleness lint (19-24
+   months since their newest paper, on lines the atlas calls ascendant or contested). Given that
+   every thin line audited this session was a gap, assume these are too until checked. That is the
+   highest-value remaining work.
+2. 31 of 35 lines still have no narrative prose. Only `line-representation-latent`,
+   `line-adapter-conditioning`, `line-pixel-space` and `line-cascaded-pixel` do.
+3. WORK_QUEUE Q7: Krea 2 and the remaining open models still to run.
+4. GitHub Pages publishing still needs the placeholder site URL replaced, and the user's go-ahead.
+
+**Two traps recorded so they are not rediscovered.**
+- Astro keys a content entry by *filename*, not the `id` in its frontmatter, and `getEntry()` returns
+  nothing on a miss rather than failing the build. This silently hid the RAE deep dive. Now a
+  validation error.
+- An empty `orgs` field caused the single-org coverage warning to assert, in the line's own text,
+  that a Korean company's paper was from Oxford. Missing data does not stay inert; it gets rendered.

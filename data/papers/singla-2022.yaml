@@ -47,3 +47,61 @@ abstract: A BlackBox Counterfactual Explainer for medical image classifiers. A G
   residents compared no explanation, saliency map, cycleGAN explanation and counterfactual explanation;
   counterfactual explanation was the only method that significantly improved users' understanding of the
   classifier's decision over the no-explanation baseline.
+explained:
+  before: Post-hoc explanation for medical image classifiers relied mainly on saliency maps, which localize
+    important regions of an image but cannot express what feature within those regions drives the classifier's
+    decision, and multiple diagnoses affecting the same anatomical region could produce indistinguishable
+    saliency explanations.
+  problem: Produce an explanation of a medical image classifier's decision that shows what imaging feature
+    drives the decision rather than merely where, and validate that explanation with clinically meaningful
+    quantitative metrics and with real clinicians, without requiring a causal graph of the underlying
+    disease process.
+  idea: Train a conditional GAN as a black-box explainer that progressively perturbs a query chest X-ray
+    along the classifier's own decision boundary, generating a smooth sequence of counterfactuals from
+    negative to positive for a target diagnosis, while a context-aware reconstruction loss preserves anatomical
+    shape and support devices such as pacemakers so the explanation is not confounded by irrelevant changes.
+  method: 'An encoder E, a conditional GAN generator G, and a discriminator D are trained jointly with
+    three losses: a Projection-GAN-style data-consistency loss using the desired classifier posterior,
+    discretized into 10 bins, as the condition; a classifier-consistency loss combining an ordinal-regression
+    discriminator term with a KL-divergence term that pulls the classifier''s output on the generated
+    image toward the target probability; and a context-aware reconstruction loss (CARL) that uses a pretrained
+    semantic segmentation network (heart and lung contours) and a pretrained foreign-object detector (pacemakers,
+    hardware) to penalize reconstruction error per anatomical region and per object rather than globally.
+    The pipeline is trained and evaluated on MIMIC-CXR (377K images from 65K patients; the classifier
+    is trained on about 198K images from 51K patients and tested on a held-out 50K images from 12K patients)
+    for three target labels: cardiomegaly, pleural effusion, and edema. No causal graph or structural
+    causal model appears anywhere in the method; it is a conditional-GAN explainer regularized only by
+    the pretrained classifier, a segmentation network, and an object detector. The paper''s own conclusion
+    states this directly: counterfactual reasoning is ''incomplete without a causal structure and explicitly
+    modeling of the interventions,'' proposed as future work rather than something the paper does.'
+  evidence: 'This paper spans nearly every evidence tier the atlas distinguishes except causal axiom tests.
+    Distribution and validity metrics: FID (lower than an xGEM baseline, higher than cycleGAN), a Counterfactual
+    Validity score measuring the fraction of counterfactuals that successfully flip the classifier''s
+    decision (near 50% for cycleGAN versus high for this method), and a Foreign Object Preservation score.
+    Downstream clinical-metric evidence: cardiothoracic ratio (CTR) for cardiomegaly and a costophrenic-recess
+    score (SCP) for pleural effusion, computed from the segmentation and detection networks on generated
+    counterfactuals and compared between matched real and counterfactual populations with paired t-tests,
+    both significant in the clinically expected direction (p<0.0001). And a human-grounded reader study,
+    the rarest evidence tier in this batch: 12 diagnostic radiology residents compared no-explanation,
+    saliency-map, cycleGAN, and this method''s counterfactual explanations across understandability, decision
+    justification, visual quality, identity preservation, and helpfulness, using 6 CXR images each (72
+    ratings per metric). A one-way ANOVA found a significant difference in understandability across the
+    four conditions (F(3,284)=3.39, p=0.019), and Tukey''s HSD post hoc test showed this method was the
+    only explanation type significantly more understandable than no explanation (p=0.018); it also scored
+    significantly higher than cycleGAN on decision justification (t(71)=3.55, p<0.001) and was chosen
+    as most helpful in 57% of responses, with a significant ANOVA result overall (F(3,284)=21.5, p<0.0001).
+    CycleGAN scored higher on visual quality and identity preservation despite its counterfactual-validity
+    score of roughly 50%.'
+  limitations: Generated images are 256x256, smaller than standard clinical chest radiograph resolution;
+    foreign-object preservation is imperfect, partly limited by the accuracy of the object detector used
+    to score it; conditional batch normalization required class-balanced mini-batches, which forced a
+    coarse discretization of the classifier-probability condition and produced abrupt transitions across
+    the generated sequence; and, as the authors state directly, the method has no causal structure underlying
+    its interventions.
+  why_it_matters: The strongest single empirical challenge to this line's core bet in this batch. A GAN
+    with no structural causal model anywhere in it produced counterfactuals that changed clinicians' understanding
+    in a statistically significant, controlled reader study, corroborated by clinically grounded quantitative
+    metrics (CTR, SCP). The authors themselves treat the missing causal structure as a direction for future
+    work rather than as a reason their explanations were not clinically useful, which the atlas should
+    register as evidence that clinical validity and explicit causal machinery are not the same axis.
+  depth: full-text

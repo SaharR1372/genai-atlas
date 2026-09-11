@@ -46,3 +46,48 @@ abstract: 'We present Causal-Adapter, a modular framework that adapts frozen tex
   FID on ADNI for high-fidelity MRI generation. These results demonstrate robust, generalizable counterfactual
   editing with faithful attribute modification and strong identity preservation. Code and models will
   be released at: https://leitong02.github.io/causaladapter/.'
+explained:
+  before: Prior counterfactual approaches either trained a bespoke causal generative model from scratch
+    or steered a frozen text-to-image diffusion backbone through prompt engineering with no explicit causal
+    structure, which risks propagating spurious correlations between attributes rather than the intended
+    causal effects.
+  problem: Adapt a frozen, pretrained text-to-image diffusion backbone to support faithful causal interventions
+    on named attributes, propagating effects correctly to causally dependent attributes while preserving
+    the rest of the image's identity, without retraining the backbone or relying on unstructured prompt
+    engineering.
+  idea: 'Insert structural-causal-model machinery into the conditioning pathway of a frozen diffusion
+    backbone through a lightweight adapter: fit each causal mechanism as nonlinear additive noise, inject
+    numeric attribute values as learnable token embeddings aligned with the text-conditioning space (prompt-aligned
+    injection), and add a contrastive loss across attribute tokens to disentangle them and reduce spurious
+    correlation between attributes.'
+  method: Causal mechanisms are fit as ȳ_i = f_i(A_i⊙Y; ω_i) + u_i, trained by negative log-likelihood.
+    A half-scale U-Net adapter learns to inject these mechanisms into a frozen Stable Diffusion backbone.
+    Abduction, action and prediction are implemented via DDIM inversion. Prompt-Aligned Injection (PAI)
+    maps each numeric attribute to a learnable embedding added to a base token so causal attributes align
+    with textual embeddings. A Conditioned Token Contrastive (CTC) loss, an InfoNCE objective with temperature
+    0.2, enforces separation between different attribute tokens and consistency within a token across
+    images.
+  evidence: 'Purely quantitative axiomatic and distributional evaluation; no clinical or reader-study
+    evidence anywhere in the paper. Four metrics are reported: effectiveness (a pretrained classifier
+    or regressor''s success at recovering the intervened attribute, F1 for categorical attributes and
+    MAE for continuous ones), composition (reconstruction fidelity under a null intervention, via MAE
+    and LPIPS), realism (Fréchet Inception Distance), and minimality (Counterfactual Latent Divergence,
+    the same metric introduced in the Diff-SCM lineage). On the synthetic Pendulum dataset, light-attribute
+    MAE dropped 91% (0.434 to 0.041). On CelebA, LPIPS dropped 86% (0.122 to 0.017) and FID dropped 58%
+    (27.861 to 8.509). On ADNI brain MRI, brain-volume MAE dropped 50% and FID dropped 87% (113.749 to
+    9.130); CLD stayed near 0.30 across datasets, versus 0.34-0.35 for baselines. Datasets: Pendulum (synthetic,
+    5,000/500/2,000 train/val/test images, 94x94, 4 continuous attributes), CelebA (162,770/19,867/19,962
+    images, 64x64, 4 categorical attributes), and ADNI brain MRI (10,780 train / 2,240 test images, 192x192,
+    6 mixed attributes).'
+  limitations: Requires the causal graph to be specified in advance for each domain; evaluated only on
+    relatively simple causal structures; no clinical validation or domain-expert assessment anywhere in
+    the paper; requires labeled attribute annotations for training; inference takes 5-7 seconds per image;
+    the authors flag potential misuse for generating synthetic faces or medical images despite stated
+    ethical safeguards.
+  why_it_matters: 'Shows the explicit-causal-machinery approach can be retrofitted onto a large pretrained
+    generative backbone rather than trained from scratch, and reports the largest FID reductions on a
+    medical dataset (ADNI) in this batch. But unlike pcgm-2025, all of its evidence stays inside the axiomatic
+    and distributional regime: no independent clinical or neuroscience replication and no reader study
+    anywhere, so despite using an explicit causal model, it does not clear the higher evidence bar the
+    atlas sets for clinical claims.'
+  depth: full-text
