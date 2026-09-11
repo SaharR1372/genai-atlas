@@ -2,6 +2,49 @@
 
 ## Unreleased
 
+### 2026-09-11 — Session 11 continued — explanations, four corrections, one silent bug
+
+**39 of the 42 audit papers now carry full-text `explained` blocks**, each reporting guidance scale
+and interval alongside every FID, because this atlas treats those as confounds rather than footnotes.
+Three remain (Q8).
+
+**Four claims of the atlas's own were corrected by the full-text reads.** This is the same failure
+mode as session 8's seven unsupported claims, and it is worth recording that it recurs whenever the
+atlas writes from a summary rather than a source:
+- **SiD2** was recorded as matching or beating latent diffusion at ImageNet 512. It does not. Its
+  1.48 sits behind EDM2-XXL's 1.40 in the paper's own matched-setting table, and the authors concede
+  latent diffusion scales slightly better. The rediscovery argument survives on the corrected number.
+- **simple diffusion** was recorded as arguing cascades are unnecessary. It argues that one
+  end-to-end model can be *comparable* to cascades and to latent diffusion, and does not refute
+  cascades on their own terms.
+- **Fluid** was recorded as finding continuous tokens beat discrete ones *as models grow*. It claims
+  only that continuous wins at every scale tested, and reports GenEval plateauing from 3.1B to 10.5B
+  while FID keeps improving.
+- **Re-Imagen** was recorded as the origin of "generation failures are knowledge failures". Its own
+  framing is narrower: rare and long-tail *entity* memorisation. The atlas now marks its own broader
+  reading as an extrapolation rather than the paper's thesis.
+- Also noted: **Edify Image** reports no FID or quantitative benchmark at all, so it cannot be placed
+  against the numbers on its line. **Demystifying Transition Matching** was confirmed genuinely
+  independent of Meta FAIR (KAIST and AWS authors), which is why it carries weight as external
+  validation. **Transition Matching Distillation** claims only its narrow video result, not a general
+  validation of the paradigm, and its own ablation shows plain TM pretraining nearly matching the
+  full objective.
+
+**A silent rendering bug, found while adding prose and older than this session.** Astro's glob loader
+keys a content entry by its *filename*, not by the `id` in its frontmatter, and `getEntry()` returns
+nothing on a miss rather than failing the build. `content/lines/representation-latent.mdx` — the RAE
+deep dive, the centrepiece of this atlas and the user's own research area — has therefore been
+written but never rendered on the site. No error, no warning, just a page missing its argument.
+Renamed to match its id, and `validate.py` now treats a filename/id mismatch as an **error** rather
+than a warning, with a test.
+
+**Two research lines gained narrative prose**, bringing the total from two to four of thirty-four.
+`/lines/line-pixel-space` now explains the three-way split, carries an explicit section on why its
+nine ImageNet FIDs between 1.51 and 2.15 cannot be read as a ranking, and ends with the atlas
+admitting in public that its previous "mostly from one group" claim was its own gap.
+`/lines/line-cascaded-pixel` makes the rediscovery argument, including why the citation graph does
+not connect these papers to the current wave: the connection is in the claim, not the references.
+
 ### 2026-09-10 — Session 11 (Opus 5) — coverage audit: the atlas was wrong about pixel space
 
 Triggered by the user noticing the pixel-space section held only two papers. It did, and that was a
@@ -21,9 +64,12 @@ with its recorded title checked against the fetched title before it entered `dat
 - **The line's stated origin was wrong.** PixNerd (2507.23268, July 2025) predates JiT (November
   2025) by four months and reaches the same conclusion independently. JiT is now recorded as an
   origin for the argument the field actually heard, not as the first to make it.
-- **SiD2 reached FID 1.5 on ImageNet 512 in pixel space in October 2024**, a year before the
-  tokenizer-free wave claimed parity. The atlas is now able to say the 2025 wave rediscovered
-  something rather than discovered it.
+- **SiD2 reached FID 1.48 on ImageNet 512 in pixel space in October 2024**, a year before the
+  tokenizer-free wave argued the case. Stated carefully after a full-text check: it is *not* the
+  parity result it is often cited as. In the paper's own matched table EDM2-XXL with a guidance
+  interval reaches 1.40, and the authors concede latent diffusion still scales slightly better. What
+  survives is still strong — pixel space was within 0.08 FID of the best latent model a year early,
+  and nothing on the single-stage line has beaten 1.48 at 512 since.
 - The line's own `weaknesses` field claimed pixel-space results were "mostly from one group". That
   was the atlas's coverage gap asserted as a property of the field. Verified affiliations now show
   at least a dozen groups: NVIDIA, Google DeepMind, Yandex Research, Alibaba (AMAP and Token Hub),

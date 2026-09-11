@@ -145,6 +145,16 @@ def run(data_dir: Path = DATA_DIR, content_dir: Path = CONTENT_DIR, root: Path =
                     referenced_mdx.add(mdx_path)
                     if not mdx_path.exists():
                         errors.append(f"{rel(f)}: {field} points to missing file '{path_str}'")
+                    # Astro's glob loader keys a content entry by its FILENAME, not by the
+                    # `id` in its frontmatter, and getEntry() returns nothing on a miss
+                    # rather than failing the build. A mismatch therefore drops the prose
+                    # from the site silently. That is how the RAE deep dive sat unrendered.
+                    elif mdx_path.stem != entity_id:
+                        errors.append(
+                            f"{rel(f)}: {field} is '{path_str}', but Astro looks the entry up by "
+                            f"filename, so this file must be named '{entity_id}.mdx' or the prose "
+                            f"will silently not render."
+                        )
 
     # candidate papers: shape-only validation, not added to registry
     candidate_dir = data_dir / "monitor" / "candidates"

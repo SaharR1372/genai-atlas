@@ -48,3 +48,54 @@ abstract: We introduce NVLM 1.0, a family of frontier-class multimodal large lan
   math and reasoning data, leading to enhanced math and coding capabilities across modalities. To advance
   research in the field, we release the model weights at https://huggingface.co/nvidia/NVLM-D-72B and
   will open-source the training code for the community soon.
+explained:
+  before: 'By late 2024 two incompatible templates for connecting vision to an LLM were both in wide use:
+    decoder-only designs (e.g., LLaVA) that unroll image patch tokens and feed them through the LLM''s
+    own self-attention alongside text, and cross-attention designs (e.g., Flamingo) that keep the LLM''s
+    self-attention text-only and inject visual information through separate cross-attention layers. No
+    systematic head-to-head comparison of the two under matched conditions existed alongside a production-grade
+    open model release.'
+  problem: Which of the two dominant multimodal LLM architectures, decoder-only or cross-attention, is
+    actually better, and can a single design get the strengths of both, in particular avoiding the widely
+    observed degradation of text-only capability after multimodal training.
+  idea: Run decoder-only and cross-attention architectures side by side under matched training, characterize
+    each one's strengths and weaknesses, and then build a hybrid, NVLM-H, that routes a low-resolution
+    thumbnail of the image through the LLM's self-attention (for joint multimodal reasoning) while routing
+    the dynamic set of high-resolution tiles through gated cross-attention (for efficiency and fine detail),
+    combined with a 1-D tile-tagging scheme for dynamic high-resolution tiling.
+  method: 'NVLM-D (decoder-only) unrolls all image tile tokens and feeds them through the LLM''s self-attention.
+    NVLM-X (cross-attention) uses a Perceiver-style resampler and gated cross-attention layers injected
+    into the LLM, with the LLM itself optionally frozen. NVLM-H combines both: thumbnail tokens go through
+    self-attention with text tokens, while the dynamic number of high-resolution tiles go through gated
+    cross-attention. The 1-D tile-tagging design adds a flat sequence of tags (tile_1, tile_2, ..., tile_global)
+    marking each tile, compared against no tag, a 2-D grid tag, and 2-D bounding-box tags. All variants
+    are trained with a high-quality curated text-only dataset mixed into multimodal training specifically
+    to preserve text-only performance, plus multimodal math and reasoning data. Weights are released for
+    NVLM-D-72B.'
+  evidence: 'Tile-tag ablation (NVLM-D, Yi-34B, Table 1): OCRBench 622 with no dynamic high-res, 728 with
+    dynamic high-res and no tag, 806 with the 1-D tag (best), versus 787 (2-D grid) and 791 (2-D bbox);
+    MMMU validation rises from 50.9 to 52.0 with the 1-D tag. Architecture comparison: NVLM-D reaches
+    the family''s best OCRBench (853) but has lower training throughput (28.8 samples/sec vs NVLM-X''s
+    50.6, a 76% gap) because it unrolls all tile tokens through self-attention; NVLM-X is more training-efficient
+    but its vision-language performance drops when the LLM is frozen (54.4 vs 57.4 MMMU for 72B), and
+    its Perceiver resampler disrupts spatial relationships between patches, hurting OCR. NVLM-H gets the
+    family''s best MMMU validation (60.2) and best MathVista (66.6) at intermediate throughput (36.2 samples/sec).
+    On text-only benchmarks, multimodal training improved the Qwen2-72B-Instruct backbone''s average score
+    by +4.3 (NVLM-D), +2.5 (NVLM-X), +2.7 (NVLM-H) over the 79.8 text-only baseline, versus reported degradations
+    of -6.3 to -6.9 points in LLaVA-OneVision-72B, InternVL-2-Llama3-76B, and VILA-1.5 40B.'
+  limitations: The paper concedes that high-resolution designs that boost OCR performance sometimes reduce
+    accuracy on reasoning benchmarks like MMMU relative to low-resolution counterparts. It notes training
+    splits of several benchmarks (ChartQA, DocVQA, VQAv2, TextVQA, AI2D) are included in its SFT data
+    mixture, so those evaluations are not zero-shot. Ablation studies were run on smaller 34B models under
+    limited compute, without careful checkpoint selection or hyperparameter tuning, so ablation conclusions
+    may not transfer cleanly to the 72B models. It is also unclear whether proprietary competitor models
+    were evaluated zero-shot or fine-tuned.
+  why_it_matters: The paper does not declare cross-attention obsolete; instead it finds a genuine trade-off
+    (cross-attention is more training-efficient and helps preserve text-only performance under a frozen
+    LLM, but decoder-only self-attention gives stronger OCR and reasoning when data quality is handled
+    well) and resolves it with a hybrid rather than picking a winner. As evidence for when cross-attention
+    stopped being the default, this paper shows that by late 2024 a leading lab treated decoder-only as
+    strong enough to be the headline variant (NVLM-D gets the best standalone OCR score and is the one
+    whose weights were released) while still finding cross-attention useful enough to keep in a hybrid,
+    i.e., cross-attention was demoted to a component rather than eliminated.
+  depth: full-text

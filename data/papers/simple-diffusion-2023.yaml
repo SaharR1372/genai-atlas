@@ -26,9 +26,10 @@ status:
   verified: true
   verified_on: '2026-09-10'
   verified_by: opus
-summary: Argues high-resolution pixel diffusion needs only a shifted noise schedule and added capacity
-  at low resolution, not a cascade of separate models. The intermediate position between cascades and
-  today's single-stage transformers.
+summary: Asks whether a single end-to-end pixel diffusion model can be made comparable to the two established
+  alternatives, cascades and latent diffusion, using a shifted noise schedule and capacity concentrated
+  at low resolution. It argues for comparability, not for cascades being unnecessary, and does not refute
+  them on their own terms.
 explanation: null
 abstract: 'Currently, applying diffusion models in pixel space of high resolution images is difficult.
   Instead, existing approaches focus on diffusion in lower dimensional spaces (latent diffusion), or have
@@ -42,3 +43,53 @@ abstract: 'Currently, applying diffusion models in pixel space of high resolutio
   and 4) downsampling is an effective strategy to avoid high resolution feature maps. Combining these
   simple yet effective techniques, we achieve state-of-the-art on image generation among diffusion models
   without sampling modifiers on ImageNet.'
+explained:
+  before: 'cdm-2021 had established cascades as the way to make high-resolution pixel diffusion work,
+    and by 2023 latent diffusion had become the dominant alternative, compressing images into a lower-dimensional
+    latent space before applying diffusion there. Both approaches add machinery on top of plain diffusion:
+    cascades need multiple models and conditioning-augmentation tricks, latent diffusion needs a separately
+    trained autoencoder.'
+  problem: Whether a single, standard denoising diffusion model, trained end to end directly on high-resolution
+    pixels, can reach sample quality comparable to cascades or latent diffusion without adding either
+    approach's extra machinery.
+  idea: 'Plain pixel-space diffusion looks weak at high resolution not because end-to-end pixel diffusion
+    is fundamentally deficient, but because a handful of details are miscalibrated for high resolution:
+    the noise schedule, where architectural capacity is placed, where dropout is applied, and how early
+    downsampling happens. Correcting those four things in a standard architecture makes single-stage pixel
+    diffusion competitive.'
+  method: Four changes are made to one single-stage model. First, the noise schedule's signal-to-noise
+    ratio is shifted by resolution, using SNR_shift64(d x d)(t) = SNR(64x64)(t) times (64/d) squared,
+    so a d x d image at time t experiences roughly the corruption a 64x64 reference image would at that
+    time, because under a fixed cosine schedule an image's global structure is already determined well
+    before the noise level reaches maximum. Second, capacity is scaled only at a specific internal resolution,
+    16x16, since increasing channel count there is far cheaper in memory (0.7GB) than the same increase
+    at 256x256 (16GB). Third, dropout is placed only at the lower-resolution stages of the network, not
+    uniformly, to avoid regularizing the memory-expensive high-resolution layers. Fourth, the network
+    downsamples aggressively and immediately, via discrete wavelet transform or strided convolutions,
+    to avoid ever holding large high-resolution feature maps; this also improves sample quality, not just
+    memory. All four are applied within one model trained end to end; there is no cascade and no separate
+    encoder or decoder.
+  evidence: On class-conditional ImageNet with a U-Net and the shifted schedule, without guidance, FID
+    (eval) is 2.88 at 128x128 and 3.71 at 256x256. A U-ViT-L variant with v-prediction loss and guidance
+    scale 1.0, trained to 500K steps, reaches FID 3.23 at 128x128 and 3.75 at 256x256. At 512x512, a U-Net
+    with the shifted schedule, a multiscale loss, and a 2-level discrete wavelet transform reaches FID
+    4.28 (2M training steps); the U-ViT-L counterpart with DWT patching and guidance 1.0 reaches FID 4.53
+    (500K steps). Text-to-image on COCO at 256x256 with a U-ViT and a T5-XXL text encoder, trained to
+    700K steps, reaches FID 8.3, with no guidance value given. Parameter counts are not stated; batch
+    size is 512 for U-Net runs and 2048 for U-ViT runs.
+  limitations: The authors concede the multiscale loss actually hurts slightly at 256x256 (3.89 versus
+    3.71 FID). U-ViT models fit train FID very well but underperform U-Net on eval FID, indicating overfitting
+    that dropout placement does not fully correct. On COCO text-to-image the paper states simple diffusion
+    still lags behind Imagen. The shifted schedule delays when high-frequency detail is generated, and
+    the authors only hypothesize, without demonstrating, that this is acceptable because high-frequency
+    detail is weakly correlated with global conditioning features. No parameter counts are reported, which
+    limits direct compute comparison against cascades or latent models.
+  why_it_matters: 'This is the paper the atlas most needs to get precisely right on the cascade-necessity
+    question, and the fetched text supports a weaker claim than ''cascades are unnecessary.'' The abstract
+    itself frames cascades and latent diffusion as the two existing solutions to high-resolution diffusion
+    and asks whether a single end-to-end model can be made comparable to them, not superior to them. The
+    paper answers that affirmatively for pixel space: single-stage pixel diffusion is viable with the
+    right schedule and capacity placement. It does not claim cascades are unnecessary in general, does
+    not refute the cascade approach on its own terms, and does not claim pixel diffusion beats latent
+    diffusion; it loosens the cascade''s load-bearing status without discrediting it.'
+  depth: full-text

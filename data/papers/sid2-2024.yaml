@@ -26,9 +26,12 @@ status:
   verified: true
   verified_on: '2026-09-10'
   verified_by: opus
-summary: Reaches FID 1.5 on ImageNet 512 in pixel space, matching or beating latent diffusion, a year
-  before the tokenizer-free papers made the same claim. The single strongest piece of evidence that the
-  2025 wave rediscovered something rather than discovering it.
+summary: Reaches FID 1.48 on ImageNet 512 in pixel space at 512 steps with guidance scale 1.0 over the
+  interval (-3, 5), and 1.50 from a 16-step distilled variant. Competitive with the best latent baseline
+  in a matched-setting table but narrowly behind it, EDM2-XXL with a guidance interval reaching 1.40,
+  and the paper concedes latent diffusion still has slightly better scaling properties. Still the strongest
+  pixel-space number at 512 in this atlas, a year before the tokenizer-free wave, which is why it belongs
+  in the rediscovery argument even though it is not the clean parity result it is sometimes reported as.
 explanation: null
 abstract: 'Latent diffusion models have become the popular choice for scaling up diffusion models for
   high resolution image synthesis. Compared to pixel-space models that are trained end-to-end, latent
@@ -41,3 +44,63 @@ abstract: 'Latent diffusion models have become the popular choice for scaling up
   Scale the model to favor processing the image at a high resolution with fewer parameters, rather than
   using more parameters at a lower resolution. Combining these with guidance intervals, we obtain a family
   of pixel-space diffusion models we call Simpler Diffusion (SiD2).'
+explained:
+  before: By 2024, cascades (cdm-2021) and single-stage-but-technique-heavy approaches (simple-diffusion-2023,
+    hdit-2024) had shown pixel-space diffusion was workable, but latent diffusion (exemplified by EDM2-class
+    models) remained the default choice for scaling to high resolution, on the premise that a compressed
+    latent space was necessary for efficiency and top quality.
+  problem: Whether pixel-space diffusion, scaled correctly, can be not merely workable but competitive
+    with latent diffusion in both quality and efficiency at 512x512 resolution, directly testing the premise
+    that a learned latent space is required for state-of-the-art results.
+  idea: 'Three changes let end-to-end pixel diffusion scale well: a monotonic sigmoid loss weighting defined
+    in x-space error rather than the standard EDM weighting; a simplified, memory-efficient architecture
+    with fewer skip connections (a residual U-ViT); and, when adding compute, doing so by processing the
+    image at a finer effective resolution with the same parameter count (smaller patch size, termed flop-heavy
+    scaling) rather than by adding parameters at coarser resolution. Combined with guidance intervals
+    at sampling time, this produces a pixel-space model family, SiD2, that the paper argues rivals latent
+    diffusion.'
+  method: The sigmoid loss weighting is w(lambda_t) = sigmoid(lambda_t minus b) applied in x-mse space,
+    with a resolution-dependent bias (b = -3 at 512x512), chosen because it is monotonically increasing
+    in x-mse, unlike the EDM weighting. The architecture, called Residual U-ViT, removes blockwise skip
+    connections and keeps a single skip per downsampling level. Scaling is done by shrinking patch size
+    from 4x4 to 2x2 at fixed resolution and parameter count (the Flop Heavy variant), increasing FLOPs
+    without increasing parameters; the paper reports flop-heavy scaling without extra data augmentation
+    beats channel scaling, and channel scaling only matches it once distribution augmentation is added
+    (1.6 versus 1.9 FID in that ablation). Guidance intervals, restricting classifier-free guidance to
+    a sub-range of the noise schedule, are applied at sampling time on top of this single end-to-end pixel-space
+    model.
+  evidence: 'This is the number the atlas is most exposed on, so it is reported exactly as found, including
+    the qualification the paper itself makes. On ImageNet512, the Flop Heavy SiD2 model reaches FID 1.48
+    with the non-distilled sampler at 512 sampling steps, guidance scale 1.0, and guidance interval (-3,
+    5); a 16-step distilled version of the same model reaches FID 1.50, meaning the commonly quoted 1.5
+    FID headline is the fast distilled variant, essentially tied with the much slower 512-step, 1.48 FID
+    full model. The paper gives a direct, named comparison against latent diffusion in the same results
+    table: EDM2-S (interval) reaches 1.68 FID and EDM2-XXL (interval) reaches 1.40 FID. The largest latent
+    EDM2 model therefore still beats SiD2 by a small margin (1.40 versus 1.48), and the paper says this
+    itself, that its models are competitive with latent models, outperforming DiT-XL/2 and only performing
+    slightly worse than EDM2. So SiD2 does not beat the best latent baseline at this resolution and setting;
+    it comes close and the paper frames it as close, not as surpassing. On ImageNet128, SiD2 Flop Heavy
+    reaches FID 1.26, reported as a new state of the art; on ImageNet256, FID 1.38, also reported as new
+    state of the art. The abstract additionally claims a new state of the art on Kinetics600, but that
+    number did not surface in the fetched body text used here and should be treated as an abstract-level
+    claim only, not independently verified from full text.'
+  limitations: The paper concedes in its own words that at the time of writing, latent diffusion still
+    has slightly better scaling properties, and that it remains to be seen whether this gap can be closed
+    further, meaning the authors do not claim pixel space has surpassed latent diffusion's scaling behavior,
+    only that it is competitive at the scales tested. Removing blockwise skip connections costs small
+    models about 0.2 FID relative to the baseline architecture, though larger models recover or match
+    baseline performance. Channel-scaled variants require extra distribution augmentation to match flop-heavy
+    scaling.
+  why_it_matters: 'For the atlas''s framing that the 2025-26 tokenizer-free pixel diffusion wave rediscovered
+    rather than discovered pixel-space competitiveness: the underlying number, FID roughly 1.48 to 1.5
+    on ImageNet512 in pixel space, is real, and the paper compares it directly and by name against latent
+    EDM2 baselines under matched guidance-interval settings, so the comparison is reasonably clean, not
+    apples to oranges. But the framing needs a correction before it is stated publicly: SiD2 does not
+    claim to beat latent diffusion outright at this resolution. The best latent baseline, EDM2-XXL, still
+    edges it out, 1.40 versus 1.48, and the paper explicitly concedes latent diffusion still has slightly
+    better scaling properties. The defensible claim is that SiD2 showed pixel-space diffusion was competitive
+    with, not superior to, latent diffusion at ImageNet512 already in 2024. That is still strong evidence
+    against later work presenting pixel-latent parity as newly discovered, but ''matching or beating''
+    should be softened to ''competitive with, narrowly behind the best latent baseline, by the paper''s
+    own comparison and own concession.'''
+  depth: full-text

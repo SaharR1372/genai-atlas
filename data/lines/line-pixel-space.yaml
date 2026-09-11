@@ -90,4 +90,4 @@ competes_with:
 - line-representation-latent
 - line-latent-hybrid
 - line-cascaded-pixel
-explains: null
+explains: content/lines/line-pixel-space.mdx

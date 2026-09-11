@@ -17,25 +17,29 @@ arc:
     between stages.
 - paper: simple-diffusion-2023
   role: improvement
-  note: 'Argues the cascade is unnecessary: shift the noise schedule and add capacity at low resolution
-    and one end-to-end model suffices.'
+  note: Asks whether one end-to-end model, with a shifted noise schedule and capacity concentrated at
+    low resolution, can be comparable to cascades and to latent diffusion. It argues comparability rather
+    than claiming cascades are unnecessary.
 - paper: hdit-2024
   role: improvement
   note: A hierarchical transformer with linear rather than quadratic cost in pixels, making native megapixel
     pixel training feasible. The architectural bridge to the single-stage line.
 - paper: sid2-2024
   role: evidence
-  note: FID 1.5 on ImageNet 512 in pixel space, a year before the tokenizer-free papers claimed parity.
-    The strongest single reason to treat 2025 as a rediscovery.
+  note: FID 1.48 on ImageNet 512 in pixel space, at 512 steps with guidance 1.0 over the interval (-3,
+    5). Narrowly behind EDM2-XXL's 1.40 in the paper's own matched table, and the paper concedes latent
+    diffusion scales slightly better, but a year ahead of the tokenizer-free wave and still the best pixel-space
+    number at 512 in this atlas.
 - paper: edify-image-2024
   role: scaling
   note: Laplacian frequency-band pixel diffusion shipped at industrial scale while the open literature
-    treated latents as settled.
+    treated latents as settled. Reports no quantitative benchmark.
 - paper: pixelflow-2025
   role: improvement
   note: Carries the multiscale bet to flow matching, ImageNet 256 FID 1.98 with no VAE.
 strengths:
-- Reached latent-diffusion quality in pixels years before the current wave, and was largely ignored
+- Got pixel-space within 0.08 FID of the best latent model at ImageNet 512 in 2024, years before the current
+  wave, and was largely ignored
 - Progressive resolution sidesteps the attention cost that constrains single-stage pixel transformers
 - Sustained by well-resourced industrial groups rather than by a single result
 weaknesses:
@@ -49,4 +53,4 @@ open_questions:
 competes_with:
 - line-vae-latent
 - line-pixel-space
-explains: null
+explains: content/lines/line-cascaded-pixel.mdx

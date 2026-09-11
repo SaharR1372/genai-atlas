@@ -30,9 +30,11 @@ status:
   verified: true
   verified_on: '2026-09-10'
   verified_by: opus
-summary: Retrieves image-text pairs from an external knowledge base to render entities the model never
-  saw enough of during training, and introduces a benchmark for exactly that failure. The actual origin
-  of the bet that some generation failures are knowledge failures, three years before the current wave.
+summary: Retrieves image-text pairs from an external knowledge base so the model can render rare and long-tail
+  entities it has not memorised, and introduces a benchmark for exactly that failure. The paper frames
+  this as an entity-memorisation problem rather than as a general theory that generation failures are
+  knowledge failures; the atlas files it as the origin of the retrieval bet, which is an extrapolation
+  of its motivation rather than its own stated thesis.
 explanation: null
 abstract: Research on text-to-image generation has witnessed significant progress in generating diverse
   and photo-realistic images, driven by diffusion and auto-regressive models trained on large-scale image-text
@@ -52,3 +54,43 @@ abstract: Research on text-to-image generation has witnessed significant progres
   for diverse entities, from frequent to rare, across multiple object categories including dogs, foods,
   landmarks, birds, and characters. Human evaluation on EntityDrawBench shows that Re-Imagen can significantly
   improve the fidelity of generated images, especially on less frequent entities.
+explained:
+  before: Text-to-image diffusion and autoregressive models trained on large-scale image-text data (this
+    paper compares against Imagen and DALL-E 2) could generate high-quality images of common entities,
+    but the paper's own analysis found output quality was 'surprisingly sensitive to the frequency of
+    the entities' in training data, so uncommon entities such as a specific dog breed or a regional food
+    were rendered poorly or unfaithfully because the model had not seen enough examples to memorize their
+    appearance.
+  problem: How to generate faithful images of entities that are rare or effectively unseen in the training
+    distribution, without requiring the model to have memorized their visual appearance from web-scale
+    pretraining alone.
+  idea: 'Give a text-to-image diffusion model access to an external multimodal knowledge base at generation
+    time: retrieve image-text pairs relevant to the prompt and feed them to the model as additional conditioning,
+    so the model can copy visual and semantic detail rather than recall it purely from parametric memory.'
+  method: Re-Imagen fine-tunes Imagen's cascaded diffusion model (a 2.5B base model plus 750M and 400M
+    super-resolution stages). A KNN-ImageText training set is built by retrieving each training pair's
+    top-2 nearest neighbors via BM25 text similarity over a 50M-pair corpus, producing (image, text, retrieval)
+    triples. Retrieved image-text pairs are encoded with a shared DStack encoder and fused into the denoising
+    network via a cross-attention module that lets the diffusion model attend to neighbor features. Text
+    and neighbor conditioning are each randomly dropped 10% of the time during training to support classifier-free
+    guidance, and the paper introduces an interleaved sampling strategy that alternates, via a randomly
+    sampled ratio, between a text-emphasizing and a neighbor-emphasizing noise prediction to balance prompt
+    fidelity against retrieved-reference fidelity.
+  evidence: 'COCO 30K FID: 5.25 in-domain, 6.88 zero-shot (retrieving from LAION) versus Imagen''s 7.27
+    zero-shot baseline. WikiImages FID: 5.88 in-domain, 5.80 out-of-domain, versus Imagen''s 6.44. On
+    the paper''s own EntityDrawBench benchmark, human-evaluated faithfulness averages 0.80 for Re-Imagen
+    versus 0.58 for DALL-E 2 and 0.28 for Imagen, roughly a 30% improvement over the best baseline, with
+    the largest gains concentrated on less-frequent entities.'
+  limitations: The paper concedes that low-quality retrieved images degrade generation quality, that highly
+    compositional prompts involving multiple entities remain difficult, that the super-resolution stages
+    fail to preserve low-level detail from retrieved entities and introduce visual distortion, and that
+    the model inherits hallucination and bias issues from the underlying web-scale training data.
+  why_it_matters: It demonstrates, with a working system and a purpose-built benchmark, that at least
+    one class of generation failure (rare-entity fidelity) is better addressed by giving the model external
+    reference material than by scaling the model or its training data. The atlas frames this as the origin
+    of the more general bet that some generation failures are knowledge failures fixable by retrieval;
+    the paper's own framing is narrower than that generalization, centered specifically on entity frequency
+    and memorization rather than a stated general theory of knowledge failures, so the broader framing
+    is a reasonable extrapolation from this paper's motivation rather than a claim the paper itself makes
+    explicitly.
+  depth: full-text

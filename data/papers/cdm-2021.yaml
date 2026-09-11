@@ -43,3 +43,47 @@ abstract: We show that cascaded diffusion models are capable of generating high 
   achieving FID scores of 1.48 at 64x64, 3.52 at 128x128 and 4.88 at 256x256 resolutions, outperforming
   BigGAN-deep, and classification accuracy scores of 63.02% (top-1) and 84.06% (top-5) at 256x256, outperforming
   VQ-VAE-2.
+explained:
+  before: Prior to this paper, high-fidelity class-conditional ImageNet generation was dominated by GANs
+    (BigGAN-deep) and autoregressive-style models (VQ-VAE-2), while diffusion models trained at a single
+    resolution in pixel space needed auxiliary classifier guidance to match that sample quality, and quality
+    degraded as target resolution increased.
+  problem: How to get diffusion models to produce high-fidelity, high-resolution class-conditional images
+    without relying on auxiliary image classifiers to boost sample quality, and without sample quality
+    collapsing as resolution rises.
+  idea: Decompose generation into a pipeline of diffusion models at increasing resolutions, a low-resolution
+    base model followed by one or more super-resolution diffusion models, rather than one model handling
+    all of resolution at once. To stop the super-resolution stages from being derailed by artifacts in
+    their generated (not clean) low-resolution input, corrupt that conditioning input with noise during
+    training, a technique the paper calls conditioning augmentation.
+  method: 'The cascade used is a 32x32 base model, a 32x32-to-64x64 super-resolution model, and then either
+    a 64x64-to-128x128 or a 64x64-to-256x256 super-resolution model, so up to three stages depending on
+    target resolution. Conditioning augmentation has three variants: blurring augmentation (a Gaussian
+    filter with randomly sampled sigma applied to 50 percent of training examples), truncated conditioning
+    augmentation (the low-resolution reverse diffusion process is stopped at timestep s greater than 0
+    instead of running to completion, so the super-resolution model conditions on a still partly noisy
+    sample), and non-truncated conditioning augmentation (the full low-resolution reverse process is run
+    to a clean sample, which is then re-corrupted with the forward process before being passed to the
+    super-resolution model). The 32x32 and 64x64 stages use 4000 diffusion timesteps; the higher-resolution
+    super-resolution stages use far fewer steps, around 100 at inference, chosen by hyperparameter search.
+    No classifier guidance is used at any stage.'
+  evidence: On class-conditional ImageNet, without classifier guidance, the cascade reaches FID 1.11 (against
+    train set) / 1.99 (against validation) at 32x32, 1.48 / 2.48 at 64x64, 3.52 / 3.76 at 128x128, and
+    4.88 / 4.63 at 256x256, outperforming BigGAN-deep at any truncation value. Classification accuracy
+    on generated 256x256 images is 63.02 percent top-1 and 84.06 percent top-5, outperforming VQ-VAE-2.
+    Inception scores are 67.95 plus or minus 1.97 at 64x64, 128.80 plus or minus 2.51 at 128x128, and
+    158.71 plus or minus 2.26 at 256x256.
+  limitations: There is no dedicated limitations section. The paper concedes that avoiding classifier
+    guidance costs it thousands of diffusion timesteps at low resolution, where ADM needs only hundreds.
+    It tried applying blurring augmentation at inference time and states this was not helpful. It notes,
+    without fully explaining, that class conditioning still substantially improves upsampling even when
+    the 64x64 input already carries most of the relevant information. It carries brief boilerplate acknowledging
+    possible misuse of image generation systems, and does not compare compute cost against any latent-space
+    alternative, since latent diffusion was not yet an established comparison point.
+  why_it_matters: Establishes that resolution can be handled by chaining diffusion models rather than
+    forcing one network to model the full-resolution pixel distribution directly, and that the resulting
+    failure mode, compounding error along the chain, can be controlled with a data-side fix (conditioning
+    augmentation) rather than an architectural one. This is the founding move of the pixel-space cascade
+    line the atlas tracks, four years before tokenizer-free pixel diffusion presents progressive-resolution
+    generation as a new idea.
+  depth: full-text

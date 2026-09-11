@@ -1,0 +1,63 @@
+---
+id: line-cascaded-pixel
+title: Cascaded and multiscale pixel diffusion
+---
+
+## The bet
+
+This line agrees with [single-stage pixel transformers](/lines/line-pixel-space) that no learned
+tokenizer is necessary, and disagrees about why pixel generation was hard. The diagnosis here is not
+the prediction target but the resolution: model a small image well, then refine upward, and pixel
+diffusion comes within a fraction of a FID point of latent diffusion with no VAE anywhere in the
+pipeline.
+
+## The arc
+
+[Cascaded Diffusion Models](/papers/cdm-2021) sets the pattern in 2021 — a chain of pixel-space
+models, each super-resolving the last, with conditioning augmentation to stop errors compounding
+along the chain. [simple diffusion](/papers/simple-diffusion-2023) then asks whether the chain
+is avoidable: with a shifted noise schedule and capacity concentrated at low resolution, can one
+end-to-end model be *comparable* to a cascade and to latent diffusion? It argues comparability. It
+does not claim cascades are unnecessary, and this atlas previously overstated it as doing so.
+
+[HDiT](/papers/hdit-2024) supplies the architecture that makes single-stage pixel training practical,
+a hierarchical transformer whose cost scales as O(n) rather than the O(n²) of a standard DiT, by
+restricting global attention to the coarsest level and using neighbourhood attention elsewhere. It
+trains natively at 1024×1024 on FFHQ; its ImageNet results are at 256×256 and are competitive rather
+than state of the art.
+
+[SiD2](/papers/sid2-2024) is the result that should change how the current wave is read, though it is
+usually reported less carefully than it deserves. In October 2024 it reached FID 1.48 on ImageNet 512
+in pixel space, at 512 steps with guidance scale 1.0 over the interval (-3, 5). It is often cited as
+matching latent diffusion. It does not: in the paper's own matched-setting table EDM2-XXL with a
+guidance interval reaches 1.40, and the authors concede that latent diffusion still has slightly
+better scaling properties. What is true, and sufficient, is that pixel-space generation was within
+0.08 FID of the best latent model a year before the tokenizer-free papers argued the case — and that
+no pixel-space paper in this atlas has beaten 1.48 at 512 since.
+
+[Edify Image](/papers/edify-image-2024) shipped industrial-scale pixel-space generation the following
+month using Laplacian frequency bands, though it reports no quantitative benchmark, so it cannot be
+placed against these numbers. [PixelFlow](/papers/pixelflow-2025) carried the multiscale bet across
+to flow matching in 2025.
+
+## Why this line is marked superseded
+
+Not because anything in it was refuted. Nothing here was. It is superseded in attention: the field
+moved to single-stage transformers, and the cascaded literature stopped accumulating. The honest
+reading is that a cascade is more moving parts than the tokenizer it was meant to replace, that
+errors compound between stages and need explicit machinery to control, and that most of this work
+predates or sits outside the transformer scaling story the field now expects a generative method to
+have.
+
+## Why it still matters
+
+It is the strongest available evidence that the 2025–26 tokenizer-free wave rediscovered something
+rather than discovered it. The argument that pixels were never the real obstacle, and that a
+well-designed pixel model comes within a fraction of a FID point of the best latent model, was made
+here with numbers years earlier. Note the careful wording: this line got close and said so honestly.
+It is the current wave, not this one, that reaches for the word parity.
+
+That is worth stating plainly, because it is the kind of thing an atlas organised around papers
+rather than ideas would miss entirely. These papers do not cite the current wave and the current wave
+does not always cite them, so nothing in the citation graph connects the two. The connection is in
+the claim, not the references.

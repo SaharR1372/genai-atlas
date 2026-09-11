@@ -181,3 +181,24 @@ def test_stale_ascendant_line_is_flagged(validate_mod, sample_data_dir):
     )
     _, warnings, _, _ = validate_mod.run(data_dir=sample_data_dir)
     assert any("on a line marked 'ascendant'" in w for w in warnings)
+
+
+def test_mdx_filename_must_match_entity_id(validate_mod, sample_data_dir, tmp_path):
+    """
+    Astro keys a content entry by filename, not by the id in its frontmatter, and a miss
+    renders nothing rather than failing the build. The atlas's RAE deep dive sat unrendered
+    for weeks because of exactly this, so it is an error and not a warning.
+    """
+    content = tmp_path / "content" / "lines"
+    content.mkdir(parents=True)
+    (content / "wrong-name.mdx").write_text("---\nid: line-mismatch\ntitle: T\n---\n\nProse.\n")
+    (sample_data_dir / "lines").mkdir(exist_ok=True)
+    (sample_data_dir / "lines" / "line-mismatch.yaml").write_text(
+        "id: line-mismatch\ntype: line\nname: Mismatch\none_line: A test.\n"
+        "core_bet: Testing.\nprimary_axis: objective\nstatus: emerging\nsections: [generation]\n"
+        "explains: content/lines/wrong-name.mdx\n"
+    )
+    errors, _, _, _ = validate_mod.run(
+        data_dir=sample_data_dir, content_dir=tmp_path / "content", root=tmp_path
+    )
+    assert any("silently not render" in e for e in errors)

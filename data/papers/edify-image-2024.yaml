@@ -26,12 +26,56 @@ status:
   verified: true
   verified_on: '2026-09-10'
   verified_by: opus
-summary: An industrial-scale pixel-space system using Laplacian frequency bands, attenuating different
+summary: 'An industrial-scale pixel-space system using Laplacian frequency bands, attenuating different
   bands at different rates. Evidence that a major vendor shipped pixel-space generation while the open
-  literature treated latents as settled.
+  literature treated latents as settled. Presented qualitatively: the paper reports no FID or quantitative
+  benchmark, so it cannot be placed against the numbers on this line.'
 explanation: null
 abstract: We introduce Edify Image, a family of diffusion models capable of generating photorealistic
   image content with pixel-perfect accuracy. Edify Image utilizes cascaded pixel-space diffusion models
   trained using a novel Laplacian diffusion process, in which image signals at different frequency bands
   are attenuated at varying rates. Edify Image supports a wide range of applications, including text-to-image
   synthesis, 4K upsampling, ControlNets, 360 HDR panorama generation, and finetuning for image customization.
+explained:
+  before: By late 2024, open pixel-space diffusion research (simple-diffusion-2023, hdit-2024) had shown
+    single-stage pixel diffusion and linear-cost transformers were viable at research scale, and sid2-2024
+    had shown pixel diffusion could rival latent diffusion on ImageNet benchmarks, but none of this had
+    been demonstrated at industrial, production text-to-image scale with the surrounding tooling (ControlNets,
+    panoramas, customization) that latent-diffusion-based commercial systems already offered.
+  problem: Build a production-scale, pixel-space text-to-image system that reaches photorealistic, pixel-accurate
+    quality and supports the application surface (4K upsampling, ControlNets, 360-degree HDR panoramas,
+    customization and finetuning) that commercial latent-diffusion products had already established, without
+    using a latent autoencoder.
+  idea: Instead of adding uniform Gaussian noise to the raw pixel signal, decompose the image into frequency
+    bands and attenuate each band's signal at a different rate during the forward diffusion process, so
+    high-frequency detail is driven into noise faster than low-frequency structure, then combine this
+    Laplacian diffusion process with a cascade of pixel-space diffusion models across resolutions to reach
+    high resolution efficiently.
+  method: 'A cascaded pixel-space system: a base model generates at 256x256, a first upsampler brings
+    this to 1024x1024, and a further stage extends to 4096x4096 for 4K output. The Laplacian diffusion
+    process is characterized by critical time points at which the high-frequency pyramid components are
+    shown to have effectively vanished into noise, which the authors use to justify reducing effective
+    dimensionality at those stages. Conditioning between stages passes the previous stage''s generated
+    image forward; the upsampler operates over a smaller noise range than the base model, and at inference
+    the base output is forward-diffused into that smaller range before being denoised by the upsampler,
+    a truncated re-noising scheme similar in spirit to the conditioning augmentation used in cdm-2021,
+    carried into a frequency-decomposed setting. The base model has 2.7B parameters, the 1K upsampler
+    has 1.6B parameters, trained for 2.7M iterations with batch size 4096 for the base model and 2048
+    for the upsampler.'
+  evidence: 'The fetched text contains no FID or quantitative human-preference numbers; the paper is presented
+    largely qualitatively, with generated sample galleries across applications rather than numerical benchmarks
+    against baselines. This is reported plainly as a gap: Edify Image''s quality claims cannot be checked
+    against a number from this source, only against qualitative material.'
+  limitations: The paper directly concedes that its 360-degree HDR panorama generation is geometrically
+    inconsistent, stating that parallax is not possible and that there is not necessarily any global consistency
+    to the lighting. It discloses training data was sourced through AI foundry partners without quantifying
+    training set size. Beyond that, the fetched text does not surface an explicit limitations section
+    covering the base cascade or upsamplers themselves, nor any acknowledgment of the absence of quantitative
+    evaluation.
+  why_it_matters: Shows that at least one major vendor chose to ship a cascaded pixel-space system, with
+    a genuinely novel forward-process modification (frequency-dependent attenuation) rather than a latent
+    autoencoder, at a time when published research consensus and most competing commercial systems treated
+    a learned latent space as effectively mandatory at production scale. This is real but weaker evidence
+    than a benchmarked comparison would provide, since the paper gives no quantitative results to check
+    the claim against.
+  depth: full-text

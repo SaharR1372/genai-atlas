@@ -43,3 +43,53 @@ abstract: Latent diffusion models excel at generating high-quality images but lo
   and the diffusion model, conditional versus unconditional generation, and how tokenizer reconstruction
   quality relates to diffusability. Applied to ImageNet, Latent Forcing achieves a new state-of-the-art
   for diffusion transformer-based pixel generation at our compute scale.
+explained:
+  before: By 2025-26, one line of work, including pixelflow-2025, sid2-2024, and hdit-2024, argued pixel-space
+    generation without any latent autoencoder was viable and in some cases preferable, while an established
+    separate line, latent diffusion, still relied on a learned autoencoder whose lossy, discarded information
+    and separately trained decoder create a persistent mismatch between what the generator optimizes and
+    what the decoder ultimately produces.
+  problem: How to keep the efficiency benefit of having some compressed, latent-like representation available
+    to the model while operating end to end on raw, lossless pixel data, avoiding both the information
+    loss of a separately trained autoencoder and the full cost of pure pixel-space generation with no
+    compressed representation at all.
+  idea: Rather than choosing between generating in the latent and generating in pixels, jointly denoise
+    a latent embedding and the raw pixels within the same model on separately tuned noise schedules, ordering
+    the trajectory so the latent finishes denoising largely before the pixel denoising begins, so the
+    latent functions as intermediate computation the pixel generation leans on rather than as the space
+    the final image lives in or is decoded from.
+  method: 'A single diffusion model is trained jointly over a pixel-space target and a latent-space target
+    (DINOv2 or Data2Vec2 embeddings) using multiple time variables rather than one shared time variable.
+    During training, per-modality timesteps are sampled independently, with logit-normal noise schedules
+    of differing mean per modality (mu = -1.2 for the latent, mu = -0.8 for pixels), and loss weights
+    balance gradient magnitudes across the two output heads. At inference, the paper''s best-performing
+    configuration is a cascaded schedule: a global time variable is remapped per modality so that an initial
+    phase runs latent denoising to completion (25 Heun steps) while pixels stay untouched, followed by
+    a second phase that denoises pixels with the now-frozen latent held fixed as conditioning (25 Heun
+    steps). There is no separate decoder network and no lossy compression; the latent is described by
+    the authors as the least-ever compressed input space reported for ImageNet-256, using six floats per
+    pixel in the default configuration, and the generated latent is discarded once pixel denoising finishes
+    rather than decoded into the image.'
+  evidence: On ImageNet-256, LF-DiT-L with a DINOv2 latent, 200 epochs, 465M parameters, 50 sampling steps
+    reaches FID-50K of 7.2 unguided and 2.48 guided; an 80-epoch variant reaches 9.76 unguided and 4.18
+    guided. The paper's own JiT baseline (200 epochs, 459M parameters, no latent forcing) reaches 16.21
+    unguided and 2.79 guided, and a JiT+REPA baseline (80 epochs, 459M parameters) reaches 18.60 unguided
+    and 4.57 guided, so Latent Forcing's guided FID at matched 200 epochs is somewhat better than the
+    JiT baseline's (2.48 versus 2.79). The unconditional ImageNet-256 setting reaches FID-50K 20.44 unguided
+    and 13.36 guided. Exact guidance scale and guidance interval values were not surfaced in this extraction
+    and should not be assumed beyond what is stated; the paper does note guidance tuning is sensitive.
+  limitations: The paper concedes that cascaded, sequential denoising lets errors compound from the latent
+    phase into the pixel phase, mitigated by injecting noise into the latent during the pixel-denoising
+    steps rather than solved outright. It concedes classifier-free guidance tuning is heavily dependent
+    on shifting DINOv2 latents and requires extensive sweeping, and that AutoGuidance outperforms CFG
+    here but adds inference complexity, meaning good guided numbers are not obtained off the shelf.
+  why_it_matters: 'On the atlas''s specific question, whether this paper positions the latent as a scratchpad
+    rather than a destination, in explicit counter-position to tokenizer-free framing, the fetched text
+    supports that reading directly: the paper states the generated latent effectively serves as a scratchpad
+    to condition generation of the natural image and is discarded at the end of the denoising process,
+    and frames its research question around when compression should apply along the trajectory (asking
+    whether only early timesteps need to be compressed, leaving later timesteps to maintain high-level
+    detail) rather than whether a latent should exist at all. This is a fair basis for the atlas''s counter-position
+    framing: latents remain useful working memory rather than becoming unnecessary, which cuts against
+    a strong reading of tokenizer-free generation as meaning latents have no further role.'
+  depth: full-text

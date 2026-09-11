@@ -42,3 +42,41 @@ abstract: We introduce ``Idea to Image,'' a system that enables multimodal itera
   with interleaved image-text sequences, follow ideas with design instructions, and generate images of
   better semantic and visual qualities. The user preference study validates the efficacy of multimodal
   iterative self-refinement on automatic image design and generation.
+explained:
+  before: Text-to-image models varied widely in what prompt phrasing worked well for them, and human users
+    learned a given model's quirks only through their own iterative trial and error, manually rewriting
+    prompts based on what images came back. There was no established mechanism for a multimodal model
+    itself to run this same explore-and-refine loop autonomously.
+  problem: Can a large multimodal model take on the human role of iteratively exploring a text-to-image
+    model's behavior, so that a high-level user idea can be automatically turned into an effective prompt
+    and a high-quality image without a human manually rewriting prompts.
+  idea: 'Put GPT-4V in a closed loop with a frozen text-to-image model: GPT-4V drafts prompts, the T2I
+    model renders candidate images, GPT-4V selects the best draft and diagnoses the gap between that draft
+    and the user''s original multimodal idea, and it uses that diagnosis plus a memory of everything tried
+    so far to write a revised prompt, repeating for several rounds.'
+  method: 'Two frozen off-the-shelf models are used, GPT-4V and a text-to-image model such as SDXL or
+    Stable Diffusion; nothing is trained. GPT-4V performs four roles across up to three iterative rounds:
+    generating an initial set of N candidate T2I prompts from the user''s multimodal idea, selecting the
+    best of N draft images via pairwise ''spot the difference'' style comparison, producing textual feedback
+    that identifies the gap between the selected draft and the original idea, and writing a revised prompt
+    conditioned on a memory module that stores all prior prompts, selected images, and feedback as an
+    interleaved image-text sequence.'
+  evidence: 'In a user preference study over 104 test queries comparing against an SDXL v1.0 baseline:
+    a manually written human prompt was preferred 13.5% of the time, Idea2Img''s initial-round prompt
+    29.8%, and the fully iterative self-refined Idea2Img output 56.7%, a 26.9-point gain over the initial
+    round. Consistent preference gains were also reported when swapping in other T2I backbones: +16.3
+    points for DeepFloyd IF, +5.8 for SD v2.1, +4.8 for SD v1.5, +16.3 for SDXL-img2img, with the paper
+    noting stronger T2I models tended to benefit more from the refined prompts.'
+  limitations: The paper states it explores only image generation and leaves extending the approach to
+    GUI navigation, embodied agents, or more general visual reasoning as future work. It optimizes against
+    a single T2I tool at a time, with no mechanism for tool selection across multiple generators. It also
+    has no way to consolidate what it learns about a T2I model back into that model's weights, since all
+    learning is confined to the runtime memory module, and it notes the pipeline's effectiveness depends
+    heavily on GPT-4V's specific capabilities, with older, weaker LMMs unable to reliably perform the
+    image-selection step.
+  why_it_matters: It establishes a self-refinement loop, model drafts, critiques its own output against
+    the goal, and rewrites the input, as a way to get more out of existing frozen generators without retraining
+    them. That closes-the-loop-with-a-critic pattern is the agentic counterpart to Re-Imagen's retrieval-based
+    fix, and later systems that plan, call tools, and verify generation results build on this same loop
+    structure.
+  depth: full-text

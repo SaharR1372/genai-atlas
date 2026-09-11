@@ -39,3 +39,46 @@ abstract: We present PixelFlow, a family of image generation models that operate
   benchmark. The qualitative text-to-image results demonstrate that PixelFlow excels in image quality,
   artistry, and semantic control. We hope this new paradigm will inspire and open up new opportunities
   for next-generation visual generation models. Code and models are available at https://github.com/ShoufaChen/PixelFlow.
+explained:
+  before: The pixel-space cascade line to this point had been built on diffusion objectives (cdm-2021,
+    simple-diffusion-2023, sid2-2024, edify-image-2024) and a linear-cost transformer backbone (hdit-2024),
+    while flow matching had become a popular alternative training objective to diffusion, largely applied
+    in latent space, leaving open whether the multiscale cascade recipe that worked for pixel-space diffusion
+    would transfer to a flow-matching objective.
+  problem: Whether cascaded, multiscale generation directly in pixel space is compatible with a flow-matching
+    rather than diffusion training objective, at affordable computational cost, without a VAE.
+  idea: 'Apply the cascade idea to flow matching instead of diffusion: build the training path as a sequence
+    of stages at increasing resolution, where each stage''s flow interpolates between an upsampled version
+    of the previous stage''s output and a downsampled, noise-mixed version of the target-resolution image,
+    training the model end to end across all stages with a single velocity-prediction objective and no
+    VAE.'
+  method: PixelFlow uses S stages at progressively increasing resolutions. Each stage's interval has a
+    start state given by the upsampled output of the previous stage and an end state given by the current
+    stage's target-resolution image mixed with noise; intermediate points are sampled by linear interpolation
+    between the two, the standard flow-matching construction applied stage-locally rather than globally.
+    Training minimizes an MSE loss on predicted velocity along these interpolated paths. At inference,
+    generation starts from pure Gaussian noise at a low kickoff resolution (8x8 in the reported configuration,
+    with 4x4 patch size) and proceeds through the stages with either an Euler or Dopri5 ODE solver, upsampling
+    and denoising at each stage; a renoising strategy is used at stage transitions specifically to suppress
+    artifacts from jumping between resolutions.
+  evidence: 'The headline ImageNet 256x256 class-conditional FID of 1.98 is obtained with the Dopri5 ODE
+    solver, a stage-wise classifier-free-guidance schedule with a maximum guidance value of 2.40, 4x4
+    patch size, 8x8 kickoff resolution, and training for 1600K iterations with EMA; roughly 30 steps per
+    stage is implied by the reported table. Other ImageNet-256 metrics at that setting: sFID 5.83, Inception
+    Score 282.1, Precision 0.81, Recall 0.60. Parameter count is not disclosed in the paper. On 512x512
+    text-to-image, PixelFlow reports GenEval 0.64, T2I-CompBench scores of 0.7578 (color), 0.4529 (shape),
+    0.6006 (texture), and DPG-Bench 77.93, useful for relative comparison within the paper but without
+    a parameter-matched pixel-versus-latent baseline reported alongside them here.'
+  limitations: The authors concede that although the model avoids full-resolution computation across all
+    stages, the final stage requires full-resolution attention, which accounts for roughly 80 percent
+    of total inference time, meaning the cascade does not eliminate the cost bottleneck, only defers it
+    to the stage where it matters most for wall-clock time. They also note that training convergence slows
+    as sequence length increases, an acknowledged scaling difficulty as resolution or stage count grows.
+  why_it_matters: Extends the multiscale cascade bet from the diffusion objective to flow matching and
+    reports competitive ImageNet-256 FID without a VAE, showing the cascade-based pixel-space recipe generalizes
+    across training objectives rather than being tied to the diffusion formulations used earlier in the
+    line. The paper explicitly frames itself against latent diffusion's decoupled VAE and generator training
+    and against VAE-induced high-frequency artifacts, positioning pixel-space cascades as a fix for a
+    problem it attributes to latents, though the final-stage attention cost shows the cascade does not
+    fully solve the resolution-cost problem it set out to address.
+  depth: full-text

@@ -40,3 +40,46 @@ abstract: We present the Hourglass Diffusion Transformer (HDiT), an image genera
   HDiT trains successfully without typical high-resolution training techniques such as multiscale architectures,
   latent autoencoders or self-conditioning. We demonstrate that HDiT performs competitively with existing
   models on ImageNet $256^2$, and sets a new state-of-the-art for diffusion models on FFHQ-$1024^2$.
+explained:
+  before: simple-diffusion-2023 showed a single-stage convolutional U-Net or U-ViT could handle pixel-space
+    diffusion with the right schedule and capacity placement, but transformer-based diffusion backbones
+    using full global self-attention scale quadratically with image token count, making native high-resolution
+    pixel-space training impractical without a latent compressor or a cascade.
+  problem: How to build a transformer-based diffusion backbone whose compute cost scales linearly rather
+    than quadratically with pixel or token count, so that transformers can train natively at high resolution
+    directly in pixel space without a cascade or a latent autoencoder.
+  idea: 'Apply a hierarchical, hourglass-shaped token structure to the diffusion transformer: shorten
+    the token sequence hierarchically going into the network and re-expand it going out, restricting full
+    global self-attention to the coarsest, most-shortened levels of this hierarchy, and using cheaper
+    local (neighborhood) self-attention at the higher-resolution levels where the sequence is still long.'
+  method: 'Global self-attention operates only at the lowest internal resolution (16x16, or 16x16 and
+    32x32 depending on configuration), while all higher-resolution stages use local self-attention; the
+    paper compares neighborhood attention against shifted-window attention for this local role and finds
+    neighborhood attention performs significantly better in practice, so that is the component used. This
+    hierarchical shortening and re-expansion combined with locally restricted attention gives the paper''s
+    central claim: HDiT has O(n) computational complexity in the number of image tokens n, versus O(n
+    squared) for a standard, non-hierarchical diffusion transformer; the paper''s own figure shows HDiT
+    incurring under 1 percent of the compute a standard DiT would need at 1024x1024. The model trains
+    successfully without typical high-resolution training techniques such as multiscale architectures,
+    latent autoencoders, or self-conditioning, meaning no cascade and no latent stage; the target resolution
+    is reached directly in one pass, natively in pixel space.'
+  evidence: 'HDiT sets a new state of the art for diffusion models on FFHQ at native 1024x1024, trained
+    fully in pixel space: an 85M-parameter model reaches FID 5.23 at 50 sampling steps with no guidance,
+    versus an NCSN++ baseline at 53.52 FID under the same setting. On ImageNet 256x256 with a 557M-parameter
+    model at 50 steps, HDiT reaches FID 6.92 with no classifier-free guidance and FID 3.21 with guidance
+    scale 1.3. An ablation-scale 117M-parameter model on ImageNet 128x128 reaches FID 27.74. The paper
+    positions the ImageNet-256 results as merely competitive with existing models, not as state of the
+    art there; the explicit state-of-the-art claim is specific to FFHQ-1024.'
+  limitations: The authors state they performed no hyperparameter tuning for the ImageNet-256 experiments,
+    and that the model does not reach the FID of state-of-the-art GANs such as StyleGAN-XL, even though
+    it is competitive with transformer-based GANs. They note that their FFHQ result's closeness to prior
+    work may be approaching a metric floor for diffusion models under FID, and say they expect substantial
+    further improvements are possible with hyperparameter tuning and architecture scaling, i.e. the reported
+    numbers are conceded to understate the architecture's ceiling rather than represent a fully tuned
+    result.
+  why_it_matters: Confirms, in the paper's own words, both the linear-versus-quadratic scaling claim and
+    native 1024x1024 pixel-space training. This is the architectural piece that makes transformer-based
+    pixel diffusion computationally plausible at megapixel resolution without a cascade or a latent stage,
+    closing the gap between convolutional U-Nets (efficient but less scalable) and plain DiTs (scalable
+    but quadratic), and later pixel-space and hybrid papers in this line build on or compare against it.
+  depth: full-text

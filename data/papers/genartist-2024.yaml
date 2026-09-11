@@ -45,3 +45,43 @@ abstract: Despite the success achieved by existing image generation and editing 
   that GenArtist can perform various generation and editing tasks, achieving state-of-the-art performance
   and surpassing existing models such as SDXL and DALL-E 3, as can be seen in Fig. 1. Project page is
   https://zhenyuw16.github.io/GenArtist_page.
+explained:
+  before: Individual text-to-image and image-editing models each specialized in particular sub-problems
+    (layout-controlled generation, entity insertion, inpainting, attribute editing, and so on), so no
+    single model handled complex prompts requiring several of these capabilities together, and none of
+    them verified their own output or corrected mistakes once an image was produced.
+  problem: How to handle complex generation and editing requests that require decomposing a task across
+    multiple specialized tools, while also verifying intermediate and final results and correcting errors
+    rather than returning a single unchecked output.
+  idea: Use a multimodal LLM as an orchestrating agent that decomposes a complex generation or editing
+    request into a tree of simpler sub-problems, calls the appropriate specialized tool for each sub-problem
+    (auto-filling missing inputs such as object positions when needed), and verifies each result step
+    by step, backtracking to alternative tools when verification fails.
+  method: GPT-4 serves as the frozen MLLM agent; no model in the system is trained. It plans over a tree
+    structure with an initial root node, generation nodes, and editing nodes, where each generation node
+    owns a sub-tree of editing nodes used purely for self-correction; the tree is traversed in pre-order,
+    executing a node's tool call and verifying the result before advancing to a child, and backtracking
+    to sibling alternatives on failure. A tool library covers generation (SDXL, PixArt-alpha, LMD, BoxDiff,
+    BLIP-Diffusion, lambda-ECLIPSE, TextDiffuser, ControlNet), editing (AnyDoor, LaMa, DiffEdit, MagicBrush,
+    DragDiffusion, DragonDiffusion, InST), and auxiliary functions (object detection, segmentation, ControlNet
+    preprocessors, LLM-based layout generation). When a tool needs position information it lacks, auxiliary
+    tools generate bounding boxes or layouts automatically, and detected object boxes are folded into
+    the MLLM's prompt as spatial reference. Verification has the MLLM check whether the objects, attributes
+    (color, shape, texture), positions, and inter-object relationships named in the text are present in
+    the image.
+  evidence: On T2I-CompBench, GenArtist outperforms DALL-E 3 on attribute binding (0.8482 vs 0.7785),
+    color (0.6948 vs 0.6205), spatial relationships (0.3346 vs 0.3003), and complex composition (0.4499
+    vs 0.3773), and outperforms SDXL by larger margins, e.g. attribute binding 0.8482 vs 0.5879 and complex
+    composition 0.4499 vs 0.3237. On MagicBrush editing, single-turn L1 distance is 0.0536 versus the
+    MagicBrush baseline's 0.0625, with CLIP-I 0.9403 vs 0.9332 and CLIP-T 0.3129 vs 0.2781; multi-turn
+    L1 is 0.0858 vs 0.0964 and CLIP-I 0.9071 vs 0.8924.
+  limitations: The paper concedes the method's effectiveness is capped by the capability of the MLLM used;
+    it states that for tasks exceeding what GPT-4 can handle, the method may fail. It also flags potential
+    negative social impact from misuse of generation or editing capability. No other technical limitations
+    (e.g., latency from many tool calls, or failure cases specific to the tree search) are discussed in
+    the fetched text.
+  why_it_matters: It extends the self-refinement idea from a single generator being iteratively re-prompted
+    (as in Idea2Img) to an agent that plans across a whole library of specialized tools and verifies each
+    step, moving the field from single-model self-critique toward tool-using, search-augmented generation
+    pipelines.
+  depth: full-text

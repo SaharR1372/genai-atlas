@@ -46,3 +46,49 @@ abstract: 'Pretrained models have become a commodity and offer strong results on
   that better balances the teachers'' influence. Our final distillation strategy leads to student models
   of the same capacity as any of the teachers, while retaining or improving upon the performance of the
   best teacher for each task. Project page and code: https://europe.naverlabs.com/unic'
+explained:
+  before: Several strong vision foundation models existed with complementary strengths, self-supervised
+    encoders like DINO good at correspondence and dense tasks, supervised encoders like DeiT-III strong
+    on classification, masked-image-modeling encoders like iBOT, but each was a separate model, so using
+    more than one at once meant deploying and combining several full backbones rather than one.
+  problem: Whether a single encoder can be trained to match or exceed the best individual teacher on each
+    classification and dense-prediction task it is evaluated on, given several teacher models with complementary
+    strengths, rather than being a compromise average of all of them.
+  idea: Distill several teacher vision encoders into one student encoder of the same capacity as any single
+    teacher, using per-layer projector heads and a teacher-dropping training scheme that prevents any
+    one teacher's loss from dominating, so the student inherits the strongest aspects of each teacher
+    instead of averaging them away.
+  method: The student is a ViT trained by distillation loss (a combination of cosine and smooth-L1 loss
+    on both CLS and patch tokens) against each frozen teacher. A 'ladder of expendable projectors' attaches
+    MLP projector heads not just at the final layer but at intermediate layers, summing their contributions
+    so that intermediate features also receive distillation signal; these projectors are discarded after
+    training and not used at inference. Teacher dropping randomly excludes some teachers from a given
+    training step with a probability based on current loss balance, always keeping whichever teacher is
+    currently least well approximated, to stop any one teacher from dominating gradients. Teacher outputs
+    are also feature-standardized (zero mean, unit variance via an exponential moving average) before
+    distillation, and CLS and patch tokens get separate projector heads. Base-scale experiments distill
+    four ImageNet-1K-trained ViT-Base/16 teachers (DINO, DeiT-III, iBOT, dBOT-ft); larger-scale experiments
+    distill DINOv2-Giant/14 and MetaCLIP-Huge/14 into a ViT-Large/14 student, UNIC-L.
+  evidence: With four ViT-Base teachers, the UNIC student reaches 83.8% ImageNet-1K accuracy versus the
+    best teacher dBOT-ft's 84.0% (essentially matched, -0.2 points), while gaining +2.7% average on 15
+    transfer datasets, +8.2% relative on ADE-20K segmentation mIoU (39.6), and improved NYU depth RMSE
+    (0.511) over the best teacher. With just two teachers (DINO, DeiT-III), it reaches 83.1% ImageNet-1K,
+    +1.5 points transfer over DINO, and +4.6 points absolute segmentation mIoU over the best individual
+    teacher (37.5 vs 32.3). At the large scale (UNIC-L, distilling DINOv2-Giant and MetaCLIP-Huge), UNIC-L
+    beats AM-RADIO on k-NN ImageNet (85.6% vs 84.8%) and zero-shot classification (81.4% vs 80.4%), and
+    is roughly on par on ADE-20K segmentation (48.3 vs AM-RADIO's 48.1 and DINOv2's 48.7 mIoU). Ablations
+    show feature standardization alone contributes +2.7% transfer, teacher dropping contributes an additional
+    +0.5% on ImageNet on top of the ladder projector.
+  limitations: The paper concedes UNIC's ImageNet-1K accuracy stays 0.4 points below the strongest single
+    teacher, DeiT-III, attributing this to not using ImageNet labels during distillation. It flags that
+    linear probing, its evaluation protocol for dense prediction transfer, is 'far from being the optimal
+    protocol' for that purpose even though it uses it for consistency. It also finds UNIC's feature space
+    needs more PCA dimensions to reconstruct well, indicating higher entanglement than a single teacher's
+    feature space. No computational cost, scalability, or out-of-distribution failure analysis is given
+    beyond these points.
+  why_it_matters: 'It shows multi-teacher distillation into a single backbone is a general, reproducible
+    recipe, not tied to one architecture, one set of teachers, or one company''s engineering: UNIC gets
+    equal-or-better performance than the best teacher on essentially every task type tested with an independently
+    designed training recipe (ladder projectors, teacher dropping) and, at large scale, matches or beats
+    AM-RADIO on several metrics using different specific mechanisms.'
+  depth: full-text

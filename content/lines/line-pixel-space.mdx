@@ -1,0 +1,85 @@
+---
+id: line-pixel-space
+title: Single-stage pixel transformers
+---
+
+## The bet
+
+Every latent line in this atlas shares one premise: that raw pixel space has too many
+spatially-correlated dimensions to model directly, so a separately trained encoder must first project
+images onto a lower-dimensional manifold. This line denies it. The claim is that the denoising or
+flow-matching objective already forces the network to discover that manifold, and that large patches
+plus the right prediction target let a single end-to-end model do the compression internally — with no
+VAE, no cascade, and no second training stage.
+
+The payoff, stated in almost the same words across
+[PixNerd](/papers/pixnerd-2025), [JiT](/papers/jit-2025), [DiP](/papers/dip-2026) and
+[HyperDiT](/papers/hyperdit-2026): you lose the tokenizer's reconstruction ceiling, the blur and
+colour artifacts it imposes, and the non-end-to-end pipeline it requires.
+
+## The arc
+
+[PixNerd](/papers/pixnerd-2025) is the technical origin, in July 2025, replacing the VAE with a
+per-patch neural field and reaching ImageNet-256 FID 2.15 in one stage. Four months later
+[JiT](/papers/jit-2025) makes the argument the field actually heard — that ε-prediction, not pixels,
+caused pixel-space instability, and that x-prediction on large patches makes a plain ViT competitive.
+JiT is usually cited as where this line begins. It is not, and the distinction matters for anyone
+tracing priority.
+
+What follows splits into three kinds of work. **Architecture**: [PixelDiT](/papers/pixeldit-2026) and
+[DiP](/papers/dip-2026), both at CVPR 2026, separate global semantics from texture refinement across
+two levels — a pattern [HyperDiT](/papers/hyperdit-2026) extends with semantic anchors and
+foundation-model register tokens. **Diagnosis**: [PixelREPA](/papers/pixelrepa-2026) finds that REPA,
+which reliably accelerates latent diffusion transformers, actively hurts JiT; [Register
+Guidance](/papers/registers-pixel-2026) finds register tokens help pixel-space transformers *more*
+than latent ones. Both say the same thing from different directions — pixel space is not latent space
+with more dimensions, and interventions do not transfer between them. **Efficiency**:
+[MOSAIK](/papers/mosaik-2026) cuts 70% of FLOPs with content-aware patch sizing, and the [empirical
+text-to-image study](/papers/pixel-t2i-empirical-2026) reports 3.2–4.8× faster inference than latent
+baselines, inverting the efficiency argument that motivated latents in the first place.
+
+[Parallel Rollout Approximation](/papers/pixel-ar-pra-2026) is the line's most useful piece of
+evidence, because it is not diffusion at all. If the tokenizer is genuinely dispensable, that should
+not depend on the generative objective — and a pixel-space autoregressive model at 511M parameters
+reaching FID 1.94 suggests it does not.
+
+## Why the FID numbers here cannot be ranked
+
+The papers on this page report ImageNet-256 FIDs of 1.51, 1.52, 1.56, 1.58, 1.61, 1.79, 1.82, 1.94 and
+2.15. That spread looks like a leaderboard and is not one. The entries differ in parameter count
+(511M to 952M), training budget (160 to 600 epochs), guidance scale (2.75 to 3.5) and guidance
+interval, and every one of those moves FID by more than the gaps between neighbouring rows. The
+[guidance notebook](/notebooks/guidance.html) shows a single frozen model moving further under
+sampler changes alone than these architectures move from each other. Read the within-paper ablations
+instead; see [why the numbers cannot rank the approaches](/compare).
+
+Two further cautions specific to this line. The two lowest numbers, from
+[PixSGR](/papers/pixsgr-2026) and [Observation Operators](/papers/obsop-2026), are single-version
+preprints, and Observation Operators shares four authors with HyperDiT, so it is one group's
+continuing programme rather than independent confirmation.
+
+## What holds up, and what does not
+
+The reconstruction-ceiling argument holds: no paper here has been refuted, and removing a lossy
+component removes its failure modes. The efficiency objection that justified latents is now contested
+in the right direction, by measurement rather than assertion.
+
+What does not yet hold is the scope. Nearly every headline number on this page is class-conditional
+ImageNet. Text-to-image evidence is one systematic study old. And the line's own strongest paper is
+candid about the gap: [PixelDiT](/papers/pixeldit-2026) states plainly that pixel data and noise
+distributions are more complex than latent ones and that no mature training recipe exists for them.
+Attention cost still scales badly with resolution — several papers here exist only to patch that,
+which is itself a measure of how binding the constraint remains.
+
+## A correction this atlas owes the reader
+
+Until September 2026 this line held two papers, both from MIT, and its own text told readers that
+pixel-space results were "mostly from one group". That was not a fact about the field. It was this
+atlas's coverage gap stated as one. The verified affiliations now on these pages span NVIDIA, Google
+DeepMind, Yandex Research, Alibaba, Tencent Youtu, KAIST, NTU Singapore, UESTC, Nanjing University,
+NUS, Peking University, HKU, Stability AI, Stanford, Caltech and ByteDance Seed.
+
+Anyone reading this line should also read [cascaded and multiscale pixel
+diffusion](/lines/line-cascaded-pixel), which made a version of the same argument years earlier and
+was largely ignored. [SiD2](/papers/sid2-2024) reached FID 1.48 on ImageNet 512 in pixel space in
+2024 — still unbeaten at that resolution by anything on this page.

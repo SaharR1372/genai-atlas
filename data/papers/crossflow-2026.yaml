@@ -47,3 +47,51 @@ abstract: 'Most diffusion and flow-matching generators define the prior, probabi
   and adversarial losses are important for fidelity. These results indicate that cross-space flow objectives
   can combine the efficiency of latent representations with direct pixel-space supervision, without requiring
   a separate decoder at inference.'
+explained:
+  before: By 2026, tokenizer-free pixel diffusion (pixelflow-2025, sid2-2024, hdit-2024) argued generation
+    should skip latents altogether, while latent-forcing-2026 argued latents remain useful as an intermediate
+    scratchpad within an otherwise pixel-output generator; conventional latent diffusion still optimized
+    its generator purely for latent-space prediction and handed off to a separately trained decoder network
+    that was never exposed to the generator's own possibly imperfect outputs during its training, creating
+    a train and inference mismatch at the latent-to-pixel handoff.
+  problem: How to remove the mismatch between a latent diffusion generator, optimized for latent-space
+    prediction, and its decoder, trained independently and never on the generator's own outputs, while
+    keeping the efficiency of running the diffusion or flow trajectory in a compressed latent space.
+  idea: 'Keep the noisy trajectory in latent space, as ordinary latent diffusion does, but change what
+    the model is trained to predict: instead of a latent-space velocity or displacement, have the network
+    directly predict the clean pixel-space image at every point along the latent trajectory, so a single
+    model can act as both a one-step latent-to-pixel generator from noise and as a drop-in replacement
+    for a separately trained decoder inside an existing latent diffusion pipeline.'
+  method: 'CrossFlow defines a cross-space flow: the prior, the probability path, and the intermediate
+    noisy states are all in the autoencoder''s latent space, as in ordinary latent flow matching, but
+    the training target at every point on that path is the clean pixel-space image, not a latent displacement
+    vector, described as a velocity-free one-step objective. Because the network''s output head is bound
+    to predict a clean image directly rather than a velocity, no multi-step ODE integration is needed
+    at inference; a single forward pass maps a noisy latent straight to a pixel-space image. This training
+    scheme lets the same trained network be used two ways: as a genuine one-step generator, sampling a
+    noisy latent and mapping it to pixels in one function evaluation, and as a decoder substitute inside
+    conventional multi-step latent diffusion pipelines, since it consumes latents, including imperfect
+    ones produced by another generator, and emits images the way a decoder would.'
+  evidence: On class-conditional ImageNet-1k at 256x256, CrossFlow-XL (461M parameters) reaches FID 1.62
+    with a single function evaluation, one forward pass with no multi-step sampling. Ablations on latent
+    encoder choice, evaluated on a smaller CrossFlow-B model, show the default VA-VAE encoder giving 2.54
+    FID versus 3.81 FID with a FLUX.2 encoder and 4.08 FID with an SD-VAE encoder, so encoder choice matters
+    substantially. Loss ablations on CrossFlow-B show removing the GAN loss degrades FID from 2.54 to
+    8.86, removing the perceptual loss degrades it to 30.21, removing both degrades it to 50.65, and a
+    further variant setting phi(r) to zero gives 8.70, together showing the pixel-space perceptual and
+    adversarial losses are load-bearing for fidelity rather than optional polish.
+  limitations: 'The authors concede that training the encoder and the cross-space generator simultaneously
+    exhibits optimization instabilities in practice, so the reported system does not use single-stage
+    end-to-end training: the encoder is trained first and then frozen while the generator is trained,
+    with the authors explicitly deferring stable single-stage joint training strategies to future work.
+    The clean single-model story therefore holds only at inference time, not at training time.'
+  why_it_matters: On the atlas's question, whether CrossFlow goes from noisy latents to pixel-space images
+    in one step, the fetched text confirms this directly, and the paper explicitly frames its contribution
+    as fixing a latent-diffusion-specific problem, generator and decoder mismatch, through cross-space
+    supervision, not as eliminating the latent or arguing against having one. It should be recorded as
+    a latent-to-pixel bridge and possible decoder replacement, distinct in kind from tokenizer-free generation,
+    which removes the latent from the pipeline entirely, and also distinct from latent-forcing-2026's
+    scratchpad framing, which keeps pixels as the model's own multi-step output with the latent feeding
+    pixel denoising rather than being mapped to pixels by a one-step head; it occupies its own third position
+    in this space.
+  depth: full-text
