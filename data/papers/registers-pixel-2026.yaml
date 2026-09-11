@@ -42,3 +42,51 @@ abstract: 'Vision Transformers (ViTs) are known to exhibit high-norm patch-token
   mechanisms, which may partially account for their strong empirical performance. Motivated by these observations,
   we propose Register Guidance, a technique that amplifies the contribution of register tokens responsible
   for improving visual structure and coherence.'
+explained:
+  before: Register tokens, extra learnable tokens appended to the patch-token sequence, were established
+    for plain Vision Transformers as a fix for high-norm patch-token outliers that degrade feature-map
+    quality. As Diffusion Transformers increasingly adopted transformer backbones and moved toward pixel-space
+    training, they became closer in form to ViTs, but whether register tokens would help them, and for
+    the same reason, was untested.
+  problem: Determine whether register tokens help Diffusion Transformers, whether pixel-space and latent-space
+    DiTs respond the same way, and whether the effect can be converted into a usable technique rather
+    than just an architectural tweak.
+  idea: DiTs do not exhibit the high-norm patch-token outliers that motivated registers in ViTs, yet they
+    still benefit from registers, and pixel-space DiTs benefit substantially more than latent-space ones
+    because registers produce cleaner intermediate feature maps at high noise levels, which pixel-space
+    generation relies on more heavily. This observation can be turned into an inference-time guidance
+    method, Register Guidance, that contrasts a model's predictions with and without registers.
+  method: 'Registers are extra learnable tokens with no additional layers, introduced only in the deeper
+    blocks of the transformer; for a 12-layer pixel DiT the best configuration uses 32 registers introduced
+    starting at block 4 through block 11, while introducing them from the first layer degrades performance.
+    To enable Register Guidance the model is trained to work both with and without registers, by randomly
+    dropping the registers during training with probability p=0.03 and using separate batches for the
+    two regimes. At sampling time the model is run twice per step, once with registers to get velocity
+    v_r and once without to get v_nr, and these are combined the same way classifier-free guidance combines
+    conditional and unconditional predictions: v_rg = v_nr + w_rg * (v_r - v_nr). This composes with ordinary
+    classifier-free guidance using an additional unconditional velocity v_u as v = v_u + w_cfg * (v_r
+    - v_u) + w_rg * (v_r - v_nr), applying both corrections at once.'
+  evidence: 'On ImageNet 256x256 at 600 epochs, adding registers improves pDiT-B/16 from FID 4.80 to 3.80,
+    pDiT-L/16 from 2.80 to 2.47, and pDiT-H/16 from 2.35 to 2.02; at 200 epochs the same pattern holds,
+    with pDiT-B/16 going from 7.39 to 5.30, pDiT-L/16 from 4.13 to 3.17, and pDiT-H/16 from 3.31 to 2.61.
+    A register-configuration ablation on pDiT-B/16 at 600 epochs shows the baseline with zero registers
+    at FID 11.1 improving to 6.45 with the optimal setting of 32 registers in layers 4-11. For Register
+    Guidance specifically, on JiT-B/16 at ImageNet 256x256: a CFG-only baseline gives FID 3.71, Register
+    Guidance alone (w_rg=3.5) gives FID 3.46, and combining both (w_rg=1.8, w_cfg=2.0) gives FID 3.32;
+    on larger models, JiT-L/16 with combined guidance reaches FID 2.00 versus a 2.36 baseline, and JiT-H/16
+    reaches FID 1.80 versus a 1.86 baseline. In latent space, a VAE-based SiT model shows only a modest
+    gain from registers (FID 2.53 to 2.38 at the Large scale), while an RAE-latent model gets worse with
+    registers (FID 3.91 to 4.44).'
+  limitations: Registers help pixel-space DiTs substantially, give smaller gains in VAE-latent space,
+    and actively hurt an RAE-latent model, and the authors state they have no theoretical explanation
+    for the RAE degradation. They explicitly say their exploration of Register Guidance leaves room for
+    further study, since it is evaluated only on pixel-space, class-conditional models, and describe extending
+    it to text-to-image generation as future work. Registers introduced starting from the first transformer
+    layer are described as substantially less informative, and the authors say the mechanism for why is
+    not fully explained, and more broadly they acknowledge the general reason registers help DiTs, despite
+    DiTs lacking the outlier phenomenon that motivated registers in ViTs, is not fully understood.
+  why_it_matters: It undercuts the assumption that an architectural fix transfers from ViTs to DiTs for
+    the same underlying reason, provides direct evidence that pixel-space and latent-space diffusion transformers
+    respond differently to the identical intervention, and yields a second CFG-like guidance axis, register
+    presence versus absence, that composes with standard classifier-free guidance for further gains.
+  depth: full-text

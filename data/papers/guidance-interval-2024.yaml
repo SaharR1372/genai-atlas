@@ -46,3 +46,39 @@ abstract: Guidance is a crucial technique for extracting the best performance ou
   parameters, network architectures, and datasets, including the large-scale setting of Stable Diffusion
   XL. We thus suggest exposing the guidance interval as a hyperparameter in all diffusion models that
   use guidance.
+explained:
+  before: Standard practice was to apply a single, constant guidance weight across every noise level of
+    the sampling chain, from the earliest, highest-noise steps to the final, lowest-noise steps, treating
+    guidance strength as one global scalar hyperparameter.
+  problem: Determine whether guidance is equally useful at every noise level during sampling, and if not,
+    find a way to apply it only where it helps.
+  idea: Guidance is actively harmful at high noise levels early in sampling, largely unnecessary at low
+    noise levels late in sampling, and only beneficial in a middle range. Restricting the guidance weight
+    to a specific interval of noise levels, and leaving it off elsewhere, therefore improves both sample
+    quality and inference speed compared to applying it everywhere.
+  method: 'The constant classifier-free guidance weight is replaced by a piecewise-constant function of
+    the noise level sigma: the weight equals a chosen gamma inside an interval (sigma_lo, sigma_hi] and
+    equals 1 (no guidance) outside it. This modifies the guidance term inside the probability-flow ODE.
+    The interval boundaries are snapped to exact sampler step boundaries so that the resulting trajectory
+    stays smooth enough for the Runge-Kutta solver being used, and gamma, sigma_lo, and sigma_hi are chosen
+    per model and dataset by grid search.'
+  evidence: 'On ImageNet-512, EDM2-S improves from FID 2.23 with standard guidance to FID 1.68 with the
+    interval (gamma=2.1, sigma in (0.28, 2.90]). EDM2-XXL improves from FID 1.81 to a then-record FID
+    1.40 (gamma=2.0, sigma in (0.19, 1.61], 32-step Heun sampler), and its FD-DINOv2 score improves from
+    33.09 to 29.16 with a different interval (gamma=2.9, sigma in (0.60, 5.00]). DiT-XL/2 on ImageNet-512
+    improves from FID 3.04 to 2.40 (gamma=2.5, sigma in (0.34, 1.02], 250-step iDDPM sampler). The improvement
+    holds at other step counts for EDM2-S: at 16 steps FID goes from 2.49 to 1.84, and at 64 steps from
+    2.27 to 1.70. On Stable Diffusion XL, restricting guidance to roughly half of 32 sampling steps (gamma=16,
+    sigma in (0.28, 5.42]) gives over a 20% speed-up from needing fewer unconditional model evaluations.'
+  limitations: 'The optimal interval is not universal: it differs across models and datasets, and even
+    differs within the same model depending on which metric (FID versus FD-DINOv2) is being optimized.
+    The authors tried smooth weighting functions instead of a hard on/off interval and found they did
+    not improve on the simple binary inclusion rule. A per-step importance analysis consistently underestimated
+    the downside of guidance at any single step, implying that harmful effects accumulate across steps
+    in a way that is not visible locally. The authors also flag their supporting one-dimensional toy example
+    as grossly simplified.'
+  why_it_matters: 'It reframes the guidance weight from a single global scalar into a function of where
+    you are in the sampling chain, which is the direct conceptual ancestor of later work treating when
+    and how to guide as its own design axis. It also delivers a rare free lunch: better distribution quality
+    and faster sampling at the same time, simply by turning guidance off where it was not helping.'
+  depth: full-text

@@ -135,3 +135,49 @@ def test_single_org_line_is_flagged(validate_mod, sample_data_dir):
     )
     _, warnings, _, _ = validate_mod.run(data_dir=sample_data_dir)
     assert any("every paper in this line is from OneLab" in w for w in warnings)
+
+
+def test_sparse_line_over_long_window_is_flagged(validate_mod, sample_data_dir):
+    """
+    Four papers is not thin by count, but spread across many years it usually means the atlas
+    has the endpoints and missed the middle. Modelled on the cascaded-pixel line, where the
+    atlas held a 2021 paper and a 2024 paper and nothing between them.
+    """
+    (sample_data_dir / "lines").mkdir(exist_ok=True)
+    for pid, date in [("gap-old", "2019-01"), ("gap-new", "2026-01")]:
+        (sample_data_dir / "papers" / f"{pid}.yaml").write_text(
+            f"id: {pid}\ntype: paper\ntitle: {pid}\ndate: '{date}'\ntier: core\n"
+            f"sections: [generation]\norgs: [LabA, LabB]\nlines: [line-sparse]\n"
+            "status: {code: none, weights: none, verified: false}\nsummary: test.\n"
+        )
+    (sample_data_dir / "lines" / "line-sparse.yaml").write_text(
+        "id: line-sparse\ntype: line\nname: Sparse\none_line: A test.\n"
+        "core_bet: Testing.\nprimary_axis: objective\nstatus: emerging\nsections: [generation]\n"
+        "arc:\n  - paper: gap-old\n    role: origin\n    note: a\n"
+        "  - paper: gap-new\n    role: improvement\n    note: b\n"
+    )
+    _, warnings, _, _ = validate_mod.run(data_dir=sample_data_dir)
+    assert any("sparse across this long a window" in w for w in warnings)
+
+
+def test_stale_ascendant_line_is_flagged(validate_mod, sample_data_dir):
+    """
+    Calling a line 'ascendant' is a claim about the present. If nothing has been added in
+    eighteen months, either the claim is wrong or the atlas stopped following it.
+    """
+    (sample_data_dir / "lines").mkdir(exist_ok=True)
+    for pid, date in [("stale-a", "2020-01"), ("stale-b", "2021-06"),
+                      ("stale-c", "2022-01"), ("stale-d", "2022-03"), ("stale-e", "2022-06")]:
+        (sample_data_dir / "papers" / f"{pid}.yaml").write_text(
+            f"id: {pid}\ntype: paper\ntitle: {pid}\ndate: '{date}'\ntier: core\n"
+            f"sections: [generation]\norgs: [LabA, LabB]\nlines: [line-stale]\n"
+            "status: {code: none, weights: none, verified: false}\nsummary: test.\n"
+        )
+    arc = "".join(f"  - paper: stale-{c}\n    role: improvement\n    note: n\n" for c in "abcde")
+    (sample_data_dir / "lines" / "line-stale.yaml").write_text(
+        "id: line-stale\ntype: line\nname: Stale\none_line: A test.\n"
+        "core_bet: Testing.\nprimary_axis: objective\nstatus: ascendant\nsections: [generation]\n"
+        "arc:\n" + arc
+    )
+    _, warnings, _, _ = validate_mod.run(data_dir=sample_data_dir)
+    assert any("on a line marked 'ascendant'" in w for w in warnings)

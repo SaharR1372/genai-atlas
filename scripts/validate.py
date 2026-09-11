@@ -16,10 +16,13 @@ from __future__ import annotations
 
 import json
 import sys
+from datetime import date
 import warnings as _warnings
 from pathlib import Path
 
 import yaml
+
+TODAY = date.today()
 
 # RefResolver is deprecated in jsonschema>=4.18 in favor of the `referencing` library.
 # We pin jsonschema<5 (see pyproject.toml) and keep RefResolver for now since it is simpler
@@ -252,6 +255,35 @@ def run(data_dir: Path = DATA_DIR, content_dir: Path = CONTENT_DIR, root: Path =
                     f"{src}: every paper in this line is from {orgs[0]}. Either the idea really is "
                     f"one group's, or the atlas has only found one group's work on it."
                 )
+
+            # Two further shapes of gap the count alone misses. A line sparse over a long
+            # window usually means the atlas has the endpoints and not the middle; a line
+            # the atlas calls live with nothing recent means it stopped being followed.
+            dates = sorted(
+                d for d in (
+                    (registry[s["paper"]]["entity"].get("date") or "")[:7]
+                    for s in entity.get("arc", []) if s.get("paper") in registry
+                ) if len(d) == 7
+            )
+            if dates and entity.get("status") != "superseded":
+                span_years = (int(dates[-1][:4]) * 12 + int(dates[-1][5:7])
+                              - int(dates[0][:4]) * 12 - int(dates[0][5:7])) / 12
+                if arc_len <= 4 and span_years >= 3:
+                    warnings.append(
+                        f"{src}: {arc_len} paper(s) spread over {span_years:.1f} years. A line this "
+                        f"sparse across this long a window usually means the atlas has the "
+                        f"endpoints and is missing what happened between them."
+                    )
+                # Only 'ascendant' and 'contested' make a claim about the present. A
+                # 'dominant' line can be settled and quiet without anything being wrong.
+                if entity.get("status") in {"ascendant", "contested"}:
+                    latest = int(dates[-1][:4]) * 12 + int(dates[-1][5:7])
+                    months = (TODAY.year * 12 + TODAY.month) - latest
+                    if months >= 18:
+                        warnings.append(
+                            f"{src}: newest paper is {months} months old, on a line marked "
+                            f"'{entity['status']}'. Either the status is stale or the coverage is."
+                        )
 
         elif etype == "problems":
             for pid in entity.get("attacked_by", []):

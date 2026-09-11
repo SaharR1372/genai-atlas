@@ -48,3 +48,47 @@ abstract: Classifier-free guidance (CFG) is crucial for improving both generatio
   experiments, we demonstrate that APG is compatible with various conditional diffusion models and samplers,
   leading to improved FID, recall, and saturation scores while maintaining precision comparable to CFG,
   making our method a superior plug-and-play alternative to standard classifier-free guidance.
+explained:
+  before: Classifier-free guidance needs a high guidance scale to get strong prompt alignment and perceptual
+    quality, but high scales cause oversaturation and other unrealistic artifacts. It was not established
+    which part of the CFG update was actually responsible for the artifacts versus which part was responsible
+    for the quality gains, so the scale had to be tuned as a single blunt trade-off knob.
+  problem: Separate the part of the classifier-free guidance update that causes oversaturation from the
+    part that improves quality, so that higher guidance scales can be used without the artifacts.
+  idea: Decompose the CFG update direction, the difference between the conditional and unconditional prediction,
+    into a component parallel to the current conditional prediction and a component orthogonal to it.
+    The parallel component is what drives oversaturation, while the orthogonal component is what drives
+    quality and alignment improvements, so down-weighting only the parallel part keeps the benefits of
+    guidance while removing the saturation artifacts.
+  method: 'Let Delta D_t = D_theta(z,t,y) - D_theta(z,t,y_null) be the CFG update on the denoised prediction.
+    Its parallel component is Delta D_t^par = (<Delta D_t, D_theta> / <D_theta, D_theta>) * D_theta, and
+    the orthogonal component is Delta D_t^perp = Delta D_t - Delta D_t^par. The modified update is Delta
+    D_t(eta) = Delta D_t^perp + eta * Delta D_t^par with eta <= 1 suppressing the saturation-causing part.
+    Two further components are added: a rescaling step that clamps the update to a sphere of radius r
+    via a factor min(1, r / ||Delta D_t||), and a reverse-momentum term Delta-bar D_t <- Delta D_t + beta
+    * Delta-bar D_t with negative beta that pushes successive updates away from prior directions, motivated
+    by a stated connection between CFG and gradient ascent. This projection must be applied to denoised
+    predictions, not raw noise predictions, for it to work. Nothing is trained; APG is purely a modification
+    to the sampler and the authors state it adds practically no extra compute over standard CFG (both
+    still require two denoiser evaluations per step).'
+  evidence: 'On ImageNet class-conditional generation (Table 1), CFG versus APG at matched guidance weight
+    w: EDM2-S at w=4 gives FID 10.42 to 6.49, recall 0.48 to 0.62, saturation 0.46 to 0.33, precision
+    roughly unchanged at 0.85; EDM2-XXL at w=2 gives FID 8.65 to 4.94, recall 0.57 to 0.67, saturation
+    0.37 to 0.31, precision 0.84 to 0.83; DiT-XL/2 at w=4 gives FID 19.14 to 9.34, recall 0.35 to 0.56,
+    saturation 0.37 to 0.30, precision 0.92 to 0.89; Stable Diffusion 2.1 at w=10 gives FID 27.53 to 22.21,
+    recall 0.41 to 0.49, saturation 0.36 to 0.27, precision 0.65 to 0.67; Stable Diffusion XL at w=15
+    gives FID 26.29 to 25.35, recall 0.49 to 0.50, saturation 0.28 to 0.18, precision 0.62 to 0.64. An
+    ablation on EDM2 at w=4 shows each component contributes: removing the projection gives FID 6.63,
+    removing rescaling gives FID 7.93, removing momentum gives FID 6.85, versus 6.49 for full APG. The
+    method is also reported to improve quality on distilled models (SDXL-Lightning at 8 steps, PixArt-delta,
+    SDXL-Flash) and to improve text-spelling accuracy on MS-COCO 2017 with SDXL and SD3, though no specific
+    numbers for those last two claims were captured from the fetched text.'
+  limitations: The authors state explicitly that challenges remain in bringing APG's sampling cost down
+    toward that of unguided sampling, meaning APG still requires two denoiser evaluations per step just
+    like standard CFG and does not remove that overhead, only the saturation trade-off that comes with
+    pushing the guidance scale higher.
+  why_it_matters: It supplies a mechanistic explanation, not just an empirical patch, for why high-scale
+    CFG oversaturates, and a drop-in sampler modification that improves FID, recall, and a dedicated saturation
+    metric simultaneously rather than trading one against another, while staying compatible with existing
+    samplers and already-distilled models.
+  depth: full-text

@@ -50,3 +50,43 @@ abstract: 'Latent diffusion models (LDMs) enable efficient high-resolution image
   and unified multimodal modeling. We summarize representative methods, identify key technical challenges,
   and discuss future directions toward high-fidelity, end-to-end vision foundation models that integrate
   generation and understanding.'
+explained:
+  before: The pixel-space diffusion literature had grown into many structurally different proposals, including
+    large-patch single-stream models, hierarchical global and local designs, frequency-decoupled approaches,
+    neural-field decoders and cross-scale semantic-anchor methods, without a shared vocabulary or comparative
+    framing connecting them to common open problems. That made it hard to tell what had been newly solved
+    and what had been reinvented.
+  problem: Give the pixel-space diffusion transformer literature a shared taxonomy, name its recurring
+    open technical challenges, and connect the line to the broader ambition of unifying visual generation
+    and understanding in one token space.
+  idea: Pixel-space diffusion transformers form a coherent research programme rather than a collection
+    of tricks. Dropping the VAE trades a fixed reconstruction ceiling for a harder but higher-ceiling
+    optimisation problem, and the same latent-free formulation lets pixels, text and task conditions share
+    one token space, which the survey argues is a more principled route to unifying generation and understanding
+    than attaching an image decoder to a language model.
+  method: 'Organises the field across seven sections along three axes: an architectural taxonomy of latent-free
+    transformers spanning single-stream large-patch, hierarchical, global-local decoupled, frequency-decoupled,
+    implicit neural field, cross-scale semantic-anchoring and unified-multimodal designs; the mathematical
+    foundations of continuous diffusion and flow trajectories operating directly on pixels; and how unified
+    multimodal systems fold text, pixels and task conditions into one shared token vocabulary processed
+    by a single transformer. Two tables are compiled from cited work rather than measured: one mapping
+    architecture categories to representative methods with their stated strengths and limitations, one
+    mapping five recurring challenges, namely quadratic complexity, the granularity conflict, optimisation
+    difficulty, high-frequency interference and semantic initialisation, to causes and solution pathways.'
+  evidence: 'None of its own. This is a survey and reports no new experimental results: no original FID,
+    parameter-count or benchmark numbers. Its only tabulated content is qualitative and compiled from
+    the papers it reviews.'
+  limitations: 'States the field''s unresolved trade-off rather than a limitation of the survey itself:
+    latent compression trades fidelity for tractability, while raw-pixel modelling keeps a higher fidelity
+    ceiling at much greater optimisation difficulty. It separately flags that discriminative vision foundation
+    model representations conflict with generation''s need for precise texture and edge recovery, and
+    that alignment objectives with inconsistent gradient directions can suppress the fine-grained information
+    generation needs. It closes with seven named open challenges: dynamic token granularity, native pixel
+    generation trajectories, post-training of pixel diffusion transformers, non-intrusive representation
+    guidance, the computation-fidelity Pareto frontier, truly unified understanding and generation, and
+    data and evaluation frameworks.'
+  why_it_matters: Signals the field crossed a threshold of size and inconsistency that needed a review,
+    which is itself evidence about the line's maturity. Its taxonomy names the axes that separate the
+    papers in this line, and its open-challenges list gives a checklist for judging which of them close
+    a stated gap rather than restating it.
+  depth: full-text

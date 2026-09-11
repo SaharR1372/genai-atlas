@@ -43,3 +43,41 @@ abstract: Pixel-space diffusion models avoid the reconstruction ceiling of laten
   and its DPG-Bench score drops by only 1.0 point. Compared to diverse efficiency paradigms, including
   temporal patch scheduling and feature caching, our approach delivers highly competitive performance
   at moderate budgets and consistently outperforms these baselines in highly constrained compute regimes.
+explained:
+  before: Pixel-space diffusion transformers such as PixelDiT get strong quality without a VAE, but pay
+    in a token count that scales with resolution. Existing efficiency fixes use larger patches at certain
+    denoising steps, applying one uniform patch size across the whole image per step, even though regions
+    differ greatly in how much they suffer from coarsening.
+  problem: Cut the token and FLOP cost of pixel-space diffusion without a matching quality loss, given
+    that a single global patch-size choice per step wastes budget on regions that tolerate coarsening
+    fine.
+  idea: Vary patch size spatially as well as temporally. At each denoising step a damage-guided predictor
+    estimates how much fidelity a region would lose if coarsened, and fine patches are allocated only
+    where predicted damage is high, coarse patches elsewhere, under a fixed token budget.
+  method: Three-stage training on a frozen PixelDiT backbone. Stage one freezes PixelDiT and adds LoRA
+    adapters, separate tokenizers for patch sizes 32 and 64, a learned patch-size embedding, and a learned
+    pixel-shuffle upsampler bridging to the fixed patch-16 pixel-level decoder, trained by self-distillation
+    against a frozen patch-16 teacher. Stage two trains on random heterogeneous layouts, 60 percent mixed
+    and 40 percent uniform, with token positions anchored to patch centres in a normalised patch-16 coordinate
+    frame. Stage three trains, offline with everything else frozen, a lightweight convolutional damage
+    predictor conditioned by FiLM on block-6 activations, noise level and pooled text embeddings, against
+    a target damage map defined as the per-64-by-64-region squared difference between a uniform patch-64
+    generator's velocity prediction and the patch-16 teacher's. Inference starts from uniform patch-16
+    and greedily reallocates tokens to the highest-damage regions.
+  evidence: Text-to-image at 1024 by 1024 with a Gemma-2 text encoder, a 50-step Euler sampler and classifier-free
+    guidance scale 2.75; no guidance-interval value appears in the fetched text. MOSAIK matches the full-compute
+    PixelDiT baseline's GenEval of 0.74 while cutting FLOPs by 70 percent and tokens per step from 4096
+    to 683, an 83 percent reduction, with DPG-Bench falling only from 83.5 to 82.5. At lighter budgets
+    of 20, 50 and 60 percent FLOP reduction, GenEval holds at 0.74 and DPG-Bench at 83.1 to 83.6. Against
+    a DDiT baseline at the same 70 percent reduction, MOSAIK's GenEval of 0.74 beats DDiT's 0.64. No ImageNet
+    FID numbers are reported, so these results cannot be compared on the numbers against the ImageNet-FID
+    papers elsewhere in this line.
+  limitations: No dedicated limitations section was found in the fetched text. The only explicit limitation
+    is a future-work note that video diffusion is left for later, so scope is static images only. Failure
+    modes, the predictor's own overhead, and whether allocation error compounds across denoising steps
+    are not discussed.
+  why_it_matters: Answers the standing objection to this whole line, that raw-pixel self-attention gets
+    quadratically worse with resolution, by showing spatially adaptive patch allocation on an existing
+    backbone can cut FLOPs by 70 percent and tokens by 83 percent for about a one-point DPG-Bench cost.
+    That reframes the compute objection as an engineering gap being closed rather than a fundamental limit.
+  depth: full-text

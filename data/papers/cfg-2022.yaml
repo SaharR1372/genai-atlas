@@ -43,3 +43,41 @@ abstract: 'Classifier guidance is a recently introduced method to trade off mode
   classifier: in what we call classifier-free guidance, we jointly train a conditional and an unconditional
   diffusion model, and we combine the resulting conditional and unconditional score estimates to attain
   a trade-off between sample quality and diversity similar to that obtained using classifier guidance.'
+explained:
+  before: Classifier guidance was the existing way to trade sample fidelity against diversity in a conditional
+    diffusion model after training, in the same spirit as low-temperature sampling or truncation in other
+    generative models. It works by combining the diffusion model's score estimate with the gradient of
+    an image classifier trained on noisy images. That requires training and maintaining a second network,
+    the classifier, separate from the generator, which raised the open question of whether guidance could
+    be done without one.
+  problem: Get the fidelity/diversity trade-off that classifier guidance provides without training a separate
+    classifier.
+  idea: Jointly train a single network to do both conditional and unconditional denoising by randomly
+    dropping the conditioning signal during training with some probability. At sampling time, extrapolate
+    the conditional prediction away from the unconditional prediction using a guidance weight w, which
+    reproduces the effect of an implicit classifier gradient without ever training one.
+  method: 'Training: sample a data pair (x, c), replace c with a null token with probability p_uncond,
+    sample a noise level and noise, and optimize the ordinary denoising loss on the resulting (possibly
+    unconditional) prediction. This is one network with a learned null-conditioning branch, nothing extra
+    is trained. Sampling: replace the conditional noise prediction with the extrapolated estimate epsilon-tilde
+    = (1+w)*epsilon_theta(z,c) - w*epsilon_theta(z), which requires two forward passes of the same network
+    per step, one conditional and one unconditional.'
+  evidence: 'On ImageNet 64x64, unguided sampling (w=0) gives FID 1.8 and IS 53.71; increasing the guidance
+    weight trades these off monotonically: w=0.1 gives FID 1.55, IS 66.11; w=0.3 gives FID 3.03, IS 92.8;
+    w=1.0 gives FID 12.6, IS 170.1; w=4.0 gives FID 26.22, IS 260.2 (all with p_uncond=0.1). On ImageNet
+    128x128, unguided sampling (w=0, T=256 steps) gives FID 7.27, IS 82.45, while w=0.3 gives the best
+    FID in the sweep, 2.43, with IS 158.47, and w=4.0 gives FID 21.53 but IS 421.03. An ablation over
+    the conditioning-dropout probability found p_uncond=0.5 consistently worse than p_uncond of 0.1 or
+    0.2, which perform similarly.'
+  limitations: 'The quality/diversity trade-off is not eliminated, only reparameterized: FID decreases
+    and then increases while IS increases monotonically with w, so there is no setting that improves both
+    at once, and the authors explicitly raise the question of whether reduced diversity is acceptable
+    in deployed systems. They also note a practical downside relative to classifier guidance: since classifiers
+    can be smaller and cheaper than the generator itself, classifier-guided sampling can in principle
+    be faster, whereas classifier-free guidance always needs two forward passes of the full generative
+    model per step.'
+  why_it_matters: It removed the dependency on an auxiliary classifier for guided diffusion sampling and
+    became the default inference-time control knob for essentially all later conditional diffusion and
+    flow models. The guidance scale it introduced is now a parameter that has to accompany almost every
+    benchmark number reported for a generative image or text-to-image model.
+  depth: full-text

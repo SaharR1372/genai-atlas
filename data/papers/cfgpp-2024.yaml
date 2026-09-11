@@ -52,3 +52,50 @@ abstract: 'Classifier-free guidance (CFG) is a fundamental tool in modern diffus
   that our method significantly enhances performance in text-to-image generation, DDIM inversion, editing,
   and solving inverse problems, suggesting a wide-ranging impact and potential applications in various
   fields that utilize text guidance. Project Page: https://cfgpp-diffusion.github.io/.'
+explained:
+  before: Standard classifier-free guidance uses the same guided (extrapolated) noise estimate both to
+    compute the current denoised estimate and to renoise for the next sampling step. This makes the DDIM
+    trajectory produced under guidance non-invertible, which complicates precise image reconstruction
+    and editing. Separately, the high guidance scales needed for good text alignment and quality routinely
+    cause oversaturation and other artifacts, which had generally been treated as an inherent limitation
+    of diffusion models rather than of the guidance formula itself.
+  problem: Fix classifier-free guidance's off-manifold behavior, its oversaturation at high guidance scales
+    and its lack of invertibility, without giving up the quality gains guidance provides, and show that
+    these problems come from the CFG update rule rather than from diffusion models in general.
+  idea: Reformulate text guidance as an inverse problem defined by a text-conditioned score-matching loss,
+    inspired by diffusion-based inverse-problem solvers. The fix is to keep using the guided, interpolated
+    prediction to decide the denoised estimate at each step, but to use only the unconditional noise estimate
+    to renoise for the next step, decoupling what the sampler denoises toward from what noise it adds
+    back.
+  method: 'Algorithm 2 (CFG++) differs from standard CFG (Algorithm 1) in exactly one place. Standard
+    CFG uses the guided noise estimate for both denoising and renoising: x_{t-1} = sqrt(alphabar_{t-1})
+    * x-hat_c^omega(x_t) + sqrt(1-alphabar_{t-1}) * epsilon-hat_c^omega(x_t). CFG++ instead computes an
+    interpolated (not extrapolated) denoised estimate using epsilon-hat_c^lambda = epsilon-hat_null +
+    lambda*(epsilon-hat_c - epsilon-hat_null) with lambda in [0,1] (versus CFG''s omega typically in [5,
+    30]), but renoises using the pure unconditional noise estimate epsilon-hat_null: x_{t-1} = sqrt(alphabar_{t-1})
+    * x-hat_c^lambda(x_t) + sqrt(1-alphabar_{t-1}) * epsilon-hat_null(x_t). No retraining is involved;
+    this changes only the sampler applied to an existing text-to-image diffusion model, evaluated on Stable
+    Diffusion v1.5, and the authors state it integrates into high-order solvers and extends to distilled
+    models.'
+  evidence: 'On SD v1.5 text-to-image generation, FID improves at every tested guidance-scale pair (CFG
+    omega versus CFG++ lambda): 2.0/0.2 gives 13.84 versus 12.75; 5.0/0.4 gives 15.08 versus 14.95; 7.5/0.6
+    gives 17.71 versus 17.47; 9.0/0.8 gives 20.01 versus 19.34; 12.5/1.0 gives 21.23 versus 20.88, while
+    CLIP similarity stays roughly constant around 0.310-0.313. On DDIM inversion over 5,000 COCO-2014
+    validation images, CFG++ gives consistent reconstruction (by PSNR and RMSE) across all tested guidance
+    scales, while standard CFG''s reconstruction degrades and fails at higher scales. On text-conditioned
+    inverse problems on 1,000 FFHQ 512x512 images using the PSLD solver, CFG++ beats CFG on three of four
+    tasks: super-resolution x8 (FID 36.58 vs 41.24, LPIPS 0.385 vs 0.394), motion deblurring (FID 65.67
+    vs 91.90, LPIPS 0.482 vs 0.493), and Gaussian deblurring (FID 39.85 vs 41.52, LPIPS 0.400 vs 0.390).
+    On inpainting, however, CFG++ is slightly worse than CFG on both metrics (FID 9.78 vs 9.36, LPIPS
+    0.052 vs 0.055), which the paper does not flag as an exception despite it running against the method''s
+    overall trend.'
+  limitations: The fetched text does not contain an explicit limitations section; the authors describe
+    their demonstrated applications as limited but frame that as an opportunity for broader future use
+    rather than a conceded shortcoming. The one place the method's own numbers work against it, a slightly
+    worse FID and LPIPS on the inpainting inverse-problem task, is not discussed by the authors.
+  why_it_matters: It shows that oversaturation and non-invertibility, often attributed to diffusion models
+    generally, are specifically artifacts of the classifier-free guidance formula, and that decoupling
+    the denoising signal from the renoising signal fixes both with a one-line change to the sampler. That
+    matters directly for any pipeline that needs exact inversion, such as image editing or inverse-problem
+    solving with a guided diffusion model.
+  depth: full-text

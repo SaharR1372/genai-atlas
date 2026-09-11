@@ -48,3 +48,47 @@ abstract: The primary axes of interest in image-generating diffusion models are 
   generation, setting record FIDs of 1.01 for 64x64 and 1.25 for 512x512, using publicly available networks.
   Furthermore, the method is also applicable to unconditional diffusion models, drastically improving
   their quality.
+explained:
+  before: 'After classifier-free guidance became standard, the only common way to trade off quality, alignment,
+    and diversity was to guide a conditional model with its own unconditional counterpart. That approach
+    simultaneously improves prompt alignment and image quality but narrows sample diversity, and these
+    effects seemed inherently entangled: there was no known way to improve quality without also giving
+    up variation. Classifier-free guidance is also only defined for conditional generation, since the
+    guiding signal is the unconditional model.'
+  problem: Obtain quality improvements from guidance without narrowing diversity, and make guidance work
+    for unconditional diffusion models too, where standard classifier-free guidance does not apply in
+    the same way.
+  idea: Guide a fully-trained diffusion model using a deliberately worse version of the same model, rather
+    than an unconditional model, obtained by giving it less capacity and/or less training. Because the
+    bad model shares the same conditioning as the good one and differs only in how well it predicts, its
+    errors act as a quality-only correction signal that is disentangled from the diversity-narrowing effect
+    that comes from contrasting conditional against unconditional predictions.
+  method: 'Two networks are used: D1, the fully trained main model, and D0, an inferior version of the
+    same architecture family created by reducing capacity (for example an XS-size variant instead of S)
+    and/or by using an early training snapshot (for example a model trained for 1/16th of D1''s iterations).
+    D1 is used unchanged; D0 requires its own separate training run but no other new components are introduced.
+    At sampling time the two predictions are combined with the same interpolation form as classifier-free
+    guidance, D_w = w*D1 + (1-w)*D0, using a guidance weight w greater than 1, evaluated with 32 deterministic
+    Heun sampling steps in the reported experiments.'
+  evidence: On ImageNet-512 with an EDM2-S backbone (unguided baseline FID 2.56), autoguidance using an
+    XS model trained for 1/16th as long reaches FID 1.34 at w=2.10, compared to 2.23 for standard classifier-free
+    guidance and 1.68 for classifier-free guidance combined with a limited guidance interval. Scaling
+    to EDM2-XXL gives a record FID of 1.25 at w=2.05. On ImageNet-64 with EDM2-S (baseline FID 1.58),
+    autoguidance reaches FID 1.01 at w=1.70 (guiding model XS, trained for 1/8th as long), versus 1.48
+    for standard classifier-free guidance. On unconditional ImageNet-512 with EDM2-S (baseline FID 11.67),
+    autoguidance reaches FID 3.86 at w=2.85. Using the FD-DINOv2 metric on EDM2-XXL at ImageNet-512, autoguidance
+    gives 24.18 versus 29.16 for classifier-free guidance with a limited interval.
+  limitations: 'The two degradations have to be of compatible type: an ablation shows that mismatching
+    them (for example applying dropout to D1 while using input noise to weaken D0) does not improve results.
+    Ablating each degradation alone is worse than combining them: reducing training alone gives FID 1.51
+    and reducing capacity alone gives FID 2.13, both worse than the combined 1.34. Results are described
+    as fairly insensitive to the guidance weight itself but sensitive to the EMA length used for the guiding
+    model. The authors state plainly that their recommended recipe, an early snapshot of a smaller model,
+    is easy to satisfy in principle but that such snapshots are not available for current large-scale
+    image generators in practice, which limits direct reuse of the method on existing pretrained systems.'
+  why_it_matters: It shows that classifier-free guidance's coupling of quality and diversity is not a
+    fundamental property of guidance itself, only of using an unconditional model as the contrast term.
+    Reframing guidance as extrapolation away from any sufficiently bad predictor of the same target opens
+    a design space beyond the conditional/unconditional split, and the method sets new record ImageNet
+    FIDs that later guidance work is compared against.
+  depth: full-text

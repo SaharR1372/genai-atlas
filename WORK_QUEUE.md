@@ -224,3 +224,51 @@ source.
 ### Next
 - [ ] Generate from all three on identical prompts and seeds, and record what each is actually good at
 - [ ] A comparison notebook, and results folded into `/models` and `/compare`
+
+---
+
+## Q8 — explanations for the 42 papers added by the coverage audit (2026-09-10, IN PROGRESS)
+
+Session 11 added 42 verified papers. Ten now carry full-text `explained` blocks. **32 still have
+only a `summary`.** The Sonnet subagent fan-out that was writing them hit the account's session rate
+limit mid-flight and four of five batches were lost; the JSON handoff files they were told to write
+are the recovery point, and only `explained_guidance.json` survived.
+
+Already done (do not redo): cfg-2022, autoguidance-2024, guidance-interval-2024, cfgpp-2024,
+apg-2024, ssg-2026, registers-pixel-2026, mosaik-2026, pixel-ar-pra-2026, pixel-survey-2026.
+
+Still needed, grouped as the batches were:
+- **flows/TM**: tarflow-2024, starflow2-2026, tm-demystify-2025, tm-design-space-2025,
+  tm-distill-2026, givt-2023, fluid-2024
+- **VLM/agentic/VFM**: blip2-2023, otter-2023, nvlm-2024, re-imagen-2022, idea2img-2023,
+  genartist-2024, unic-2024, theia-2024
+- **pixel single-stage**: pixnerd-2025, pixeldit-2026, dip-2026, hyperdit-2026, no-vae-2025,
+  pixelrepa-2026, pixsgr-2026, obsop-2026, pixel-t2i-empirical-2026
+- **cascaded/hybrid**: cdm-2021, simple-diffusion-2023, sid2-2024, hdit-2024, edify-image-2024,
+  pixelflow-2025, latent-forcing-2026, crossflow-2026
+
+Method that worked: one subagent per batch, each fetching `arxiv.org/html/<id>v1` for full text,
+writing a single JSON file of `{paper_id: {before, problem, idea, method, evidence, limitations,
+why_it_matters, depth}}` into the scratchpad rather than editing YAML directly (concurrent YAML
+writes have corrupted files in this project before), then the parent applies it. Instruct every
+agent to report guidance scale AND interval alongside every FID, since this atlas treats those as
+first-class confounds.
+
+Questions to put to the sources while doing this, still unanswered:
+- Does PixNerd's own framing support the atlas's new priority claim that it, not JiT, is this line's
+  technical origin? The atlas is asserting this and has not yet verified it against PixNerd's text.
+- Does PixelREPA really find REPA *hurts* JiT, and with what before/after numbers?
+- Is calling `no-vae-2025` tokenizer-free fair, given it keeps a self-supervised pretrained encoder?
+- Does SiD2 position its ImageNet-512 FID 1.5 against latent diffusion, and at what guidance/params?
+- Is Fluid's claim really that continuous beats discrete *as scale grows*, and random vs raster order?
+
+## Q9 — medical thin lines (2026-09-10, NOT STARTED)
+
+The audit agent for this was killed by the same rate limit before returning anything.
+`line-medical-counterfactual` holds exactly one paper, from 2020, on a line marked `ascendant` — the
+validator now flags it as 75 months stale. The project blueprint itself named "Ribeiro 2023" and
+"diffusion counterfactuals" as expected follow-ups that were never added, so this is near-certainly a
+gap. `line-medical-fm-latent` has two papers, both 2026, both Oxford; that one may genuinely be
+that small, and recording an honest "nobody else has done this" is an acceptable outcome.
+Use the PubMed MCP tools, not just arXiv.
+

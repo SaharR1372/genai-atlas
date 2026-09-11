@@ -50,3 +50,43 @@ abstract: 'Pixel-space continuous-token autoregressive (AR) generation directly 
   art among pixel-space AR models. Beyond generation, PRA achieves higher ImageNet classification probing
   accuracy than other AR and diffusion baselines, suggesting its potential for unified pixel-space image
   generation and understanding.'
+explained:
+  before: Pixel-space continuous-token autoregressive generation avoids a pretrained tokenizer but faces
+    two compounding problems. Each autoregressive step predicts a high-dimensional raw patch, so single-step
+    error is large; and teacher-forced training conditions on clean ground-truth prefixes while inference
+    conditions on the model's own imperfect generated patches, so inference-time errors compound in a
+    way training never sees. Prior fixes such as x-prediction and input noise injection only mitigate
+    this, and exact-rollout training would fix it but needs impractical sequential sampling.
+  problem: Build a pixel-in, pixel-out autoregressive generator whose training conditions actually resemble
+    its inference conditions, without giving up parallel teacher-forced training.
+  idea: Generate a low-dimensional intermediate state per patch instead of a full pixel patch, decode
+    it to pixels with a dedicated pixel decoder, and construct each position's training input independently
+    through that same intermediate-state-to-pixel decode path used at inference. Training then sees inference-realistic
+    decoded inputs while staying fully parallel across positions.
+  method: A causal transformer backbone processes 16 by 16 pixel patches as 768-dimensional tokens, 256
+    tokens per 256 by 256 image in raster order, with 16 class-conditioning prefix tokens and dropout
+    0.1. A lightweight intermediate-state encoder of four SwiGLU blocks, with token masking probability
+    0.5, maps each patch plus autoregressive prefix representation to a low-dimensional state, 16 dimensions
+    by default. A causal-transformer pixel decoder of six to eight layers maps perturbed intermediate
+    states back to pixels, and a SwiGLU-MLP diffusion head predicts rectified-flow velocity. Training
+    runs two parallel autoregressive forward passes per batch, one computing targets from ground truth
+    and one training on inputs built by perturbing and decoding those targets through the inference-time
+    path, done independently per position to stay parallel. The loss combines autoregressive rectified-flow
+    matching, L1 plus LPIPS reconstruction on decoded pixels, and an auxiliary pixel-prediction loss from
+    autoregressive hidden states, equally weighted.
+  evidence: Class-conditional ImageNet-1K at 256 by 256, 400 epochs, batch size 512, AdamW with peak learning
+    rate 3e-4, sampled with a 100-step Euler-Maruyama solver. Classifier-free guidance is applied on a
+    linear schedule across autoregressive positions rather than as a single scalar, so no fixed guidance
+    value or interval is available. PRA-S at 135M parameters reaches FID 2.58, PRA-B at 250M reaches 2.21,
+    and PRA-L at 511M reaches 1.94. The paper compares against FARMER-1.9B/8, the prior best pixel-space
+    autoregressive model at roughly 1.9B parameters and FID 3.60, and cites JiT-L/16 at 459M and FID 2.36
+    alongside SphereAR-L at 479M and FID 1.54.
+  limitations: 'The paper concedes PRA adds real complexity: an internal intermediate state, a separate
+    pixel decoder, and an extra parallel autoregressive forward pass during training. It names simplifying
+    the framework and testing on broader data and tasks as future work. It does not address autoregression''s
+    underlying sequential-inference speed disadvantage against parallel diffusion sampling.'
+  why_it_matters: Shows this line's no-pretrained-tokenizer bet is not specific to diffusion. A purely
+    autoregressive pixel-space model, with the train/inference mismatch engineered away, beats a much
+    larger prior pixel-space autoregressive model and approaches pixel diffusion baselines, which strengthens
+    the claim that tokenizer-freedom is a property of raw pixel space rather than of one generative objective.
+  depth: full-text
