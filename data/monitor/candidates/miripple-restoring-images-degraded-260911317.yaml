@@ -1,0 +1,46 @@
+id: miripple-restoring-images-degraded-260911317
+type: paper
+title: 'Mi-Ripple: Restoring Images Degraded by Iterative AI Editing'
+arxiv: '2609.11317'
+date: 2026-09
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Jiayin Chen
+- Yicheng Xu
+- Muting Wang
+tier: emerging
+sections:
+- rae
+- editing
+- medical
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: Iterative reference-conditioned image editing can introduce grid-like and granular textures,
+  commonly described as digital ripple. We present Mi-Ripple, a diagnosis-guided restoration workflow
+  that suppresses this digital ripple while protecting image structure. Mi-Ripple separates periodic lattice
+  artifacts from content-entangled granular texture, then combines selective spectral notching, structure-aware
+  smoothing, and cleaned-reference regeneration. This separation enables low-distortion filtering when
+  artifacts are spectrally isolated and visual reconstruction when filtering would erase legitimate detail.
+  Across fourteen notch-only executions, whole-image residual standard deviation is 0
+explanation: null
+_review:
+  score: 10.8
+  reasons:
+  - 'core topic: image editing, generated images'
+  - 'matches sections: rae, editing, medical'
+  - 48 upvotes on Hugging Face daily papers
+  source: huggingface
+  hf_upvotes: 48
+  discovered_on: '2026-09-13'
