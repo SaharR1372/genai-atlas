@@ -1,0 +1,48 @@
+id: paintanything-unified-anycolor-control-260920816
+type: paper
+title: 'Paint-Anything: Unified Any-Color Control for Image Generation and Editing'
+arxiv: '2609.20816'
+date: 2026-09
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Ji Xie
+- Dewei Zhou
+- Xinyu Huang
+- Zhennan Chen
+- Xun Wang
+tier: emerging
+sections:
+- generation
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: 'Professional design requires any-color control: the ability to specify an object''s target color
+  with any 24-bit hex value for image generation and editing. Prior work has explored color generation,
+  editing, and colorization, but often relies on dedicated color representations or specialized inference
+  procedures. Advances in large language models offer a simpler starting point: even compact models can
+  associate hex values with color semantics. We present Paint-Anything, which learns a shared hex-prompt
+  interface for generation and editing through object-level color supervision. We develop a data pipeline
+  that constructs Paint-500K from real images through object grounding, perceptual color la'
+explanation: null
+_review:
+  score: 11.0
+  reasons:
+  - 'core topic: image generation'
+  - core topic appears in the title
+  - 'matches sections: generation'
+  - affiliated with a major lab or university
+  - title suggests a substantive contribution
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-09-19'

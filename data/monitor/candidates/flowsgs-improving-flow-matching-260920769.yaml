@@ -1,0 +1,46 @@
+id: flowsgs-improving-flow-matching-260920769
+type: paper
+title: 'FlowSGS: Improving Flow Matching Priors for Inverse Imaging with Stochastic Interpolants'
+arxiv: '2609.20769'
+date: 2026-09
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Tianao Li
+- Xinhui Qian
+- Emma Alexander
+tier: emerging
+sections:
+- generation
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: Flow matching has emerged as the state-of-the-art generative model and has been used for plug-and-play
+  (PnP) priors to solve inverse problems in computational imaging. However, existing flow-based inverse
+  solvers assume linear forward models and/or make simplifying approximations in posterior sampling. To
+  circumvent these problems, we introduce FlowSGS, a flow-based posterior sampling method using Split
+  Gibbs Sampling (SGS) to decompose the posterior into a likelihood step and a prior step. Specifically,
+  we sample from the likelihood step using Langevin dynamics and leverage the Stochastic Interpolants
+  (SI) framework to integrate a pretrained flow model into the prior step. We provide a form
+explanation: null
+_review:
+  score: 13.0
+  reasons:
+  - 'core topic: flow matching'
+  - core topic appears in the title
+  - 'matches sections: generation'
+  - affiliated with a major lab or university
+  - 'mentions atlas work: Flow Matching, Plug-and-Play'
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-09-19'

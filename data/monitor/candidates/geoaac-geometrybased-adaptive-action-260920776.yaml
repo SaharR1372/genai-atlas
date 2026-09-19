@@ -1,0 +1,50 @@
+id: geoaac-geometrybased-adaptive-action-260920776
+type: paper
+title: 'GeoAAC: Geometry-Based Adaptive Action Chunking from Denoising Trajectories in VLA Policies'
+arxiv: '2609.20776'
+date: 2026-09
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Xin Chen
+- Sen Chen
+- Yujuan Ding
+- Jian Liu
+- Guoqing Wang
+- Wei Ye
+- Heng Tao Shen
+- Yi Bin
+tier: emerging
+sections:
+- generation
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: Action chunking is widely used for action generation and execution in Vision-Language-Action
+  (VLA) policies, yet existing approaches commonly use a fixed action horizon. During a rollout, different
+  task stages may require different levels of action continuity, control precision, and closed-loop feedback,
+  making a fixed horizon unable to accommodate changing control requirements. We propose \textbf{GeoAAC},
+  a geometry-based adaptive action chunking method for flow-based VLA policies that adjusts the action
+  horizon according to the reliability of the current action prediction. We show that the geometry of
+  Flow Matching denoising trajectories provides process-level information for characterizin
+explanation: null
+_review:
+  score: 9.0
+  reasons:
+  - 'core topic: flow matching'
+  - 'matches sections: generation'
+  - affiliated with a major lab or university
+  - 'mentions atlas work: Flow Matching'
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-09-19'

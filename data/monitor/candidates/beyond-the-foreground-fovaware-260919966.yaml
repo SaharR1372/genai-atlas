@@ -1,0 +1,52 @@
+id: beyond-the-foreground-fovaware-260919966
+type: paper
+title: 'Beyond the Foreground: FOV-Aware Polyp Image Synthesis via Lesion-Guided Adaptive Mucosal Context
+  Propagation'
+arxiv: '2609.19966'
+date: 2026-09
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Tong Wang
+- Yuting He
+- Bin Ren
+- Yutong Xie
+- Guanyu Yang
+tier: emerging
+sections:
+- generation
+- medical
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: 'Synthetic image and mask pairs can alleviate scarce colonoscopy annotations, but realistic synthesis
+  requires preserving the supplied lesion while generating compatible mucosa. Existing foreground-guided
+  methods treat all non-foreground pixels as background and rely mainly on local integration. Directly
+  applying them to colonoscopy causes two problems: non-mucosal black regions contaminate generated tissue,
+  and local reasoning produces inconsistent mucosal texture and illumination. We propose LAMP, the first
+  foreground-guided framework for polyp image synthesis based on lesion-guided adaptive mucosal context
+  propagation. LAMP explicitly separates the lesion, valid mucosa, and camera exterior'
+explanation: null
+_review:
+  score: 19.0
+  reasons:
+  - 'core topic: image synthesis'
+  - core topic appears in the title
+  - 'matches sections: generation, medical'
+  - affiliated with a major lab or university
+  - 'mentions atlas work: STREAM'
+  - code or weights released
+  - title suggests a substantive contribution
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-09-19'

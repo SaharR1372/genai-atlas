@@ -1,0 +1,49 @@
+id: uniladir-latent-diffusion-unifies-260919878
+type: paper
+title: 'Uni-LaDiR: Latent Diffusion Unifies Multimodal Reasoning'
+arxiv: '2609.19878'
+date: 2026-09
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Haoqiang Kang
+- Yizhe Zhang
+- Nikki Lijing Kuang
+- Yian Ma
+- Lianhui Qin
+tier: emerging
+sections:
+- generation
+- rae
+- vlm
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: Multimodal reasoning requires models to draw on information from multiple modalities throughout
+  the reasoning process. Yet existing methods often concatenate modality-specific thought tokens in a
+  single sequence, leaving the model to bridge representational differences as it reasons across modalities.
+  We introduce Uni-LaDiR (Unified Latent Diffusion Reasoner), a framework that brings these thoughts into
+  a shared latent space for reasoning. A unified encoder maps teacher reasoning steps from different modalities
+  into shared thought tokens, trained to preserve the information needed for later reasoning steps and
+  the final answer or action. Because the same context can support multiple valid ne
+explanation: null
+_review:
+  score: 13.0
+  reasons:
+  - 'core topic: latent diffusion'
+  - core topic appears in the title
+  - 'matches sections: generation, rae, vlm'
+  - affiliated with a major lab or university
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-09-19'
