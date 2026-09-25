@@ -1,12 +1,12 @@
 {
-  "last_run": "2026-09-10T01:36:24.884357+00:00",
+  "last_run": "2026-09-25T11:31:51.488632+00:00",
   "last_run_stats": {
-    "raw": 321,
-    "admitted": 5,
+    "raw": 329,
+    "admitted": 9,
     "duplicates": 0,
-    "off_topic": 257,
-    "out_of_scope": 56,
-    "irrelevant": 3
+    "off_topic": 250,
+    "out_of_scope": 64,
+    "irrelevant": 2
   },
   "runs": [
     {
@@ -17,6 +17,20 @@
         "flowcpo-a-unified-divergence-260909905",
         "efficient-fairness-auditing-across-260909486",
         "muonc-operatoraligned-muon-for-260909676"
+      ]
+    },
+    {
+      "at": "2026-09-25T11:31:51.488632+00:00",
+      "admitted": [
+        "endofsa-endoscopic-fewshot-image-260929930",
+        "structured-poseconditioned-flow-matching-260929912",
+        "complexsync-highfidelity-and-realtime-260929225",
+        "omnifabric-coherent-uv-space-260930234",
+        "multimodal-thinking-with-renderable-260930130",
+        "mind-what-matters-for-260929940",
+        "morphik-morphologyconditioned-neural-inverse-260929908",
+        "on-the-diffusibility-of-260928473",
+        "from-graphs-to-feeders-260929879"
       ]
     }
   ]

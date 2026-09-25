@@ -1,0 +1,45 @@
+id: from-graphs-to-feeders-260929879
+type: paper
+title: 'From Graphs to Feeders: Constraint-Guided Diffusion for Rule-Compliant Feeder Generation'
+arxiv: '2609.29879'
+date: 2026-09
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Yu Qin
+- Andrew Glaws
+- Aadil Latif
+- Ryan King
+tier: emerging
+sections:
+- generation
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: 'Generative modeling approaches often focus on recovering broad statistical characteristics from
+  the training data. In the context of graph generation, this may refer to degree distributions, clustering
+  coefficients, or spectral properties. However, generating usable distribution feeders when detailed
+  feeder models are unavailable requires more than matching generic graph statistics: the sampled topology
+  must also obey electrical compatibility and radiality rules. We therefore formulate feeder synthesis
+  as a constraint-guided graph generation problem and propose the Power-Grid-constrained Discrete Denoising
+  Diffusion model, PG-DiGress, which learns categorical node and edge patterns from feed'
+explanation: null
+_review:
+  score: 6.0
+  reasons:
+  - 'core topic: diffusion model'
+  - 'matches sections: generation'
+  - 'mentions atlas work: STREAM'
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-09-25'

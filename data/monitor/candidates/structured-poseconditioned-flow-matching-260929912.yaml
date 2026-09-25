@@ -1,0 +1,50 @@
+id: structured-poseconditioned-flow-matching-260929912
+type: paper
+title: Structured Pose-Conditioned Flow Matching for Generative 5G CSI Augmentation
+arxiv: '2609.29912'
+date: 2026-09
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Haojin Li
+- Anbang Zhang
+- Wai Ho Mow
+- Chenyuan Feng
+- Chen Sun
+- Haijun Zhang
+tier: emerging
+sections:
+- generation
+- rae
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: With the growing demand for privacy-preserving and occlusion-resilient human pose recognition
+  (HPR), 5G channel state information (CSI) offers a promising contactless sensing modality by integrating
+  communication and sensing capabilities. However, collecting large-scale synchronized CSI-pose pairs
+  remains costly in practical 5G systems. To address this limitation, we propose StructFlow-HPR, a structured
+  pose-conditioned flow matching framework for generative CSI augmentation. StructFlow-HPR learns a continuous
+  latent transport process from Gaussian noise to real CSI representations under pose guidance, while
+  preserving the receiver-frequency topology of CSI through a reconstruction-preservin
+explanation: null
+_review:
+  score: 15.0
+  reasons:
+  - 'core topic: flow matching'
+  - core topic appears in the title
+  - 'matches sections: generation, rae'
+  - affiliated with a major lab or university
+  - 'mentions atlas work: Flow Matching, STREAM, UNIC'
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-09-25'

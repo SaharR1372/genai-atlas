@@ -1,0 +1,51 @@
+id: multimodal-thinking-with-renderable-260930130
+type: paper
+title: Multimodal Thinking with Renderable Programs
+arxiv: '2609.30130'
+date: 2026-09
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Sunli Chen
+- Ding Zhong
+- Ziqiao Ma
+- Jiaxin Liu
+- Zeyuan Yang
+- Hao Zhang
+- Lie Lu
+- Joyce Chai
+tier: emerging
+sections:
+- generation
+- editing
+- vlm
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: Current vision-language models (VLMs) excel at visual content understanding and text-based reasoning,
+  yet their structure limits the advancement of incorporating images into the reasoning chain. Though
+  Omnimodal models have made efforts in unifying text and image generation, they focus on visual tasks
+  in the open-domain, lacking tractability due to rasterized or latent representations of images. We introduce
+  SVGLM, a framework that uses scalable vector graphics (SVG) primitives to connect text and image in
+  reasoning tasks. We exploit the duality of SVG as both image description and text instructions, yielding
+  a more compact, interpretable solution to equip general VLMs with the capability of
+explanation: null
+_review:
+  score: 9.0
+  reasons:
+  - 'core topic: image generation, image editing, generating images'
+  - 'matches sections: generation, editing, vlm'
+  - affiliated with a major lab or university
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-09-25'

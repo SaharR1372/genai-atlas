@@ -1,0 +1,50 @@
+id: omnifabric-coherent-uv-space-260930234
+type: paper
+title: 'OmniFabric: Coherent UV Space Texture Synthesis for 3D Garment Reconstruction'
+arxiv: '2609.30234'
+date: 2026-09
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Ding-Jiun Huang
+- Yuanhao Wang
+- Cheng Zhang
+- Hugo Bertiche
+- Alexandru-Eugen Ichim
+- Thabo Beeler
+- Fernando De la Torre
+tier: emerging
+sections:
+- generation
+- rae
+- vlm
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: Automated generation of production-ready 3D garment assets from a single image is a central challenge
+  in digital content creation. While recent generative models have significantly advanced 3D geometry
+  reconstruction, synthesizing high-quality textures remains a bottleneck. Existing methods often bake
+  environmental illumination and shadows directly into the texture map, or they fail to maintain global
+  structural coherence, making the resulting assets unusable for physical simulation and relighting. In
+  this work, we introduce OmniFabric, a novel approach that synthesizes globally coherent texture maps
+  directly within the 2D sewing pattern space. Given a single reference image, our pipeline ut
+explanation: null
+_review:
+  score: 9.0
+  reasons:
+  - 'core topic: diffusion transformer'
+  - 'matches sections: generation, rae, vlm'
+  - affiliated with a major lab or university
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-09-25'

@@ -1,0 +1,46 @@
+id: complexsync-highfidelity-and-realtime-260929225
+type: paper
+title: 'ComplexSync: High-Fidelity and Real-Time Lip Sync in Complex Scenarios'
+arxiv: '2609.29225'
+date: 2026-09
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Jiaran Cai
+- Xingpei Ma
+- Shenneng Huang
+tier: emerging
+sections:
+- generation
+- vfm
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: 'Lip synchronization aims to generate visual lip dynamics that align precisely with speech audio.
+  Despite the high generation quality of diffusion models, they often struggle in complex scenarios and
+  suffer from prohibitive inference latency, limiting real-world deployment. We present ComplexSync, a
+  unified diffusion-based framework that enables real-time, high-fidelity lip sync under complex conditions.
+  First, we introduce a dual-stream joint training strategy to mitigate information leakage from reference
+  frames while preserving natural dynamics. Second, we develop a distillation-based acceleration scheme
+  for single-step denoising, achieving a throughput of over 70 FPS. Third, we propose a '
+explanation: null
+_review:
+  score: 11.0
+  reasons:
+  - 'core topic: diffusion model'
+  - 'matches sections: generation, vfm'
+  - affiliated with a major lab or university
+  - 'mentions atlas work: STREAM'
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-09-25'
