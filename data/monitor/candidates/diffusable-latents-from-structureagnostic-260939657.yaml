@@ -1,0 +1,46 @@
+id: diffusable-latents-from-structureagnostic-260939657
+type: paper
+title: Diffusable Latents from Structure-Agnostic Distillation
+arxiv: '2609.39657'
+date: 2026-09
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Adrien Ramanana Rahary
+- Nicolas Dufour
+- Patrick Pérez
+- David Picard
+tier: emerging
+sections:
+- generation
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: 'Distilling pretrained foundation models into an autoencoder bottleneck improves latent diffusability,
+  enabling diffusion models to converge faster and reach higher sample quality. Standard distillation
+  aligns the latent at each position to a co-located teacher feature, tying the latent layout to the teacher''s.
+  We show this constraint is unnecessary: aligning a single pooled image-level descriptor to the teacher''s
+  performs as well as or slightly better than dense position-wise distillation. We compare first-order
+  and relational pooled objectives across latent shapes and teacher modalities. First-order matching extends
+  naturally to 1D token-sequence latents and across modalities, where distill'
+explanation: null
+_review:
+  score: 8.0
+  reasons:
+  - 'core topic: diffusion model'
+  - 'matches sections: generation'
+  - 'mentions atlas work: Latent Diffusability'
+  - code or weights released
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-10-01'

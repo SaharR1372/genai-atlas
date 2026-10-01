@@ -1,0 +1,50 @@
+id: resarc-residualaware-autoregressive-coding-260939451
+type: paper
+title: 'ResARC: Residual-Aware AutoRegressive Coding for Ultra-Low Bitrate Image Compression'
+arxiv: '2609.39451'
+date: 2026-09
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Qin Yan
+- Ruixiao Dong
+- Yutao Xie
+- Li Li
+- Ying Chen
+- Kai Li
+- Daowen Li
+- Houqiang Li
+tier: emerging
+sections:
+- generation
+- rae
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: 'Progressive autoregressive image codecs provide an appealing paradigm for generative compression
+  by quantizing continuous latents into discrete tokens, transmitting coarse-to-fine prefix tokens and
+  generating the remaining suffix tokens at the decoder. However, their reconstruction quality is fundamentally
+  limited by two residuals introduced along this pipeline: the quantization residual, arising from information
+  loss during discrete tokenization, and the generation residual, resulting from imperfect autoregressive
+  generation of the suffix tokens. To address these limitations, we introduce ResARC, a residual-aware
+  autoregressive codec that explicitly compensates for both residuals at the dec'
+explanation: null
+_review:
+  score: 7.0
+  reasons:
+  - 'core topic: diffusion transformer, autoregressive image'
+  - 'matches sections: generation, rae'
+  - affiliated with a major lab or university
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-10-01'

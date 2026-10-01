@@ -1,0 +1,45 @@
+id: correcting-condot-exact-finitestep-260939488
+type: paper
+title: 'Correcting CondOT: Exact Finite-Step Sampling in Gaussian Flow Matching'
+arxiv: '2609.39488'
+date: 2026-09
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Ron Levy
+- Michael Elad
+tier: emerging
+sections:
+- generation
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: Flow matching generates samples by gradually transforming noise into data. In practice, using
+  a finite number of sampling steps introduces a numerical error that depends on the chosen schedule.
+  We study this dependence for Gaussian targets and the explicit midpoint sampling method, using the exact
+  flow field. We measure sampling error by the squared Wasserstein distance between the target distribution
+  and the final distribution produced by the midpoint sampler. We show that the standard conditional optimal
+  transport (CondOT) schedule cancels the leading midpoint error and improves the general convergence
+  bound, even when the sampling steps are unequally spaced. On a uniform grid of $S$ sampl
+explanation: null
+_review:
+  score: 13.0
+  reasons:
+  - 'core topic: flow matching'
+  - core topic appears in the title
+  - 'matches sections: generation'
+  - affiliated with a major lab or university
+  - 'mentions atlas work: Flow Matching'
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-10-01'

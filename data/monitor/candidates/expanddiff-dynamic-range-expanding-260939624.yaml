@@ -1,0 +1,47 @@
+id: expanddiff-dynamic-range-expanding-260939624
+type: paper
+title: 'ExpandDiff: Dynamic Range Expanding Diffusion for Single-Image HDR Reconstruction'
+arxiv: '2609.39624'
+date: 2026-09
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Mehmet Emre andıran
+- Zhuoqian Yang
+- Liying Lu
+- Mathieu Salzmann
+- Sabine Süsstrunk
+tier: emerging
+sections:
+- rae
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: Single-image HDR reconstruction requires inferring missing detail while preserving the visible
+  content of an LDR image. Differences in sensor dynamic range and exposure cause LDR images to lose varying
+  amounts of information in shadows and highlights. We present ExpandDiff, a conditional diffusion pipeline
+  that jointly reconstructs clipped shadows and highlights. To account for this variation, we introduce
+  Dynamic Clipping Synthesis (DCS), which randomly samples shadow and highlight clipping percentiles when
+  constructing training inputs from HDR targets. A pixel-space diffusion model guided by spatially-adaptive
+  normalization then predicts perceptually encoded HDR through a bounded output he
+explanation: null
+_review:
+  score: 9.0
+  reasons:
+  - 'core topic: diffusion model'
+  - 'matches sections: rae'
+  - affiliated with a major lab or university
+  - 'mentions atlas work: CLIP'
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-10-01'

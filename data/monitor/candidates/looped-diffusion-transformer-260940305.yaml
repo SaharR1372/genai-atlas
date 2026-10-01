@@ -1,0 +1,50 @@
+id: looped-diffusion-transformer-260940305
+type: paper
+title: Looped Diffusion Transformer
+arxiv: '2609.40305'
+date: 2026-09
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Yong Xien Chng
+- Tianyi Chen
+- Wenwen Tong
+- Haiwen Diao
+- Zhongang Cai
+- Lei Yang
+- Ziwei Liu
+- Lewei Lu
+tier: emerging
+sections:
+- generation
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: 'Improving text-to-image models has traditionally relied on increasing model size or the number
+  of denoising steps. In this work, we explore an alternative way to scale computation by repeatedly running
+  shared Transformer blocks within each denoising step, effectively increasing computational depth while
+  keeping the parameter count fixed. This looped computation enables iterative refinement of internal
+  representations without explicit reasoning tokens. However, naive looping fails to consistently improve
+  image quality. We trace this problem to weak supervision across intermediate loops and unregulated attention
+  updates that progressively erode local information. To overcome these challenges, '
+explanation: null
+_review:
+  score: 9.0
+  reasons:
+  - 'core topic: text-to-image, diffusion transformer, diffusion model'
+  - core topic appears in the title
+  - 'matches sections: generation'
+  - affiliated with a major lab or university
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-10-01'

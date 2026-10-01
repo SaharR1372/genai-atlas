@@ -1,12 +1,12 @@
 {
-  "last_run": "2026-09-10T01:36:24.884357+00:00",
+  "last_run": "2026-10-01T12:48:45.152351+00:00",
   "last_run_stats": {
-    "raw": 321,
-    "admitted": 5,
+    "raw": 332,
+    "admitted": 16,
     "duplicates": 0,
-    "off_topic": 257,
-    "out_of_scope": 56,
-    "irrelevant": 3
+    "off_topic": 254,
+    "out_of_scope": 57,
+    "irrelevant": 4
   },
   "runs": [
     {
@@ -17,6 +17,27 @@
         "flowcpo-a-unified-divergence-260909905",
         "efficient-fairness-auditing-across-260909486",
         "muonc-operatoraligned-muon-for-260909676"
+      ]
+    },
+    {
+      "at": "2026-10-01T12:48:45.152351+00:00",
+      "admitted": [
+        "dscope-decomposing-and-steering-260939625",
+        "steering-fields-adaptive-vector-260939573",
+        "multimodal-flow-unified-flow-260940362",
+        "unievovl-an-onpolicy-selfdistillation-260938721",
+        "gfdopd-guidancefolded-onpolicy-distillation-260939692",
+        "correcting-condot-exact-finitestep-260939488",
+        "cast-causal-advantagestructured-training-260939441",
+        "sage-salient-factor-discovery-260939635",
+        "looped-diffusion-transformer-260940305",
+        "let-the-carrier-carry-260939723",
+        "shieldclip-selective-safety-alignment-260939688",
+        "expanddiff-dynamic-range-expanding-260939624",
+        "learning-normal-diffusion-dynamics-260939548",
+        "diffusable-latents-from-structureagnostic-260939657",
+        "parameterization-method-of-reservoir-260939626",
+        "resarc-residualaware-autoregressive-coding-260939451"
       ]
     }
   ]

@@ -1,0 +1,51 @@
+id: steering-fields-adaptive-vector-260939573
+type: paper
+title: 'Steering Fields: Adaptive Vector Fields for Safe Image Generation and Beyond'
+arxiv: '2609.39573'
+date: 2026-09
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Simone Facchiano
+- Jan Eric Lenssen
+- Bernt Schiele
+- Wolfgang Stammer
+- Fabio Galasso
+- Jonas Fischer
+tier: emerging
+sections:
+- generation
+- rae
+- editing
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: As state-of-the-art text-to-image flow models achieve near-photorealistic quality, controlling
+  their outputs, e.g., suppressing harmful content while promoting benign alternatives, has become a central
+  challenge. The current steering paradigm consists of adding a global steering vector to selected activations.
+  While functional, a fixed and example-agnostic vector applied uniformly along the entire trajectory
+  cannot adapt to the changing state of the generation and often causes unintended global changes. We
+  introduce Steering Fields, a generalization of steering vectors that adaptively re-estimates the steering
+  direction at each step of the generative process. Steering Fields operate on the n
+explanation: null
+_review:
+  score: 16.0
+  reasons:
+  - 'core topic: image generation, text-to-image, image editing'
+  - core topic appears in the title
+  - 'matches sections: generation, rae, editing'
+  - 'mentions atlas work: CLIP'
+  - title suggests a substantive contribution
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-10-01'
