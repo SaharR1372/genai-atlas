@@ -1,0 +1,46 @@
+id: how-much-audio-is-261012250
+type: paper
+title: How Much Audio Is Left In An Embedding? An Inversion Audit Of Audio Encoders
+arxiv: '2610.12250'
+date: 2026-10
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Marios Glytsos
+- Brian McFee
+tier: emerging
+sections:
+- generation
+- rae
+- editing
+- vfm
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: Pretrained audio encoders are reused for downstream tasks that are often unknown when the encoder
+  is trained, so their usefulness depends partly on which signal properties survive the pretext objective.
+  We study this retained information through paired source reconstruction. Using a shared Stable Audio
+  Open latent diffusion decoder, we reconstruct five-second, 44.1-kHz stereo music from frozen representations
+  produced by supervised classifiers (VGGish, ConvNeXt), an audio-text contrastive model (CLAP), and a
+  waveform-reconstruction model (EnCodec). These objectives impose different pressures to preserve source
+  detail, while their exposed interfaces vary substantially in temporal and spectral
+explanation: null
+_review:
+  score: 12.0
+  reasons:
+  - 'core topic: latent diffusion'
+  - 'matches sections: generation, rae, editing, vfm'
+  - 'mentions atlas work: STREAM'
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-10-10'

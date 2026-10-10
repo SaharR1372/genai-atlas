@@ -1,0 +1,49 @@
+id: rubriccepr-selfevolving-image-editing-261012469
+type: paper
+title: 'Rubric-CEPR: Self-Evolving Image Editing via Reward-Verified Self-Distillation'
+arxiv: '2610.12469'
+date: 2026-10
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Ritesh Thawkar
+- Shubham Patle
+- Shravan Venkatraman
+- Rao Muhammad Anwer
+tier: emerging
+sections:
+- generation
+- editing
+- vfm
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: 'Instruction-guided image editors have become highly capable, yet improving them further still
+  depends on human-edited training pairs or external reward models. Such supervision is costly to obtain
+  and can reward plausible failures: a realistic output may leave the requested change undone or alter
+  content that should be preserved. In this work, we strive to improve a pretrained image editor using
+  only its own generations, without human-edited targets or an external training-time reward model. To
+  this end, we propose a self-evolving framework, named Rubric-CEPR, that verifies the editor''s own samples
+  with its internal representations through a rubric-augmented Contrastive Edit-Preservation Rew'
+explanation: null
+_review:
+  score: 17.0
+  reasons:
+  - 'core topic: image editing'
+  - core topic appears in the title
+  - 'matches sections: generation, editing, vfm'
+  - affiliated with a major lab or university
+  - 'mentions atlas work: ImgEdit, Qwen-Image, Step1X-Edit'
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-10-10'

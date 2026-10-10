@@ -1,0 +1,44 @@
+id: streamingaware-diffusion-for-realtime-261011746
+type: paper
+title: Streaming-Aware Diffusion for Real-Time Video Super-Resolution via Cross-Step Attention
+arxiv: '2610.11746'
+date: 2026-10
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Harris Partaourides
+- Sotirios Chatzis
+tier: emerging
+sections:
+- generation
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: 'Real-time video super-resolution requires high spatio-temporal fidelity under strict latency
+  constraints, challenging diffusion models due to their iterative sampling cost and limited temporal
+  coordination. We propose a streaming-aware framework that adapts pretrained single-image latent diffusion
+  models for efficient video super-resolution (VSR) by exploiting the sequential structure of video streams.
+  Our Cross-Step Attention mechanism reuses intermediate denoising features across adjacent frames and
+  diffusion steps, enabling temporal information exchange without explicit temporal modeling. We further
+  introduce Trajectory-Coupled Diffusion Scheduling, which aligns adjacent diffusion states '
+explanation: null
+_review:
+  score: 9.0
+  reasons:
+  - 'core topic: latent diffusion, diffusion model'
+  - 'matches sections: generation'
+  - affiliated with a major lab or university
+  - 'mentions atlas work: STREAM'
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-10-10'

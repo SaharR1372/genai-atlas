@@ -1,12 +1,12 @@
 {
-  "last_run": "2026-09-10T01:36:24.884357+00:00",
+  "last_run": "2026-10-10T12:12:21.287574+00:00",
   "last_run_stats": {
-    "raw": 321,
-    "admitted": 5,
+    "raw": 313,
+    "admitted": 12,
     "duplicates": 0,
-    "off_topic": 257,
-    "out_of_scope": 56,
-    "irrelevant": 3
+    "off_topic": 229,
+    "out_of_scope": 67,
+    "irrelevant": 2
   },
   "runs": [
     {
@@ -17,6 +17,23 @@
         "flowcpo-a-unified-divergence-260909905",
         "efficient-fairness-auditing-across-260909486",
         "muonc-operatoraligned-muon-for-260909676"
+      ]
+    },
+    {
+      "at": "2026-10-10T12:12:21.287574+00:00",
+      "admitted": [
+        "onesearchvl-unified-multimodal-deep-261012419",
+        "rubriccepr-selfevolving-image-editing-261012469",
+        "healthy-counterfactual-generation-via-261012147",
+        "laribo-rna-codesign-via-261012236",
+        "vibeedit-image-editing-with-261012229",
+        "dino-forcing-flow-models-261011751",
+        "how-much-audio-is-261012250",
+        "beyond-spatiotemporal-priors-a-261012421",
+        "bifork-generative-modeling-of-261012449",
+        "fewstep-generation-via-dataspace-261012102",
+        "streamingaware-diffusion-for-realtime-261011746",
+        "budgetpix-computeadaptive-tokenization-for-261012307"
       ]
     }
   ]

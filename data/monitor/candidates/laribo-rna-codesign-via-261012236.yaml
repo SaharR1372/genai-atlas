@@ -1,0 +1,46 @@
+id: laribo-rna-codesign-via-261012236
+type: paper
+title: 'La-Ribo: RNA Co-Design via Geometry-Latent Flow Matching'
+arxiv: '2610.12236'
+date: 2026-10
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Runze Ma
+- Will Hua
+- Shuangjia Zheng
+tier: emerging
+sections:
+- generation
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: RNA function arises from the coupling of nucleotide sequence and three-dimensional structure,
+  motivating their joint design. Coordinating global folding with nucleotide-level detail remains challenging
+  under limited structural supervision. We introduce La-Ribo, a generative framework for RNA sequence-structure
+  co-design via geometry-latent flow matching. La-Ribo retains a sparse phosphate-sugar--base scaffold
+  and encodes nucleotide identity and local conformation in residue-wise latents. A shared flow network
+  generates both jointly, and an RNA-specific decoder then reconstructs all heavy atoms. To expand supervision,
+  we construct a quality-controlled corpus of 168,561 RNA structures, integra
+explanation: null
+_review:
+  score: 13.0
+  reasons:
+  - 'core topic: flow matching'
+  - core topic appears in the title
+  - 'matches sections: generation'
+  - affiliated with a major lab or university
+  - 'mentions atlas work: Flow Matching'
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-10-10'

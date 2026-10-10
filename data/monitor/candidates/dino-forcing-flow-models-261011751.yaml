@@ -1,0 +1,50 @@
+id: dino-forcing-flow-models-261011751
+type: paper
+title: 'Dino Forcing Flow Models: Do not denoise what you can predict'
+arxiv: '2610.11751'
+date: 2026-10
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Arijit Ghosh
+- Lucas Degeorge
+- Paul Couairon
+- Alexei A Efros
+- Vicky Kalogeiton
+- David Picard
+tier: emerging
+sections:
+- generation
+- rae
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: 'Co-denoising pretrained representations such as DINO can substantially improve the training
+  speed and quality of flow matching models, but it introduces a second denoising trajectory and requires
+  carefully designed schedules. We propose a simpler alternative: predict the pretrained representation
+  directly, then condition the model on its own prediction. This removes the need for a second ODE and
+  any representation-specific denoising schedules, while retaining the benefits of representation guidance.
+  Our approach converges substantially faster and achieves better generation quality as measured by FID
+  score. On ImageNet, it outperforms the state of the art in latent space at 2x fewer epochs th'
+explanation: null
+_review:
+  score: 13.0
+  reasons:
+  - 'core topic: flow matching'
+  - 'matches sections: generation, rae'
+  - affiliated with a major lab or university
+  - 'mentions atlas work: Flow Matching, Imagen'
+  - code or weights released
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-10-10'

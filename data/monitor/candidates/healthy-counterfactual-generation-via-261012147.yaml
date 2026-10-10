@@ -1,0 +1,50 @@
+id: healthy-counterfactual-generation-via-261012147
+type: paper
+title: Healthy Counterfactual Generation via Diffusion Inpainting for Mammography Classification
+arxiv: '2610.12147'
+date: 2026-10
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Inês Cruchinho Garcia
+- Mariana Mourão
+- Francisco Maria Calisto
+- Carlos Santiago
+- Jacinto Nascimento
+tier: emerging
+sections:
+- editing
+- vlm
+- medical
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: False negatives remain a critical limitation of computer-aided diagnosis (CAD) systems for breast
+  cancer screening due to delayed detection and treatment. To address this issue, we propose a counterfactual
+  data augmentation strategy that generates healthy mammograms by "erasing" lesions from anomalous images,
+  thereby enriching the training distribution. We train a Denoising Diffusion Probabilistic Model on BI-RADS
+  1 (healthy) mammograms and use a RePaint-based sampling strategy to inpaint realistic normal tissue
+  within annotated lesion bounding boxes. The resulting healthy counterfactuals replace annotated lesion
+  regions with realistic healthy tissue while preserving patient-specific anatomi
+explanation: null
+_review:
+  score: 15.0
+  reasons:
+  - 'core topic: generated images'
+  - 'matches sections: editing, vlm, medical'
+  - affiliated with a major lab or university
+  - 'mentions atlas work: CLIP, REPA'
+  - code or weights released
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-10-10'
