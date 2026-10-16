@@ -1,0 +1,46 @@
+id: softcache-adaptive-step-size-261022369
+type: paper
+title: 'SoftCache: Adaptive Step Size Caching for Diffusion Transformers'
+arxiv: '2610.22369'
+date: 2026-10
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Shimon Malnick
+- Nadav Orenstein
+- Ohad Fried
+- Shai Avidan
+tier: emerging
+sections:
+- generation
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: 'Diffusion and flow models generate a sample over iterative steps, each a full pass through a
+  large network, and that pass dominates generation cost. Training-free caching accelerates them by reusing
+  activations from recent evaluations instead of recomputing them. Dynamic caching methods decide when
+  to refresh by accumulating a cheap probe of the network input into a staleness signal and spending a
+  fresh evaluation once it crosses a threshold. They perform hard caching: the signal is a binary switch
+  between refresh and reuse, and every step, fresh or cached, advances by the prescribed step size. We
+  observe that the signal carries much more than this switch. How far it sits below the threshold'
+explanation: null
+_review:
+  score: 9.0
+  reasons:
+  - 'core topic: diffusion transformer'
+  - core topic appears in the title
+  - 'matches sections: generation'
+  - affiliated with a major lab or university
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-10-16'

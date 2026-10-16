@@ -1,0 +1,51 @@
+id: scope-semantic-bounded-credit-261022264
+type: paper
+title: 'SCOPE: Semantic Bounded Credit Optimization for Prompt Engineering in Text-to-image Generation'
+arxiv: '2610.22264'
+date: 2026-10
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Yufei Jiao
+- Jinfa Huang
+- Zeyue Xue
+- Tianyu Xie
+- Yuexiao Ma
+- Rongrong Ji
+- Xiawu Zheng
+- Jiebo Luo
+tier: emerging
+sections:
+- generation
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: Reinforcement learning (RL) enables language models to improve text-to-image (T2I) generation
+  by rewriting prompts for a frozen image generator. Existing methods typically apply a single signal
+  derived from the image to individual subword tokens, although objects, counts, attributes, and relations
+  form coherent semantic spans. We propose SCOPE, an objective based on Group Relative Policy Optimization
+  (GRPO) that aligns update weighting with this structure. The rewriter jointly generates an enhanced
+  prompt and its semantic partition. SCOPE pools shifts in policy log probabilities within each span to
+  derive a shared coefficient for its token losses while retaining a single advantage for each c
+explanation: null
+_review:
+  score: 13.0
+  reasons:
+  - 'core topic: image generation, text-to-image, image generator'
+  - core topic appears in the title
+  - 'matches sections: generation'
+  - affiliated with a major lab or university
+  - 'mentions atlas work: Qwen-Image'
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-10-16'

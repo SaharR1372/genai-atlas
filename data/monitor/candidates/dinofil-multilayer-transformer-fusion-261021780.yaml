@@ -1,0 +1,48 @@
+id: dinofil-multilayer-transformer-fusion-261021780
+type: paper
+title: 'DINO-FIL: Multi-Layer Transformer Fusion for Generative Inpainting Forgery Localization'
+arxiv: '2610.21780'
+date: 2026-10
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Simon Freitter
+- David Fischinger
+- Silvia Poletti
+- Marcel Hasenbalg
+- Martin Boyer
+tier: emerging
+sections:
+- rae
+- editing
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: We propose DINO-FIL, a transformer-based framework for pixel-level localization of generative
+  image forgeries. The method leverages multi-layer representations from a pretrained DINOv3 ViT-H+/16
+  encoder combined with a lightweight fusion decoder to capture both semantic structure and fine-grained
+  texture inconsistencies introduced by image editing. By aggregating intermediate transformer features
+  across depths, the model improves sensitivity to subtle, spatially localized artifacts that are often
+  missed by standard single-layer approaches. We evaluate DINO-FIL in a cross-dataset setting, training
+  on B-Free and testing on Beyond the Brush, CocoGlide, TGIF, and SAGI-D. The model achieves stron
+explanation: null
+_review:
+  score: 11.0
+  reasons:
+  - 'core topic: image editing'
+  - 'matches sections: rae, editing'
+  - affiliated with a major lab or university
+  - 'mentions atlas work: DINOv3'
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-10-16'

@@ -1,0 +1,50 @@
+id: infinisplat-v2-analyzing-and-261020341
+type: paper
+title: 'InfiniSplat v2: Analyzing and Improving Feed-Forward 3DGS from Any Views'
+arxiv: '2610.20341'
+date: 2026-10
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Yongzhen Hu
+- Hao Yu
+- Jiawei Wang
+- Xianming Zeng
+- Jianyun Xu
+- Xingliang Liu
+- Ruizhen Hu
+- Xiaowei Zhou
+tier: emerging
+sections:
+- rae
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: Feed-forward Gaussian reconstruction builds 3D scenes directly from input images for novel view
+  rendering, but learning Gaussian attributes from predicted geometry for high-quality rendering under
+  large viewpoint changes remains challenging. We analyze limitations in Gaussian attribute learning and
+  introduce InfiniSplat v2, which improves rendering quality through architectural and training changes.
+  Our method decouples geometry and attribute prediction with a frozen geometry branch, aligns predicted
+  Gaussians using ground-truth camera poses during training, and adopts large-angle target view supervision.
+  Across six datasets, the feed-forward outputs of the same trained model achieve state-o
+explanation: null
+_review:
+  score: 10.0
+  reasons:
+  - 'core topic: image reconstruction'
+  - 'matches sections: rae'
+  - affiliated with a major lab or university
+  - 114 upvotes on Hugging Face daily papers
+  source: huggingface
+  hf_upvotes: 114
+  discovered_on: '2026-10-16'

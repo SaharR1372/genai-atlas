@@ -1,0 +1,44 @@
+id: conditional-mean-flows-fewstep-261021657
+type: paper
+title: 'Conditional Mean Flows: Few-Step Densities for Simulation-Based Inference'
+arxiv: '2610.21657'
+date: 2026-10
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Jonas Arruda
+- Jan Hasenauer
+- Stefan T. Radev
+tier: emerging
+sections:
+- generation
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: Flow matching has emerged as a powerful generative family for simulation-based inference (SBI).
+  However, sampling and density evaluation require numerical integration at inference time. This makes
+  posterior sampling in neural posterior estimation costly. More importantly, it can make repeated likelihood
+  evaluation prohibitively expensive and impractical for Markov chain Monte Carlo (MCMC) sampling, which
+  may require thousands of repeated density evaluations. Here, we develop conditional mean flows for posterior
+  and likelihood approximation, combining few-step sampling with tractable density evaluation. We show
+  that the mean flow objective identifies conditional flow maps and that independent
+explanation: null
+_review:
+  score: 6.0
+  reasons:
+  - 'core topic: flow matching'
+  - 'matches sections: generation'
+  - 'mentions atlas work: Flow Matching, STREAM'
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-10-16'

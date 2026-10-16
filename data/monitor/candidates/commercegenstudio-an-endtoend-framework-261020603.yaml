@@ -1,0 +1,51 @@
+id: commercegenstudio-an-endtoend-framework-261020603
+type: paper
+title: 'CommerceGen-Studio: An End-to-End Framework for Commercial-Grade Main-Image Generation'
+arxiv: '2610.20603'
+date: 2026-10
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Xiaoli Xu
+- Zhengtao Wu
+- Zhengze Xu
+- Tao Liu
+- Yongchao Du
+- Zuan Gao
+- Xingjian Wang
+- Hao Yan
+tier: emerging
+sections:
+- generation
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: 'We present CommerceGen-Studio, an end-to-end framework for generating commercial-grade main
+  images for e-commerce Stock Keeping Units (SKUs). Our framework is organized along a three-stage pipeline
+  of information extraction, semantic rewriting, and multi-condition generation: Prompt-Eval-Refine-Loop
+  Agent (PERL-Agent) distills heterogeneous SKU metadata into concise selling-point text lists through
+  an iterative closed loop of VLM and LLM roles scored by a reference-free rubric. Layout Thinker Optimization
+  (LTO) aligns the rewriter with both caption and rendered-image quality via alternating domain-specific
+  policy optimization. SKU-DiT, trained under Reinforce-Distill-Reinforce (RDR) progress'
+explanation: null
+_review:
+  score: 11.0
+  reasons:
+  - 'core topic: image generation'
+  - core topic appears in the title
+  - 'matches sections: generation'
+  - affiliated with a major lab or university
+  - 20 upvotes on Hugging Face daily papers
+  source: huggingface
+  hf_upvotes: 20
+  discovered_on: '2026-10-16'

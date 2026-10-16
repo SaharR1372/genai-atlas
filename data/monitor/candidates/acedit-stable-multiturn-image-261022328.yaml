@@ -1,0 +1,47 @@
+id: acedit-stable-multiturn-image-261022328
+type: paper
+title: 'ACEdit: Stable Multi-Turn Image Editing via Asymmetric Conditioning'
+arxiv: '2610.22328'
+date: 2026-10
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Sara Dorfman
+- Nir Goren
+- Gal Barak
+- Daniel Cohen-Or
+- Or Patashnik
+tier: emerging
+sections:
+- generation
+- editing
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: Image editing models produce impressive results for individual edits, but their quality often
+  deteriorates over multiple editing turns. Each editing turn introduces small distribution shifts that
+  accumulate over successive edits, creating a gap between the input distributions encountered during
+  the editor's original training and multi-turn inference. We introduce a training scheme that makes multi-turn
+  image editing stable under this accumulating distribution shift. A key is to force the editor to operate
+  on its own outputs from previous editing turns during training, bringing the principle of Self-Forcing
+  to image editing. The main challenge is that self-generated editing trajectories devia
+explanation: null
+_review:
+  score: 8.0
+  reasons:
+  - 'core topic: image editing'
+  - core topic appears in the title
+  - 'matches sections: generation, editing'
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-10-16'

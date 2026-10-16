@@ -1,0 +1,46 @@
+id: designing-transformers-for-continuous-261022330
+type: paper
+title: Designing Transformers for Continuous Diffusion Language Models
+arxiv: '2610.22330'
+date: 2026-10
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Weijian Luo
+- Yujian Chen
+- Hao Jiang
+- Guang Cheng
+- Tianyang Hu
+tier: emerging
+sections:
+- generation
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: Continuous diffusion language models (CDLMs) offer an alternative approach to parallel language
+  generation; however, most existing studies directly use transformer architectures from either causal
+  large language models (LLMs) or Diffusion Transformers (DiTs) for image generation, which were not optimized
+  for CDLMs. In this paper, we conduct a systematic study on Transformer architectures for CDLMs and introduce
+  Language Diffusion Transformer (LangDiT), combining feature and query-key normalization, wider noise
+  conditioning, likelihood-shortcut gradient routing and calibration, and confidence-gated training self-conditioning.
+  LangDiT significantly reduces generation perplexity in matched Lang
+explanation: null
+_review:
+  score: 6.0
+  reasons:
+  - 'core topic: image generation, diffusion transformer'
+  - 'matches sections: generation'
+  - 'mentions atlas work: Plug-and-Play'
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-10-16'

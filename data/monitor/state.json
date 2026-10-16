@@ -1,12 +1,12 @@
 {
-  "last_run": "2026-09-10T01:36:24.884357+00:00",
+  "last_run": "2026-10-16T11:03:41.531444+00:00",
   "last_run_stats": {
-    "raw": 321,
-    "admitted": 5,
+    "raw": 320,
+    "admitted": 17,
     "duplicates": 0,
-    "off_topic": 257,
-    "out_of_scope": 56,
-    "irrelevant": 3
+    "off_topic": 243,
+    "out_of_scope": 55,
+    "irrelevant": 2
   },
   "runs": [
     {
@@ -17,6 +17,28 @@
         "flowcpo-a-unified-divergence-260909905",
         "efficient-fairness-auditing-across-260909486",
         "muonc-operatoraligned-muon-for-260909676"
+      ]
+    },
+    {
+      "at": "2026-10-16T11:03:41.531444+00:00",
+      "admitted": [
+        "rethinking-classifierfree-guidance-for-261021550",
+        "featok-featureloss-tokenization-for-261022060",
+        "which-tokens-to-merge-261022370",
+        "beyond-pairwise-repulsion-collective-261022267",
+        "scope-semantic-bounded-credit-261022264",
+        "beyond-generation-using-multimodal-261021760",
+        "dinofil-multilayer-transformer-fusion-261021780",
+        "commercegenstudio-an-endtoend-framework-261020603",
+        "infinisplat-v2-analyzing-and-261020341",
+        "softcache-adaptive-step-size-261022369",
+        "pathfm-fast-generative-forecasting-261022358",
+        "acedit-stable-multiturn-image-261022328",
+        "can-visual-generation-expand-261021459",
+        "not-just-a-subject-261022320",
+        "designing-transformers-for-continuous-261022330",
+        "learn-only-where-you-261021977",
+        "conditional-mean-flows-fewstep-261021657"
       ]
     }
   ]
