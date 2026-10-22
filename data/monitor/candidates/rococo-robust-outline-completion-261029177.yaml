@@ -1,0 +1,45 @@
+id: rococo-robust-outline-completion-261029177
+type: paper
+title: 'ROCOCO: Robust Outline Completion of Occluded Curvilinear Objects'
+arxiv: '2610.29177'
+date: 2026-10
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Ken Zheng
+- Jaimyn Drake
+tier: emerging
+sections:
+- generation
+- editing
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: We propose a learning-based generative model for completing curvilinear features under occlusion
+  by environmental obstacles. To this end, we adopt a flow matching-based approach that supports the inpainting
+  of occluded regions with the appropriate curvilinear features. To eliminate the reliance on privileged
+  information about the occlusion a priori, we also train a UNet-based mask prediction model, which can
+  identify regions for inpainting given only the occluded observation. The components of our approach
+  are validated via experiments using procedurally-generated test cases, and the complete pipeline is
+  validated using large public datasets for curvilinear objects. Against off-the-shelf inp
+explanation: null
+_review:
+  score: 11.0
+  reasons:
+  - 'core topic: flow matching'
+  - 'matches sections: generation, editing'
+  - affiliated with a major lab or university
+  - 'mentions atlas work: Flow Matching'
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-10-22'

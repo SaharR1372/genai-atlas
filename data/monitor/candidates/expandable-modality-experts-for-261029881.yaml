@@ -1,0 +1,48 @@
+id: expandable-modality-experts-for-261029881
+type: paper
+title: Expandable Modality Experts for Medical Vision-Language Learning
+arxiv: '2610.29881'
+date: 2026-10
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- DM BAPPY
+- Eunsu Kim
+- Hanjoo Lee
+- Sung Hak Lee
+- Sangjeong Ahn
+tier: emerging
+sections:
+- rae
+- vfm
+- medical
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: Learning across medical imaging modalities requires making use of images without paired text
+  and accommodating new domains while retaining existing representations. We propose a medical vision-language
+  technique built around an expandable bank of modality experts. Its Multiway Transformer combines shared
+  visual computation with deterministically routed feed-forward experts and a separate text pathway. A
+  modality-aware visual tokenizer supplies targets for masked pretraining on 19.4 million unpaired image
+  rows across seven modalities; contrastive alignment then uses 3.23 million image-text pairs. Additional
+  fundus and optical coherence tomography experts learn from paired data while the origi
+explanation: null
+_review:
+  score: 9.0
+  reasons:
+  - 'core topic: visual tokenizer'
+  - 'matches sections: rae, vfm, medical'
+  - affiliated with a major lab or university
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-10-22'

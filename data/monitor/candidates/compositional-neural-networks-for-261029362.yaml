@@ -1,0 +1,48 @@
+id: compositional-neural-networks-for-261029362
+type: paper
+title: Compositional neural networks for multimodal X-ray and neutron scattering inversion
+arxiv: '2610.29362'
+date: 2026-10
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Valentin Munteanu
+- Alexander Hinderhofer
+- Dmitry Lapkin
+- Vladimir Starostin
+- Frank Schreiber
+tier: emerging
+sections:
+- generation
+- editing
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: X-ray and neutron scattering are indispensable for structural characterization across condensed-matter
+  physics and materials science. Yet, because scattering experiments generally record intensities without
+  phase information, distinct structures can yield similar scattering patterns, rendering the corresponding
+  inverse problems non-unique. This ambiguity can be reduced by combining complementary measurements,
+  but their integration into machine-learning frameworks remains challenging. Here we introduce a modular
+  framework for probabilistic multi-measurement analysis based on prior-amortized flow matching. Single-observation
+  posterior estimators are trained separately for individual observatio
+explanation: null
+_review:
+  score: 11.0
+  reasons:
+  - 'core topic: flow matching'
+  - 'matches sections: generation, editing'
+  - affiliated with a major lab or university
+  - 'mentions atlas work: Flow Matching'
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-10-22'

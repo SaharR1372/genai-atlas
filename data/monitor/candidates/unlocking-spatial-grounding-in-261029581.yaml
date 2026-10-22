@@ -1,0 +1,44 @@
+id: unlocking-spatial-grounding-in-261029581
+type: paper
+title: Unlocking Spatial Grounding in Flow-Matching Models via SNR Tuning
+arxiv: '2610.29581'
+date: 2026-10
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Martin Thißen
+- Elke Hergenröther
+tier: emerging
+sections:
+- generation
+- rae
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: Despite the success of foundation models in image synthesis, achieving fine-grained spatial control
+  remains a significant challenge, typically requiring auxiliary structural adapters or complex inference-time
+  steering. While modern vision-language (VLM) text encoders possess the latent capacity to represent
+  spatial coordinates, generative models often fail to leverage this information. We demonstrate that
+  the signal-to-noise ratio (SNR) distribution is a critical determinant of spatial grounding in flow-matching
+  models. Using a novel synthetic benchmark of geometric primitives, we isolate structural mechanics from
+  textural complexity inherent in natural imagery and introduce a rigorous color
+explanation: null
+_review:
+  score: 7.0
+  reasons:
+  - 'core topic: image synthesis'
+  - 'matches sections: generation, rae'
+  - affiliated with a major lab or university
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-10-22'

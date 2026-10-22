@@ -1,0 +1,47 @@
+id: efficient-generative-image-compression-261029691
+type: paper
+title: Efficient Generative Image Compression with Quantized Latents Refinement
+arxiv: '2610.29691'
+date: 2026-10
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Hao Cao
+- Yinhuan Huang
+- Wenqi Guo
+- Zhijin Qin
+- Jungong Han
+tier: emerging
+sections:
+- rae
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: Generative image compression (GIC) delivers strong perceptual quality at low bitrates. However,
+  GIC methods with strong perceptual quality often rely on pretrained diffusion models with high latency,
+  while recent lightweight GIC methods reduce latency but deliver lower perceptual quality. We observe
+  that, for lightweight GIC methods at low bitrates, coarse deterministic quantization can collapse nearby
+  encoder latents corresponding to different fine details to the same point, making these details difficult
+  to recover. Motivated by this, we propose GR-GIC, an efficient GIC that delivers competitive reconstruction
+  performance with fast inference. For better performance, we introduce Guided Ref
+explanation: null
+_review:
+  score: 7.0
+  reasons:
+  - 'core topic: diffusion model'
+  - 'matches sections: rae'
+  - affiliated with a major lab or university
+  - title suggests a substantive contribution
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-10-22'

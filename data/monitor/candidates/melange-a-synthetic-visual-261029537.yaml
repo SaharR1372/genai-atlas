@@ -1,0 +1,45 @@
+id: melange-a-synthetic-visual-261029537
+type: paper
+title: 'Melange: A Synthetic Visual Bias Benchmark for Multi-modal Large Language Models'
+arxiv: '2610.29537'
+date: 2026-10
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Razieh Rezaei
+- Ehsaneddin Asgary
+- Masoud Jalili Sabet
+tier: emerging
+sections:
+- rae
+- vlm
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: 'Multi-modal Large Language Models (MLLMs) have seen broad adoption, but their biases are still
+  far less examined than those of standard LLMs, creating possible social harms when deployed in real-world
+  settings. Prior efforts to extend bias analyses from LLMs into the multi-modal space either cover only
+  a few bias categories or do not ensure that the groups being compared are clearly addressed by visual
+  cues in the images. To overcome these limitations, we introduce Melange, a wide-ranging synthetic visual
+  benchmark covering seven categories for assessing social biases in MLLMs. It is grounded in the widely
+  used language-only BBQ dataset (Bias Benchmark for Question Answering) from BigBench, '
+explanation: null
+_review:
+  score: 7.0
+  reasons:
+  - 'core topic: generated images'
+  - 'matches sections: rae, vlm'
+  - affiliated with a major lab or university
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-10-22'

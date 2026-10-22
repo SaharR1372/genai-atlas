@@ -1,0 +1,45 @@
+id: ltem-llmfriendly-tableenhanced-markdown-261029188
+type: paper
+title: 'LTEM: LLM-Friendly Table-Enhanced Markdown for Table Understanding and Generation'
+arxiv: '2610.29188'
+date: 2026-10
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Eunbin Kim
+- Hyeonseok Kang
+- Sangkeun Jung
+tier: emerging
+sections:
+- unified
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: Tables in real-world documents, including scientific papers, financial reports, and statistical
+  summaries, frequently use merged cells, multi-level headers, and sectioned layouts. Yet the lightweight
+  formats LLMs handle best (Markdown, CSV) cannot express these structures, while expressive formats (HTML,
+  LaTeX) impose excessive token cost and parsing complexity. To enable systematic analysis of this trade-off,
+  we introduce a taxonomy decomposing table structure into six atomic features (F1-F6) and corresponding
+  complexity levels (L1-L6), and construct STB (Synthetic Table Benchmark), a controlled benchmark with
+  1,089 tables systematically distributed across complexity levels. Using this fram
+explanation: null
+_review:
+  score: 8.0
+  reasons:
+  - 'core topic: understanding and generation'
+  - core topic appears in the title
+  - 'matches sections: unified'
+  - code or weights released
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-10-22'

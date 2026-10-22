@@ -1,0 +1,46 @@
+id: spatially-gated-demographic-steering-261029651
+type: paper
+title: Spatially Gated Demographic Steering for Debiasing Multi-Person Text-to-Image Generation
+arxiv: '2610.29651'
+date: 2026-10
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Venkatesh Thirugnana Sambandham
+- Torsten Schon
+tier: emerging
+sections:
+- generation
+- editing
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: 'Text-to-Image models reproduce societal stereotypes, and existing mitigation applies one demographic
+  correction to the whole scene. In multi-person scene generation this creates a trade-off: global steering
+  improves aggregate balance only by homogenizing the people within an image. Steering-based methods like
+  Embedding Arithmetic drive the intra-image diversity below the unsteered baseline. Text- and latent-projection
+  approaches shift the aggregate skew with only marginal gains in intra-image diversity. We present Spatially
+  Gated Steering (SGS), which steers the demographics of each person independently by extracting per-person
+  masks from the Diffusion Transformer''s (DiT) internal attention '
+explanation: null
+_review:
+  score: 13.0
+  reasons:
+  - 'core topic: image generation, text-to-image, diffusion transformer'
+  - core topic appears in the title
+  - 'matches sections: generation, editing'
+  - affiliated with a major lab or university
+  - code or weights released
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-10-22'
