@@ -1,0 +1,46 @@
+id: flextryon-a-timeefficient-framework-261039646
+type: paper
+title: 'FlexTry-On: A Time-Efficient Framework for Multi-Scenario Virtual Try-on'
+arxiv: '2610.39646'
+date: 2026-10
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Phuong Dam
+- Quyen Nguyen Duc
+- Son Hoang Minh
+- Daeyoung Kim
+tier: emerging
+sections:
+- generation
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: 'Virtual try-on has achieved remarkable progress in recent years, yet most existing methods are
+  designed for a specific scenario, such as cloth-to-person or person-to-person try-on, and often require
+  separate conditioning strategies and processing pipelines for different settings. We present FlexTry-On,
+  a unified and time-efficient diffusion-based framework for diverse virtual try-on scenarios, including
+  cloth-to-person, person-to-person, cross-domain, and in-the-wild settings. FlexTry-On adopts a common
+  conditioning formulation, where a text-aware condition extraction strategy converts heterogeneous garment
+  sources into a unified representation, and a dual-conditioning diffusion transformer '
+explanation: null
+_review:
+  score: 7.0
+  reasons:
+  - 'core topic: diffusion transformer'
+  - 'matches sections: generation'
+  - affiliated with a major lab or university
+  - title suggests a substantive contribution
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-10-31'

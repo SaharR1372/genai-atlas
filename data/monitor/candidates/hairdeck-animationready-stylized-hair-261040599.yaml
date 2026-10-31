@@ -1,0 +1,49 @@
+id: hairdeck-animationready-stylized-hair-261040599
+type: paper
+title: 'HairDeck: Animation-Ready Stylized Hair Cards from a Single Image'
+arxiv: '2610.40599'
+date: 2026-10
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Yuze He
+- Yixiang Wei
+- Wang Zhao
+- Chuhao Chen
+- Yanning Zhou
+- Yong-Jin Liu
+tier: emerging
+sections:
+- generation
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: 'The hair of stylized characters in games and avatars is built from hair cards: artist-placed
+  ribbons whose geometry is the visible hair, animated by spring bones. Existing image-based methods produce
+  realistic hair or a single fused mesh, while CHARM, the only generator of stylized hair cards, decodes
+  a hairstyle autoregressively as a long sequence of control points. Observing that a card hairstyle is
+  an unordered set of artist-defined primitives, we propose HairDeck, which generates it as one: each
+  card is a single token, and a set diffusion transformer denoises all cards together. From a single image,
+  HairDeck generates the cards and the spring-bone chains that drive them, yielding an anim'
+explanation: null
+_review:
+  score: 10.8
+  reasons:
+  - 'core topic: diffusion transformer'
+  - 'matches sections: generation'
+  - affiliated with a major lab or university
+  - 'mentions atlas work: STREAM'
+  - 18 upvotes on Hugging Face daily papers
+  source: arxiv+huggingface
+  hf_upvotes: 18
+  discovered_on: '2026-10-31'

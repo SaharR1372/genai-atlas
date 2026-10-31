@@ -1,0 +1,45 @@
+id: difficulty-calibration-across-time-261040616
+type: paper
+title: Difficulty Calibration Across Time for Membership Inference in Diffusion Models
+arxiv: '2610.40616'
+date: 2026-10
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Michael Joseph
+- Yedid Hoshen
+tier: emerging
+sections:
+- rae
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: 'Modern diffusion models are trained on massive datasets that often include copyrighted or private
+  images. Membership inference attacks (MIAs) address this by testing whether a given image was in a model''s
+  training set. The standard approach scores an image by its reconstruction loss and flags low-loss images
+  as members. This often fails because some images are simply easier to reconstruct than others, so a
+  simple unseen image can score a lower loss than a complex training image. Difficulty calibration separates
+  memorization from how difficult an image is to begin with. We show how to calibrate along two axes of
+  time: training time and diffusion time. First, across training time, we introduce'
+explanation: null
+_review:
+  score: 11.0
+  reasons:
+  - 'core topic: diffusion model'
+  - core topic appears in the title
+  - 'matches sections: rae'
+  - affiliated with a major lab or university
+  - code or weights released
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-10-31'

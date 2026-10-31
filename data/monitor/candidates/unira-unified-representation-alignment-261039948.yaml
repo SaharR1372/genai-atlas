@@ -1,0 +1,50 @@
+id: unira-unified-representation-alignment-261039948
+type: paper
+title: 'UniRA: Unified Representation Alignment and Auto-Encoding for Efficient Diffusion Generation'
+arxiv: '2610.39948'
+date: 2026-10
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- An Lanji
+- Dawei Liu
+- Jin Li
+- Haoran Xu
+- Mei Chen
+- Yu Tian
+tier: emerging
+sections:
+- generation
+- rae
+- vfm
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: 'Diffusion transformers (DiTs) have become the dominant architecture for high-fidelity image
+  synthesis, yet they suffer from slow training convergence and high computational cost. Two recent lines
+  of work address this from complementary angles: Representation Alignment (REPA) accelerates DiT training
+  by aligning intermediate features with a pretrained external representation model (e.g., DINOv2), while
+  Representation Auto-Encoders (RAE) replace the pixel-space VAE with a compact representation-space tokenizer
+  learned from self-supervised features. However, these approaches are developed and applied in isolation:
+  REPA still relies on a pixel-space VAE for latent diffusion, and RAE does not exp'
+explanation: null
+_review:
+  score: 12.0
+  reasons:
+  - 'core topic: image synthesis, latent diffusion, diffusion transformer'
+  - 'matches sections: generation, rae, vfm'
+  - 'mentions atlas work: DINOv2, Imagen, REPA'
+  - title suggests a substantive contribution
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-10-31'

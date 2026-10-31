@@ -1,0 +1,47 @@
+id: read-allocate-route-rolecoupled-261040647
+type: paper
+title: 'Read, Allocate, Route: Role-Coupled Tokenization for Pixel-Space Generative Transformers'
+arxiv: '2610.40647'
+date: 2026-10
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Jiongfan Yang
+- Weichen Fan
+- Haiwen Diao
+- Zhongang Cai
+- Ziwei Liu
+tier: emerging
+sections:
+- generation
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: 'Pixel-space generative Transformers typically use one token per image patch, so capturing finer
+  detail requires more tokens and makes global attention increasingly expensive. We observe that finer
+  detail does not necessarily require more global communication: low-frequency structure benefits from
+  global exchange, while high-frequency detail can be modeled locally. Based on this insight, we introduce
+  SpecSlot, a pixel-space rectified-flow Transformer that decouples output detail from the length of the
+  global attention sequence. SpecSlot expands each spatial anchor into multiple slots, each assigned a
+  disjoint band of DCT coefficients; this separates anchor density from spectral subdivision. O'
+explanation: null
+_review:
+  score: 9.6
+  reasons:
+  - 'core topic: image generation, text-to-image'
+  - 'matches sections: generation'
+  - 'mentions atlas work: Imagen, UNIC'
+  - 36 upvotes on Hugging Face daily papers
+  source: arxiv+huggingface
+  hf_upvotes: 36
+  discovered_on: '2026-10-31'

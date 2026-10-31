@@ -1,0 +1,46 @@
+id: frameworkconditional-open-materials-generation-261040443
+type: paper
+title: Framework-Conditional Open Materials Generation
+arxiv: '2610.40443'
+date: 2026-10
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Maya M. Martirossyan
+- Hillary Pan
+- Philipp Höllmer
+- Stefano Martiniani
+tier: emerging
+sections:
+- generation
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: Theoretical predictions of novel materials rely on a variety of techniques, from data-mining-based
+  ion substitution methods to fully de novo generative models. Each approach imposes specific constraints
+  and encounters unique challenges when extrapolating beyond the distribution of known materials to discover
+  new ones. The foremost goal of materials generation is to produce stable, unique, and novel (S.U.N.)
+  structures. Predicted structures that meet these criteria, however, typically result from novel chemical
+  compositions mapped onto known structural prototypes or frameworks. We leverage this heuristic insight
+  to present a new generative paradigm for the de novo prediction of inorganic crys
+explanation: null
+_review:
+  score: 9.0
+  reasons:
+  - 'core topic: flow matching'
+  - 'matches sections: generation'
+  - affiliated with a major lab or university
+  - 'mentions atlas work: Flow Matching'
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-10-31'

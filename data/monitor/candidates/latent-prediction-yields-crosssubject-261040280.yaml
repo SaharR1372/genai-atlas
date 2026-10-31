@@ -1,0 +1,49 @@
+id: latent-prediction-yields-crosssubject-261040280
+type: paper
+title: Latent Prediction Yields Cross-Subject Alignable Representations in Sensory-Evoked fMRI
+arxiv: '2610.40280'
+date: 2026-10
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Serwan Jassim
+- Victoria Bosch
+- Daniel Anthes
+- Elia Bruni
+- Tim Kietzmann
+tier: emerging
+sections:
+- rae
+- vfm
+- medical
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: Decoding sensory-evoked functional magnetic resonance imaging (fMRI) data is a central analytical
+  tool in cognitive neuroscience. Here we ask whether self-supervised learning (SSL), which has been scarcely
+  explored in this domain, can yield representations that support strong downstream performance. To do
+  so, we adapt a joint embedding predictive architecture (JEPA) to train participant-specific encoders
+  on brain data alone. The encoders never see the stimulus images or any representation derived from them.
+  Applied to the Natural Scenes Dataset (NSD), we evaluate our learned brain embeddings on the downstream
+  tasks of brain captioning and image reconstruction, as well as cross-participant ge
+explanation: null
+_review:
+  score: 13.0
+  reasons:
+  - 'core topic: image reconstruction'
+  - 'matches sections: rae, vfm, medical'
+  - affiliated with a major lab or university
+  - 'mentions atlas work: STREAM'
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-10-31'

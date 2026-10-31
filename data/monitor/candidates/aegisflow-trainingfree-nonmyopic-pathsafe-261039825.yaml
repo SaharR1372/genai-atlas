@@ -1,0 +1,48 @@
+id: aegisflow-trainingfree-nonmyopic-pathsafe-261039825
+type: paper
+title: 'AegisFlow: Training-Free Non-Myopic Path-Safe Guided Flow Matching'
+arxiv: '2610.39825'
+date: 2026-10
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Kunpeng Liu
+- Boshi Zhang
+- Keyou You
+tier: emerging
+sections:
+- generation
+- editing
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: Pretrained generative models, such as diffusion and flow matching models, have demonstrated exceptional
+  capabilities in synthesizing high-quality data. However, steering their generative trajectories to satisfy
+  strict constraints--such as identity preservation in image editing or obstacle avoidance in robotics--remains
+  fundamentally challenging. While recent training-free guidance methods enforce path-safety, they rely
+  heavily on min-norm controllers that only account for immediate constraint satisfaction. These myopic
+  approaches often yield suboptimal trajectories that hover dangerously close to the boundary, severely
+  restricting the model's ability to optimize toward its target. In this pa
+explanation: null
+_review:
+  score: 17.0
+  reasons:
+  - 'core topic: image editing, flow matching'
+  - core topic appears in the title
+  - 'matches sections: generation, editing'
+  - affiliated with a major lab or university
+  - 'mentions atlas work: Flow Matching'
+  - code or weights released
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-10-31'

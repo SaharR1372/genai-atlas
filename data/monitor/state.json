@@ -1,12 +1,12 @@
 {
-  "last_run": "2026-09-10T01:36:24.884357+00:00",
+  "last_run": "2026-10-31T11:57:08.843510+00:00",
   "last_run_stats": {
-    "raw": 321,
-    "admitted": 5,
+    "raw": 316,
+    "admitted": 24,
     "duplicates": 0,
-    "off_topic": 257,
-    "out_of_scope": 56,
-    "irrelevant": 3
+    "off_topic": 237,
+    "out_of_scope": 48,
+    "irrelevant": 2
   },
   "runs": [
     {
@@ -17,6 +17,35 @@
         "flowcpo-a-unified-divergence-260909905",
         "efficient-fairness-auditing-across-260909486",
         "muonc-operatoraligned-muon-for-260909676"
+      ]
+    },
+    {
+      "at": "2026-10-31T11:57:08.843510+00:00",
+      "admitted": [
+        "difuse-fusing-native-diffusion-261039609",
+        "intrinsic-distribution-matching-261039633",
+        "aegisflow-trainingfree-nonmyopic-pathsafe-261039825",
+        "coupled-guidance-for-flow-261040109",
+        "epcrawdc-equivariant-physics-constrained-261040046",
+        "ffai-flow-matching-with-261039517",
+        "unlocking-anyorder-generation-in-261039293",
+        "composing-and-steering-diffusion-261040383",
+        "loremim-lostorreplaced-masked-image-261040284",
+        "latent-prediction-yields-crosssubject-261040280",
+        "selfthinker-selfevolving-reasoning-via-261040115",
+        "learning-safe-flow-matching-261040075",
+        "mosaicflow-orthogonalaxis-and-statusconditioned-261039534",
+        "unira-unified-representation-alignment-261039948",
+        "difficulty-calibration-across-time-261040616",
+        "hairdeck-animationready-stylized-hair-261040599",
+        "read-allocate-route-rolecoupled-261040647",
+        "an-odebased-sampler-for-261040618",
+        "frameworkconditional-open-materials-generation-261040443",
+        "synthfaces-balanced-large-scale-261040119",
+        "sdmd-sinkhorn-distribution-matching-261039889",
+        "intreal-a-realworld-dataset-261038425",
+        "dmod-diffusion-mode-estimation-261040110",
+        "flextryon-a-timeefficient-framework-261039646"
       ]
     }
   ]

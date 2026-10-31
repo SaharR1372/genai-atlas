@@ -1,0 +1,48 @@
+id: unlocking-anyorder-generation-in-261039293
+type: paper
+title: Unlocking Any-Order Generation in Pretrained Autoregressive Image Models
+arxiv: '2610.39293'
+date: 2026-10
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Rishav Pramanik
+- Marco Pedersoli
+- Zhaozheng Yin
+tier: emerging
+sections:
+- generation
+- editing
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: 'Autoregressive (AR) image generators are powerful in principle but inflexible in practice: training
+  with a fixed raster-scan order hardcodes a single factorization of the image distribution into the model,
+  leaving it unable to inpaint, outpaint, or edit at inference time. Existing solutions, including the
+  modern discrete-diffusion family, train from scratch on a mixture of token orderings, paying roughly
+  3x the compute of standard raster-scan training; discrete diffusion further sacrifices compatibility
+  with the AR inference ecosystem (KV caching, vLLM) by construction. We argue that this cost is unnecessary.
+  A pretrained raster-scan AR model has already learned the joint distribution over i'
+explanation: null
+_review:
+  score: 14.2
+  reasons:
+  - 'core topic: image generator, autoregressive image'
+  - core topic appears in the title
+  - 'matches sections: generation, editing'
+  - 'mentions atlas work: Imagen'
+  - code or weights released
+  - 2 upvotes on Hugging Face daily papers
+  source: huggingface
+  hf_upvotes: 2
+  discovered_on: '2026-10-31'

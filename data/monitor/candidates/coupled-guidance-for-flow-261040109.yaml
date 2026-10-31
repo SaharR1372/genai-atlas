@@ -1,0 +1,48 @@
+id: coupled-guidance-for-flow-261040109
+type: paper
+title: Coupled Guidance for Flow Matching
+arxiv: '2610.40109'
+date: 2026-10
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Mateo Clémente
+- Léo Maxime Brunswic
+- Rui Heng Yang
+- Amir Rasouli
+tier: emerging
+sections:
+- generation
+- editing
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: Guidance methods are essential tools for steering the generation process in diffusion models,
+  improving the generalizability of stochastic robotic controllers and enabling high-quality controlled
+  image synthesis. Despite strong parallels between flow-matching and diffusion, integrating guidance
+  into flow-matching models remains quite challenging. Recent work has proposed general guidance frameworks
+  for flow-matching, however, they are direct adaptations of diffusion guidance methods and can prove
+  unstable. In this work, we conduct a theoretical analysis of guidance in flow-matching and show that
+  a naive translation of diffusion-based guidance to flow-matching breaks the coupling distribution
+explanation: null
+_review:
+  score: 15.0
+  reasons:
+  - 'core topic: image generation, image synthesis, diffusion model'
+  - core topic appears in the title
+  - 'matches sections: generation, editing'
+  - affiliated with a major lab or university
+  - 'mentions atlas work: Flow Matching, Imagen'
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-10-31'

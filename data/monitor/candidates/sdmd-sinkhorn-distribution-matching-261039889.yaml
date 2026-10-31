@@ -1,0 +1,48 @@
+id: sdmd-sinkhorn-distribution-matching-261039889
+type: paper
+title: 'sDMD: Sinkhorn Distribution Matching Distillation'
+arxiv: '2610.39889'
+date: 2026-10
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Jaihoon Kim
+- Lingxiao Li
+- Soshi Shimada
+- Roshni Cooper
+- Minhyuk Sung
+- Yiwei Zhao
+tier: emerging
+sections:
+- generation
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: 'Distribution Matching Distillation (DMD) distills multi-step diffusion models into few-step
+  generators by minimizing reverse KL divergence. Despite its strong performance, DMD guides samples by
+  local density alone, which introduces two limitations: teacher scores can be unreliable in regions of
+  low teacher density, and the mode-seeking behavior of reverse KL can collapse the student onto a subset
+  of the teacher modes. We first connect DMD to Wasserstein gradient flow, showing that its gradient follows
+  from a fixed-point formulation with integral KL (IKL) as the energy functional. This perspective motivates
+  augmenting IKL with an optimal transport term that addresses these limitations by guid'
+explanation: null
+_review:
+  score: 9.0
+  reasons:
+  - 'core topic: diffusion model'
+  - 'matches sections: generation'
+  - affiliated with a major lab or university
+  - 'mentions atlas work: Qwen-Image'
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-10-31'

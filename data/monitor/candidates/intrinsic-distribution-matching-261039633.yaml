@@ -1,0 +1,53 @@
+id: intrinsic-distribution-matching-261039633
+type: paper
+title: Intrinsic Distribution Matching
+arxiv: '2610.39633'
+date: 2026-10
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Deyuan Liu
+- Yansen Han
+- Kaiwen Zheng
+- Jun Xie
+- Jiacheng Liu
+- Zhenglin Cheng
+- Peng Sun
+- Jintao Zhang
+tier: emerging
+sections:
+- generation
+- rae
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: One-step and few-step text-to-image generation must accurately render the details specified in
+  the prompt despite limited opportunities for refinement. Distribution matching distillation (DMD) uses
+  score differences to bring the generated distribution closer to a reference distribution. Following
+  prior work, we estimate this difference with internal velocity branches, avoiding a separate fake-score
+  network. We ask whether an explicit moment constraint improves this learned score supervision. A decomposition
+  of the reverse-KL field into a Gaussian moment component and a non-Gaussian residual identifies statistics
+  that can be constrained explicitly. We introduce Intrinsic Distribution Matching
+explanation: null
+_review:
+  score: 18.0
+  reasons:
+  - 'core topic: image generation, text-to-image'
+  - 'matches sections: generation, rae'
+  - affiliated with a major lab or university
+  - 'mentions atlas work: DINOv2, Qwen-Image'
+  - code or weights released
+  - 241 upvotes on Hugging Face daily papers
+  source: arxiv+huggingface
+  hf_upvotes: 241
+  discovered_on: '2026-10-31'

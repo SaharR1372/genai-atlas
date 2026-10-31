@@ -1,0 +1,52 @@
+id: loremim-lostorreplaced-masked-image-261040284
+type: paper
+title: 'LoRe-MIM: Lost-or-Replaced Masked Image Modeling for Self-Supervised Representation Learning in
+  Whole-Body PET/CT'
+arxiv: '2610.40284'
+date: 2026-10
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Amartya Bhattacharya
+- Bashirul Azam Biswas
+- Biratal Raj Wagle
+- Michael S. Leapman
+- Matthew E. Maeder
+- James B. Yu
+- Indrani Bhattacharya
+tier: emerging
+sections:
+- rae
+- vfm
+- medical
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: Deep learning models for whole-body positron emission tomography/computed tomography (PET/CT)
+  hold significant clinical potential for disease detection, treatment planning, and response assessment.
+  However, the time and cost associated with expert annotations remain major bottlenecks in developing
+  robust and generalizable models. Although self-supervised learning (SSL) has emerged as a promising
+  approach to mitigating annotation scarcity, its application to whole-body PET/CT remains relatively
+  underexplored due to the limited availability of large-scale datasets and the challenges associated
+  with learning complementary cross-modal representations. To address these limitations, we curate a he
+explanation: null
+_review:
+  score: 13.0
+  reasons:
+  - 'core topic: image reconstruction'
+  - 'matches sections: rae, vfm, medical'
+  - affiliated with a major lab or university
+  - 'mentions atlas work: STREAM'
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-10-31'

@@ -1,0 +1,46 @@
+id: synthfaces-balanced-large-scale-261040119
+type: paper
+title: 'SynthFaces: Balanced Large Scale Human Dataset'
+arxiv: '2610.40119'
+date: 2026-10
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Sergey Karpukhin
+- Denis Bobkov
+- Kirill Morozov
+- Aibek Alanov
+tier: emerging
+sections:
+- generation
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: The pursuit of fair and equitable AI in human-centric tasks is critically hindered by the inherent
+  biases and privacy risks of real-world datasets, which offer imbalanced representations of identity
+  and often contain sensitive personal information. Consequently, state-of-the-art generative models trained
+  on this skewed data exhibit unfair performance, particularly in identity-preserving generation. In this
+  work we propose a pipeline for controllable generation of dataset with diverse faces for generative
+  models training and finetuning. We achieve this by expanding foundational Arc2Face diffusion model with
+  a flow matching generative model in the manifold of identity embeddings. We demonstrat
+explanation: null
+_review:
+  score: 9.0
+  reasons:
+  - 'core topic: diffusion model, flow matching'
+  - 'matches sections: generation'
+  - affiliated with a major lab or university
+  - 'mentions atlas work: Flow Matching, STREAM'
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-10-31'
