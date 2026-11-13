@@ -1,0 +1,47 @@
+id: natural-gradient-learning-in-261116666
+type: paper
+title: Natural Gradient Learning in Predictive Coding through Lateral Circuits
+arxiv: '2611.16666'
+date: 2026-11
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Lhea Beumer
+- Sander de Haan
+- Niclas Pokel
+- Pau Vilimelis Aceituno
+- Benjamin F. Grewe
+tier: emerging
+sections:
+- rae
+- editing
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: 'Predictive coding (PC) trains neural networks through local energy-minimization dynamics without
+  depending on a global error signal that backpropagation (BP) requires. Although PC is a promising alternative
+  algorithm for efficient learning, the computational cost of inference dynamics currently outweighs the
+  resulting learning benefits in practice. In this work, we take inspiration from optimization theory
+  to extract more learning benefit from each inference phase. We introduce Natural PC, which augments
+  standard PC with a lateral circuit, enabling exact and efficient natural gradient learning locally in
+  space and time. Our lateral circuit learns the activity correlations that determine the '
+explanation: null
+_review:
+  score: 8.0
+  reasons:
+  - 'core topic: image reconstruction'
+  - 'matches sections: rae, editing'
+  - 'mentions atlas work: Imagen'
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-11-13'

@@ -1,0 +1,50 @@
+id: flowir-depthdriven-rectified-flow-261116269
+type: paper
+title: 'FlowIR: Depth-driven Rectified Flow for Resolving Thermal Ambiguity in Infrared Super-Resolution'
+arxiv: '2611.16269'
+date: 2026-11
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Xingyue Zhu
+- Qinyun Mei
+- Zhexi Min
+- Yang Zou
+- Xingyuan Li
+- Zhiying Jiang
+- Jinyuan Liu
+tier: emerging
+sections:
+- generation
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: Distinguishing different heat sources in low-resolution infrared (IR) images is inherently difficult,
+  as multiple thermal emitters often collapse into ambiguous and overlapping responses. Existing super-resolution
+  methods hallucinate structures from such ambiguous 2D evidence, leading to thermal drift, boundary merging,
+  and unreliable restoration under infrared degradations. We propose FlowIR, a depth-driven rectified
+  flow framework that resolves thermal ambiguity by injecting 3D geometric cues into the generation process.
+  Pseudo-3D depth lifting and depth-guided 3D convolutions disentangle overlapping foreground objects,
+  while cluster-wise inter-attention suppresses cross-source feature con
+explanation: null
+_review:
+  score: 13.0
+  reasons:
+  - 'core topic: rectified flow'
+  - core topic appears in the title
+  - 'matches sections: generation'
+  - affiliated with a major lab or university
+  - 'mentions atlas work: Rectified Flow'
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-11-13'

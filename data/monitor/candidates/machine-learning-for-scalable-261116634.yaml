@@ -1,0 +1,44 @@
+id: machine-learning-for-scalable-261116634
+type: paper
+title: Machine Learning for Scalable Multi-AP Coordination in IEEE 802.11bn Networks
+arxiv: '2611.16634'
+date: 2026-11
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Maksymilian Wojnar
+- Szymon Szott
+tier: emerging
+sections:
+- generation
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: As Wi-Fi deployments become denser, fully distributed random channel access no longer guarantees
+  the required quality of service. The multi-access point coordination (MAPC) framework introduced in
+  IEEE~802.11bn lets neighboring access points (APs) cooperate, but choosing which APs transmit together
+  and how to configure them remains an open, computationally hard problem. We develop and validate a stack
+  of machine learning (ML) coordination methods, progressing from lightweight hierarchical multi-armed
+  bandits (H-MABs) to a generative pipeline built on graph neural networks (GNNs) and flow matching (FM).
+  The methods are evaluated in simulation and on a hardware testbed, improving throughput ov
+explanation: null
+_review:
+  score: 9.0
+  reasons:
+  - 'core topic: flow matching'
+  - 'matches sections: generation'
+  - affiliated with a major lab or university
+  - 'mentions atlas work: Flow Matching'
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-11-13'

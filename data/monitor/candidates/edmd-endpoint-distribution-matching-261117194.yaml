@@ -1,0 +1,49 @@
+id: edmd-endpoint-distribution-matching-261117194
+type: paper
+title: 'eDMD: Endpoint Distribution Matching for Few-Step Diffusion Distillation'
+arxiv: '2611.17194'
+date: 2026-11
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Tong Zhao
+- Xianfang Zeng
+- Yucheng Han
+- Ruoyu Wang
+- Mingkun Lei
+- Gang Yu
+- Chi Zhang
+tier: emerging
+sections:
+- generation
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: Distribution matching distillation (DMD) has emerged as a leading paradigm for distilling diffusion
+  models into few-step students, where an auxiliary fake score model tracks the student's distribution
+  and the discrepancy between the teacher and fake predictions drives the student toward the teacher.
+  In multi-step distillation, although only the student's final output is delivered, existing methods
+  train the fake model on intermediate states or across all denoising steps. Consequently, the student's
+  update signal becomes entangled with intermediate distributions, which can distort the matching direction
+  and remain nonzero even after the student's final outputs already match the teacher distri
+explanation: null
+_review:
+  score: 9.0
+  reasons:
+  - 'core topic: diffusion model'
+  - 'matches sections: generation'
+  - affiliated with a major lab or university
+  - 'mentions atlas work: Qwen-Image, REPA'
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-11-13'

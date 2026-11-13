@@ -1,0 +1,49 @@
+id: sprint3d-accelerating-endtoend-3d-261116701
+type: paper
+title: 'Sprint3D: Accelerating End-to-End 3D Asset Generation through Pipeline Optimization'
+arxiv: '2611.16701'
+date: 2026-11
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Sho Kuno
+- Ruihan Yu
+- Yonghao Yu
+- Guixu Lin
+- Lian Fu
+- Muyao Niu
+- Yu-Ju Tsai
+- Zheng-Hui Huang
+tier: emerging
+sections:
+- generation
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: 'Image-to-3D generative models now produce asset-quality textured meshes, but at minutes per
+  asset they remain slow to iterate with and costly to deploy. Prior work has mostly accelerated the sampling
+  of the networks, and where it also optimizes the mesh processing, it trains its own generators. We instead
+  start from a publicly released pipeline and ask how much of its end-to-end time can be saved. Profiling
+  the public Pixal3D pipeline shows that its latency is dominated by what happens after the networks:
+  the four rectified flows take 14% of the wall-clock time and mesh post-processing takes 85%, most of
+  it in CPU-based UV unwrapping. We therefore first rebuild the mesh post-processing on th'
+explanation: null
+_review:
+  score: 6.0
+  reasons:
+  - 'core topic: rectified flow'
+  - 'matches sections: generation'
+  - 'mentions atlas work: Rectified Flow'
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-11-13'

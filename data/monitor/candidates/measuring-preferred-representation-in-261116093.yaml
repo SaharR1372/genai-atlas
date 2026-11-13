@@ -1,0 +1,51 @@
+id: measuring-preferred-representation-in-261116093
+type: paper
+title: Measuring Preferred Representation in AI-generated Images with Community Scorers
+arxiv: '2611.16093'
+date: 2026-11
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Melanie F. Pradier
+- Camilla Longden
+- Anja Thieme
+- Rita F. Marques
+- Nari Johnson
+- Sidhika Balachandar
+- Xinnuo Xu
+- Linda Y. Wen
+tier: emerging
+sections:
+- generation
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: AI-generated images often misrepresent historically marginalised communities, with real-world
+  consequences beyond the images themselves. However, conventional metrics fail to measure how communities
+  want to be represented in AI-generated images. To address this, we introduce the concept of preferred
+  representation. Building on previous work, we propose a measurement instrument that operationalises
+  this concept through a Community Scorer - a model that evaluates a specific community's preferred representation
+  in AI-generated images. We interrogate the validity of Community Scorers on three diverse disability
+  communities that span the Global North and South. The results show that Community Sco
+explanation: null
+_review:
+  score: 12.0
+  reasons:
+  - 'core topic: text-to-image, generated images'
+  - core topic appears in the title
+  - 'matches sections: generation'
+  - 'mentions atlas work: STREAM'
+  - code or weights released
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-11-13'
