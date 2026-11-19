@@ -1,0 +1,47 @@
+id: the-elephant-in-the-261124793
+type: paper
+title: 'The Elephant in the Question: Unified Models Picture the Concepts Behind Their Answers'
+arxiv: '2611.24793'
+date: 2026-11
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Tobias Braun
+- Marcus Rohrbach
+- Lorenzo Cavallaro
+tier: emerging
+sections:
+- unified
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: Visualizing intermediate representations could help us inspect the reasoning steps underlying
+  a model output. Unified multimodal models offer this opportunity by combining understanding and generation
+  in one architecture. Their image generators can access representations formed while processing text.
+  We introduce the V-lens, which uses this connection to visualize a chosen token's hidden state without
+  training a decoder. Across four diffusion-based and two purely autoregressive unified models, the resulting
+  images reveal key intermediate concepts that connect a question to its answer even when the concepts
+  are never named explicitly. Controlled tests show how this content changes with contex
+explanation: null
+_review:
+  score: 13.0
+  reasons:
+  - 'core topic: image generator, unified multimodal, understanding and generation'
+  - 'matches sections: unified'
+  - affiliated with a major lab or university
+  - 'mentions atlas work: BAGEL'
+  - code or weights released
+  - title suggests a substantive contribution
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-11-19'

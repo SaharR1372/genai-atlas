@@ -1,0 +1,52 @@
+id: ultimate3d-teaching-multimodal-llms-261124795
+type: paper
+title: 'Ultimate3D: Teaching Multimodal LLMs 3D Camera-Object Relations by Large-Scale Visual Instruction
+  Data'
+arxiv: '2611.24795'
+date: 2026-11
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Liu He
+- Yizhi Song
+- Ruiqi Xu
+- Baris Sarper Tezcan
+- Xiao Zeng
+- Albert Y. C. Chen
+- Lu Xia
+- Shashwat Verma
+tier: emerging
+sections:
+- generation
+- rae
+- unified
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: Multimodal Large Language Models (MLLMs) struggle with accurately capturing camera-object relations,
+  especially for object orientation, camera viewpoint, and camera shots. This stems from the fact that
+  existing MLLMs are trained on images with limited diverse camera-object relations and corresponding
+  textual descriptions. To address this, we propose a synthetic generation pipeline to create large-scale
+  3D visual instruction datasets. Our framework takes 3D assets as input and uses rendering and diffusion-based
+  image generation models to create photorealistic images preserving precise camera-object relations.
+  Additionally, large language models (LLMs) are used to generate text prompts for gui
+explanation: null
+_review:
+  score: 9.0
+  reasons:
+  - 'core topic: image generation'
+  - 'matches sections: generation, rae, unified'
+  - affiliated with a major lab or university
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-11-19'

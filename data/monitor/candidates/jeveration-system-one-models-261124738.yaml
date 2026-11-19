@@ -1,0 +1,47 @@
+id: jeveration-system-one-models-261124738
+type: paper
+title: 'Jeveration: System One Models Now Generate'
+arxiv: '2611.24738'
+date: 2026-11
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Yuhe Liu
+- Qi Li
+- Shihua Zhang
+- Xinchao Wang
+tier: emerging
+sections:
+- generation
+- vlm
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: System One models such as Jev return decisions through fast, parallel prediction. In this paper,
+  we introduce Jeveration, showing that the same decision paradigm can also generate high-quality images
+  in a single forward pass. Jeveration builds on a frozen vision-language model, repurposing its visual-semantic
+  knowledge for holistic image generation. The key challenge is to maintain global consistency. A single
+  prompt admits many valid images, yet parallel predictions must converge on a coherent whole. We therefore
+  condition all positions on a shared random state to coordinate parallel predictions, so that each draw
+  yields a different but coherent image. Since the model tends to ignore this s
+explanation: null
+_review:
+  score: 12.0
+  reasons:
+  - 'core topic: image generation, text-to-image'
+  - 'matches sections: generation, vlm'
+  - affiliated with a major lab or university
+  - 67 upvotes on Hugging Face daily papers
+  source: arxiv+huggingface
+  hf_upvotes: 67
+  discovered_on: '2026-11-19'

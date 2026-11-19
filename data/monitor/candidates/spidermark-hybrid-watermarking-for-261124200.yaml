@@ -1,0 +1,49 @@
+id: spidermark-hybrid-watermarking-for-261124200
+type: paper
+title: 'SpiderMark: Hybrid Watermarking for Generative AI via Algorithmic Injection and Learning-Based
+  Verification'
+arxiv: '2611.24200'
+date: 2026-11
+venue:
+  name: arXiv
+  status: preprint
+orgs: []
+authors:
+- Chihcheng Hsieh
+- Yang Song
+- Flora Salim
+- Martin Bell
+- Jacinto C. Nascimento
+- Catarina Moreira
+tier: emerging
+sections:
+- generation
+links:
+  code: null
+  weights: null
+  project: null
+  pdf: null
+status:
+  code: none
+  weights: none
+  verified: false
+  verified_on: null
+  verified_by: null
+summary: The proliferation of diffusion-based generative models has intensified the need for reliable
+  methods to trace and verify the provenance of AI-generated images. Existing watermarking approaches
+  for diffusion models typically rely on isotropic frequency patterns and handcrafted detection metrics,
+  which are prone to directional vulnerability and threshold instability across diverse image transformations.
+  We propose SpiderMark, a hybrid watermarking framework that combines algorithmic frequency-domain injection
+  with learning-based probabilistic verification, requiring no modifications to pretrained diffusion model
+  weights. SpiderMark embeds a structured spider-web pattern, comprising radial spok
+explanation: null
+_review:
+  score: 9.0
+  reasons:
+  - 'core topic: generated images, diffusion model'
+  - 'matches sections: generation'
+  - affiliated with a major lab or university
+  - 'mentions atlas work: CLIP'
+  source: arxiv
+  hf_upvotes: null
+  discovered_on: '2026-11-19'
